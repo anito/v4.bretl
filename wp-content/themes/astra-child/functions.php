@@ -57,7 +57,7 @@ function theme_setup_theme_supported_features()
         ),
     ));
 }
-// add_action('after_setup_theme', 'theme_setup_theme_supported_features');
+add_action('after_setup_theme', 'theme_setup_theme_supported_features');
 
 /**
  * check for sales attribute and if true add SALES Category to it
