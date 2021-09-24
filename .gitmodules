@@ -1,0 +1,3 @@
+[submodule "wp-content/plugins/wp-maintenance-mode"]
+	path = wp-content/plugins/wp-maintenance-mode
+	url = git@github.com:anito/wp-maintenance-mode.git
