@@ -1,0 +1,46 @@
+# osx noise
+.DS_Store
+profile
+node_modules/*
+
+# xcode noise
+build/*
+*.mode1
+*.mode1v3
+*.mode2v3
+*.perspective
+*.perspectivev3
+*.pbxuser
+*.xcworkspace
+xcuserdata
+
+# svn & cvs
+.svn
+CVS
+
+/*
+!/wp-content/
+/wp-content/*
+
+!.gitignore
+!README.md
+
+# child themes
+!/wp-content/themes
+/wp-content/themes/*
+!/wp-content/themes/*-child
+/wp-content/themes/*-child/ignored-assets
+/wp-content/themes/*-child/node_modules
+/wp-content/themes/*-child/scratchbook.*
+
+# plugins
+!/wp-content/plugins
+/wp-content/plugins/*
+!/wp-content/plugins/woocommerce-new-product
+!/wp-content/plugins/wp-maintenance-mode
+!/wp-content/plugins/spine-app
+wp-content/plugins/spine-app/assets/spine/nbproject
+wp-content/plugins/spine-app/assets/spine/node_modules
+
+/wp-content/themes/motors-child/languages/
+/wp-content/themes/vendipro-child/js/node_modules
