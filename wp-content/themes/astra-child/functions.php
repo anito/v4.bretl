@@ -293,3 +293,4 @@ function wbp_get_post()
     wp_die();
 }
 add_action('wp_ajax_wbp_get_post', 'wbp_get_post');
+//
