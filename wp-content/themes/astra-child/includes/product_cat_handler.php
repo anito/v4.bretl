@@ -1,9 +1,9 @@
 <?php
 function process_sales_cat($post_id, $term_id) {
-	global $woocommerce;
 
-	if( !defined( 'SALES_CAT_ID' ) )
+	if( !defined( 'SALES_CAT_ID' ) ) {
 		return;
+	}
 
 	$post_id = intval($post_id);
 	$term_id = intval($term_id);
@@ -19,6 +19,7 @@ function process_sales_cat($post_id, $term_id) {
 	}
 	set_product_cat($product, $term_id, $add);
 }
+
 function set_product_cat($product, $term_id, $add) {
 	$term_ids = $product->get_category_ids();
 	$term_ids = array_unique(array_map('intval', $term_ids));
