@@ -1,7 +1,6 @@
 # osx noise
 .DS_Store
 profile
-node_modules/*
 
 # xcode noise
 build/*
@@ -19,8 +18,11 @@ xcuserdata
 CVS
 
 /*
-/wp-content/plugins/*
 /wp-content/*
+/wp-content/plugins/*
+
+/node_modules/*
+/node_modules/animate.css/*
 
 /wp-content/themes/*
 /wp-content/themes/*-child/ignored-assets
@@ -33,6 +35,11 @@ CVS
 
 !.gitignore
 !README.md
+
+# Animate Library
+!/node_modules
+!/node_modules/animate.css
+!/node_modules/animate.css/animate.css
 
 !/wp-content/
 # child themes

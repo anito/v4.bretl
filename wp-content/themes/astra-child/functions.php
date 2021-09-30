@@ -54,10 +54,14 @@ add_action("save_post", "check_product_for_sale", 99, 3);
 /** check for featured product attribute and if true add FEATURED Category to it */
 function check_product_cat_before_save($product, $data_store)
 {
-    if (defined('FEATURED_CAT_ID')) {
-        $is_featured = $product->is_featured();
-        set_product_cat($product, FEATURED_CAT_ID, $is_featured);
+    if (! defined('FEATURED_CAT_ID')) {
+        return;
     }
+
+    require_once __DIR__ . '/includes/product_cat_handler.php';
+
+    $is_featured = $product->is_featured();
+    set_product_cat($product, FEATURED_CAT_ID, $is_featured);
 }
 add_action("woocommerce_before_product_object_save", "check_product_cat_before_save", 99, 2);
 
@@ -82,6 +86,8 @@ function add_scripts()
 
     wp_register_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), '1.0', true);
     wp_enqueue_script('main');
+    wp_register_script('helper', get_stylesheet_directory_uri() . '/js/helper.js', array('jquery'), '1.0', true);
+    wp_enqueue_script('helper');
 
 }
 add_action('wp_enqueue_scripts', 'add_scripts');
@@ -164,17 +170,30 @@ function unsupported_browsers_template()
 add_action('wp_enqueue_scripts', 'detectTrident');
 
 /**
- * Enqueue Consens Pro script
+ * Enqueue vendor scripts
  */
-function enqueue_cp()
+function enqueue_vendors()
 {
+    $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
+
     if (!IS_DEV_MODE) {
+
+        /**
+         * Consens Pro
+         */
         wp_enqueue_style('consent-pro', get_stylesheet_directory_uri() . '/consent-pro/style.css');
         wp_enqueue_script('consent-pro', 'https://cookie-cdn.cookiepro.com/scripttemplates/otSDKStub.js');
     }
 
+    /**
+     * Animate css
+     * https://github.com/daneden/animate.css
+     * 
+     */
+    wp_enqueue_style('animate.css', '/node_modules/animate.css/animate' . $suffix . '.css');
+
 }
-add_action('wp_enqueue_scripts', 'enqueue_cp', 15);
+add_action('wp_enqueue_scripts', 'enqueue_vendors', 15);
 
 function add_cp_data_attribute($tag, $handle, $src)
 {
@@ -186,7 +205,7 @@ function add_cp_data_attribute($tag, $handle, $src)
 add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
 /**
- * Hook for Jet Engines Duplicate Form
+ * Hook for Jet Engines Forms
  */
 function add_ajax_scripts()
 {
@@ -221,3 +240,15 @@ function wbp_get_post()
     wp_die();
 }
 add_action('wp_ajax_wbp_get_post', 'wbp_get_post');
+
+/**
+ * Replace Elementors with Woos Placeholder Image (which we can define in the woo product settings)
+ */
+add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', 'wbp_get_wc_placeholder_image');
+
+function wbp_get_wc_placeholder_image($default_placeholder)
+{
+    $placeholder = wc_placeholder_img_src('woocommerce_image');
+
+    return $placeholder;
+}
