@@ -38,8 +38,9 @@ CVS
 
 # Animate Library
 !/node_modules
-!/node_modules/animate.css
+!/node_modules/animate.css/
 !/node_modules/animate.css/animate.css
+!/node_modules/animate.css/animate.min.css
 
 !/wp-content/
 # child themes
