@@ -35,7 +35,11 @@ Template: astra
   margin: 0;
 }
 /**
- * Custom
+ * Fix Astras Header Sections
+ */
+ .site-header-section {
+    position: relative;
+}
 */
 /**
  * Bordered Boxes
