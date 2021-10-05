@@ -50,6 +50,10 @@ Template: astra
   border-radius: 5px;
   background: #fcfdfd;
 }
+.border-lg input[type=search] {
+    border: 0 none;
+    background-color: inherit;
+}
 .woocommerce #customer_details,
 .woocommerce-page.woocommerce-checkout form #order_review {
 	padding: 0 2em 2em;
