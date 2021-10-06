@@ -252,3 +252,28 @@ function wbp_get_wc_placeholder_image($default_placeholder)
 
     return $placeholder;
 }
+/**
+ * Customize product data tabs
+ */
+add_filter('woocommerce_product_tabs', 'woo_custom_description_tab', 98);
+function woo_custom_description_tab($tabs)
+{
+    // Get $product object
+    global $product;
+
+    $tabs['description'] = array(
+        'title' => __('Description', 'woocommerce'),
+        'callback' => 'woo_custom_description_tab_content',
+    );
+
+    return $tabs;
+}
+
+function woo_custom_description_tab_content($tab_name, $tab)
+{
+    global $product;
+    $title = $product->get_title();
+    $content = $product->get_description();
+    echo '<h3>' . $title . ' - Highlights</h3>' . $content;
+}
+
