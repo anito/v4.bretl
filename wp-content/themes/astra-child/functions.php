@@ -274,5 +274,5 @@ function woo_custom_description_tab_content($tab_name, $tab)
     global $product;
     $title = $product->get_title();
     $content = $product->get_description();
-    echo '<h3>' . $title . ' Highlights</h3>' . $content;
+    echo '<h3>' . $title . ' Highlights</h3>' . do_shortcode($content);
 }
