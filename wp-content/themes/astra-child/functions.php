@@ -253,7 +253,9 @@ function wbp_get_wc_placeholder_image($default_placeholder)
     return $placeholder;
 }
 /**
- * Customize product data tabs
+ * In order to improver SEO,
+ * display the product title in product description
+ * 
  */
 add_filter('woocommerce_product_tabs', 'woo_custom_description_tab', 98);
 function woo_custom_description_tab($tabs)
@@ -274,5 +276,6 @@ function woo_custom_description_tab_content($tab_name, $tab)
     global $product;
     $title = $product->get_title();
     $content = $product->get_description();
-    echo '<h3>' . $title . ' Highlights</h3>' . do_shortcode($content);
+    // don't forget to process any shortcode
+    echo '<h3>' . $title . ': Highlights</h3>' . do_shortcode($content);
 }
