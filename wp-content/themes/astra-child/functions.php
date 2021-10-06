@@ -26,7 +26,7 @@ add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
  */
 function check_product_for_sale($post_id, $post, $is_update)
 {
-    if(! class_exists('WooCommerce', false)) {
+    if (!class_exists('WooCommerce', false)) {
         return;
     }
 
@@ -54,7 +54,7 @@ add_action("save_post", "check_product_for_sale", 99, 3);
 /** check for featured product attribute and if true add FEATURED Category to it */
 function check_product_cat_before_save($product, $data_store)
 {
-    if (! defined('FEATURED_CAT_ID')) {
+    if (!defined('FEATURED_CAT_ID')) {
         return;
     }
 
@@ -188,7 +188,7 @@ function enqueue_vendors()
     /**
      * Animate css
      * https://github.com/daneden/animate.css
-     * 
+     *
      */
     wp_enqueue_style('animate.css', '/node_modules/animate.css/animate' . $suffix . '.css');
 
@@ -274,6 +274,5 @@ function woo_custom_description_tab_content($tab_name, $tab)
     global $product;
     $title = $product->get_title();
     $content = $product->get_description();
-    echo '<h3>' . $title . ' - Highlights</h3>' . $content;
+    echo '<h3>' . $title . ' Highlights</h3>' . $content;
 }
-
