@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/includes/sender_email.php';
+require_once __DIR__ . '/includes/duplicate_content.php';
 
 /**
  * Define Constants
  */
-define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.1');
+define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.2');
 
 /**
  * Astra Child Theme functions and definitions
