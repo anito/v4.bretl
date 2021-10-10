@@ -2,7 +2,7 @@
 function wbp_create_attribute_taxonomies()
 {
   $attributes_taxonomies = [
-    'feature'
+    'Merkmale'
   ];
   foreach ($attributes_taxonomies as $tax) {
     wbp_create_attribute_taxonomy($tax);
