@@ -21,50 +21,52 @@ function child_enqueue_styles()
 }
 add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
 
-/**
- * check for sales attribute and if true add SALES Category to it
- *
- */
-function check_product_for_sale($post_id, $post, $is_update)
+function wbp_check_sale($post_id, $post)
 {
-    if (!class_exists('WooCommerce', false)) {
-        return;
-    }
+  if (!class_exists('WooCommerce', false)) {
+    return;
+  }
 
-    require_once __DIR__ . '/includes/product_cat_handler.php';
+  require_once __DIR__ . '/includes/product_term_handler.php';
 
-    $product_id = $post_id;
-    $product = wc_get_product($product_id);
+  $product = wc_get_product($post_id);
 
-    if (!$product) {
-        return 0;
-    }
+  if (!$product) {
+    return 0;
+  }
 
-    if ($product->is_type('variation')) {
-        $variation = new WC_Product_Variation($product);
-        $product_id = $variation->get_parent_id();
-        $product = wc_get_product($product_id);
-    }
-    if (defined('SALES_CAT_ID')) {
-        process_sales_cat($product_id, SALES_CAT_ID);
-    }
+  if ($product->is_type('variation')) {
+    $variation = new WC_Product_Variation($product);
+    $post_id = $variation->get_parent_id();
+    $product = wc_get_product($post_id);
+  }
 
+  wbp_process_sales($post_id, $post);
 }
-add_action("save_post", "check_product_for_sale", 99, 3);
+add_action("save_post", "wbp_check_sale", 99, 3);
+add_action("woocommerce_before_product_object_save", "wbp_check_sale", 99, 2);
 
-/** check for featured product attribute and if true add FEATURED Category to it */
-function check_product_cat_before_save($product, $data_store)
+function wbp_check_featured_before_save($product, $data_store)
 {
-    if (!defined('FEATURED_CAT_ID')) {
-        return;
-    }
+  require_once __DIR__ . '/includes/product_term_handler.php';
 
-    require_once __DIR__ . '/includes/product_cat_handler.php';
+  $is_featured = $product->is_featured();
 
-    $is_featured = $product->is_featured();
-    set_product_cat($product, FEATURED_CAT_ID, $is_featured);
+  $term = get_term_by('name', 'Featured', 'product_cat');
+  if ($term) {
+    $term_id = $term->term_id;
+    wbp_set_product_term($product, $term_id, 'cat', $is_featured);
+  }
+
+  $term = get_term_by('name', 'Featured', 'product_tag');
+  if ($term) {
+    $term_id = $term->term_id;
+    wbp_set_product_term($product, $term_id, 'tag', $is_featured);
+  }
+
+  wbp_set_pa_feature_term($product, 'Featured', $is_featured);
 }
-add_action("woocommerce_before_product_object_save", "check_product_cat_before_save", 99, 2);
+add_action("woocommerce_before_product_object_save", "wbp_check_featured_before_save", 99, 2);
 
 function add_scripts()
 {
@@ -254,9 +256,9 @@ function wbp_get_wc_placeholder_image($default_placeholder)
     return $placeholder;
 }
 /**
- * In order to improver SEO,
+ * In order to improve SEO,
  * display the product title in product description
- * 
+ *
  */
 add_filter('woocommerce_product_tabs', 'woo_custom_description_tab', 98);
 function woo_custom_description_tab($tabs)
