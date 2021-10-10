@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/sender_email.php';
 require_once __DIR__ . '/includes/duplicate_content.php';
+require_once __DIR__ . '/includes/register_wc_taxonomies.php';
 
 /**
  * Define Constants
