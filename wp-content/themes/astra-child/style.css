@@ -34,45 +34,4 @@ Template: astra
 .widget {
   margin: 0;
 }
-/**
- * Fix Astras Header Sections
- */
- .site-header-section {
-    position: relative;
-}
-/**
- * Bordered Boxes
-*/
-.border-lg,
-.woocommerce #customer_details,
-.woocommerce-page.woocommerce-checkout form #order_review_heading,
-.woocommerce-page.woocommerce-checkout form #order_review {
-	border-style: solid;
-	border-width: 1px;
-  border-color: var(--ast-global-color-8);
-  border-radius: 5px;
-  background: #fcfdfd;
-}
-.border-lg input[type=search] {
-    border: 0 none;
-    background-color: inherit;
-}
-.woocommerce #customer_details,
-.woocommerce-page.woocommerce-checkout form #order_review {
-	padding: 0 2em 2em;
-}
-.woocommerce-page.woocommerce-checkout form #order_review_heading {
-	border-radius: 5px 5px 0 0;
-	border-bottom: 0;
-}
-.woocommerce-page.woocommerce-checkout form #order_review {
-	border-radius: 0 0 5px 5px;
-	border-top: 0;
-}
-/**
- * Fix Woo disabled Buttons
-*/
-.woocommerce button.button:disabled,
-.woocommerce button.button:disabled[disabled] {
-  color: var(--ast-global-color-5);
-}
+
