@@ -27,7 +27,6 @@ function wbp_check_sale_before_save($post_id, $post)
   if (!class_exists('WooCommerce', false)) {
     return;
   }
-
   
   $product = wc_get_product($post_id);
   
@@ -45,7 +44,6 @@ function wbp_check_sale_before_save($post_id, $post)
   wbp_process_sale($post_id, $post);
 }
 add_action("save_post", "wbp_check_sale_before_save", 99, 3);
-add_action("woocommerce_before_product_object_save", "wbp_check_sale_before_save", 99, 2);
 
 function wbp_check_featured_before_save($post) {
   require_once __DIR__ . '/includes/product_term_handler.php';

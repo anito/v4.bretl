@@ -30,6 +30,19 @@ function wbp_process_sale($post_id, $post)
 
 function wbp_process_featured($product)
 {
+  $cats = get_the_terms($product->get_id(), 'product_cat');
+  $tags = get_the_terms($product->get_id(), 'product_tag');
+  $is_cat_featured = in_array(WC_COMMON_TAXONOMIES['featured'], wp_list_pluck($cats, 'name'));
+  $is_tag_featured = in_array(WC_COMMON_TAXONOMIES['featured'], wp_list_pluck($tags, 'name'));
+  
+  // $merged = array_merge($cats, $tags);
+  // $unique = array_unique(wp_list_pluck($merged, 'name'));
+
+  // $is_prod_featured = $product->is_featured();
+  if($_GET['action'] !== 'woocommerce_feature_product') {
+    $is_terms_featured = in_array(WC_COMMON_TAXONOMIES['featured'], array_unique(wp_list_pluck(array_merge($cats, $tags), 'name')));
+    $product->set_featured($is_terms_featured);
+  }
   $is_featured = $product->is_featured();
 
   $term = get_term_by('name', WC_COMMON_TAXONOMIES['featured'], 'product_cat');
@@ -101,6 +114,10 @@ function wbp_set_pa_feature_term($product, $term_name, $bool)
   );
 
   update_post_meta($product_id, '_product_attributes', $attributes);
+}
+
+function wbp_get_product_term($name, $type) {
+  $term_id = get_term_by('name', 'product_' . $type);
 }
 
 function wbp_sanitize_ids($ids=[], $id, $bool)
