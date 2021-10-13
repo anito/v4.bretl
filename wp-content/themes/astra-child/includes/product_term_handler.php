@@ -30,16 +30,11 @@ function wbp_process_sale($post_id, $post)
 
 function wbp_process_featured($product)
 {
-  $cats = get_the_terms($product->get_id(), 'product_cat');
-  $tags = get_the_terms($product->get_id(), 'product_tag');
-  $is_cat_featured = in_array(WC_COMMON_TAXONOMIES['featured'], wp_list_pluck($cats, 'name'));
-  $is_tag_featured = in_array(WC_COMMON_TAXONOMIES['featured'], wp_list_pluck($tags, 'name'));
-  
-  // $merged = array_merge($cats, $tags);
-  // $unique = array_unique(wp_list_pluck($merged, 'name'));
+  $product_id = $product->get_id();
+  $cats = __get_the_terms($product_id, 'product_cat');
+  $tags = __get_the_terms($product_id, 'product_tag');
 
-  // $is_prod_featured = $product->is_featured();
-  if($_GET['action'] !== 'woocommerce_feature_product') {
+  if ($_GET['action'] !== 'woocommerce_feature_product') {
     $is_terms_featured = in_array(WC_COMMON_TAXONOMIES['featured'], array_unique(wp_list_pluck(array_merge($cats, $tags), 'name')));
     $product->set_featured($is_terms_featured);
   }
@@ -90,12 +85,12 @@ function wbp_set_pa_feature_term($product, $term_name, $bool)
   $attributes = $product->get_attributes();
 
   $term_ids = [];
-  if(! empty($attributes) && isset($attributes[$taxonomy])) {
+  if (!empty($attributes) && isset($attributes[$taxonomy])) {
     $term_ids = array_merge($term_ids, $attributes[$taxonomy]['data']['options']);
   }
-  
 
-  if(! term_exists($term_name, $taxonomy)) {
+
+  if (!term_exists($term_name, $taxonomy)) {
     wp_insert_term($term_name, $taxonomy);
   }
 
@@ -116,11 +111,12 @@ function wbp_set_pa_feature_term($product, $term_name, $bool)
   update_post_meta($product_id, '_product_attributes', $attributes);
 }
 
-function wbp_get_product_term($name, $type) {
+function wbp_get_product_term($name, $type)
+{
   $term_id = get_term_by('name', 'product_' . $type);
 }
 
-function wbp_sanitize_ids($ids=[], $id, $bool)
+function wbp_sanitize_ids($ids = [], $id, $bool)
 {
   if (!$bool) {
     # remove id
@@ -131,4 +127,14 @@ function wbp_sanitize_ids($ids=[], $id, $bool)
     $ids[] = $id;
   }
   return $ids;
+}
+
+function __get_the_terms($post_id, $taxonomy)
+{
+  $terms = get_the_terms($post_id, $taxonomy);
+  if ($terms) {
+    return $terms;
+  } else {
+    return array();
+  }
 }
