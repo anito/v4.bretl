@@ -73,8 +73,8 @@
     });
   };
 
-  add_fb_div();
-  add_image_disclaimer();
-  //   add_animate_scroll();
+  // add_fb_div();
+  // add_image_disclaimer();
+  // add_animate_scroll();
   add_animate_css_listeners();
 })(jQuery);
