@@ -268,6 +268,6 @@ add_filter('woocommerce_cart_needs_payment', '__return_false');
 
 
 /**
- * Remove Coupon Code from checkot page
+ * Remove Coupon Code from checkout page
  */
-remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
+// remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
