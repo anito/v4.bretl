@@ -98,7 +98,7 @@ add_action('widgets_init', 'wbp_register_sidebar_widgets', 11);
 /**
  * Default sort for shop and specific categories
  */
-function custom_default_orderby($sortby)
+function wbp_custom_default_orderby($sortby)
 {
 
   if (is_shop()) {
@@ -121,12 +121,12 @@ function custom_default_orderby($sortby)
 
   return $sortby;
 }
-add_filter('woocommerce_default_catalog_orderby', 'custom_default_orderby');
+add_filter('woocommerce_default_catalog_orderby', 'wbp_custom_default_orderby');
 
 /**
  * Unsupprted Browsers IE 11 and lower
  */
-function detectTrident($current_theme)
+function wbp_detectTrident($current_theme)
 {
   $ua = $_SERVER['HTTP_USER_AGENT'];
   $browser = ['name' => '', 'version' => '', 'platform' => ''];
@@ -153,7 +153,7 @@ function unsupported_browsers_template()
 {
   get_template_part('custom-templates/custom', 'unsupported-browser');
 }
-add_action('wp_enqueue_scripts', 'detectTrident');
+add_action('wp_enqueue_scripts', 'wbp_detectTrident');
 
 /**
  * Enqueue vendor scripts
@@ -239,7 +239,7 @@ add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', '
 
 /**
  * In order to improve SEO,
- * display the product title in product description
+ * display the product title again in product description
  *
  */
 function woo_custom_description_tab($tabs)
@@ -254,7 +254,7 @@ function woo_custom_description_tab($tabs)
 
   return $tabs;
 }
-function woo_custom_description_tab_content($tab_name, $tab)
+function wbp_woo_custom_description_tab_content($tab_name, $tab)
 {
   global $product;
   $title = $product->get_title();
@@ -262,6 +262,12 @@ function woo_custom_description_tab_content($tab_name, $tab)
   // don't forget to process any shortcode
   echo '<h3>' . $title . ': Highlights</h3>' . do_shortcode($content);
 }
-add_filter('woocommerce_product_tabs', 'woo_custom_description_tab', 98);
+add_filter('woocommerce_product_tabs', 'wbp_woo_custom_description_tab', 98);
 
 add_filter('woocommerce_cart_needs_payment', '__return_false');
+
+
+/**
+ * Remove Coupon Code from checkot page
+ */
+remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
