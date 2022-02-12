@@ -270,4 +270,7 @@ add_filter('woocommerce_cart_needs_payment', '__return_false');
 /**
  * Remove Coupon Code from checkout page
  */
+if (function_exists( 'astra_get_option' ) ) {
+  $wbp_astra_show_coupon_on_cart = astra_get_option('checkout-coupon-display');
+}
 // remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
