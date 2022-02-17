@@ -247,16 +247,16 @@ function wbp_woo_custom_description_tab($tabs)
   // Get $product object
   global $product;
 
-  // $tabs['description'] = array(
-  //   'title' => __('Description', 'woocommerce'),
-  //   'priority'   => 10,
-  //   'callback' => 'wbp_woo_tab_content',
-  // );
-  $tabs['technical'] = array(
-    'title'   => __('Technical Details', 'astra-child'),
-    'priority'   => 20,
-    'callback'   => 'wbp_woo_tab_technical'
+  $tabs['description'] = array(
+    'title' => __('Description', 'woocommerce'),
+    'priority'   => 10,
+    'callback' => 'wbp_woo_tab_content',
   );
+  // $tabs['technical'] = array(
+  //   'title'   => __('Technical Details', 'astra-child'),
+  //   'priority'   => 20,
+  //   'callback'   => 'wbp_woo_tab_technical'
+  // );
   $tabs['datasheets'] = array(
     'title'   => __('Datasheets', 'astra-child'),
     'priority'   => 30,
