@@ -56,9 +56,9 @@ function add_scripts()
 {
   wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'));
 
-  wp_enqueue_style('fancybox', get_stylesheet_directory_uri() . '/css/fancybox/jquery.fancybox.css', wp_get_theme()->get('Version'));
+  // wp_enqueue_style('fancybox', get_stylesheet_directory_uri() . '/css/fancybox/jquery.fancybox.css', wp_get_theme()->get('Version'));
 
-  wp_enqueue_style('fancybox', get_stylesheet_directory_uri() . '/css/fancybox/jquery.fancybox.css', wp_get_theme()->get('Version'));
+  // wp_enqueue_style('fancybox', get_stylesheet_directory_uri() . '/css/fancybox/jquery.fancybox.css', wp_get_theme()->get('Version'));
 
   $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
   // Function to add analyticstracking.js to the site
@@ -242,15 +242,28 @@ add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', '
  * display the product title again in product description
  *
  */
-function woo_custom_description_tab($tabs)
+function wbp_woo_custom_description_tab($tabs)
 {
   // Get $product object
   global $product;
 
   $tabs['description'] = array(
     'title' => __('Description', 'woocommerce'),
-    'callback' => 'woo_custom_description_tab_content',
+    'priority'   => 10,
+    'callback' => 'wbp_woo_custom_description_tab_content',
   );
+  $tabs['technical'] = array(
+    'title'   => __('Technical Details', 'astra-child'),
+    'priority'   => 20,
+    'callback'   => 'wbp_woo_technical_tab_content'
+  );
+  $tabs['datasheets'] = array(
+    'title'   => __('Datasheets', 'astra-child'),
+    'priority'   => 30,
+    'callback'   => 'wbp_woo_datasheets_tab_content'
+  );
+  unset($tabs['reviews']);
+  unset($tabs['additional_information']);
 
   return $tabs;
 }
@@ -259,8 +272,16 @@ function wbp_woo_custom_description_tab_content($tab_name, $tab)
   global $product;
   $title = $product->get_title();
   $content = $product->get_description();
-  // don't forget to process any shortcode
+  // process shortcode
   echo '<h3>' . $title . ': Highlights</h3>' . do_shortcode($content);
+}
+function wbp_woo_technical_tab_content()
+{
+  echo '<p>Der Tab <strong>' . __('Technical Details', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
+}
+function wbp_woo_datasheets_tab_content()
+{
+  echo '<p>Der Tab <strong>' . __('Datasheets', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
 }
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_description_tab', 98);
 
