@@ -260,7 +260,7 @@ function wbp_woo_custom_description_tab($tabs)
   // );
 
   $meta = get_post_meta($product->id);
-  $datasheets = $meta['_datasheet'];
+  $datasheets = $meta['_datasheet'][0];
   if(!empty($datasheets)) {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheets', 'astra-child'),
