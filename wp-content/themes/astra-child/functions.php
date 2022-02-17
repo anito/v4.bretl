@@ -252,6 +252,7 @@ function wbp_woo_custom_description_tab($tabs)
     'priority'   => 10,
     'callback' => 'wbp_woo_tab_content',
   );
+
   // $tabs['technical'] = array(
   //   'title'   => __('Technical Details', 'astra-child'),
   //   'priority'   => 20,
@@ -259,8 +260,8 @@ function wbp_woo_custom_description_tab($tabs)
   // );
 
   $meta = get_post_meta($product->id);
-  $dg = $meta['_datasheet'][0];
-  if(!empty($dg)) {
+  $datasheets = $meta['_datasheet'];
+  if(!empty($datasheets)) {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheets', 'astra-child'),
       'priority'   => 30,
@@ -283,7 +284,6 @@ function wbp_woo_tab_content($tab_name, $tab)
 }
 function wbp_woo_tab_technical()
 {
-  global $product;
   echo '<p>Der Tab <strong>' . __('Technical Details', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
 }
 function wbp_woo_tab_datasheets()
