@@ -280,7 +280,7 @@ function wbp_woo_tab_content($tab_name, $tab)
   $title = $product->get_title();
   $content = $product->get_description();
   // don't forget to process any shortcode that migt be in the_content
-  echo '<h3>' . $title . ': Highlights</h3>' . do_shortcode($content);
+  echo '<h3>' . $title . ': Highlights</h3>';
 }
 function wbp_woo_tab_technical()
 {
