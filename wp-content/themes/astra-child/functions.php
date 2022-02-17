@@ -247,11 +247,11 @@ function wbp_woo_custom_description_tab($tabs)
   // Get $product object
   global $product;
 
-  // $tabs['description'] = array(
-  //   'title' => __('Description', 'woocommerce'),
-  //   'priority'   => 10,
-  //   'callback' => 'wbp_woo_tab_content',
-  // );
+  $tabs['description'] = array(
+    'title' => __('Description', 'woocommerce'),
+    'priority'   => 10,
+    'callback' => 'wbp_woo_tab_content',
+  );
   // $tabs['technical'] = array(
   //   'title'   => __('Technical Details', 'astra-child'),
   //   'priority'   => 20,
@@ -269,6 +269,7 @@ function wbp_woo_custom_description_tab($tabs)
 }
 function wbp_woo_tab_content($tab_name, $tab)
 {
+  
   global $product;
 
   $product_id = $product->id;
@@ -278,9 +279,8 @@ function wbp_woo_tab_content($tab_name, $tab)
   // wc_get_product_term_ids($product_id, '');
 
   $title = $product->get_title();
-  $content = $product->get_description();
-  // don't forget to process any shortcode that migt be in the_content
-  echo '<h3>' . $title . ': Highlights</h3><br />' . $content;
+  $content = wpautop($product->get_description()); // prevent to strip out all \n !!!
+  echo '<h3>' . $title . ': Highlights</h3>' . do_shortcode($content); // keep possible shortcode
 }
 function wbp_woo_tab_technical()
 {
@@ -300,12 +300,3 @@ function wbp_woo_tab_datasheets()
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_description_tab', 98);
 
 add_filter('woocommerce_cart_needs_payment', '__return_false');
-
-
-/**
- * Remove Coupon Code from checkout page
- */
-if (function_exists( 'astra_get_option' ) ) {
-  $wbp_astra_show_coupon_on_cart = astra_get_option('checkout-coupon-display');
-}
-// remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
