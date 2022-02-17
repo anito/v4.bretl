@@ -250,38 +250,52 @@ function wbp_woo_custom_description_tab($tabs)
   $tabs['description'] = array(
     'title' => __('Description', 'woocommerce'),
     'priority'   => 10,
-    'callback' => 'wbp_woo_custom_description_tab_content',
+    'callback' => 'wbp_woo_tab_content',
   );
   $tabs['technical'] = array(
     'title'   => __('Technical Details', 'astra-child'),
     'priority'   => 20,
-    'callback'   => 'wbp_woo_technical_tab_content'
+    'callback'   => 'wbp_woo_tab_technical'
   );
   $tabs['datasheets'] = array(
     'title'   => __('Datasheets', 'astra-child'),
     'priority'   => 30,
-    'callback'   => 'wbp_woo_datasheets_tab_content'
+    'callback'   => 'wbp_woo_tab_datasheets'
   );
   unset($tabs['reviews']);
   unset($tabs['additional_information']);
 
   return $tabs;
 }
-function wbp_woo_custom_description_tab_content($tab_name, $tab)
+function wbp_woo_tab_content($tab_name, $tab)
 {
   global $product;
+
+  $product_id = $product->id;
+  // $product_attr = $product->get_attributes();
+  $meta= get_post_meta($product_id);
+  $shortcode = $meta['_datasheet'][0];
+  // wc_get_product_term_ids($product_id, '');
+
   $title = $product->get_title();
   $content = $product->get_description();
-  // process shortcode
+  // don't forget to process any shortcode that migt be in the_content
   echo '<h3>' . $title . ': Highlights</h3>' . do_shortcode($content);
 }
-function wbp_woo_technical_tab_content()
+function wbp_woo_tab_technical()
 {
+  global $product;
   echo '<p>Der Tab <strong>' . __('Technical Details', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
 }
-function wbp_woo_datasheets_tab_content()
+function wbp_woo_tab_datasheets()
 {
-  echo '<p>Der Tab <strong>' . __('Datasheets', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
+  global $product;
+
+  $meta = get_post_meta($product->id);
+  $dg = $meta['_datasheet'][0];
+
+  // echo '<p>Der Tab <strong>' . __('Datasheets', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
+  echo do_shortcode($dg);
 }
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_description_tab', 98);
 
