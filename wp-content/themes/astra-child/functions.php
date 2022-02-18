@@ -263,7 +263,7 @@ function wbp_woo_custom_description_tab($tabs)
   $datasheets = $meta['_datasheet'][0];
   if(!empty($datasheets)) {
     $tabs['datasheets'] = array(
-      'title'   => __('Datasheets', 'astra-child'),
+      'title'   => __('Datasheet', 'astra-child'),
       'priority'   => 30,
       'callback'   => 'wbp_woo_tab_datasheets'
     );
@@ -293,7 +293,6 @@ function wbp_woo_tab_datasheets()
   $meta = get_post_meta($product->id);
   $dg = $meta['_datasheet'][0];
 
-  // echo '<p>Der Tab <strong>' . __('Datasheets', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
   echo do_shortcode($dg);
 }
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_description_tab', 98);
