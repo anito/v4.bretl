@@ -25,7 +25,7 @@ function wbp_process_sale($post_id, $post)
   }
 
   // Product Sale attribute
-  if (SYNC_PRODUCT_ATTS) {
+  if (SYNC_COMMON_TAX_AND_ATTS) {
     wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['sale'], $is_on_sale);
   }
 }
@@ -56,7 +56,7 @@ function wbp_process_featured($product)
   }
 
   // Product Featured attribute
-  if(SYNC_PRODUCT_ATTS) {
+  if(SYNC_COMMON_TAX_AND_ATTS) {
     wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['featured'], $is_featured);
   }
 }
