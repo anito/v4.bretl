@@ -14,6 +14,7 @@ function wbp_create_attribute_taxonomies()
     if (empty($plucked[$tax])) {
       $id = wc_create_attribute([
         'name' => $tax,
+        'has_archives' => 1
       ]);
     }
   }
