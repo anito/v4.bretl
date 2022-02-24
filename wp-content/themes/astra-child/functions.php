@@ -298,3 +298,16 @@ function wbp_woo_tab_datasheets()
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_description_tab', 98);
 
 add_filter('woocommerce_cart_needs_payment', '__return_false');
+
+/**
+ * Custom mobile breakpoint
+*/
+add_filter('astra_mobile_breakpoint', function () {
+  return 544;
+});
+/**
+ * Custom tablet breakpoint
+*/
+add_filter('astra_mobile_breakpoint', function () {
+  return 921;
+});
