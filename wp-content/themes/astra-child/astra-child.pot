@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Astra Child\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-17 14:05+0000\n"
+"POT-Creation-Date: 2022-02-26 08:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -45,11 +45,17 @@ msgstr ""
 msgid "Axel Nitzschner"
 msgstr ""
 
-#: functions.php:261 functions.php:285
-msgid "Datasheets"
+#: woocommerce/emails/email-order-details.php:113
+msgid ""
+"Colorized cells are hidden from the customer. Reach out for an admin in "
+"order to change this behaviour."
 msgstr ""
 
-#: includes/duplicate_content.php:104
+#: functions.php:266
+msgid "Datasheet"
+msgstr ""
+
+#: includes/duplicate_content.php:106
 msgid "Duplicate"
 msgstr ""
 
@@ -61,6 +67,6 @@ msgstr ""
 msgid "Sidebar for Account"
 msgstr ""
 
-#: functions.php:256 functions.php:280
+#: functions.php:287
 msgid "Technical Details"
 msgstr ""
