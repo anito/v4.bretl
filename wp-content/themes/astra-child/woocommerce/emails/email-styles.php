@@ -461,7 +461,7 @@ img {
 	border: 3px solid #0474be;
 	border-radius: 6px;
 	background-color: #ddeffb;
-	margin: 30px 0px;
+	margin-bottom: 30px !important;
 }
 .price-hidden {
 	background-color: #ff000005;
