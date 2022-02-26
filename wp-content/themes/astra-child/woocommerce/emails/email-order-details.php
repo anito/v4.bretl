@@ -110,7 +110,7 @@ do_action('woocommerce_email_before_order_table', $order, $sent_to_admin, $plain
 		<table class="td xs" style="margin-top: 8px; border-width: 2px;">
 			<tr>
 				<td class="td <?php echo $price_hidden_class ?>" style="width: 1.5rem;">&nbsp;</td>
-				<td class="nopad" style="border-width: 0px;"><?php echo __('Colorized cells are hidden from the customer. Reach out for an admin in order to change this behaviour.', 'astra-child'); ?></td>
+				<td class="nopad" style="border-width: 0px;"><?php echo __('Colorized', 'astra-child'); ?></td>
 			</tr>
 		</table>
 	<?php
