@@ -456,7 +456,7 @@ img {
 	max-width: 100%;
 	height: auto;
 }
-.blockquote-customer-note {
+#blockquote-customer-note {
 	padding: 10px;
 	border: 3px solid #0474be;
 	border-radius: 6px;
