@@ -459,8 +459,9 @@ img {
 .blockquote-customer-note {
 	padding: 10px;
 	border: 3px solid #0474be;
-	border-radius: 8px;
+	border-radius: 6px;
 	background-color: #ddeffb;
+	margin-bottom: 20px;
 }
 .price-hidden {
 	background-color: #ff000005;
