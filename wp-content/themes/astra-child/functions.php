@@ -261,7 +261,7 @@ function wbp_woo_custom_description_tab($tabs)
 
   $meta = get_post_meta($product->id);
   $datasheets = $meta['_datasheet'][0];
-  if(!empty($datasheets)) {
+  if (!empty($datasheets)) {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
       'priority'   => 30,
@@ -275,7 +275,7 @@ function wbp_woo_custom_description_tab($tabs)
 }
 function wbp_woo_tab_content($tab_name, $tab)
 {
-  
+
   global $product;
 
   $title = $product->get_title();
@@ -301,13 +301,30 @@ add_filter('woocommerce_cart_needs_payment', '__return_false');
 
 /**
  * Custom mobile breakpoint
-*/
+ */
 add_filter('astra_mobile_breakpoint', function () {
   return 544;
 });
 /**
  * Custom tablet breakpoint
-*/
+ */
 add_filter('astra_tablet_breakpoint', function () {
   return 921;
+});
+
+/**
+ * Quote Plugin
+ */
+function wbp_get_price_visibility($show)
+{
+  return array(
+    'show' => (isset($show['to_admin']) ? $show['to_admin'] : false) || (isset($show['to_customer']) ? $show['to_customer'] : false),
+    'class' => (isset($show['to_customer']) && !$show['to_customer']) ? 'price-hidden' : ''
+  );
+};
+add_filter('wbp_show_prices', function() {
+  if(!defined('SHOW_CUSTOMER_EMAIL_PRICE')) {
+    return false;
+  }
+  return SHOW_CUSTOMER_EMAIL_PRICE;
 });
