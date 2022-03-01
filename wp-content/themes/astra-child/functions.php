@@ -309,7 +309,7 @@ add_filter('astra_mobile_breakpoint', function () {
  * Custom tablet breakpoint
  */
 add_filter('astra_tablet_breakpoint', function () {
-  return 921;
+  return 1024;
 });
 
 /**
