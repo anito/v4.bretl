@@ -226,7 +226,7 @@ function wbp_get_post()
 add_action('wp_ajax_wbp_get_post', 'wbp_get_post');
 
 /**
- * Replace Elementors with Woos Placeholder Image (which we can define in the woo product settings)
+ * Replace Elementors with Woos Placeholder Image (can be defined in woo product settings)
  */
 function wbp_get_wc_placeholder_image($default_placeholder)
 {
@@ -328,3 +328,20 @@ add_filter('wbp_show_prices', function() {
   }
   return SHOW_CUSTOMER_EMAIL_PRICE;
 });
+
+/**
+ * Remove required billing & shipping address fields
+ */
+function wbp_filter_default_address_fields( $address_fields ) {
+    // Only on checkout page
+    if( ! is_checkout() ) return $address_fields;
+
+    // list all non required field
+    $key_fields = array('country','first_name','company','address_1','address_2','city','state','postcode');
+
+    foreach( $key_fields as $key_field )
+        $address_fields[$key_field]['required'] = false;
+
+    return $address_fields;
+}
+add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_fields', 20, 1 );
