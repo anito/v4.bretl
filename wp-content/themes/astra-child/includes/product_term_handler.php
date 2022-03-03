@@ -79,7 +79,7 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
 }
 
 /**
- * Add or remove the "sale" term to/from product attribute "Merkmale"
+ * Add or remove the "sale" term to/from product attribute "Besonderheiten"
  */
 function wbp_set_pa_term($product, $term_name, $bool)
 {
