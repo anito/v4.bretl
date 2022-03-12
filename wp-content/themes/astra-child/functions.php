@@ -280,7 +280,7 @@ function wbp_woo_tab_content($tab_name, $tab)
 
   $title = $product->get_title();
   $content = wpautop($product->get_description()); // prevent to strip out all \n !!!
-  echo '<h3>' . $title . '<h3><h4>Highlights:</h4>' . do_shortcode($content); // keep possible shortcode
+  echo '<h5>' . $title . '<h5><h6>Highlights:</h6>' . do_shortcode($content); // keep possible shortcode
 }
 function wbp_woo_tab_technical()
 {
