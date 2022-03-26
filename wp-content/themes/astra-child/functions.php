@@ -280,7 +280,7 @@ function wbp_woo_tab_content($tab_name, $tab)
 
   $title = $product->get_title();
   $content = wpautop($product->get_description()); // prevent to strip out all \n !!!
-  echo '<h5>' . $title . '<h5><h6>Highlights:</h6>' . do_shortcode($content); // keep possible shortcode
+  echo '<h6 style="font-weight:600; margin-bottom: 10px;">Highlights</h6><h5 style="margin-bottom: 30px;">' . $title . '</h5>' . do_shortcode($content); // keep possible shortcode
 }
 function wbp_woo_tab_technical()
 {
@@ -298,19 +298,6 @@ function wbp_woo_tab_datasheets()
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_description_tab', 98);
 
 add_filter('woocommerce_cart_needs_payment', '__return_false');
-
-/**
- * Custom mobile breakpoint
- */
-add_filter('astra_mobile_breakpoint', function () {
-  return 544;
-});
-/**
- * Custom tablet breakpoint
- */
-add_filter('astra_tablet_breakpoint', function () {
-  return 1024;
-});
 
 /**
  * Quote Plugin
