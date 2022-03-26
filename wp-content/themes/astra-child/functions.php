@@ -315,3 +315,16 @@ function wbp_filter_default_address_fields( $address_fields ) {
     return $address_fields;
 }
 add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_fields', 20, 1 );
+
+/**
+ *  Add nonce to logout URL in navigation
+ */
+function wbp_add_logout_url_nonce($items){
+  foreach($items as $item){
+    if( $item->url == '/account/customer-logout/?logout=true'){
+         $item->url = $item->url . '?redirect_url=/&_wpnonce=' . wp_create_nonce( 'log-out' );
+    }
+  }
+  return $items;
+}
+add_filter('wp_nav_menu_objects', 'wbp_add_logout_url_nonce');
