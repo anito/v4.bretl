@@ -79,23 +79,6 @@ function add_scripts()
 add_action('wp_enqueue_scripts', 'add_scripts');
 
 /**
- * Register some extra Footer
- */
-function wbp_register_sidebar_widgets()
-{
-  register_sidebar(array(
-    'name' => __('Account Sidebar', 'astra-child'),
-    'id' => 'wbp_account',
-    'before_widget' => '<div class="column widget %2$s" id="%1$s">',
-    'after_widget' => '</div>',
-    'before_title' => '<span class="widgettitle">',
-    'after_title' => '</span>',
-    'description' => __('Sidebar for Account', 'astra-child'),
-  ));
-}
-add_action('widgets_init', 'wbp_register_sidebar_widgets', 11);
-
-/**
  * Default sort for shop and specific categories
  */
 function wbp_custom_default_orderby($sortby)
