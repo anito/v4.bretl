@@ -327,4 +327,4 @@ function wbp_add_logout_url_nonce($items){
   }
   return $items;
 }
-add_filter('wp_nav_menu_objects', 'wbp_add_logout_url_nonce');
+add_filter('wp_nav_menu_objects', 'wbp_add_logout_url_nonce', 1);
