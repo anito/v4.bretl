@@ -321,8 +321,8 @@ add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_f
  */
 function wbp_add_logout_url_nonce($items){
   foreach($items as $item){
-    if( $item->url == '/wp-login.php?action=logout'){
-      $item->url = $item->url . '?redirect_url=/account/&_wpnonce=' . wp_create_nonce( 'log-out' );
+    if( $item->url == '/customer-logout/'){
+      $item->url = $item->url . '?_wpnonce=' . wp_create_nonce( 'log-out' );
     }
   }
   return $items;
