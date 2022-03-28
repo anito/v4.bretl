@@ -318,7 +318,7 @@ add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_f
 
 function wbp_wc_coupons_enabled($is_enabled) {
   if(function_exists('astra_get_option')) {
-    return astra_get_option('checkout-coupon-display');
+    return 'yes' === astra_get_option('checkout-coupon-display');
   }
   return $is_enabled;
 }
