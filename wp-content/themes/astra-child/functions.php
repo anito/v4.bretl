@@ -315,3 +315,12 @@ function wbp_filter_default_address_fields( $address_fields ) {
     return $address_fields;
 }
 add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_fields', 20, 1 );
+
+function wbp_wc_coupons_enabled($is_enabled) {
+  if(function_exists('astra_get_option')) {
+    return astra_get_option('checkout-coupon-display');
+  }
+  return $is_enabled;
+}
+
+add_filter('woocommerce_coupons_enabled', 'wbp_wc_coupons_enabled');
