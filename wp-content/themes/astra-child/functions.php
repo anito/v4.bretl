@@ -318,9 +318,17 @@ add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_f
 
 function wbp_wc_coupons_enabled($is_enabled) {
   if(function_exists('astra_get_option')) {
-    return 'yes' === astra_get_option('checkout-coupon-display');
+    return astra_get_option('checkout-coupon-display');;
   }
   return $is_enabled;
 }
-
 add_filter('woocommerce_coupons_enabled', 'wbp_wc_coupons_enabled');
+
+function wbp_return_theme_author($author) {
+  $author = array(
+    'theme_name'       => __( 'Axel Nitzschner', 'astra' ),
+    'theme_author_url' => 'https://webpremiere.de/',
+  );
+  return $author;
+}
+add_filter('astra_theme_author', 'wbp_return_theme_author');
