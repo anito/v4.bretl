@@ -82,10 +82,10 @@ do_action('woocommerce_email_before_order_table', $order, $sent_to_admin, $plain
 					foreach ($item_totals as $total) {
 						$i++;
 				?>
-						<tr>
-							<th class="td" scope="row" colspan="2" style="text-align:<?php echo esc_attr($text_align); ?>; <?php echo (1 === $i) ? 'border-top-width: 4px;' : ''; ?>"><?php echo wp_kses_post($total['label']); ?></th>
-							<td class="td" style="text-align:<?php echo esc_attr($text_align); ?>; <?php echo (1 === $i) ? 'border-top-width: 4px;' : ''; ?>"><?php echo wp_kses_post($total['value']); ?></td>
-						</tr>
+					<tr>
+						<th class="td" scope="row" colspan="2" style="text-align:<?php echo esc_attr($text_align); ?>; <?php echo (1 === $i) ? 'border-top-width: 4px;' : ''; ?>"><?php echo wp_kses_post($total['label']); ?></th>
+						<td class="td" style="text-align:<?php echo esc_attr($text_align); ?>; <?php echo (1 === $i) ? 'border-top-width: 4px;' : ''; ?>"><?php echo wp_kses_post($total['value']); ?></td>
+					</tr>
 					<?php
 					}
 				}
@@ -107,12 +107,7 @@ do_action('woocommerce_email_before_order_table', $order, $sent_to_admin, $plain
 	<?php
 	if ($sent_to_admin && !empty($price_hidden_class)) {
 	?>
-		<table class="td xs" style="margin-top: 8px; border-width: 2px;">
-			<tr>
-				<td class="td <?php echo $price_hidden_class ?>" style="width: 1.5rem;">&nbsp;</td>
-				<td class="nopad" style="border-width: 0px;"><?php echo __('Farbig hinterlegte Zellen werden dem Kunden nicht angezeigt. Diese Einstellung kann von einem Administrator geändert werden.', 'astra-child'); ?></td>
-			</tr>
-		</table>
+		<div class="admin-remark"><?php echo __('Farbig hinterlegte Zellen wurden dem Kunden nicht angezeigt.', 'astra-child'); ?></div>
 	<?php
 	}
 	?>

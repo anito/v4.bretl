@@ -235,7 +235,23 @@ img {
 	margin-bottom: 30px !important;
 }
 
-.price-hidden {
+.admin-remark {
+	position: relative;
+	font-size: 8px;
+	line-height: 1.4em;
+	padding-left: 30px;
+	margin-top: 20px;
+}
+.admin-remark:before {
+	content: "";
+	display: block;
+	position: absolute;
+	left: 0px;
+	width: 15px;
+	height: 15px;
+	border: 2px solid <?php echo esc_attr( $bg_darker_10 ); ?>
+}
+.price-hidden, .admin-remark:before {
 	background-color: #ff000005;
 }
 
