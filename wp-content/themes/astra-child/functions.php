@@ -316,13 +316,13 @@ function wbp_filter_default_address_fields( $address_fields ) {
 }
 add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_fields', 20, 1 );
 
-function wbp_wc_coupons_enabled($is_enabled) {
-  if(function_exists('astra_get_option')) {
+function wbp_wc_coupons_frontend_enabled($is_enabled) {
+  if(!is_admin() && function_exists('astra_get_option')) {
     return astra_get_option('checkout-coupon-display');;
   }
-  return $is_enabled;
+  return true;
 }
-add_filter('woocommerce_coupons_enabled', 'wbp_wc_coupons_enabled');
+add_filter('woocommerce_coupons_enabled', 'wbp_wc_coupons_frontend_enabled');
 
 function wbp_return_theme_author($author) {
   $author = array(
