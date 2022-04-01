@@ -326,7 +326,7 @@ add_filter('woocommerce_coupons_enabled', 'wbp_wc_coupons_frontend_enabled');
 
 function wbp_return_theme_author($author) {
   $author = array(
-    'theme_name'       => __( 'Axel Nitzschner', 'astra' ),
+    'theme_name'       => __( 'Axel Nitzschner', 'astra-child' ),
     'theme_author_url' => 'https://webpremiere.de/',
   );
   return $author;
