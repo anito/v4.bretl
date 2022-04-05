@@ -29,7 +29,7 @@ function wbp_admin_style($hook) {
   wp_register_style( 'wbp_woocommerce_admin_styles', get_stylesheet_directory_uri() . '/style-admin.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION );
   wp_enqueue_style('wbp_woocommerce_admin_styles');
 }
-add_action('admin_enqueue_scripts', 'wpb_admin_style');
+add_action('admin_enqueue_scripts', 'wpb_admin_style', 1);
 
 function wbp_check_sale_before_save($post_id, $post)
 {
