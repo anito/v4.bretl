@@ -26,7 +26,7 @@ add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
  * Admin Styles
  */
 function wbp_admin_style($hook) {
-  wp_register_style( 'wbp_woocommerce_admin_styles', get_stylesheet_directory_uri() . '/style-admin.css', array('woocommerce_admin_styles'), CHILD_THEME_ASTRA_CHILD_VERSION );
+  wp_register_style( 'wbp_woocommerce_admin_styles', get_stylesheet_directory_uri() . '/style-admin.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION );
   wp_enqueue_style('wbp_woocommerce_admin_styles');
 }
 add_action('admin_enqueue_scripts', 'wpb_admin_style');
