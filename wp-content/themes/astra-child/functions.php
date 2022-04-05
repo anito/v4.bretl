@@ -26,7 +26,7 @@ add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
  * Admin Styles
  */
 function wbp_admin_style($hook) {
-  wp_enqueue_style('admin-styles', get_template_directory_uri().'/style-admin.css');
+  wp_enqueue_style('admin-styles', get_stylesheet_directory_uri() .'/style-admin.css');
 }
 add_action('admin_enqueue_scripts', 'wpb_admin_style');
 
