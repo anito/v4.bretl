@@ -300,7 +300,7 @@ add_filter('wbp_show_prices', function() {
 });
 
 /**
- * Remove required billing & shipping address fields
+ * Change required billing & shipping address fields
  */
 function wbp_filter_default_address_fields( $address_fields ) {
     // Only on checkout page
@@ -332,3 +332,9 @@ function wbp_return_theme_author($author) {
   return $author;
 }
 add_filter('astra_theme_author', 'wbp_return_theme_author');
+
+function wbp_admin_style() {
+  wp_enqueue_style('admin-styles', get_template_directory_uri().'/style-admin.css');
+}
+
+add_action('admin_enqueue_scripts', 'wpb_admin_style');
