@@ -22,6 +22,14 @@ function child_enqueue_styles()
 }
 add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
 
+/**
+ * Admin Styles
+ */
+function wbp_admin_style($hook) {
+  wp_enqueue_style('admin-styles', get_template_directory_uri().'/style-admin.css');
+}
+add_action('admin_enqueue_scripts', 'wpb_admin_style');
+
 function wbp_check_sale_before_save($post_id, $post)
 {
   if (!class_exists('WooCommerce', false)) {
@@ -332,9 +340,3 @@ function wbp_return_theme_author($author) {
   return $author;
 }
 add_filter('astra_theme_author', 'wbp_return_theme_author');
-
-function wbp_admin_style() {
-  wp_enqueue_style('admin-styles', get_template_directory_uri().'/style-admin.css');
-}
-
-add_action('admin_enqueue_scripts', 'wpb_admin_style');
