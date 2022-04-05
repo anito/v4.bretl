@@ -23,13 +23,17 @@ function child_enqueue_styles()
 add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
 
 /**
- * Admin Styles
+ * Admin Styles fpr WC Screens
  */
 function wbp_admin_style($hook) {
-  wp_register_style( 'wbp_woocommerce_admin_styles', get_stylesheet_directory_uri() . '/style-admin.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION );
-  wp_enqueue_style('wbp_woocommerce_admin_styles');
+  $screen    = get_current_screen();
+  $screen_id = $screen ? $screen->id : '';
+  if ( in_array( $screen_id, wc_get_screen_ids() ) ) {
+    wp_register_style( 'wbp_woocommerce_admin_styles', get_stylesheet_directory_uri() . '/style-admin.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION );
+    wp_enqueue_style('wbp_woocommerce_admin_styles');
+  }
 }
-add_action('admin_enqueue_scripts', 'wpb_admin_style', 1);
+add_action( 'admin_enqueue_scripts', 'wbp_admin_style');
 
 function wbp_check_sale_before_save($post_id, $post)
 {
