@@ -345,3 +345,13 @@ function wbp_return_theme_author($author) {
   return $author;
 }
 add_filter('astra_theme_author', 'wbp_return_theme_author');
+
+/**
+ * Change Variable Price Html
+ */
+function wbp_format_variation_price_range($price, $from, $to) {
+  // $price = sprintf( _x( '%1$s &ndash; %2$s', 'Price range: from-to', 'woocommerce' ), is_numeric( $from ) ? wc_price( $from ) : $from, is_numeric( $to ) ? wc_price( $to ) : $to );
+  $price = sprintf( _x( 'from %1$s', 'Price range: from', 'astra-child' ), is_numeric( $from ) ? wc_price( $from ) : $from );
+  return $price;
+}
+add_filter( 'woocommerce_format_price_range', 'wbp_format_variation_price_range', 10, 3 );

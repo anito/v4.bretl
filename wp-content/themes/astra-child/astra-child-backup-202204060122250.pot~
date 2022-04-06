@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Astra Child\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-06 01:22+0000\n"
+"POT-Creation-Date: 2022-02-26 08:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -15,6 +15,10 @@ msgstr ""
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.5.5; wp-5.8.1\n"
 "X-Domain: astra-child"
+
+#: functions.php:87
+msgid "Account Sidebar"
+msgstr ""
 
 #. Name of the theme
 msgid "Astra Child"
@@ -38,11 +42,16 @@ msgid ""
 msgstr ""
 
 #. Author of the theme
-#: functions.php:342
 msgid "Axel Nitzschner"
 msgstr ""
 
-#: functions.php:262
+#: woocommerce/emails/email-order-details.php:113
+msgid ""
+"Colorized cells are hidden from the customer. Reach out for an admin in "
+"order to change this behaviour."
+msgstr ""
+
+#: functions.php:266
 msgid "Datasheet"
 msgstr ""
 
@@ -50,20 +59,14 @@ msgstr ""
 msgid "Duplicate"
 msgstr ""
 
-#: woocommerce/emails/email-order-details.php:110
-msgid "Farbig hinterlegte Zellen wurden dem Kunden nicht angezeigt."
-msgstr ""
-
 #. Author URI of the theme
 msgid "http://wpastra.com/about/"
 msgstr ""
 
-#: functions.php:354
-#, php-format
-msgctxt "Price range: from"
-msgid "from %1$s"
+#: functions.php:93
+msgid "Sidebar for Account"
 msgstr ""
 
-#: functions.php:283
+#: functions.php:287
 msgid "Technical Details"
 msgstr ""
