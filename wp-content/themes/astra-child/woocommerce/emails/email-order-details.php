@@ -107,7 +107,7 @@ do_action('woocommerce_email_before_order_table', $order, $sent_to_admin, $plain
 	<?php
 	if ($sent_to_admin && !empty($price_hidden_class)) {
 	?>
-		<div class="admin-remark"><?php echo __('Farbig hinterlegte Zellen wurden dem Kunden nicht angezeigt.', 'astra-child'); ?></div>
+		<div class="admin-remark"><?php echo __('Colorized areas will are hidden from clients', 'astra-child'); ?></div>
 	<?php
 	}
 	?>
