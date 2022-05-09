@@ -25,15 +25,16 @@ add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
 /**
  * Admin Styles fpr WC Screens
  */
-function wbp_admin_style($hook) {
+function wbp_admin_style($hook)
+{
   $screen    = get_current_screen();
   $screen_id = $screen ? $screen->id : '';
-  if ( in_array( $screen_id, wc_get_screen_ids() ) ) {
-    wp_register_style( 'wbp_woocommerce_admin_styles', get_stylesheet_directory_uri() . '/style-admin.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION );
+  if (in_array($screen_id, wc_get_screen_ids())) {
+    wp_register_style('wbp_woocommerce_admin_styles', get_stylesheet_directory_uri() . '/style-admin.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION);
     wp_enqueue_style('wbp_woocommerce_admin_styles');
   }
 }
-add_action( 'admin_enqueue_scripts', 'wbp_admin_style');
+add_action('admin_enqueue_scripts', 'wbp_admin_style');
 
 function wbp_check_sale_before_save($post_id, $post)
 {
@@ -305,8 +306,8 @@ function wbp_get_price_visibility($show)
     'class' => (isset($show['to_customer']) && !$show['to_customer']) ? 'price-hidden' : ''
   );
 };
-add_filter('wbp_show_prices', function() {
-  if(!defined('SHOW_CUSTOMER_EMAIL_PRICE')) {
+add_filter('wbp_show_prices', function () {
+  if (!defined('SHOW_CUSTOMER_EMAIL_PRICE')) {
     return false;
   }
   return SHOW_CUSTOMER_EMAIL_PRICE;
@@ -315,31 +316,34 @@ add_filter('wbp_show_prices', function() {
 /**
  * Change required billing & shipping address fields
  */
-function wbp_filter_default_address_fields( $address_fields ) {
-    // Only on checkout page
-    if( ! is_checkout() ) return $address_fields;
+function wbp_filter_default_address_fields($address_fields)
+{
+  // Only on checkout page
+  if (!is_checkout()) return $address_fields;
 
-    // list all non required field
-    $key_fields = array('country','first_name','company','address_1','address_2','city','state','postcode');
+  // list all non required field
+  $key_fields = array('country', 'first_name', 'company', 'address_1', 'address_2', 'city', 'state', 'postcode');
 
-    foreach( $key_fields as $key_field )
-        $address_fields[$key_field]['required'] = false;
+  foreach ($key_fields as $key_field)
+    $address_fields[$key_field]['required'] = false;
 
-    return $address_fields;
+  return $address_fields;
 }
-add_filter( 'woocommerce_default_address_fields' , 'wbp_filter_default_address_fields', 20, 1 );
+add_filter('woocommerce_default_address_fields', 'wbp_filter_default_address_fields', 20, 1);
 
-function wbp_wc_coupons_frontend_enabled($is_enabled) {
-  if(!is_admin() && function_exists('astra_get_option')) {
+function wbp_wc_coupons_frontend_enabled($is_enabled)
+{
+  if (!is_admin() && function_exists('astra_get_option')) {
     return astra_get_option('checkout-coupon-display');;
   }
   return true;
 }
 add_filter('woocommerce_coupons_enabled', 'wbp_wc_coupons_frontend_enabled');
 
-function wbp_return_theme_author($author) {
+function wbp_return_theme_author($author)
+{
   $author = array(
-    'theme_name'       => __( 'Axel Nitzschner', 'astra-child' ),
+    'theme_name'       => __('Axel Nitzschner', 'astra-child'),
     'theme_author_url' => 'https://webpremiere.de/',
   );
   return $author;
@@ -349,9 +353,10 @@ add_filter('astra_theme_author', 'wbp_return_theme_author');
 /**
  * Change Variable Price Html
  */
-function wbp_format_variation_price_range($price, $from, $to) {
+function wbp_format_variation_price_range($price, $from, $to)
+{
   // $price = sprintf( _x( '%1$s &ndash; %2$s', 'Price range: from-to', 'woocommerce' ), is_numeric( $from ) ? wc_price( $from ) : $from, is_numeric( $to ) ? wc_price( $to ) : $to );
-  $price = sprintf( _x( 'from %1$s', 'Price range: from', 'astra-child' ), is_numeric( $from ) ? wc_price( $from ) : $from );
+  $price = sprintf(_x('from %1$s', 'Price range: from', 'astra-child'), is_numeric($from) ? wc_price($from) : $from);
   return $price;
 }
-add_filter( 'woocommerce_format_price_range', 'wbp_format_variation_price_range', 10, 3 );
+add_filter('woocommerce_format_price_range', 'wbp_format_variation_price_range', 10, 3);
