@@ -360,3 +360,45 @@ function wbp_format_variation_price_range($price, $from, $to)
   return $price;
 }
 add_filter('woocommerce_format_price_range', 'wbp_format_variation_price_range', 10, 3);
+
+if (class_exists('gpls_woo_rfq_product_meta')) {
+  remove_action('woocommerce_product_options_advanced', array('gpls_woo_rfq_product_meta', 'gpls_woo_rfq_add_custom_general_fields'), 11, 0);
+  remove_action('woocommerce_process_product_meta', array('gpls_woo_rfq_product_meta', 'gpls_woo_rfq_add_custom_general_fields_save'), 11, 1);
+}
+
+// add_action('woocommerce_product_options_advanced', 'wbp_woo_add_ebay_field', 11, 0);
+// add_action('woocommerce_process_product_meta', 'wbp_woo_save_ebay_field', 11, 1);
+
+function wbp_woo_add_ebay_field()
+{
+
+  global $woocommerce, $post;
+
+?>
+<?php
+
+  woocommerce_wp_text_input(
+    array(
+      'id' => '_wbp_ebay_link',
+      'label' => __('eBay Link', 'astra-child'),
+      'placeholder' => 'Link to eBay product',
+      'desc_tip' => 'true',
+      'description' => __("Enable eBay link for this product", 'astra-child'),
+      'data_type' => 'url'
+
+    )
+  );
+}
+
+function wbp_woo_save_ebay_field($post_id)
+{
+
+
+  if (isset($_POST['_wbp_ebay_link'])) {
+
+    update_post_meta($post_id, '_wbp_ebay_link', $_POST['_wbp_ebay_link']);
+  } else {
+
+    update_post_meta($post_id, '_wbp_ebay_link', '');
+  }
+}
