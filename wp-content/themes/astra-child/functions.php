@@ -34,13 +34,13 @@ function wbp_admin_style($hook)
     wp_enqueue_style('wbp_woocommerce_admin_styles');
   }
 }
-add_action('admin_enqueue_scripts', 'wbp_admin_style');
 
 function wbp_check_sale_before_save($post_id, $post)
 {
   if (!class_exists('WooCommerce', false)) {
     return;
   }
+  add_action('admin_enqueue_scripts', 'wbp_admin_style');
 
   $product = wc_get_product($post_id);
 
@@ -402,3 +402,13 @@ function wbp_woo_save_ebay_field($post_id)
     update_post_meta($post_id, '_wbp_ebay_link', '');
   }
 }
+
+
+/**
+ * Replace default Elementor image placeholdder
+ */
+function custom_elementor_placeholder_image()
+{
+  return get_stylesheet_directory_uri() . '/images/placeholder.jpg';
+}
+add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');

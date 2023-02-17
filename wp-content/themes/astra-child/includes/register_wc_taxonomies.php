@@ -1,6 +1,10 @@
 <?php
 function wbp_create_attribute_taxonomies()
 {
+  if (!class_exists('WooCommerce', false)) {
+    return;
+  }
+  
   $attributes_taxonomies = [];
   if(defined('WC_CUSTOM_PRODUCT_ATTRIBUTES')) {
     foreach(WC_CUSTOM_PRODUCT_ATTRIBUTES as $attribute) {
