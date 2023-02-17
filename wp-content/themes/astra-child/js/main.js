@@ -1,3 +1,27 @@
+const observe = (function () {
+  const MutationObserver =
+    window.MutationObserver || window.WebKitMutationObserver;
+
+  return function (obj, callback) {
+    if (obj?.nodeType !== 1) return;
+
+    if (MutationObserver) {
+      // define a new observer
+      var mutationObserver = new MutationObserver(callback);
+
+      // have the observer observe for changes in children
+      mutationObserver.observe(obj, { childList: true, subtree: true });
+      return mutationObserver;
+    }
+
+    // browser support fallback
+    else if (window.addEventListener) {
+      obj.addEventListener("DOMNodeInserted", callback, false);
+      obj.addEventListener("DOMNodeRemoved", callback, false);
+    }
+  };
+})();
+
 (function ($) {
   var add_fb_div = function () {
     $("body").prepend('<div id="fb-root"></div>');
@@ -37,8 +61,6 @@
 
     $(".get-quotes").on("mouseover", (e) => {
       e.stopPropagation();
-
-      console.log("over");
       if (!$(icon).hasClass("over")) {
         $(icon).addClass("over");
         animateCSS(
@@ -73,8 +95,51 @@
     });
   };
 
+  // Copy and observe an elements wishlist count
+  var add_wishlist_hook = (targetSelector, storeName) => {
+    const className = ".jet-engine-data-store-count";
+    function getElement(name) {
+      const el = document.querySelector(name);
+      return el.dataset.store === storeName ? el : null;
+    }
+
+    function callback(mutationList) {
+      for (const mutation of mutationList) {
+        if (mutation.type === "childList") {
+          if (mutation.addedNodes.length) {
+            console.log("A node has been added.", mutation.addedNodes[0]);
+          }
+          if (mutation.removedNodes.length) {
+            console.log("A node has been removed.", mutation.removedNodes[0]);
+          }
+        } else if (mutation.type === "attributes") {
+          console.log(`The ${mutation.attributeName} attribute was modified.`);
+        }
+      }
+      copy();
+    }
+
+    function copy() {
+      const targetEl = document.querySelector(targetSelector);
+      let spanEl = targetEl.querySelector(".wishlist-widget");
+      if (!spanEl) {
+        spanEl = document.createElement("span");
+        spanEl.classList.add("wishlist-widget");
+        targetEl.append(spanEl);
+      }
+      spanEl.innerHTML = storeEl.innerHTML;
+    }
+
+    const storeEl = getElement(className);
+    if (storeEl) {
+      copy();
+      observe(storeEl, callback);
+    }
+  };
+
   // add_fb_div();
   // add_image_disclaimer();
   // add_animate_scroll();
   add_animate_css_listeners();
+  add_wishlist_hook(".wishlist-target [class*=title]", "wishlist");
 })(jQuery);
