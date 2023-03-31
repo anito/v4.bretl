@@ -280,25 +280,6 @@ function wbp_product_set_attributes($post_id, $attributes)
   update_post_meta($post_id, '_product_attributes', $product_attributes);
 }
 
-function wbp_update_post()
-{
-  $post_ID = $_POST['post_id'];
-  $post_status = $_POST['post_status'];
-  wp_update_post(array(
-    'ID' => $post_ID,
-    'post_status' => $post_status,
-  ));
-
-  wp_die();
-}
-
-function wbp_get_post()
-{
-  $post_ID = $_POST['post_id'];
-  $post = get_post($post_ID);
-  wp_die();
-}
-
 if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 15);
 
@@ -308,12 +289,7 @@ if (is_admin()) {
   add_action('wp_ajax_nopriv_wbp_ebay_preview', 'wbp_ebay_preview');
   add_action('wp_ajax_nopriv_wbp_ebay_images', 'wbp_ebay_images');
   add_action('wp_ajax_nopriv_wbp_ebay_data', 'wbp_ebay_data');
-
   add_action('wp_ajax_wbp_del_images', 'wbp_del_images');
-} else {
-  add_action('wp_enqueue_scripts', 'wbp_add_ajax_scripts', 15);
-  add_action('wp_ajax_wbp_get_post', 'wbp_get_post');
-  add_action('wp_ajax_wbp_update_post', 'wbp_update_post');
 }
 
 /**
