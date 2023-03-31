@@ -1,5 +1,4 @@
 jQuery(document).ready(function ($) {
-  
   const { local_url, remote_url, home_url } = ajax_object;
 
   // Set Status
@@ -185,11 +184,14 @@ jQuery(document).ready(function ($) {
   function ajax_import_data_callback(data, callback) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
-      const { success, post_id } = response;
+      const {
+        success,
+        data: { post_id },
+      } = response;
       console.log(response);
 
       if (success) {
-        location = `${home_url}wp-admin/post.php?post=${post_id}&action=edit`;
+        location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
       } else {
         alert(
           "Sorry, etwas scheint schiefgegangen zu sein.. Versuche es bitte nochnmal."
@@ -237,11 +239,14 @@ jQuery(document).ready(function ($) {
   function ajax_import_images_callback(data, callback) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
-      const { success, post_id } = response;
+      const {
+        success,
+        data: { post_id },
+      } = response;
       console.log(response);
 
       if (success) {
-        location = `${home_url}wp-admin/post.php?post=${post_id}&action=edit`;
+        location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
       } else {
         alert("ERROR");
       }
@@ -286,9 +291,12 @@ jQuery(document).ready(function ($) {
   }
 
   function ajax_del_images_callback(data, callback) {
-    const { success, post_id } = JSON.parse(data);
+    const {
+      success,
+      data: { post_id },
+    } = JSON.parse(data);
     if (success) {
-      location = `${home_url}wp-admin/post.php?post=${post_id}&action=edit`;
+      location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
     }
     callback?.();
   }
