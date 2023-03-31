@@ -9,7 +9,8 @@ require_once __DIR__ . '/includes/register_wc_taxonomies.php';
 function add_allowed_origins($origins)
 {
   return array_merge($origins, [
-    'https://dev.bretl.webpremiere.de'
+    'http://dev.auto-traktor-bretschneider.de',
+    'https://dev.auto-traktor-bretschneider.mbp/',
   ]);
 }
 add_filter('allowed_http_origins', 'add_allowed_origins');
