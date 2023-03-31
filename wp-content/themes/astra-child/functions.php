@@ -202,13 +202,13 @@ function add_cp_data_attribute($tag, $handle, $src)
 }
 add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
-function getServiceEndpoint($external = false)
+function getServiceEndpoint()
 {
-  $ssl = $_SERVER['HTTPS'] !== 'on';
-  if ($ssl) {
-    return admin_url('admin-ajax.php');
-  }
-  return 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
+  $ssl = $_SERVER['HTTPS'] === 'on';
+  // if ($ssl) {
+  // }
+  return admin_url('admin-ajax.php');
+  // return 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
 }
 
 function wbp_add_ajax_scripts()
@@ -216,7 +216,7 @@ function wbp_add_ajax_scripts()
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
   wp_localize_script('ajax-callback', 'ajax_object', array(
-    'url' => getServiceEndpoint(true),
+    'url' => getServiceEndpoint(),
     'nonce' => wp_create_nonce()
   ));
 }
