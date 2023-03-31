@@ -286,10 +286,15 @@ function wbp_get_post()
 
 if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_ajax_scripts', 15);
+  
   add_action('wp_ajax_wbp_ebay_preview', 'wbp_ebay_preview');
   add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
-  add_action('wp_ajax_wbp_del_images', 'wbp_del_images');
   add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');
+  add_action('wp_ajax_nopriv_wbp_ebay_preview', 'wbp_ebay_preview');
+  add_action('wp_ajax_nopriv_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_nopriv_wbp_ebay_data', 'wbp_ebay_data');
+
+  add_action('wp_ajax_wbp_del_images', 'wbp_del_images');
 } else {
   add_action('wp_enqueue_scripts', 'wbp_add_ajax_scripts', 15);
   add_action('wp_ajax_wbp_get_post', 'wbp_get_post');
