@@ -35,14 +35,14 @@ function wbp_admin_style($hook)
   }
 }
 
-function wbp_check_sale_before_save($post_id, $post)
+function wbp_save_post($post_ID, $post)
 {
   if (!class_exists('WooCommerce', false)) {
     return;
   }
   add_action('admin_enqueue_scripts', 'wbp_admin_style');
 
-  $product = wc_get_product($post_id);
+  $product = wc_get_product($post_ID);
 
   if (!$product) {
     return 0;
@@ -50,21 +50,25 @@ function wbp_check_sale_before_save($post_id, $post)
 
   if ($product->is_type('variation')) {
     $variation = new WC_Product_Variation($product);
-    $post_id = $variation->get_parent_id();
-    $product = wc_get_product($post_id);
+    $post_ID = $variation->get_parent_id();
+    $product = wc_get_product($post_ID);
   }
 
   require_once __DIR__ . '/includes/product_term_handler.php';
-  wbp_process_sale($post_id, $post);
+  wbp_process_sale($post_ID, $post);
+  wbp_process_ebay($post_ID, $post);
 }
-add_action("save_post", "wbp_check_sale_before_save", 99, 3);
+add_filter('wp_insert_post_empty_content', function () {
+  return false;
+});
+add_action("save_post", "wbp_save_post", 99, 3);
 
-function wbp_check_featured_before_save($post)
+function wbp_product_before_save($product)
 {
   require_once __DIR__ . '/includes/product_term_handler.php';
-  wbp_process_featured($post);
+  wbp_process_featured($product);
 }
-add_action("woocommerce_before_product_object_save", "wbp_check_featured_before_save", 99, 2);
+add_action("woocommerce_before_product_object_save", "wbp_product_before_save", 99, 2);
 
 function add_scripts()
 {
@@ -186,41 +190,90 @@ function add_cp_data_attribute($tag, $handle, $src)
 }
 add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
-/**
- * Hook for Jet Engines Forms
- */
-function add_ajax_scripts()
+function wbp_add_ajax_scripts()
 {
-  wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js', array(), '1.0.0', true);
+  wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
   wp_localize_script('ajax-callback', 'ajax_object', array(
-    'ajaxurl' => admin_url('admin-ajax.php'),
-    'ajaxnonce' => wp_create_nonce('ajax_post_validation'),
+    'url' => admin_url('admin-ajax.php'),
+    'nonce' => wp_create_nonce()
   ));
 }
-add_action('wp_enqueue_scripts', 'add_ajax_scripts', 15);
+
+function wbp_ebay_preview()
+{
+  require_once __DIR__ . '/includes/ajax_handler.php';
+  wbp_get_ebay_preview();
+}
+
+function wbp_ebay_data()
+{
+  require_once __DIR__ . '/includes/ajax_handler.php';
+  wbp_import_ebay_data();
+}
+
+function wbp_ebay_images()
+{
+  require_once __DIR__ . '/includes/ajax_handler.php';
+  wbp_import_ebay_images();
+}
+
+function wbp_del_images()
+{
+  require_once __DIR__ . '/includes/ajax_handler.php';
+  wbp_delete_images();
+}
+
+function wbp_product_set_attributes($post_id, $attributes)
+{
+  $i = 0;
+  // Loop through the attributes array
+  foreach ($attributes as $name => $value) {
+    $product_attributes[$i] = array(
+      'name' => htmlspecialchars(stripslashes($name)), // set attribute name
+      'value' => $value, // set attribute value
+      'position' => 1,
+      'is_visible' => 1,
+      'is_variation' => 0,
+      'is_taxonomy' => 0
+    );
+
+    $i++;
+  }
+
+  // Now update the post with its new attributes
+  update_post_meta($post_id, '_product_attributes', $product_attributes);
+}
 
 function wbp_update_post()
 {
-  $post_id = $_POST['post_id'];
+  $post_ID = $_POST['post_id'];
   $post_status = $_POST['post_status'];
-  wp_update_post(array(
-    'ID' => $post_id,
+  wp_update_post(array('ID' => $post_ID,
     'post_status' => $post_status,
   ));
 
   wp_die();
 }
-add_action('wp_ajax_wbp_update_post', 'wbp_update_post');
 
 function wbp_get_post()
 {
-  $post_id = $_POST['post_id'];
-  $post = get_post($post_id);
-
+  $post_ID = $_POST['post_id'];
+  $post = get_post($post_ID);
   wp_die();
 }
-add_action('wp_ajax_wbp_get_post', 'wbp_get_post');
+
+if (is_admin()) {
+  add_action('admin_enqueue_scripts', 'wbp_add_ajax_scripts', 15);
+  add_action('wp_ajax_wbp_ebay_preview', 'wbp_ebay_preview');
+  add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_wbp_del_images', 'wbp_del_images');
+  add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');
+} else {
+  add_action('wp_enqueue_scripts', 'wbp_add_ajax_scripts', 15);
+  add_action('wp_ajax_wbp_get_post', 'wbp_get_post');
+  add_action('wp_ajax_wbp_update_post', 'wbp_update_post');
+}
 
 /**
  * Replace Elementors with Woos Placeholder Image (can be defined in woo product settings)
@@ -270,6 +323,7 @@ function wbp_woo_custom_description_tab($tabs)
 
   return $tabs;
 }
+
 function wbp_woo_tab_content($tab_name, $tab)
 {
 
@@ -366,43 +420,37 @@ if (class_exists('gpls_woo_rfq_product_meta')) {
   remove_action('woocommerce_process_product_meta', array('gpls_woo_rfq_product_meta', 'gpls_woo_rfq_add_custom_general_fields_save'), 11, 1);
 }
 
-// add_action('woocommerce_product_options_advanced', 'wbp_woo_add_ebay_field', 11, 0);
-// add_action('woocommerce_process_product_meta', 'wbp_woo_save_ebay_field', 11, 1);
-
-function wbp_woo_add_ebay_field()
+function wbp_product_custom_fields()
 {
 
   global $woocommerce, $post;
+  echo '<div class=" product_custom_field ">';
 
 ?>
 <?php
 
   woocommerce_wp_text_input(
     array(
-      'id' => '_wbp_ebay_link',
-      'label' => __('eBay Link', 'astra-child'),
-      'placeholder' => 'Link to eBay product',
+      'id' => 'ebay_url',
+      'label' => __('EBAY URL', 'astra-child'),
+      'placeholder' => 'Link to eBay Kleinanzeigen',
       'desc_tip' => 'true',
       'description' => __("Enable eBay link for this product", 'astra-child'),
       'data_type' => 'url'
-
     )
   );
+  echo '</div>';
 }
 
-function wbp_woo_save_ebay_field($post_id)
+function wbp_product_custom_fields_save($post_id)
 {
-
-
-  if (isset($_POST['_wbp_ebay_link'])) {
-
-    update_post_meta($post_id, '_wbp_ebay_link', $_POST['_wbp_ebay_link']);
-  } else {
-
-    update_post_meta($post_id, '_wbp_ebay_link', '');
-  }
+  // Custom Product Text Field
+  $woocommerce_custom_product_text_field = $_POST['ebay_url'];
+  if (!empty($woocommerce_custom_product_text_field))
+    update_post_meta($post_id, 'ebay_url', esc_attr($woocommerce_custom_product_text_field));
 }
-
+// add_action('woocommerce_product_options_general_product_data', 'wbp_product_custom_fields');
+// add_action('woocommerce_process_product_meta', 'wbp_product_custom_fields_save');
 
 /**
  * Replace default Elementor image placeholdder

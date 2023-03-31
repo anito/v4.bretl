@@ -100,7 +100,7 @@ const observe = (function () {
     const className = ".jet-engine-data-store-count";
     function getElement(name) {
       const el = document.querySelector(name);
-      return el.dataset.store === storeName ? el : null;
+      return el?.dataset.store === storeName ? el : null;
     }
 
     function callback(mutationList) {
@@ -120,14 +120,20 @@ const observe = (function () {
     }
 
     function copy() {
-      const targetEl = document.querySelector(targetSelector);
-      let spanEl = targetEl.querySelector(".wishlist-widget");
-      if (!spanEl) {
-        spanEl = document.createElement("span");
-        spanEl.classList.add("wishlist-widget");
-        targetEl.append(spanEl);
-      }
-      spanEl.innerHTML = storeEl.innerHTML;
+      const targetEls = document.querySelectorAll(targetSelector);
+      targetEls.forEach((el) => {
+        let spanEl = el.querySelector(".wishlist-widget");
+        if (!spanEl) {
+          spanEl = document.createElement("span");
+          spanEl.classList.add("wishlist-widget");
+          el.append(spanEl);
+        }
+        if (storeEl.innerHTML !== "0") {
+          spanEl.innerHTML = storeEl.innerHTML;
+        } else {
+          spanEl.remove();
+        }
+      });
     }
 
     const storeEl = getElement(className);

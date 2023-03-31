@@ -36,7 +36,7 @@ function wbp_process_featured($product)
   $cats = __get_the_terms($product_id, 'product_cat');
   $tags = __get_the_terms($product_id, 'product_tag');
 
-  if ($_GET['action'] !== 'woocommerce_feature_product') {
+  if (isset($_GET['action']) && $_GET['action'] !== 'woocommerce_feature_product') {
     $is_terms_featured = in_array(WC_COMMON_TAXONOMIES['featured'], array_unique(wp_list_pluck(array_merge($cats, $tags), 'name')));
     $product->set_featured($is_terms_featured);
   }
@@ -58,6 +58,25 @@ function wbp_process_featured($product)
   // Product Featured attribute
   if(SYNC_COMMON_TAX_AND_ATTS) {
     wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['featured'], $is_featured);
+  }
+}
+
+function wbp_process_ebay($post_id, $post)
+{
+  $meta = get_post_meta($post_id);
+  $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : null;
+  if (!empty($ebay_id)) {
+
+    if (empty($post->post_title)) {
+      wp_insert_post([
+        'ID' => $post_id,
+        'post_type' => 'product',
+        'post_title' => "Entwurf eBay ID " . $ebay_id
+      ]);
+    }
+    update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . 's-' . $ebay_id . '/k0');
+  } else {
+    delete_post_meta($post_id, 'ebay_url');
   }
 }
 
