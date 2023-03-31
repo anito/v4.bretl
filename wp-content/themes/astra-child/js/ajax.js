@@ -114,7 +114,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function delEbayImages(e) {
+  function delImages(e) {
     e.preventDefault();
     const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
@@ -144,12 +144,12 @@ jQuery(document).ready(function ($) {
   const form = document.getElementById("post");
   const getEbayDataButton = document.getElementById("get-ebay-data");
   const getEbayImagesButton = document.getElementById("get-ebay-images");
-  const delEbayImagesButton = document.getElementById("del-images");
+  const delImagesButton = document.getElementById("del-images");
   const getEbayPreviewButton = document.getElementById("get-ebay-preview");
 
   getEbayPreviewButton?.addEventListener("click", getEbayPreview);
   getEbayImagesButton?.addEventListener("click", getEbayImages);
-  delEbayImagesButton?.addEventListener("click", delEbayImages);
+  delImagesButton?.addEventListener("click", delImages);
   getEbayDataButton?.addEventListener("click", getEbayData);
 
   function ajax_preview_callback(data, callback) {

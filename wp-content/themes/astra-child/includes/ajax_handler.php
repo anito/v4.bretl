@@ -2,6 +2,7 @@
 function wbp_get_ebay_preview()
 {
   $formData = $_POST['formdata'];
+  write_log($_POST);
   $post_id = $formData['post_ID'];
   $ebay_id_raw = $formData['ebay_id'];
   $post_status = $formData['post_status'];
