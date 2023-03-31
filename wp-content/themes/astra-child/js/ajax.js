@@ -262,7 +262,7 @@ jQuery(document).ready(function ($) {
 
     let images = [];
     doc.documentElement
-      .querySelectorAll("#viewad-product img[data-imgsrc]")
+      .querySelectorAll("#viewad-product .galleryimage-large img[data-imgsrc]")
       .forEach((image) => {
         images.push(image.dataset.imgsrc);
       });
