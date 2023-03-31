@@ -10,7 +10,6 @@ function add_allowed_origins($origins)
 {
   return array_merge($origins, [
     'https://dev.auto-traktor-bretschneider.de',
-    'https://dev.auto-traktor-bretschneider.mbp',
   ]);
 }
 add_filter('allowed_http_origins', 'add_allowed_origins');
@@ -202,16 +201,42 @@ function add_cp_data_attribute($tag, $handle, $src)
 }
 add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
-function wbp_add_ajax_scripts()
+function wbp_add_admin_ajax_scripts()
 {
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
+  $valid_cert = !!check_cert();
+  $local_url = admin_url('admin-ajax.php');
+  if (!$valid_cert) {
+    $remote_url = 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
+  } else {
+    $remote_url = $local_url;
+  }
+
   wp_localize_script('ajax-callback', 'ajax_object', array(
-    'remote_url' => 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php',
-    'local_url' => admin_url('admin-ajax.php'),
+    'remote_url' => $remote_url,
+    'local_url' => $local_url,
     'home_url' => home_url(),
     'nonce' => wp_create_nonce()
   ));
+}
+
+function check_cert()
+{
+  $g = stream_context_create(array("ssl" => array("capture_peer_cert" => true)));
+  $r = stream_socket_client(
+    "ssl://" . HOST . ":443",
+    $errno,
+    $errstr,
+    30,
+    STREAM_CLIENT_CONNECT,
+    $g
+  ); // returns ressource|false
+  if (false === $r) {
+    return false;
+  }
+  $cont = stream_context_get_params($r);
+  return ($cont["options"]["ssl"]["peer_certificate"]);
 }
 
 function wbp_ebay_preview()
@@ -263,7 +288,8 @@ function wbp_update_post()
 {
   $post_ID = $_POST['post_id'];
   $post_status = $_POST['post_status'];
-  wp_update_post(array('ID' => $post_ID,
+  wp_update_post(array(
+    'ID' => $post_ID,
     'post_status' => $post_status,
   ));
 
@@ -278,7 +304,7 @@ function wbp_get_post()
 }
 
 if (is_admin()) {
-  add_action('admin_enqueue_scripts', 'wbp_add_ajax_scripts', 15);
+  add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 15);
 
   add_action('wp_ajax_wbp_ebay_preview', 'wbp_ebay_preview');
   add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
