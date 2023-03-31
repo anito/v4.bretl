@@ -43,7 +43,7 @@ jQuery(document).ready(function ($) {
     return false;
   });
 
-  function getPreview(e) {
+  function getEbayPreview(e) {
     e.preventDefault();
     const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
@@ -67,7 +67,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function getData(e) {
+  function getEbayData(e) {
     e.preventDefault();
     const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
@@ -91,7 +91,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function getImages(e) {
+  function getEbayImages(e) {
     e.preventDefault();
     const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
@@ -114,7 +114,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function delImages(e) {
+  function delEbayImages(e) {
     e.preventDefault();
     const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
@@ -142,15 +142,15 @@ jQuery(document).ready(function ($) {
   const MSG_MISSING_EBAY_ID = "Keine eBay-Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
   const form = document.getElementById("post");
-  const getdataButton = document.getElementById("get-ebay-data");
-  const getimagesButton = document.getElementById("get-ebay-images");
-  const delimagesButton = document.getElementById("del-images");
-  const getpreviewButton = document.getElementById("get-ebay-preview");
+  const getEbayDataButton = document.getElementById("get-ebay-data");
+  const getEbayImagesButton = document.getElementById("get-ebay-images");
+  const delEbayImagesButton = document.getElementById("del-images");
+  const getEbayPreviewButton = document.getElementById("get-ebay-preview");
 
-  getpreviewButton?.addEventListener("click", getPreview);
-  getimagesButton?.addEventListener("click", getImages);
-  delimagesButton?.addEventListener("click", delImages);
-  getdataButton?.addEventListener("click", getData);
+  getEbayPreviewButton?.addEventListener("click", getEbayPreview);
+  getEbayImagesButton?.addEventListener("click", getEbayImages);
+  delEbayImagesButton?.addEventListener("click", delEbayImages);
+  getEbayDataButton?.addEventListener("click", getEbayData);
 
   function ajax_preview_callback(data, callback) {
     const response = JSON.parse(data);

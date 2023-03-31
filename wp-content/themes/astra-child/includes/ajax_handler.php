@@ -1,17 +1,20 @@
 <?php
-
 function wbp_get_ebay_preview()
 {
   $formData = $_POST['formdata'];
-  $ebay_id = $formData['ebay_id'];
+  $post_id = $formData['post_ID'];
+  $ebay_id_raw = $formData['ebay_id'];
+  $post_status = $formData['post_status'];
+  preg_match('/(\/?)(\d{10,})/', $ebay_id_raw, $matches);
+  if (isset($matches[2])) $ebay_id = $matches[2];
 
   $response = wp_remote_get(EBAY_URL . '/s-' . $ebay_id . '/k0');
 
   echo json_encode(
     [
-      'post_id' => $formData['post_ID'],
-      'ebay_id' => $formData['ebay_id'],
-      'post_status' => $formData['post_status'],
+      'post_id' => $post_id,
+      'ebay_id' => $ebay_id,
+      'post_status' => $post_status,
       'content' => $response
     ]
   );
@@ -25,7 +28,9 @@ function wbp_import_ebay_data()
     $post_id = $postdata['post_id'];
   }
   if (isset($postdata['ebay_id'])) {
-    $ebay_id = $postdata['ebay_id'];
+    $ebay_id_raw = $postdata['ebay_id'];
+    preg_match('/(\/?)(\d{10,})/', $ebay_id_raw, $matches);
+    if (isset($matches[2])) $ebay_id = $matches[2];
   }
   $ebaydata = $_POST['ebaydata'];
   if (
@@ -67,7 +72,9 @@ function wbp_import_ebay_images()
     $post_id = $postdata['post_id'];
   }
   if (isset($postdata['ebay_id'])) {
-    $ebay_id = $postdata['ebay_id'];
+    $ebay_id_raw = $postdata['ebay_id'];
+    preg_match('/(\/?)(\d{10,})/', $ebay_id_raw, $matches);
+    if (isset($matches[2])) $ebay_id = $matches[2];
   }
   $ebaydata = $_POST['ebaydata'];
   $ebay_images = isset($ebaydata['images']) ? $ebaydata['images'] : [];

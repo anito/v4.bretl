@@ -4,6 +4,17 @@ require_once __DIR__ . '/includes/duplicate_content.php';
 require_once __DIR__ . '/includes/register_wc_taxonomies.php';
 
 /**
+ * CSRF allowed domains
+ */
+function add_allowed_origins($origins)
+{
+  return array_merge($origins, [
+    'https://dev.bretl.webpremiere.de'
+  ]);
+}
+add_filter('allowed_http_origins', 'add_allowed_origins');
+
+/**
  * Define Constants
  */
 define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.3');
@@ -190,12 +201,21 @@ function add_cp_data_attribute($tag, $handle, $src)
 }
 add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
+function getServiceEndpoint($external = false)
+{
+  $ssl = $_SERVER['HTTPS'] !== 'on';
+  if ($ssl) {
+    return admin_url('admin-ajax.php');
+  }
+  return 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
+}
+
 function wbp_add_ajax_scripts()
 {
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
   wp_localize_script('ajax-callback', 'ajax_object', array(
-    'url' => admin_url('admin-ajax.php'),
+    'url' => getServiceEndpoint(true),
     'nonce' => wp_create_nonce()
   ));
 }
