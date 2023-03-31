@@ -47,6 +47,7 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
     const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
+    console.log(formdata);
 
     if (!formdata.ebay_id) {
       alert(MSG_MISSING_EBAY_ID);
@@ -56,13 +57,16 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url: `${url}?_nonce=${nonce}`,
+      url,
       data: {
         action: "wbp_ebay_preview",
         formdata,
       },
       success: (data) => ajax_preview_callback(data, remove_spinner),
-      error: remove_spinner,
+      error: (a, b, c) => {
+        remove_spinner();
+        console.log(a, b, c);
+      },
       complete: remove_spinner,
     });
   }
@@ -81,7 +85,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url: `${url}?_nonce=${nonce}`,
+      url,
       data: {
         action: "wbp_ebay_preview",
         formdata,
@@ -104,7 +108,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url: `${url}?_nonce=${nonce}`,
+      url,
       data: {
         action: "wbp_ebay_preview",
         formdata,
@@ -129,7 +133,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url: `${url}?_nonce=${nonce}`,
+      url,
       data: {
         action: "wbp_del_images",
         post_id,
@@ -154,6 +158,7 @@ jQuery(document).ready(function ($) {
 
   function ajax_preview_callback(data, callback) {
     const response = JSON.parse(data);
+    console.log(response);
     const wrapper = document.getElementById("ebay-preview-wrapper");
 
     if (wrapper) {
