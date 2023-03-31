@@ -2,7 +2,6 @@
 function wbp_get_ebay_preview()
 {
   $formData = $_POST['formdata'];
-  write_log($_POST);
   $post_id = $formData['post_ID'];
   $ebay_id_raw = $formData['ebay_id'];
   $post_status = $formData['post_status'];
@@ -134,13 +133,11 @@ function wbp_upload_image($url, $post_id)
 
     if (is_wp_error($file['tmp_name'])) {
       @unlink($file['tmp_name']);
-      write_log($file['tmp_name']->get_error_messages());
     } else {
       $attachmentId = media_handle_sideload($file, $post_id);
 
       if (is_wp_error($attachmentId)) {
         @unlink($file['tmp_name']);
-        write_log($attachmentId->get_error_messages());
       } else {
         $url = wp_get_attachment_url($attachmentId);
       }

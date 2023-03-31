@@ -144,12 +144,8 @@ function wbp_detectTrident($current_theme)
   $browser = ['name' => '', 'version' => '', 'platform' => ''];
   if (preg_match('/Trident\/([0-9.]*)/u', $ua, $match)) {
     $match = (int)array_pop($match) + 4;
-    // write_log( "Trident:" );
-    // write_log( $match );
   } elseif (preg_match('/MSIE\s{1}([0-9.]*)/u', $ua, $match)) {
     $match = (int)array_pop($match);
-    // write_log( "MSIE:" );
-    // write_log( $match );
   }
   if (!empty($match) && ($match <= 11)) {
     $browser['name'] = 'ie';
