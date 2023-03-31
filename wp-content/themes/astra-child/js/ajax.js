@@ -1,4 +1,7 @@
 jQuery(document).ready(function ($) {
+  
+  const { local_url, remote_url, home_url } = ajax_object;
+
   // Set Status
   $("#change-post-status").on("click", function () {
     let post_id = $(this).attr("id");
@@ -6,7 +9,7 @@ jQuery(document).ready(function ($) {
     let that = this;
     $.ajax({
       method: "POST",
-      url: ajax_object.url,
+      url: local_url,
       data: {
         action: "wbp_update_post",
         post_id,
@@ -28,7 +31,7 @@ jQuery(document).ready(function ($) {
     let that = this;
     $.ajax({
       type: "POST",
-      url: ajax_object.url,
+      url: local_url,
       data: {
         action: "wbp_get_post",
         post_id,
@@ -45,7 +48,6 @@ jQuery(document).ready(function ($) {
 
   function getEbayPreview(e) {
     e.preventDefault();
-    const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
     console.log(formdata);
 
@@ -57,7 +59,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url,
+      url: remote_url,
       data: {
         action: "wbp_ebay_preview",
         formdata,
@@ -73,7 +75,6 @@ jQuery(document).ready(function ($) {
 
   function getEbayData(e) {
     e.preventDefault();
-    const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
 
     if (!formdata.ebay_id) {
@@ -85,7 +86,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url,
+      url: remote_url,
       data: {
         action: "wbp_ebay_preview",
         formdata,
@@ -97,7 +98,6 @@ jQuery(document).ready(function ($) {
 
   function getEbayImages(e) {
     e.preventDefault();
-    const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
 
     if (!formdata.ebay_id) {
@@ -108,7 +108,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url,
+      url: remote_url,
       data: {
         action: "wbp_ebay_preview",
         formdata,
@@ -120,7 +120,6 @@ jQuery(document).ready(function ($) {
 
   function delImages(e) {
     e.preventDefault();
-    const { url, nonce } = ajax_object;
     const formdata = $(form).serializeJSON();
 
     if (!formdata.post_ID) {
@@ -133,7 +132,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
     const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
-      url,
+      url: local_url,
       data: {
         action: "wbp_del_images",
         post_id,
@@ -151,10 +150,10 @@ jQuery(document).ready(function ($) {
   const delImagesButton = document.getElementById("del-images");
   const getEbayPreviewButton = document.getElementById("get-ebay-preview");
 
-  getEbayPreviewButton?.addEventListener("click", getEbayPreview);
-  getEbayImagesButton?.addEventListener("click", getEbayImages);
-  delImagesButton?.addEventListener("click", delImages);
   getEbayDataButton?.addEventListener("click", getEbayData);
+  getEbayImagesButton?.addEventListener("click", getEbayImages);
+  getEbayPreviewButton?.addEventListener("click", getEbayPreview);
+  delImagesButton?.addEventListener("click", delImages);
 
   function ajax_preview_callback(data, callback) {
     const response = JSON.parse(data);
@@ -186,10 +185,11 @@ jQuery(document).ready(function ($) {
   function ajax_import_data_callback(data, callback) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
+      const { success, post_id } = response;
       console.log(response);
 
-      if (response.success) {
-        location = response.data.redirect;
+      if (success) {
+        location = `${home_url}wp-admin/post.php?post=${post_id}&action=edit`;
       } else {
         alert(
           "Sorry, etwas scheint schiefgegangen zu sein.. Versuche es bitte nochnmal."
@@ -202,7 +202,6 @@ jQuery(document).ready(function ($) {
       callback?.();
     };
     const response = JSON.parse(data);
-    const { url, nonce } = ajax_object;
     const { post_id, ebay_id, post_status, content } = response;
     const postdata = { post_id, ebay_id, post_status };
     let doc;
@@ -224,7 +223,7 @@ jQuery(document).ready(function ($) {
     const ebaydata = { title, price, description };
 
     $.post({
-      url: `${url}?_nonce=${nonce}`,
+      url: local_url,
       data: {
         action: "wbp_ebay_data",
         postdata,
@@ -238,10 +237,11 @@ jQuery(document).ready(function ($) {
   function ajax_import_images_callback(data, callback) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
+      const { success, post_id } = response;
       console.log(response);
 
-      if (response.success) {
-        location = response.data.redirect;
+      if (success) {
+        location = `${home_url}wp-admin/post.php?post=${post_id}&action=edit`;
       } else {
         alert("ERROR");
       }
@@ -252,7 +252,6 @@ jQuery(document).ready(function ($) {
       callback?.();
     };
     const response = JSON.parse(data);
-    const { url, nonce } = ajax_object;
     const { post_id, ebay_id, post_status, content } = response;
     const postdata = { post_id, ebay_id, post_status };
 
@@ -275,7 +274,7 @@ jQuery(document).ready(function ($) {
     const ebaydata = { images };
 
     $.post({
-      url: `${url}?_nonce=${nonce}`,
+      url: local_url,
       data: {
         action: "wbp_ebay_images",
         postdata,
@@ -287,12 +286,9 @@ jQuery(document).ready(function ($) {
   }
 
   function ajax_del_images_callback(data, callback) {
-    const {
-      success,
-      data: { redirect },
-    } = JSON.parse(data);
+    const { success, post_id } = JSON.parse(data);
     if (success) {
-      location = redirect;
+      location = `${home_url}wp-admin/post.php?post=${post_id}&action=edit`;
     }
     callback?.();
   }

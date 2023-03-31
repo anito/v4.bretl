@@ -202,21 +202,14 @@ function add_cp_data_attribute($tag, $handle, $src)
 }
 add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
-function getServiceEndpoint()
-{
-  $ssl = $_SERVER['HTTPS'] === 'on';
-  // if ($ssl) {
-  // }
-  return admin_url('admin-ajax.php');
-  // return 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
-}
-
 function wbp_add_ajax_scripts()
 {
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
   wp_localize_script('ajax-callback', 'ajax_object', array(
-    'url' => getServiceEndpoint(),
+    'remote_url' => 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php',
+    'local_url' => admin_url('admin-ajax.php'),
+    'home_url' => home_url(),
     'nonce' => wp_create_nonce()
   ));
 }
@@ -286,7 +279,7 @@ function wbp_get_post()
 
 if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_ajax_scripts', 15);
-  
+
   add_action('wp_ajax_wbp_ebay_preview', 'wbp_ebay_preview');
   add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
   add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');

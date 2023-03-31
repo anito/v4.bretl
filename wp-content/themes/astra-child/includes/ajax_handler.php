@@ -56,7 +56,6 @@ function wbp_import_ebay_data()
   echo json_encode([
     'success' => !!$id,
     'data' => [
-      'redirect' => home_url("wp-admin/post.php?post=" . $post_id . "&action=edit"),
       'post_id' => $post_id,
       'ebay_id' => $ebay_id,
       'price' => $price,
@@ -103,7 +102,6 @@ function wbp_import_ebay_images()
   echo json_encode([
     'success' => !!$id,
     'data' => [
-      'redirect' => home_url("wp-admin/post.php?post=" . $post_id . "&action=edit"),
       'post_id' => $post_id,
       'ebay_id' => $ebay_id,
       'images' => $ids,
@@ -121,9 +119,7 @@ function wbp_delete_images()
 
   echo json_encode([
     'success' => true,
-    'data' => [
-      'redirect' => home_url("wp-admin/post.php?post=" . $post_id . "&action=edit")
-    ]
+    'data' => ['post_id' => $post_id]
   ]);
   wp_die();
 }
