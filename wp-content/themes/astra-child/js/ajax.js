@@ -165,7 +165,10 @@ jQuery(document).ready(function ($) {
       iframe.contentWindow.document.open();
       if (iframe.contentWindow.document) {
         try {
-          iframe.contentWindow.document.write(response.content.body);
+          iframe.contentWindow.document.write(
+            response.content?.body ||
+              "<h1>Arrgh🥶, etwas scheint schiefgegangen zu sein...</h1>"
+          );
         } catch (err) {}
       }
       iframe.contentWindow.document.close();
@@ -183,7 +186,9 @@ jQuery(document).ready(function ($) {
       if (response.success) {
         location = response.data.redirect;
       } else {
-        alert("Sorry, etwas ist schief gelaufen. Versuche es bitte nochnmal.");
+        alert(
+          "Sorry, etwas scheint schiefgegangen zu sein.. Versuche es bitte nochnmal."
+        );
       }
       callback?.();
     };
