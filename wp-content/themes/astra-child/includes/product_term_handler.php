@@ -76,7 +76,7 @@ function wbp_process_ebay($post_id, $post)
     }
     update_post_meta((int) $post_id, '_sku', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
-    update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . 's-' . $ebay_id . '/k0');
+    update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . '/s-' . $ebay_id . '/k0');
   } else {
     delete_post_meta($post_id, 'ebay_url');
   }
