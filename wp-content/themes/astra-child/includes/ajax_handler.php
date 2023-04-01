@@ -11,7 +11,6 @@ function parse_ebay_id($val)
 function wbp_get_ebay_ad()
 {
   $formdata = $_POST['formdata'];
-  write_log($formdata);
   $post_id = $formdata['post_ID'];
   $post_status = $formdata['post_status'];
   $ebay_id_raw = $formdata['ebay_id'];
@@ -50,6 +49,7 @@ function wbp_import_ebay_data()
 
     update_post_meta((int) $post_id, '_regular_price', $price);
     update_post_meta((int) $post_id, '_price', $price);
+    update_post_meta((int) $post_id, '_sku', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
 
     $id = wp_insert_post(array(

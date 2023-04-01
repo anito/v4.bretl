@@ -64,11 +64,9 @@ function wbp_process_featured($product)
 function wbp_process_ebay($post_id, $post)
 {
   $meta = get_post_meta($post_id);
-  $ebay_id_raw = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : null;
+  $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : null;
 
-  if ($ebay_id_raw) {
-    require_once __DIR__ . '/ajax_handler.php';
-    $ebay_id = parse_ebay_id($ebay_id_raw);
+  if ($ebay_id) {
     if (empty($post->post_title)) {
       wp_insert_post([
         'ID' => $post_id,
@@ -76,6 +74,7 @@ function wbp_process_ebay($post_id, $post)
         'post_title' => "Entwurf eBay ID " . $ebay_id
       ]);
     }
+    update_post_meta((int) $post_id, '_sku', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . 's-' . $ebay_id . '/k0');
   } else {
