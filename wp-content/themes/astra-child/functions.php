@@ -235,10 +235,10 @@ function check_cert()
   return ($cont["options"]["ssl"]["peer_certificate"]);
 }
 
-function wbp_ebay_preview()
+function wbp_ebay_ad()
 {
   require_once __DIR__ . '/includes/ajax_handler.php';
-  wbp_get_ebay_preview();
+  wbp_get_ebay_ad();
 }
 
 function wbp_ebay_data()
@@ -283,12 +283,12 @@ function wbp_product_set_attributes($post_id, $attributes)
 if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 15);
 
-  add_action('wp_ajax_wbp_ebay_preview', 'wbp_ebay_preview');
-  add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_wbp_ebay_ad', 'wbp_ebay_ad');
   add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');
-  add_action('wp_ajax_nopriv_wbp_ebay_preview', 'wbp_ebay_preview');
-  add_action('wp_ajax_nopriv_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_nopriv_wbp_ebay_ad', 'wbp_ebay_ad');
   add_action('wp_ajax_nopriv_wbp_ebay_data', 'wbp_ebay_data');
+  add_action('wp_ajax_nopriv_wbp_ebay_images', 'wbp_ebay_images');
   add_action('wp_ajax_wbp_del_images', 'wbp_del_images');
 }
 

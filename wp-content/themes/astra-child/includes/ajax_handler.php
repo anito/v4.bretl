@@ -1,14 +1,22 @@
 <?php
-function wbp_get_ebay_preview()
+function parseEbayId($val)
+{
+  preg_match('/(\/?)(\d{10,})/', $val, $matches);
+  if (isset($matches[2])) {
+    return $matches[2];
+  }
+  return null;
+}
+
+function wbp_get_ebay_ad()
 {
   $formData = $_POST['formdata'];
   $post_id = $formData['post_ID'];
-  $ebay_id_raw = $formData['ebay_id'];
   $post_status = $formData['post_status'];
-  preg_match('/(\/?)(\d{10,})/', $ebay_id_raw, $matches);
-  if (isset($matches[2])) $ebay_id = $matches[2];
+  $ebay_id_raw = $formData['ebay_id'];
+  $ebay_id = parseEbayId($ebay_id_raw);
 
-  $response = wp_remote_get(EBAY_URL . '/s-' . $ebay_id . '/k0');
+  $response = wp_remote_get(EBAY_URL . $ebay_id ? '/s-' . $ebay_id . '/k0' : '/');
 
   echo json_encode(
     [
