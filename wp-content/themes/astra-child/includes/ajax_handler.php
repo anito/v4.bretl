@@ -17,7 +17,8 @@ function wbp_get_ebay_ad()
   $ebay_id_raw = $formdata['ebay_id'];
   $ebay_id = parse_ebay_id($ebay_id_raw);
 
-  $response = wp_remote_get(EBAY_URL . $ebay_id ? '/s-' . $ebay_id . '/k0' : '/');
+  $url = EBAY_URL . ($ebay_id ? '/s-' . $ebay_id . '/k0' : '/');
+  $response = wp_remote_get($url);
 
   echo json_encode(
     [
