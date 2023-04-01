@@ -1,11 +1,11 @@
 <?php
-function parseEbayId($val)
+function parse_ebay_id($val)
 {
-  preg_match('/(\/?)(\d{10,})/', $val, $matches);
+  preg_match('/(\/?)(\d{8,})/', $val, $matches);
   if (isset($matches[2])) {
     return $matches[2];
   }
-  return null;
+  return false;
 }
 
 function wbp_get_ebay_ad()
@@ -14,7 +14,7 @@ function wbp_get_ebay_ad()
   $post_id = $formData['post_ID'];
   $post_status = $formData['post_status'];
   $ebay_id_raw = $formData['ebay_id'];
-  $ebay_id = parseEbayId($ebay_id_raw);
+  $ebay_id = parse_ebay_id($ebay_id_raw);
 
   $response = wp_remote_get(EBAY_URL . $ebay_id ? '/s-' . $ebay_id . '/k0' : '/');
 
@@ -37,8 +37,7 @@ function wbp_import_ebay_data()
   }
   if (isset($postdata['ebay_id'])) {
     $ebay_id_raw = $postdata['ebay_id'];
-    preg_match('/(\/?)(\d{10,})/', $ebay_id_raw, $matches);
-    if (isset($matches[2])) $ebay_id = $matches[2];
+    $ebay_id = parse_ebay_id($ebay_id_raw);
   }
   $ebaydata = $_POST['ebaydata'];
   if (
@@ -80,8 +79,7 @@ function wbp_import_ebay_images()
   }
   if (isset($postdata['ebay_id'])) {
     $ebay_id_raw = $postdata['ebay_id'];
-    preg_match('/(\/?)(\d{10,})/', $ebay_id_raw, $matches);
-    if (isset($matches[2])) $ebay_id = $matches[2];
+    $ebay_id = parse_ebay_id($ebay_id_raw);
   }
   $ebaydata = $_POST['ebaydata'];
   $ebay_images = isset($ebaydata['images']) ? $ebaydata['images'] : [];
