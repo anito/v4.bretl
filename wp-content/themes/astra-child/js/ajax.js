@@ -60,7 +60,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: remote_url,
       data: {
-        action: "wbp_ebay_preview",
+        action: "wbp_ebay_ad",
         formdata,
       },
       success: (data) => ajax_preview_callback(data, remove_spinner),
@@ -87,7 +87,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: remote_url,
       data: {
-        action: "wbp_ebay_preview",
+        action: "wbp_ebay_ad",
         formdata,
       },
       success: (data) => ajax_import_data_callback(data, remove_spinner),
@@ -109,7 +109,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: remote_url,
       data: {
-        action: "wbp_ebay_preview",
+        action: "wbp_ebay_ad",
         formdata,
       },
       success: (data) => ajax_import_images_callback(data, remove_spinner),

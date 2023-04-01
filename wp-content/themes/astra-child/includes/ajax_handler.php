@@ -10,10 +10,11 @@ function parse_ebay_id($val)
 
 function wbp_get_ebay_ad()
 {
-  $formData = $_POST['formdata'];
-  $post_id = $formData['post_ID'];
-  $post_status = $formData['post_status'];
-  $ebay_id_raw = $formData['ebay_id'];
+  $formdata = $_POST['formdata'];
+  write_log($formdata);
+  $post_id = $formdata['post_ID'];
+  $post_status = $formdata['post_status'];
+  $ebay_id_raw = $formdata['ebay_id'];
   $ebay_id = parse_ebay_id($ebay_id_raw);
 
   $response = wp_remote_get(EBAY_URL . $ebay_id ? '/s-' . $ebay_id . '/k0' : '/');
