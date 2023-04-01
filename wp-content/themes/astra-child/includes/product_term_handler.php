@@ -65,10 +65,10 @@ function wbp_process_ebay($post_id, $post)
 {
   $meta = get_post_meta($post_id);
   $ebay_id_raw = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : null;
-  preg_match('/(\/?)(\d{10,})/', $ebay_id_raw, $matches);
-  if (isset($matches[2])) $ebay_id = $matches[2];
 
-  if ($ebay_id) {
+  if ($ebay_id_raw) {
+    require_once __DIR__ . '/ajax_handler.php';
+    $ebay_id = parse_ebay_id($ebay_id_raw);
     if (empty($post->post_title)) {
       wp_insert_post([
         'ID' => $post_id,
