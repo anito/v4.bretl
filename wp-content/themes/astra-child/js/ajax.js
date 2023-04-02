@@ -15,10 +15,10 @@ jQuery(document).ready(function ($) {
         post_status,
       },
       success: function (response, status, options) {
-        if (status === "success") ajax_preview_callback(status, that);
+        if (status === "success") ajax_ad_callback(status, that);
       },
       error: function (response, status, text) {
-        if (status === "error") ajax_preview_callback(status, that);
+        if (status === "error") ajax_ad_callback(status, that);
       },
     });
     return false;
@@ -36,16 +36,16 @@ jQuery(document).ready(function ($) {
         post_id,
       },
       success: function (response, status, options) {
-        if (status === "success") ajax_preview_callback(status, that);
+        if (status === "success") ajax_ad_callback(status, that);
       },
       error: function (response, status, text) {
-        if (status === "error") ajax_preview_callback(status, that);
+        if (status === "error") ajax_ad_callback(status, that);
       },
     });
     return false;
   });
 
-  function getEbayPreview(e) {
+  function getEbayAd(e) {
     e.preventDefault();
     const formdata = $(form).serializeJSON();
     console.log(formdata);
@@ -63,7 +63,7 @@ jQuery(document).ready(function ($) {
         action: "wbp_ebay_ad",
         formdata,
       },
-      success: (data) => ajax_preview_callback(data, remove_spinner),
+      success: (data) => ajax_ad_callback(data, remove_spinner),
       error: (a, b, c) => {
         remove_spinner();
         console.log(a, b, c);
@@ -72,7 +72,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function getEbayData(e) {
+  function importEbayData(e) {
     e.preventDefault();
     const formdata = $(form).serializeJSON();
 
@@ -95,7 +95,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function getEbayImages(e) {
+  function importEbayImages(e) {
     e.preventDefault();
     const formdata = $(form).serializeJSON();
 
@@ -144,20 +144,20 @@ jQuery(document).ready(function ($) {
   const MSG_MISSING_EBAY_ID = "Keine eBay-Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
   const form = document.getElementById("post");
-  const getEbayDataButton = document.getElementById("get-ebay-data");
-  const getEbayPreviewButton = document.getElementById("get-ebay-ad");
-  const getEbayImagesButton = document.getElementById("get-ebay-images");
+  const getEbayAdButton = document.getElementById("get-ebay-ad");
+  const importEbayDataButton = document.getElementById("import-ebay-data");
+  const importEbayImagesButton = document.getElementById("import-ebay-images");
   const delImagesButton = document.getElementById("del-images");
 
-  getEbayDataButton?.addEventListener("click", getEbayData);
-  getEbayImagesButton?.addEventListener("click", getEbayImages);
-  getEbayPreviewButton?.addEventListener("click", getEbayPreview);
+  importEbayDataButton?.addEventListener("click", importEbayData);
+  importEbayImagesButton?.addEventListener("click", importEbayImages);
+  getEbayAdButton?.addEventListener("click", getEbayAd);
   delImagesButton?.addEventListener("click", delImages);
 
-  function ajax_preview_callback(data, callback) {
+  function ajax_ad_callback(data, callback) {
     const response = JSON.parse(data);
     console.log(response);
-    const wrapper = document.getElementById("ebay-preview-wrapper");
+    const wrapper = document.getElementById("ebay-ad-wrapper");
 
     if (wrapper) {
       const iframe =
@@ -194,7 +194,7 @@ jQuery(document).ready(function ($) {
         location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
       } else {
         alert(
-          "Sorry, etwas scheint schiefgegangen zu sein.. Versuche es bitte nochnmal."
+          "Arrgh🥶, etwas scheint schiefgegangen zu sein.. Versuche es bitte nochnmal."
         );
       }
       callback?.();
