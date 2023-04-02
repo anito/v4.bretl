@@ -64,9 +64,9 @@ function wbp_process_featured($product)
 function wbp_process_ebay($post_id, $post)
 {
   $meta = get_post_meta($post_id);
-  $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : null;
+  $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : false;
 
-  if ($ebay_id) {
+  if (false !== $ebay_id) {
     if (empty($post->post_title)) {
       wp_insert_post([
         'ID' => $post_id,
@@ -78,6 +78,8 @@ function wbp_process_ebay($post_id, $post)
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . '/s-' . $ebay_id . '/k0');
   } else {
+    delete_post_meta($post_id, '_sku');
+    delete_post_meta($post_id, 'ebay_id');
     delete_post_meta($post_id, 'ebay_url');
   }
 }

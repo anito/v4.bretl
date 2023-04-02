@@ -145,9 +145,9 @@ jQuery(document).ready(function ($) {
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
   const form = document.getElementById("post");
   const getEbayDataButton = document.getElementById("get-ebay-data");
+  const getEbayPreviewButton = document.getElementById("get-ebay-ad");
   const getEbayImagesButton = document.getElementById("get-ebay-images");
   const delImagesButton = document.getElementById("del-images");
-  const getEbayPreviewButton = document.getElementById("get-ebay-preview");
 
   getEbayDataButton?.addEventListener("click", getEbayData);
   getEbayImagesButton?.addEventListener("click", getEbayImages);
