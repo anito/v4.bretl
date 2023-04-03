@@ -56,7 +56,7 @@ function wbp_process_featured($product)
   }
 
   // Product Featured attribute
-  if(SYNC_COMMON_TAX_AND_ATTS) {
+  if (SYNC_COMMON_TAX_AND_ATTS) {
     wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['featured'], $is_featured);
   }
 }
@@ -91,20 +91,18 @@ function wbp_process_ebay($post_id, $post)
       ]);
     }
 
-    if (!$product->get_sku()) {
-      try {
-        $product->set_sku($ebay_id);
-      } catch (Exception $e) {
-      }
-      $product->save();
+    try {
+      $product->set_sku($ebay_id);
+    } catch (Exception $e) {
     }
+    $product->save();
 
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . '/s-' . $ebay_id . '/k0');
   } else {
     $product->set_sku('');
     $product->save();
-    
+
     delete_post_meta($post_id, 'ebay_id');
     delete_post_meta($post_id, 'ebay_url');
   }
