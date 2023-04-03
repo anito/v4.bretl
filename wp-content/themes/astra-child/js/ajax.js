@@ -194,7 +194,7 @@ jQuery(document).ready(function ($) {
         location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
       } else {
         alert(
-          "Arrgh🥶, etwas scheint schiefgegangen zu sein.. Versuche es bitte nochnmal."
+          `Arrgh🥶, etwas scheint schiefgegangen zu sein.Versuche es bitte nochnmal.`
         );
       }
       callback?.();

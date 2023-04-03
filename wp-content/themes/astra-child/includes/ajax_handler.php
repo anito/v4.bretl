@@ -7,6 +7,24 @@ function parse_ebay_id($val)
   }
   return false;
 }
+function is_valid_title($val)
+{
+  preg_match('/\[#### DUPLIKAT ID \d{8,} ####\]/', $val, $matches, PREG_OFFSET_CAPTURE);
+  if (isset($matches[0])) {
+    return false;
+  }
+  return true;
+}
+function wbp_sanitize_title($val)
+{
+  // $val = "some title [#### DUPLIKAT ID 2373338457 ####] [#### DUPLIKAT ID 2373338457 ####]";
+  // $val = "some title [#### DUPLIKAT ID 2373338457 ####]";
+  preg_match('/((?!DUPLIKAT ID).)*(\[#### DUPLIKAT ID \d{8,} ####\])/', $val, $matches);
+  if (isset($matches[0])) {
+    return $matches[0];
+  }
+  return $val;
+}
 
 function wbp_get_ebay_ad()
 {
@@ -52,22 +70,25 @@ function wbp_import_ebay_data()
     update_post_meta((int) $post_id, '_sku', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
 
-    $id = wp_insert_post(array(
+    $result = wp_insert_post(array(
       'ID' => $post_id,
+      'post_title' => wp_strip_all_tags($title),
       'post_type' => 'product',
-      'post_title' => $title,
+      'post_status' => 'draft',
       'post_content' => $content
-    ));
+    ), true);
+    $is_error = !is_int($result);
+  } else {
+    $is_error = true;
   }
 
-
-  echo json_encode([
-    'success' => !!$id,
+  echo json_encode(['success' => !$is_error,
     'data' => [
       'post_id' => $post_id,
       'ebay_id' => $ebay_id,
       'price' => $price,
       'content' => $content,
+      'error' => $is_error ? $result : false
     ],
   ]);
   wp_die();

@@ -36,7 +36,7 @@ add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
 /**
  * Admin Styles fpr WC Screens
  */
-function wbp_admin_style($hook)
+function wbp_wc_screen_styles($hook)
 {
   $screen    = get_current_screen();
   $screen_id = $screen ? $screen->id : '';
@@ -46,18 +46,25 @@ function wbp_admin_style($hook)
   }
 }
 
+function wbp_publish_guard($data)
+{
+  require_once __DIR__ . '/includes/ajax_handler.php';
+  if (!is_valid_title($data['post_title']) && $data['post_status'] == 'publish') {
+    $data['post_status'] = 'draft';
+    // remove duplicate [#### DUPLICATE ID ####] from the title
+    $data['post_title'] = wbp_sanitize_title($data['post_title']);
+  }
+  return $data;
+}
+
 function wbp_save_post($post_ID, $post)
 {
-  if (!class_exists('WooCommerce', false)) {
-    return;
-  }
-  add_action('admin_enqueue_scripts', 'wbp_admin_style');
+  if (!class_exists('WooCommerce', false)) return 0;
+  if ($post->post_type != "product" || $post->post_status == 'trash') return 0;
 
   $product = wc_get_product($post_ID);
+  if (!$product) return 0;
 
-  if (!$product) {
-    return 0;
-  }
 
   if ($product->is_type('variation')) {
     $variation = new WC_Product_Variation($product);
@@ -73,6 +80,7 @@ add_filter('wp_insert_post_empty_content', function () {
   return false;
 });
 add_action("save_post", "wbp_save_post", 99, 3);
+add_action("wp_insert_post_data", "wbp_publish_guard", 99, 3);
 
 function wbp_product_before_save($product)
 {
@@ -201,6 +209,8 @@ function wbp_add_admin_ajax_scripts()
 {
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
+  // ebay doesn't accept a wc_remote_get from referrers w/o valid certificates
+  // if validation fails, fallback to https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php
   $valid_cert = !!check_cert();
   $local_url = admin_url('admin-ajax.php');
   if (!$valid_cert) {
@@ -282,6 +292,7 @@ function wbp_product_set_attributes($post_id, $attributes)
 
 if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 15);
+  add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');
 
   add_action('wp_ajax_wbp_ebay_ad', 'wbp_ebay_ad');
   add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');

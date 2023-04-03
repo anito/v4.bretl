@@ -63,15 +63,29 @@ function wbp_process_featured($product)
 
 function wbp_process_ebay($post_id, $post)
 {
-  $meta = get_post_meta($post_id);
-  $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : false;
+  global $wpdb;
 
-  if (false !== $ebay_id) {
+  $title = $post->post_title;
+  $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title = %s", 'inherit', 'trash', $title);
+  $posts_like_title = $wpdb->get_results($prepare);
+
+  $meta = get_post_meta($post_id);
+  $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : "";
+
+  if (!empty($ebay_id)) {
     if (empty($post->post_title)) {
       wp_insert_post([
         'ID' => $post_id,
         'post_type' => 'product',
-        'post_title' => "Entwurf eBay ID " . $ebay_id
+        'post_title' => "Entwurf ID " . $ebay_id
+      ]);
+    }
+    if (count($posts_like_title) >= 2) {
+      wp_insert_post([
+        'ID' => $post_id,
+        'post_type' => 'product',
+        'post_content' => $post->post_content,
+        'post_title' => wp_strip_all_tags(wbp_sanitize_title($title . " [#### DUPLIKAT ID " . $ebay_id . " ####]"))
       ]);
     }
     update_post_meta((int) $post_id, '_sku', $ebay_id);
@@ -145,7 +159,7 @@ function wbp_get_product_term($name, $type)
   $term_id = get_term_by('name', 'product_' . $type);
 }
 
-function wbp_sanitize_ids($ids = [], $id, $bool)
+function wbp_sanitize_ids($ids, $id, $bool)
 {
   if (!$bool) {
     # remove id
