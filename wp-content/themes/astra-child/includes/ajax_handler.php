@@ -17,8 +17,6 @@ function is_valid_title($val)
 }
 function wbp_sanitize_title($val)
 {
-  // $val = "some title [#### DUPLIKAT ID 2373338457 ####] [#### DUPLIKAT ID 2373338457 ####]";
-  // $val = "some title [#### DUPLIKAT ID 2373338457 ####]";
   preg_match('/((?!DUPLIKAT ID).)*(\[#### DUPLIKAT ID \d{8,} ####\])/', $val, $matches);
   if (isset($matches[0])) {
     return $matches[0];
@@ -72,7 +70,7 @@ function wbp_import_ebay_data()
 
     $result = wp_insert_post(array(
       'ID' => $post_id,
-      'post_title' => wp_strip_all_tags($title),
+      'post_title' => $title,
       'post_type' => 'product',
       'post_status' => 'draft',
       'post_content' => $content
