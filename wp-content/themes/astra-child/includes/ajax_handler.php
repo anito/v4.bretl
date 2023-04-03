@@ -9,17 +9,23 @@ function parse_ebay_id($val)
 }
 function is_valid_title($val)
 {
-  preg_match('/\[#### DUPLIKAT ID \d{8,} ####\]/', $val, $matches, PREG_OFFSET_CAPTURE);
+  preg_match('/\[ DUPLIKAT \d+ ID \d{8,} \]/', $val, $matches);
   if (isset($matches[0])) {
     return false;
   }
   return true;
 }
+
+function wbp_increment($matches)
+{
+  return $matches[1] . ++$matches[2] . $matches[3];
+}
+
 function wbp_sanitize_title($val)
 {
-  preg_match('/((?!DUPLIKAT ID).)*(\[#### DUPLIKAT ID \d{8,} ####\])/', $val, $matches);
+  preg_match('/((?!DUPLIKAT \d+ ID).)*(\[ DUPLIKAT \d+ ID \d{8,} \])/', $val, $matches);
   if (isset($matches[0])) {
-    return $matches[0];
+    return preg_replace_callback('/(.*\[ DUPLIKAT )(\d+)( ID \d{8,} \])/', "wbp_increment", $matches[0]);
   }
   return $val;
 }
@@ -63,10 +69,16 @@ function wbp_import_ebay_data()
     ($content = isset($ebaydata['description']) ? $ebaydata['description'] : null)
   ) {
 
-    update_post_meta((int) $post_id, '_regular_price', $price);
-    update_post_meta((int) $post_id, '_price', $price);
-    update_post_meta((int) $post_id, '_sku', $ebay_id);
+    $product = wc_get_product($post_id);
+    $product->set_regular_price($price);
+    try {
+      $product->set_sku($ebay_id);
+    } catch (Exception $e) {
+    }
+    $product->save();
+
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
+    update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . '/s-' . $ebay_id . '/k0');
 
     $result = wp_insert_post(array(
       'ID' => $post_id,

@@ -51,7 +51,7 @@ function wbp_publish_guard($data)
   require_once __DIR__ . '/includes/ajax_handler.php';
   if (!is_valid_title($data['post_title']) && $data['post_status'] == 'publish') {
     $data['post_status'] = 'draft';
-    // remove duplicate [#### DUPLICATE ID ####] from the title
+    // prevent adding duplicate DUPLIKAT info to title
     $data['post_title'] = wbp_sanitize_title($data['post_title']);
   }
   return $data;
@@ -488,60 +488,3 @@ function custom_elementor_placeholder_image()
   return get_stylesheet_directory_uri() . '/images/placeholder.jpg';
 }
 add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');
-
-function wbp_query_vars($query_vars)
-{
-  global $wpdb, $pagenow;
-
-  if ('edit.php' != $pagenow) return $query_vars;
-
-  if (isset($_GET['s'])) {
-    $query_vars[] = $_GET['s'];
-  }
-
-  $terms = $query_vars;
-  foreach ($terms as $term) {
-    $term = trim($term);
-    $sku_to_id = $wpdb->get_col($wpdb->prepare("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='_sku' AND meta_value LIKE '%%%s%%';", $wpdb->esc_like($term)));
-  }
-
-  return $query_vars;
-}
-// add_filter('query_vars', 'wbp_query_vars');
-
-function wbp_extend_admin_search(WP_Query $query)
-{
-  $qv = $query->query_vars;
-  if (
-    ($query->is_main_query()) &&
-    ($qv['post_type'] == 'product') &&
-    (isset($_GET['s']))
-  ) {
-    $x = $query->get('ebay_id');
-    $search_term = $_GET['s'];
-    $custom_fields = array('ebay_id');
-
-    $meta_query = $query->get('meta_query');
-    if (!is_array($meta_query)) {
-      $meta_query = array();
-    }
-
-    foreach ($custom_fields as $custom_field) {
-      $meta_query[] = array(
-        'key'     => $custom_field,
-        'value'   => $search_term,
-        'compare' => 'LIKE',
-      );
-    }
-
-    if (
-      count($meta_query) > 1
-    ) {
-      $meta_query['relation'] = 'OR';
-    }
-
-    $query->set('meta_query', $meta_query);
-  };
-  return $query;
-}
-// add_action('pre_get_posts', 'wbp_extend_admin_search');
