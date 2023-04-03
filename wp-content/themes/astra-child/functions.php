@@ -544,4 +544,4 @@ function wbp_extend_admin_search(WP_Query $query)
   };
   return $query;
 }
-add_action('pre_get_posts', 'wbp_extend_admin_search');
+// add_action('pre_get_posts', 'wbp_extend_admin_search');
