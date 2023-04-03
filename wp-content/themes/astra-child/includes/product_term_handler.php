@@ -65,12 +65,14 @@ function wbp_process_ebay($post_id, $post)
 {
   global $wpdb;
 
+  $product = wc_get_product(($post_id));
   $title = $post->post_title;
   $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title = %s", 'inherit', 'trash', $title);
   $posts_like_title = $wpdb->get_results($prepare);
 
   $meta = get_post_meta($post_id);
   $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : "";
+
 
   if (!empty($ebay_id)) {
     if (empty($post->post_title)) {
@@ -88,9 +90,21 @@ function wbp_process_ebay($post_id, $post)
         'post_title' => wp_strip_all_tags(wbp_sanitize_title($title . " [ DUPLIKAT " . 0 . " ID " . $ebay_id . " ]"))
       ]);
     }
+
+    if (!$product->get_sku()) {
+      try {
+        $product->set_sku($ebay_id);
+      } catch (Exception $e) {
+      }
+      $product->save();
+    }
+
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . '/s-' . $ebay_id . '/k0');
   } else {
+    $product->set_sku('');
+    $product->save();
+    
     delete_post_meta($post_id, 'ebay_id');
     delete_post_meta($post_id, 'ebay_url');
   }
