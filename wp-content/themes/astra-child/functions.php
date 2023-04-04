@@ -512,7 +512,7 @@ add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeh
 
 function wbp_add_product_custom_columns($defaults)
 {
-  $defaults['sync'] = 'eBay KA';
+  $defaults['sync'] = 'eBay';
   return $defaults;
 }
 add_filter('manage_product_posts_columns', 'wbp_add_product_custom_columns');
