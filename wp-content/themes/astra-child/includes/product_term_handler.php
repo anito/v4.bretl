@@ -67,11 +67,11 @@ function wbp_process_ebay($post_id, $post)
 
   $product = wc_get_product(($post_id));
   $title = $post->post_title;
-  $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title = %s", 'inherit', 'trash', $title);
+  $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
   $posts_like_title = $wpdb->get_results($prepare);
 
   $meta = get_post_meta($post_id);
-  $ebay_id = isset($meta['ebay_id'][0]) ? $meta['ebay_id'][0] : "";
+  $ebay_id = isset($meta['ebay_id'][0]) ? parse_ebay_id($meta['ebay_id'][0]) : "";
 
 
   if (!empty($ebay_id)) {

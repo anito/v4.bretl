@@ -21,13 +21,13 @@ function wbp_increment($matches)
   return $matches[1] . ++$matches[2] . $matches[3];
 }
 
-function wbp_sanitize_title($val)
+function wbp_sanitize_title($title, $appendix = "")
 {
-  preg_match('/((?!DUPLIKAT \d+ ID).)*(\[ DUPLIKAT \d+ ID \d{8,} \])/', $val, $matches);
+  preg_match('/((?!DUPLIKAT \d+ ID).)*(\[ DUPLIKAT \d+ ID \d{8,} \])/', $title . $appendix, $matches);
   if (isset($matches[0])) {
     return preg_replace_callback('/(.*\[ DUPLIKAT )(\d+)( ID \d{8,} \])/', "wbp_increment", $matches[0]);
   }
-  return $val;
+  return $title;
 }
 
 function wbp_get_ebay_ad()
