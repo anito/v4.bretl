@@ -34,7 +34,6 @@ function wbp_get_ebay_ad()
 {
   $formdata = $_POST['formdata'];
   $post_id = $formdata['post_ID'];
-  $post_status = $formdata['post_status'];
   $ebay_id_raw = $formdata['ebay_id'];
   $ebay_id = parse_ebay_id($ebay_id_raw);
 
@@ -45,37 +44,60 @@ function wbp_get_ebay_ad()
     [
       'post_id' => $post_id,
       'ebay_id' => $ebay_id,
-      'post_status' => $post_status,
       'content' => $response
     ]
   );
   wp_die();
 }
 
+function wbp_publish_post()
+{
+  $post_id = isset($_POST['postId']) ? intval($_POST['postId']) : null;
+  if ($post_id) {
+    $result = wp_update_post(array(
+      'ID' => $post_id,
+      'post_status' => 'publish',
+    ));
+  }
+  $is_error = !is_int($result);
+  $post = get_post($post_id);
+
+  echo json_encode([
+    'success' => $post_id === $result,
+    'data' => [
+      'post_status' => $post->post_status,
+      'error' => $is_error ? $result : false
+    ],
+  ]);
+}
+
 function wbp_import_ebay_data()
 {
-  $postdata = $_POST['postdata'];
-  if (isset($postdata['post_id'])) {
-    $post_id = $postdata['post_id'];
+  $postdata = isset($_POST['postdata']) ? $_POST['postdata'] : null;
+  if ($postdata && isset($postdata['post_id'])) {
+    $post_id = intval($postdata['post_id']);
   }
-  if (isset($postdata['ebay_id'])) {
+  if ($postdata && isset($postdata['ebay_id'])) {
     $ebay_id_raw = $postdata['ebay_id'];
     $ebay_id = parse_ebay_id($ebay_id_raw);
   }
-  $ebaydata = $_POST['ebaydata'];
+  $ebaydata = isset($_POST['ebaydata']) ? $_POST['ebaydata'] : null;
   if (
+    ($ebaydata) &&
     ($title = isset($ebaydata['title']) ? $ebaydata['title'] : null) &&
     ($price = isset($ebaydata['price']) ? $ebaydata['price'] : null) &&
     ($content = isset($ebaydata['description']) ? $ebaydata['description'] : null)
   ) {
 
     $product = wc_get_product($post_id);
-    $product->set_regular_price($price);
-    try {
-      $product->set_sku($ebay_id);
-    } catch (Exception $e) {
+    if ($product) {
+      $product->set_regular_price($price);
+      try {
+        $product->set_sku($ebay_id);
+      } catch (Exception $e) {
+      }
+      $product->save();
     }
-    $product->save();
 
     update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
     update_post_meta((int) $post_id, 'ebay_url', EBAY_URL . '/s-' . $ebay_id . '/k0');
@@ -108,7 +130,7 @@ function wbp_import_ebay_images()
 {
   $postdata = $_POST['postdata'];
   if (isset($postdata['post_id'])) {
-    $post_id = $postdata['post_id'];
+    $post_id = intval($postdata['post_id']);
   }
   if (isset($postdata['ebay_id'])) {
     $ebay_id_raw = $postdata['ebay_id'];
@@ -138,7 +160,7 @@ function wbp_import_ebay_images()
   ));
 
   echo json_encode([
-    'success' => !!$id,
+    'success' => $post_id === $id,
     'data' => [
       'post_id' => $post_id,
       'ebay_id' => $ebay_id,

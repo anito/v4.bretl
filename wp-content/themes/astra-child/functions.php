@@ -57,6 +57,10 @@ function wbp_publish_guard($data)
   return $data;
 }
 
+function wbp_product_quick_edit_save($product)
+{
+}
+
 function wbp_save_post($post_ID, $post)
 {
   if (!class_exists('WooCommerce', false)) return 0;
@@ -74,12 +78,16 @@ function wbp_save_post($post_ID, $post)
 
   require_once __DIR__ . '/includes/product_term_handler.php';
   wbp_process_sale($post_ID, $post);
-  wbp_process_ebay($post_ID, $post);
+  $screen_id = get_current_screen();
+  if ($screen_id == 'product') {
+    wbp_process_ebay($post_ID, $post);
+  }
 }
 add_filter('wp_insert_post_empty_content', function () {
   return false;
 });
 add_action("save_post", "wbp_save_post", 99, 3);
+add_action("woocommerce_product_quick_edit_save", "wbp_product_quick_edit_save", 99, 3);
 add_action("wp_insert_post_data", "wbp_publish_guard", 99, 3);
 
 function wbp_product_before_save($product)
@@ -207,6 +215,7 @@ add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
 function wbp_add_admin_ajax_scripts()
 {
+  global $wp;
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
   // ebay doesn't accept a wc_remote_get from referrers w/o valid certificates
@@ -219,10 +228,14 @@ function wbp_add_admin_ajax_scripts()
     $remote_url = $local_url;
   }
 
+  $screen_id = get_current_screen()->id;
+  $request_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
   wp_localize_script('ajax-callback', 'ajax_object', array(
     'remote_url' => $remote_url,
     'local_url' => $local_url,
     'home_url' => home_url(),
+    'screen' => $screen_id,
+    'relocate_url' => home_url($request_url),
     'nonce' => wp_create_nonce()
   ));
 }
@@ -249,6 +262,12 @@ function wbp_ebay_ad()
 {
   require_once __DIR__ . '/includes/ajax_handler.php';
   wbp_get_ebay_ad();
+}
+
+function wbp_publish()
+{
+  require_once __DIR__ . '/includes/ajax_handler.php';
+  wbp_publish_post();
 }
 
 function wbp_ebay_data()
@@ -294,9 +313,11 @@ if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 15);
   add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');
 
+  add_action('wp_ajax_wbp_publish', 'wbp_publish');
   add_action('wp_ajax_wbp_ebay_ad', 'wbp_ebay_ad');
   add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');
   add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_nopriv_wbp_publish', 'wbp_publish');
   add_action('wp_ajax_nopriv_wbp_ebay_ad', 'wbp_ebay_ad');
   add_action('wp_ajax_nopriv_wbp_ebay_data', 'wbp_ebay_data');
   add_action('wp_ajax_nopriv_wbp_ebay_images', 'wbp_ebay_images');
@@ -455,7 +476,7 @@ function wbp_product_custom_fields()
   echo '<div class=" product_custom_field ">';
 
 ?>
-<?php
+  <?php
 
   woocommerce_wp_text_input(
     array(
@@ -488,3 +509,68 @@ function custom_elementor_placeholder_image()
   return get_stylesheet_directory_uri() . '/images/placeholder.jpg';
 }
 add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');
+
+function wbp_add_product_custom_columns($defaults)
+{
+  $defaults['sync'] = 'eBay KA';
+  return $defaults;
+}
+add_filter('manage_product_posts_columns', 'wbp_add_product_custom_columns');
+
+function wbp_populate_product_custom_columns($column_name, $post_id)
+{
+  $post = get_post($post_id);
+  $product = wc_get_product($post_id);
+  if ($product) {
+    $post_status = $post->post_status;
+    $sku = $product->get_sku($post_id);
+    $sku = is_numeric($sku) ? $sku : false;
+  }
+  switch ($column_name) {
+    case 'sync': {
+  ?>
+        <div class="sync-column-content" style="display:flex; flex-direction: column; width: 113px;">
+          <div id="import-ebay-data-action'<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
+            <span class="spinner" style="position: absolute; left: -35px;"></span>
+            <input type="submit" id="import-ebay-data-<?php echo $post_id ?>" disabled name="import-ebay-data" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-data button button-primary button-small" style="flex: 1; margin-bottom: 3px;" value="Daten importieren">
+          </div>
+          <div id="import-ebay-images-action'<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
+            <span class="spinner" style="position: absolute; left: -35px;"></span>
+            <input type="submit" id="import-ebay-images-<?php echo $post_id ?>" disabled name="import-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-images button button-primary button-small" style="flex: 1; margin-bottom: 3px;" value="Fotos importieren">
+          </div>
+          <div id="publish-post-action-'<?php echo $post_id ?>" class="publish-column-content" style="display:flex; position: relative;">
+            <span class="spinner" style="position: absolute; left: -35px;"></span>
+            <input type="submit" id="publish-post-'<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-primary button-small" style="flex: 1; " value="<?php echo __('Publish') ?>">
+          </div>
+        </div>
+        <script>
+          jQuery(document).ready(($) => {
+            const sku = '<?php echo $sku; ?>';
+            const post_status = '<?php echo $post_status ?>';
+
+            const tr = document.getElementById('post-<?php echo $post_id ?>')
+            const publishButton = tr?.querySelector('input.publish-post')
+            const importDataButton = tr?.querySelector('input.import-ebay-data')
+            const importImagesButton = tr?.querySelector('input.import-ebay-images')
+
+            publishButton.disabled = post_status == 'publish'
+            if (sku) {
+              tr.querySelector('.import-ebay-data')?.removeAttribute('disabled');
+              tr.querySelector('.import-ebay-images')?.removeAttribute('disabled');
+            }
+            const {
+              publishPost,
+              importEbayData,
+              importEbayImages
+            } = ajax_object;
+            publishButton?.addEventListener("click", publishPost);
+            importDataButton?.addEventListener("click", importEbayData);
+            importImagesButton?.addEventListener("click", importEbayImages);
+          })
+        </script>
+<?php
+        break;
+      }
+  }
+}
+add_action('manage_posts_custom_column', 'wbp_populate_product_custom_columns', 10, 2);

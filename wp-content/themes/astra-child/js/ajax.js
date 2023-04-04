@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-  const { local_url, remote_url, home_url } = ajax_object;
+  const { local_url, remote_url, home_url, relocate_url, screen } = ajax_object;
 
   // Set Status
   $("#change-post-status").on("click", function () {
@@ -48,7 +48,6 @@ jQuery(document).ready(function ($) {
   function getEbayAd(e) {
     e.preventDefault();
     const formdata = $(form).serializeJSON();
-    console.log(formdata);
 
     if (!formdata.ebay_id) {
       alert(MSG_MISSING_EBAY_ID);
@@ -74,46 +73,113 @@ jQuery(document).ready(function ($) {
 
   function importEbayData(e) {
     e.preventDefault();
-    const formdata = $(form).serializeJSON();
+
+    const spinner = e.target.parentElement.querySelector(".spinner");
+    spinner?.classList.add("is-active");
+
+    const ondone = () => {
+      spinner?.classList.remove("is-active");
+    };
+
+    const success = (data) => ajax_import_data_callback(data, ondone);
+    const error = (error) => {
+      ondone();
+      console.log(error);
+    };
+
+    if (form) {
+      formdata = $(form).serializeJSON();
+    } else {
+      const button = e.target;
+      const post_ID = button.dataset.postId;
+      const ebay_id = button.dataset.ebayId;
+      formdata = { post_ID, ebay_id };
+    }
 
     if (!formdata.ebay_id) {
       alert(MSG_MISSING_EBAY_ID);
       return;
     }
 
-    const spinner = e.target.parentElement.querySelector(".spinner");
-    spinner?.classList.add("is-active");
-    const remove_spinner = () => spinner.classList.remove("is-active");
     $.post({
       url: remote_url,
       data: {
         action: "wbp_ebay_ad",
         formdata,
       },
-      success: (data) => ajax_import_data_callback(data, remove_spinner),
-      error: remove_spinner,
+      success,
+      error,
     });
   }
 
   function importEbayImages(e) {
     e.preventDefault();
-    const formdata = $(form).serializeJSON();
+
+    const spinner = e.target.parentElement.querySelector(".spinner");
+    spinner?.classList.add("is-active");
+
+    const ondone = () => {
+      spinner?.classList.remove("is-active");
+    };
+
+    const success = (data) => ajax_import_images_callback(data, ondone);
+    const error = (error) => {
+      ondone();
+      console.log(error);
+    };
+
+    if (form) {
+      formdata = $(form).serializeJSON();
+    } else {
+      const button = e.target;
+      const post_ID = button.dataset.postId;
+      const ebay_id = button.dataset.ebayId;
+      formdata = { post_ID, ebay_id };
+    }
 
     if (!formdata.ebay_id) {
       alert(MSG_MISSING_EBAY_ID);
       return;
     }
-    const spinner = e.target.parentElement.querySelector(".spinner");
-    spinner?.classList.add("is-active");
-    const remove_spinner = () => spinner.classList.remove("is-active");
+
     $.post({
       url: remote_url,
       data: {
         action: "wbp_ebay_ad",
         formdata,
       },
-      success: (data) => ajax_import_images_callback(data, remove_spinner),
-      error: remove_spinner,
+      success,
+      error,
+    });
+  }
+
+  function publishPost(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const postId = e.target.dataset.postId;
+    const spinner = e.target.parentElement.querySelector(".spinner");
+    spinner?.classList.add("is-active");
+
+    const success = (data) => {
+      if (relocate_url) {
+        location = relocate_url;
+      } else {
+        alert(MSG_ERROR);
+      }
+    };
+    const error = (error) => {
+      console.log(error);
+    };
+
+    $.post({
+      url: remote_url,
+      data: {
+        action: "wbp_publish",
+        postId,
+      },
+      success,
+      error,
     });
   }
 
@@ -143,16 +209,64 @@ jQuery(document).ready(function ($) {
 
   const MSG_MISSING_EBAY_ID = "Keine eBay-Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
-  const form = document.getElementById("post");
-  const getEbayAdButton = document.getElementById("get-ebay-ad");
-  const importEbayDataButton = document.getElementById("import-ebay-data");
-  const importEbayImagesButton = document.getElementById("import-ebay-images");
-  const delImagesButton = document.getElementById("del-images");
+  const MSG_ERROR =
+    "Arrgh🥶, etwas scheint schiefgegangen zu sein.\n\nBitte nochnmal versuchen.";
 
-  importEbayDataButton?.addEventListener("click", importEbayData);
-  importEbayImagesButton?.addEventListener("click", importEbayImages);
-  getEbayAdButton?.addEventListener("click", getEbayAd);
-  delImagesButton?.addEventListener("click", delImages);
+  let form;
+  switch (screen) {
+    case "edit-product":
+      const importEbayDataButtons = document.querySelectorAll(
+        "input.import-ebay-data"
+      );
+      const importEbayImagesButtons = document.querySelectorAll(
+        "input.import-ebay-images"
+      );
+      const publishButtons = document.querySelectorAll("input.publish-post");
+
+      importEbayDataButtons.forEach((button) => {
+        const tablerowElement = button.closest("[id^=post-]");
+        const ebay_id = tablerowElement?.querySelector(".sku")?.innerText;
+
+        if (ebay_id) {
+          ajax_object.importEbayData = importEbayData;
+        }
+      });
+      importEbayImagesButtons.forEach((button) => {
+        const tablerowElement = button.closest("[id^=post-]");
+        const ebay_id = tablerowElement?.querySelector(".sku")?.innerText;
+
+        if (ebay_id) {
+          ajax_object.importEbayImages = importEbayImages;
+        }
+      });
+      publishButtons.forEach((button) => {
+        const post_status = button.dataset.postStatus;
+
+        if (post_status == "draft") {
+          ajax_object.publishPost = publishPost;
+        }
+      });
+      break;
+    case "product":
+      form = document.getElementById("post");
+
+      const getEbayAdButton = document.getElementById("get-ebay-ad");
+      const importEbayDataButton = document.getElementById("import-ebay-data");
+      const importEbayImagesButton =
+        document.getElementById("import-ebay-images");
+      const delImagesButton = document.getElementById("del-images");
+
+      importEbayDataButton?.addEventListener("click", importEbayData);
+      importEbayImagesButton?.addEventListener("click", importEbayImages);
+      getEbayAdButton?.addEventListener("click", getEbayAd);
+      delImagesButton?.addEventListener("click", delImages);
+
+      getEbayAdButton?.removeAttribute("disabled");
+      importEbayDataButton?.removeAttribute("disabled");
+      importEbayImagesButton?.removeAttribute("disabled");
+      delImagesButton?.removeAttribute("disabled");
+      break;
+  }
 
   function ajax_ad_callback(data, callback) {
     const response = JSON.parse(data);
@@ -191,18 +305,20 @@ jQuery(document).ready(function ($) {
       console.log(response);
 
       if (success) {
-        location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
+        if (relocate_url) {
+          location = relocate_url;
+        }
       } else {
-        alert(
-          `Arrgh🥶, etwas scheint schiefgegangen zu sein.Versuche es bitte nochnmal.`
-        );
+        alert(MSG_ERROR);
       }
       callback?.();
     };
+
     const handle_error = (data) => {
       console.log(data);
       callback?.();
     };
+
     const response = JSON.parse(data);
     const { post_id, ebay_id, post_status, content } = response;
     const postdata = { post_id, ebay_id, post_status };
@@ -243,12 +359,13 @@ jQuery(document).ready(function ($) {
         success,
         data: { post_id },
       } = response;
+      const { relocate_url } = ajax_object;
       console.log(response);
 
       if (success) {
-        location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
+        location = relocate_url;
       } else {
-        alert("ERROR");
+        alert(MSG_ERROR);
       }
       callback?.();
     };
