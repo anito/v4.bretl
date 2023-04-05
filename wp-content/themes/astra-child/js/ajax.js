@@ -262,8 +262,8 @@ jQuery(document).ready(function ($) {
         document.getElementById("import-ebay-images");
       const delImagesButton = document.getElementById("del-images");
 
-      importEbayDataButton?.addEventListener("click", (e) => importEbayData(e, () => location = relocate_url));
-      importEbayImagesButton?.addEventListener("click", (e) => importEbayImages(e, () => location = relocate_url));
+      importEbayDataButton?.addEventListener("click", (e) => importEbayData(e, relocate));
+      importEbayImagesButton?.addEventListener("click", (e) => importEbayImages(e, relocate));
       getEbayAdButton?.addEventListener("click", getEbayAd);
       delImagesButton?.addEventListener("click", delImages);
 
@@ -272,6 +272,13 @@ jQuery(document).ready(function ($) {
       importEbayImagesButton?.removeAttribute("disabled");
       delImagesButton?.removeAttribute("disabled");
       break;
+  }
+
+  function relocate() {
+    const params = new URL(relocate_url).searchParams;
+    if(Array.from(params).length) {
+      location = relocate_url;
+    }
   }
 
   function ajax_ad_callback(data, callback) {
