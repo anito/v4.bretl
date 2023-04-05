@@ -67,7 +67,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function importEbayData(e, callback) {
+  function importEbayData(e) {
     e.preventDefault();
 
     const el = e.target;
@@ -79,7 +79,7 @@ jQuery(document).ready(function ($) {
     };
 
     const success = (data) => {
-      processDataImport(data, { el, post_ID }, callback);
+      processDataImport(data, { el, post_ID });
     };
     const error = (error) => {
       ondone();
@@ -112,7 +112,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function importEbayImages(e, callback) {
+  function importEbayImages(e) {
     e.preventDefault();
 
     const el = e.target;
@@ -124,9 +124,9 @@ jQuery(document).ready(function ($) {
     };
 
     const success = (data) => {
-      processImageImport(data, { el, post_ID }, callback);
+      processImageImport(data, { el, post_ID });
     };
-    
+
     const error = (error) => {
       ondone();
       console.log(error);
@@ -160,9 +160,18 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function parseResponse({ data, post_ID, el }) {
-    const row = el.closest(`#post-${post_ID}`);
-    $(row)?.replaceWith(data);
+  function parseResponse({ data, el }) {
+    const {
+      html,
+      post: { post_ID },
+    } = JSON.parse(data);
+
+    if ("product" === screen) {
+      location = `${home_url}/wp-admin/post.php?post=${post_ID}&action=edit`;
+    } else {
+      const row = el.closest(`#post-${post_ID}`);
+      $(row)?.replaceWith(html);
+    }
   }
 
   function publishPost(e) {
@@ -184,7 +193,7 @@ jQuery(document).ready(function ($) {
         action: "wbp_publish",
         post_ID,
       },
-      success: (data) => parseResponse({ data, post_ID, el }),
+      success: (data) => parseResponse({ data, el }),
       error: (error) => console.log(error),
     });
   }
@@ -262,8 +271,8 @@ jQuery(document).ready(function ($) {
         document.getElementById("import-ebay-images");
       const delImagesButton = document.getElementById("del-images");
 
-      importEbayDataButton?.addEventListener("click", (e) => importEbayData(e, relocate));
-      importEbayImagesButton?.addEventListener("click", (e) => importEbayImages(e, relocate));
+      importEbayDataButton?.addEventListener("click", importEbayData);
+      importEbayImagesButton?.addEventListener("click", importEbayImages);
       getEbayAdButton?.addEventListener("click", getEbayAd);
       delImagesButton?.addEventListener("click", delImages);
 
@@ -275,7 +284,7 @@ jQuery(document).ready(function ($) {
   }
 
   function relocate() {
-    if(-1 === relocate_url?.indexOf('post-new.php')) {
+    if (-1 !== relocate_url?.indexOf("post-new.php")) {
       location = relocate_url;
     }
   }
@@ -309,7 +318,6 @@ jQuery(document).ready(function ($) {
   function processDataImport(data, transferObj = {}, callback = () => {}) {
     const handle_success = (data) => {
       parseResponse({ data, ...transferObj });
-      callback?.()
     };
 
     const handle_error = (data) => {
@@ -350,13 +358,12 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function processImageImport(data, transferObj = {}, callback = () => {}) {
+  function processImageImport(data, transferObj = {}) {
     const handle_success = (data) => {
       parseResponse({ data, ...transferObj });
-      callback?.();
     };
-    const handle_error = (data) => {
-      callback?.();
+    const handle_error = (error) => {
+      console.log(error);
     };
     const response = JSON.parse(data);
     const { post_ID, ebay_id, post_status, content } = response;
@@ -380,7 +387,7 @@ jQuery(document).ready(function ($) {
 
     const ebaydata = { images };
 
-    console.log(ebaydata)
+    console.log(ebaydata);
 
     $.post({
       url: local_url,

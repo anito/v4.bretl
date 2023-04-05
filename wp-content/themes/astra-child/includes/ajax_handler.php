@@ -60,8 +60,15 @@ function wbp_publish_post()
     ));
   }
   
+  ob_start();
+  
   $table = new Extended_WC_Admin_List_Table_Products();
   $table->render_row($post_ID);
+
+  echo json_encode([
+    'html' => ob_get_clean(),
+    'post' => compact(['post_ID'])
+  ]);
 
   // $post = get_post($post_ID);
   // echo json_encode([
@@ -111,8 +118,15 @@ function wbp_import_ebay_data()
     ), true);
   }
 
+  ob_start();
+
   $table = new Extended_WC_Admin_List_Table_Products();
   $table->render_row($post_ID);
+
+  echo json_encode([
+    'html' => ob_get_clean(),
+    'post' => compact(['post_ID'])
+  ]);
 
   // echo json_encode([
   //   'success' => $post_ID === $result,
@@ -154,8 +168,15 @@ function wbp_import_ebay_images()
     'post_type' => 'product',
   ));
 
+  ob_start();
+
   $table = new Extended_WC_Admin_List_Table_Products();
   $table->render_row($post_ID);
+
+  echo json_encode([
+    'html' => ob_get_clean(),
+    'post' => compact(['post_ID'])
+  ]);
   wp_die();
 }
 
