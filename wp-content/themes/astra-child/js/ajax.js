@@ -3,7 +3,7 @@ jQuery(document).ready(function ($) {
 
   // Set Status
   $("#change-post-status").on("click", function () {
-    let post_id = $(this).attr("id");
+    let post_ID = $(this).attr("id");
     let post_status = $(this).data("post-status");
     let that = this;
     $.ajax({
@@ -11,7 +11,7 @@ jQuery(document).ready(function ($) {
       url: local_url,
       data: {
         action: "wbp_update_post",
-        post_id,
+        post_ID,
         post_status,
       },
       success: function (response, status, options) {
@@ -26,14 +26,14 @@ jQuery(document).ready(function ($) {
 
   // Get Status
   $("#get-status").on("click", function () {
-    let post_id = $(this).attr("id");
+    let post_ID = $(this).attr("id");
     let that = this;
     $.ajax({
       type: "POST",
       url: local_url,
       data: {
         action: "wbp_get_post",
-        post_id,
+        post_ID,
       },
       success: function (response, status, options) {
         if (status === "success") ajax_ad_callback(status, that);
@@ -63,25 +63,24 @@ jQuery(document).ready(function ($) {
         formdata,
       },
       success: (data) => ajax_ad_callback(data, remove_spinner),
-      error: (a, b, c) => {
-        remove_spinner();
-        console.log(a, b, c);
-      },
-      complete: remove_spinner,
+      error: remove_spinner,
     });
   }
 
-  function importEbayData(e) {
+  function importEbayData(e, callback) {
     e.preventDefault();
 
-    const spinner = e.target.parentElement.querySelector(".spinner");
+    const el = e.target;
+    const spinner = el.parentElement.querySelector(".spinner");
     spinner?.classList.add("is-active");
 
     const ondone = () => {
       spinner?.classList.remove("is-active");
     };
 
-    const success = (data) => ajax_import_data_callback(data, ondone);
+    const success = (data) => {
+      processDataImport(data, { el, post_ID }, callback);
+    };
     const error = (error) => {
       ondone();
       console.log(error);
@@ -95,6 +94,7 @@ jQuery(document).ready(function ($) {
       const ebay_id = button.dataset.ebayId;
       formdata = { post_ID, ebay_id };
     }
+    const { post_ID } = formdata;
 
     if (!formdata.ebay_id) {
       alert(MSG_MISSING_EBAY_ID);
@@ -112,9 +112,10 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function importEbayImages(e) {
+  function importEbayImages(e, callback) {
     e.preventDefault();
 
+    const el = e.target;
     const spinner = e.target.parentElement.querySelector(".spinner");
     spinner?.classList.add("is-active");
 
@@ -122,7 +123,10 @@ jQuery(document).ready(function ($) {
       spinner?.classList.remove("is-active");
     };
 
-    const success = (data) => ajax_import_images_callback(data, ondone);
+    const success = (data) => {
+      processImageImport(data, { el, post_ID }, callback);
+    };
+    
     const error = (error) => {
       ondone();
       console.log(error);
@@ -136,6 +140,9 @@ jQuery(document).ready(function ($) {
       const ebay_id = button.dataset.ebayId;
       formdata = { post_ID, ebay_id };
     }
+    const { post_ID } = formdata;
+
+    console.log(formdata);
 
     if (!formdata.ebay_id) {
       alert(MSG_MISSING_EBAY_ID);
@@ -151,24 +158,22 @@ jQuery(document).ready(function ($) {
       success,
       error,
     });
+  }
+
+  function parseResponse({ data, post_ID, el }) {
+    const row = el.closest(`#post-${post_ID}`);
+    $(row)?.replaceWith(data);
   }
 
   function publishPost(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    const postId = e.target.dataset.postId;
-    const spinner = e.target.parentElement.querySelector(".spinner");
+    const el = e.target;
+    const post_ID = el.dataset.postId;
+    const spinner = el.parentElement.querySelector(".spinner");
     spinner?.classList.add("is-active");
 
-    const success = (data) => {
-      if (relocate_url) {
-        console.log(data);
-        location = relocate_url;
-      } else {
-        alert(MSG_ERROR);
-      }
-    };
     const error = (error) => {
       console.log(error);
     };
@@ -177,10 +182,10 @@ jQuery(document).ready(function ($) {
       url: local_url,
       data: {
         action: "wbp_publish",
-        postId,
+        post_ID,
       },
-      success,
-      error,
+      success: (data) => parseResponse({ data, post_ID, el }),
+      error: (error) => console.log(error),
     });
   }
 
@@ -192,7 +197,7 @@ jQuery(document).ready(function ($) {
       alert(MSG_MISSING_POST_ID);
       return;
     }
-    const post_id = formdata.post_ID;
+    const post_ID = formdata.post_ID;
 
     const spinner = e.target.parentElement.querySelector(".spinner");
     spinner?.classList.add("is-active");
@@ -201,7 +206,7 @@ jQuery(document).ready(function ($) {
       url: local_url,
       data: {
         action: "wbp_del_images",
-        post_id,
+        post_ID,
       },
       success: (data) => ajax_del_images_callback(data, remove_spinner),
       error: remove_spinner,
@@ -257,8 +262,8 @@ jQuery(document).ready(function ($) {
         document.getElementById("import-ebay-images");
       const delImagesButton = document.getElementById("del-images");
 
-      importEbayDataButton?.addEventListener("click", importEbayData);
-      importEbayImagesButton?.addEventListener("click", importEbayImages);
+      importEbayDataButton?.addEventListener("click", (e) => importEbayData(e, () => location = relocate_url));
+      importEbayImagesButton?.addEventListener("click", (e) => importEbayImages(e, () => location = relocate_url));
       getEbayAdButton?.addEventListener("click", getEbayAd);
       delImagesButton?.addEventListener("click", delImages);
 
@@ -271,7 +276,6 @@ jQuery(document).ready(function ($) {
 
   function ajax_ad_callback(data, callback) {
     const response = JSON.parse(data);
-    console.log(response);
 
     const wrapper = document.getElementById("ebay-ad-wrapper");
     if (wrapper) {
@@ -296,21 +300,10 @@ jQuery(document).ready(function ($) {
     }
   }
 
-  function ajax_import_data_callback(data, callback) {
+  function processDataImport(data, transferObj = {}, callback = () => {}) {
     const handle_success = (data) => {
-      const response = JSON.parse(data);
-      const { success } = response;
-
-      console.log(response);
-
-      if (success) {
-        if (relocate_url) {
-          location = relocate_url;
-        }
-      } else {
-        alert(MSG_ERROR);
-      }
-      callback?.();
+      parseResponse({ data, ...transferObj });
+      callback?.()
     };
 
     const handle_error = (data) => {
@@ -319,8 +312,8 @@ jQuery(document).ready(function ($) {
     };
 
     const response = JSON.parse(data);
-    const { post_id, ebay_id, post_status, content } = response;
-    const postdata = { post_id, ebay_id, post_status };
+    const { post_ID, ebay_id, post_status, content } = response;
+    const postdata = { post_ID, ebay_id, post_status };
     let doc;
     try {
       const parser = new DOMParser();
@@ -351,28 +344,17 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function ajax_import_images_callback(data, callback) {
+  function processImageImport(data, transferObj = {}, callback = () => {}) {
     const handle_success = (data) => {
-      const response = JSON.parse(data);
-      const { relocate_url } = ajax_object;
-
-      console.log(response);
-
-      const { success } = response;
-      if (success) {
-        location = relocate_url;
-      } else {
-        alert(MSG_ERROR);
-      }
+      parseResponse({ data, ...transferObj });
       callback?.();
     };
     const handle_error = (data) => {
-      console.log(data);
       callback?.();
     };
     const response = JSON.parse(data);
-    const { post_id, ebay_id, post_status, content } = response;
-    const postdata = { post_id, ebay_id, post_status };
+    const { post_ID, ebay_id, post_status, content } = response;
+    const postdata = { post_ID, ebay_id, post_status };
 
     let doc;
     try {
@@ -391,6 +373,8 @@ jQuery(document).ready(function ($) {
       });
 
     const ebaydata = { images };
+
+    console.log(ebaydata)
 
     $.post({
       url: local_url,
