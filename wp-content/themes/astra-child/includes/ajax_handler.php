@@ -113,7 +113,7 @@ function wbp_import_ebay_data()
   }
 
   echo json_encode([
-    'success' => $result = $post_id,
+    'success' => $post_id === $result,
     'data' => compact(['post_id', 'ebay_id', 'post_status', 'price', 'content', 'error']),
   ]);
   wp_die();
@@ -153,7 +153,8 @@ function wbp_import_ebay_images()
   ));
   $error = is_wp_error(($result)) ? array('message' => $result->get_error_message()) : false;
 
-  echo json_encode(['success' => $post_id === $result,
+  echo json_encode([
+    'success' => $post_id === $result,
     'data' => compact(['post_id', 'ebay_id', 'ids', 'error']),
   ]);
   wp_die();
@@ -181,16 +182,16 @@ function wbp_upload_image($url, $post_id)
     $file['name'] = $url;
     $file['tmp_name'] = download_url($url);
 
-    if (is_wp_error($file['tmp_name'])) {
-      @unlink($file['tmp_name']);
-    } else {
+    if (!is_wp_error($file['tmp_name'])) {
       $attachmentId = media_handle_sideload($file, $post_id);
-
+      
       if (is_wp_error($attachmentId)) {
         @unlink($file['tmp_name']);
       } else {
         $url = wp_get_attachment_url($attachmentId);
       }
+    } else {
+      // @unlink($file['tmp_name']);
     }
   }
   return $attachmentId;
