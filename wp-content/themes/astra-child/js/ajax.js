@@ -272,8 +272,8 @@ jQuery(document).ready(function ($) {
   function ajax_ad_callback(data, callback) {
     const response = JSON.parse(data);
     console.log(response);
-    const wrapper = document.getElementById("ebay-ad-wrapper");
 
+    const wrapper = document.getElementById("ebay-ad-wrapper");
     if (wrapper) {
       const iframe =
         wrapper.querySelector("iframe") || document.createElement("iframe");
@@ -299,6 +299,8 @@ jQuery(document).ready(function ($) {
   function ajax_import_data_callback(data, callback) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
+      const { success } = response;
+
       console.log(response);
 
       if (success) {
@@ -353,8 +355,10 @@ jQuery(document).ready(function ($) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
       const { relocate_url } = ajax_object;
+
       console.log(response);
 
+      const { success } = response;
       if (success) {
         location = relocate_url;
       } else {
