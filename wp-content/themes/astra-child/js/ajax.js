@@ -275,8 +275,7 @@ jQuery(document).ready(function ($) {
   }
 
   function relocate() {
-    const params = new URL(relocate_url).searchParams;
-    if(Array.from(params).length) {
+    if(-1 === relocate_url?.indexOf('post-new.php')) {
       location = relocate_url;
     }
   }
