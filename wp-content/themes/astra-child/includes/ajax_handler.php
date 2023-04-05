@@ -59,16 +59,14 @@ function wbp_publish_post()
       'post_status' => 'publish',
     ));
   }
-  $is_error = !is_int($result);
+  $error = is_wp_error(($result)) ? array('message' => $result->get_error_message()) : false;
   $post = get_post($post_id);
 
   echo json_encode([
     'success' => $post_id === $result,
-    'data' => [
-      'post_status' => $post->post_status,
-      'error' => $is_error ? $result : false
-    ],
+    'data' => compact(['post_id', 'post_status', 'error']),
   ]);
+  wp_die();
 }
 
 function wbp_import_ebay_data()
@@ -109,19 +107,14 @@ function wbp_import_ebay_data()
       'post_status' => 'draft',
       'post_content' => $content
     ), true);
-    $is_error = !is_int($result);
+    $error = is_wp_error(($result)) ? array('message' => $result->get_error_message()) : false;
   } else {
-    $is_error = true;
+    $error = array('message' => 'Wrong eBay data');
   }
 
-  echo json_encode(['success' => !$is_error,
-    'data' => [
-      'post_id' => $post_id,
-      'ebay_id' => $ebay_id,
-      'price' => $price,
-      'content' => $content,
-      'error' => $is_error ? $result : false
-    ],
+  echo json_encode([
+    'success' => $result = $post_id,
+    'data' => compact(['post_id', 'ebay_id', 'post_status', 'price', 'content', 'error']),
   ]);
   wp_die();
 }
@@ -154,18 +147,14 @@ function wbp_import_ebay_images()
   update_post_meta((int) $post_id, '_product_image_gallery', implode(',', $ids));
   update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
 
-  $id = wp_update_post(array(
+  $result = wp_update_post(array(
     'ID' => $post_id,
     'post_type' => 'product',
   ));
+  $error = is_wp_error(($result)) ? array('message' => $result->get_error_message()) : false;
 
-  echo json_encode([
-    'success' => $post_id === $id,
-    'data' => [
-      'post_id' => $post_id,
-      'ebay_id' => $ebay_id,
-      'images' => $ids,
-    ],
+  echo json_encode(['success' => $post_id === $result,
+    'data' => compact(['post_id', 'ebay_id', 'ids', 'error']),
   ]);
   wp_die();
 }

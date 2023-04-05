@@ -163,6 +163,7 @@ jQuery(document).ready(function ($) {
 
     const success = (data) => {
       if (relocate_url) {
+        console.log(data);
         location = relocate_url;
       } else {
         alert(MSG_ERROR);
@@ -173,7 +174,7 @@ jQuery(document).ready(function ($) {
     };
 
     $.post({
-      url: remote_url,
+      url: local_url,
       data: {
         action: "wbp_publish",
         postId,
@@ -298,10 +299,6 @@ jQuery(document).ready(function ($) {
   function ajax_import_data_callback(data, callback) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
-      const {
-        success,
-        data: { post_id },
-      } = response;
       console.log(response);
 
       if (success) {
@@ -355,10 +352,6 @@ jQuery(document).ready(function ($) {
   function ajax_import_images_callback(data, callback) {
     const handle_success = (data) => {
       const response = JSON.parse(data);
-      const {
-        success,
-        data: { post_id },
-      } = response;
       const { relocate_url } = ajax_object;
       console.log(response);
 
@@ -408,12 +401,9 @@ jQuery(document).ready(function ($) {
   }
 
   function ajax_del_images_callback(data, callback) {
-    const {
-      success,
-      data: { post_id },
-    } = JSON.parse(data);
+    const { success } = JSON.parse(data);
     if (success) {
-      location = `${home_url}/wp-admin/post.php?post=${post_id}&action=edit`;
+      location = relocate_url;
     }
     callback?.();
   }
