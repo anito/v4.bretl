@@ -392,7 +392,7 @@ jQuery(document).ready(function ($) {
     console.log(ebaydata);
 
     if(images.length) {
-      msg = `${images.length} Fotos importiert.` 
+      msg = `${images.length} Fotos wurden importiert.`; 
     } else {
       msg = 'Es konnten keine Fotos importiert werden.';
     }
