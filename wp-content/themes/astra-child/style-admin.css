@@ -36,10 +36,6 @@
 [class*=post-] [id*="-wbp-action"] .spinner {
   left: -20px;
 }
-[class*=post-] [id*="-wbp-action"] {
-  display: flex;
-  justify-content: center;
-}
 [class*=post-] .ebay-sync-action-button {
   width: 180px;
   align-self: center;
