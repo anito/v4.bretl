@@ -50,44 +50,63 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       case 'sync': {
 ?>
           <div class="sync-column-content" style="display:flex; flex-direction: column; width: 113px;">
-            <div id="import-ebay-data-action'<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
+            <div id="import-ebay-data-action-<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
               <span class="spinner" style="position: absolute; left: -35px;"></span>
-              <input type="submit" id="import-ebay-data-<?php echo $post_id ?>" disabled name="import-ebay-data" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-data button button-primary button-small" style="flex: 1; margin-bottom: 3px;" value="Daten importieren">
+              <input type="submit" id="import-ebay-data-<?php echo $post_id ?>" disabled name="import-ebay-data" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-data button button-primary button-small" style="" value="Daten importieren">
             </div>
-            <div id="import-ebay-images-action'<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
+            <div id="import-ebay-images-action-<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
               <span class="spinner" style="position: absolute; left: -35px;"></span>
-              <input type="submit" id="import-ebay-images-<?php echo $post_id ?>" disabled name="import-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-images button button-primary button-small" style="flex: 1; margin-bottom: 3px;" value="Fotos importieren">
+              <span class="ebay-images-wrapper" style="display: flex;">
+                <input type="submit" id="import-ebay-images-<?php echo $post_id ?>" disabled name="import-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-images button button-primary button-small" style="" value="Fotos importieren">
+                <button type="submit" id="delete-ebay-images-<?php echo $post_id ?>" disabled name="delete-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-ebay-images button button-primary button-small" style="">
+                  <i class="dashicons dashicons-trash" style="font-size: 1.3em; vertical-align: middle"></i>
+                </button>
+              </span>
             </div>
-            <div id="publish-post-action-'<?php echo $post_id ?>" class="publish-column-content" style="display:flex; position: relative;">
+            <div id="publish-post-action-<?php echo $post_id ?>" class="publish-column-content" style="display:flex; position: relative;">
               <span class="spinner" style="position: absolute; left: -35px;"></span>
-              <input type="submit" id="publish-post-'<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-primary button-small" style="flex: 1; " value="<?php echo __('Publish') ?>">
+              <input type="submit" id="publish-post-<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-primary button-small" style="" value="<?php echo __('Publish') ?>">
             </div>
           </div>
+          <style>
+            .sync-column-content .button {
+              flex: 1;
+              margin: 0 3px 3px 0;
+            }
+          </style>
           <script>
             jQuery(document).ready(($) => {
+              const {
+                publishPost,
+                importEbayData,
+                importEbayImages,
+                deleteEbayImages
+              } = ajax_object;
 
               const sku = '<?php echo $sku; ?>';
               const post_status = '<?php echo $post_status ?>';
 
-              const tr = document.getElementById('post-<?php echo $post_id ?>')
-              const publishButton = tr?.querySelector('input.publish-post')
-              const importDataButton = tr?.querySelector('input.import-ebay-data')
-              const importImagesButton = tr?.querySelector('input.import-ebay-images')
+              const tr = document.getElementById('post-<?php echo $post_id ?>');
+              const publishButton = tr?.querySelector('#publish-post-<?php echo $post_id ?>');
+              const importDataButton = tr?.querySelector('#import-ebay-data-<?php echo $post_id ?>');
+              const importImagesButton = tr?.querySelector('#import-ebay-images-<?php echo $post_id ?>');
+              const deleteImagesButton = tr?.querySelector('#delete-ebay-images-<?php echo $post_id ?>');
 
-              publishButton.disabled = post_status == 'publish'
-              if (sku) {
-                tr.querySelector('.import-ebay-data')?.removeAttribute('disabled');
-                tr.querySelector('.import-ebay-images')?.removeAttribute('disabled');
-              }
-              const {
-                publishPost,
-                importEbayData,
-                importEbayImages
-              } = ajax_object;
-              publishButton?.addEventListener("click", publishPost);
-              importDataButton?.addEventListener("click", importEbayData);
-              importImagesButton?.addEventListener("click", importEbayImages);
-            })
+              setTimeout(() => {
+                publishButton?.addEventListener("click", publishPost);
+                importDataButton?.addEventListener("click", importEbayData);
+                importImagesButton?.addEventListener("click", importEbayImages);
+                deleteImagesButton?.addEventListener("click", deleteEbayImages);
+
+
+                if (sku) {
+                  importDataButton && (importDataButton.disabled = false);
+                  importImagesButton && (importImagesButton.disabled = false);
+                  deleteImagesButton && (deleteImagesButton.disabled = false);
+                }
+                publishButton && (publishButton.disabled = post_status == 'publish');
+              }, 200)
+            });
           </script>
 <?php
           break;

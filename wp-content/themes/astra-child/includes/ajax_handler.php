@@ -187,9 +187,14 @@ function wbp_delete_images()
     remove_attachments($post_ID);
   }
 
+  ob_start();
+
+  $table = new Extended_WC_Admin_List_Table_Products();
+  $table->render_row($post_ID);
+
   echo json_encode([
-    'success' => true,
-    'data' => ['post_ID' => $post_ID]
+    'html' => ob_get_clean(),
+    'post' => compact(['post_ID'])
   ]);
   wp_die();
 }

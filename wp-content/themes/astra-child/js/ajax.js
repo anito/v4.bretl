@@ -53,9 +53,9 @@ jQuery(document).ready(function ($) {
       alert(MSG_MISSING_EBAY_ID);
       return;
     }
-    const spinner = e.target.parentElement.querySelector(".spinner");
+    const spinner = e.target.closest("[id*=-action]")?.querySelector('.spinner');
     spinner?.classList.add("is-active");
-    const remove_spinner = () => spinner.classList.remove("is-active");
+    const remove_spinner = () => spinner?.classList.remove("is-active");
     $.post({
       url: remote_url,
       data: {
@@ -71,7 +71,7 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
 
     const el = e.target;
-    const spinner = el.parentElement.querySelector(".spinner");
+    const spinner = el.closest("[id*=-action]")?.querySelector('.spinner');
     spinner?.classList.add("is-active");
 
     const ondone = () => {
@@ -116,7 +116,7 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
 
     const el = e.target;
-    const spinner = e.target.parentElement.querySelector(".spinner");
+    const spinner = el.closest("[id*=-action]")?.querySelector('.spinner');
     spinner?.classList.add("is-active");
 
     const ondone = () => {
@@ -166,11 +166,14 @@ jQuery(document).ready(function ($) {
       post: { post_ID },
     } = JSON.parse(data);
 
-    if ("product" === screen) {
-      location = `${home_url}/wp-admin/post.php?post=${post_ID}&action=edit`;
-    } else {
-      const row = el.closest(`#post-${post_ID}`);
-      $(row)?.replaceWith(html);
+    switch(screen) {
+      case "product":
+        location = `${home_url}/wp-admin/post.php?post=${post_ID}&action=edit`;
+        break;
+      case 'edit-product':
+        const row = el.closest(`#post-${post_ID}`);
+        $(row)?.replaceWith(html);
+        break
     }
   }
 
@@ -180,7 +183,7 @@ jQuery(document).ready(function ($) {
 
     const el = e.target;
     const post_ID = el.dataset.postId;
-    const spinner = el.parentElement.querySelector(".spinner");
+    const spinner = el.closest("[id*=-action]")?.querySelector('.spinner');
     spinner?.classList.add("is-active");
 
     const error = (error) => {
@@ -198,9 +201,17 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function delImages(e) {
+  function deleteEbayImages(e) {
     e.preventDefault();
-    const formdata = $(form).serializeJSON();
+    const el = e.target.closest('.ebay-images-wrapper').querySelector('[id*=delete-ebay-images-]');
+    
+    if (form) {
+      formdata = $(form).serializeJSON();
+    } else {
+      const post_ID = el?.dataset.postId;
+      const ebay_id = el?.dataset.ebayId;
+      formdata = { post_ID, ebay_id };
+    }
 
     if (!formdata.post_ID) {
       alert(MSG_MISSING_POST_ID);
@@ -208,16 +219,16 @@ jQuery(document).ready(function ($) {
     }
     const post_ID = formdata.post_ID;
 
-    const spinner = e.target.parentElement.querySelector(".spinner");
+    const spinner = el.closest("[id*=-action]")?.querySelector('.spinner');
     spinner?.classList.add("is-active");
-    const remove_spinner = () => spinner.classList.remove("is-active");
+    const remove_spinner = () => spinner?.classList.remove("is-active");
     $.post({
       url: local_url,
       data: {
         action: "wbp_del_images",
         post_ID,
       },
-      success: (data) => ajax_del_images_callback(data, remove_spinner),
+      success: (data) => parseResponse({ data, el }),
       error: remove_spinner,
     });
   }
@@ -230,37 +241,10 @@ jQuery(document).ready(function ($) {
   let form;
   switch (screen) {
     case "edit-product":
-      const importEbayDataButtons = document.querySelectorAll(
-        "input.import-ebay-data"
-      );
-      const importEbayImagesButtons = document.querySelectorAll(
-        "input.import-ebay-images"
-      );
-      const publishButtons = document.querySelectorAll("input.publish-post");
-
-      importEbayDataButtons.forEach((button) => {
-        const tablerowElement = button.closest("[id^=post-]");
-        const ebay_id = tablerowElement?.querySelector(".sku")?.innerText;
-
-        if (ebay_id) {
-          ajax_object.importEbayData = importEbayData;
-        }
-      });
-      importEbayImagesButtons.forEach((button) => {
-        const tablerowElement = button.closest("[id^=post-]");
-        const ebay_id = tablerowElement?.querySelector(".sku")?.innerText;
-
-        if (ebay_id) {
-          ajax_object.importEbayImages = importEbayImages;
-        }
-      });
-      publishButtons.forEach((button) => {
-        const post_status = button.dataset.postStatus;
-
-        if (post_status == "draft") {
-          ajax_object.publishPost = publishPost;
-        }
-      });
+      ajax_object.publishPost = publishPost;
+      ajax_object.importEbayData = importEbayData;
+      ajax_object.importEbayImages = importEbayImages;
+      ajax_object.deleteEbayImages = deleteEbayImages;
       break;
     case "product":
       form = document.getElementById("post");
@@ -274,7 +258,7 @@ jQuery(document).ready(function ($) {
       importEbayDataButton?.addEventListener("click", importEbayData);
       importEbayImagesButton?.addEventListener("click", importEbayImages);
       getEbayAdButton?.addEventListener("click", getEbayAd);
-      delImagesButton?.addEventListener("click", delImages);
+      delImagesButton?.addEventListener("click", deleteEbayImages);
 
       getEbayAdButton?.removeAttribute("disabled");
       importEbayDataButton?.removeAttribute("disabled");
@@ -388,6 +372,9 @@ jQuery(document).ready(function ($) {
     const ebaydata = { images };
 
     console.log(ebaydata);
+    if(!images.length) {
+      alert('Es konnten keine Fotos import werden.')
+    }
 
     $.post({
       url: local_url,
@@ -399,13 +386,5 @@ jQuery(document).ready(function ($) {
       success: handle_success,
       error: handle_error,
     });
-  }
-
-  function ajax_del_images_callback(data, callback) {
-    const { success } = JSON.parse(data);
-    if (success) {
-      location = relocate_url;
-    }
-    callback?.();
   }
 });
