@@ -66,7 +66,7 @@ function wbp_publish_guard($data)
   return $data;
 }
 
-function wbp_check_quick_edit_save_post($post)
+function wbp_product_quick_edit_save($post)
 {
   // This is probably a save sction from quick edit - render a row
   $screen = get_current_screen();
@@ -98,7 +98,6 @@ add_filter('wp_insert_post_empty_content', function () {
   return false;
 });
 add_action("save_post", "wbp_save_post", 99, 3);
-add_action("save_post", "wbp_check_quick_edit_save_post", 99, 3);
 add_action("woocommerce_product_quick_edit_save", "wbp_product_quick_edit_save", 99, 3);
 add_action("wp_insert_post_data", "wbp_publish_guard", 99, 3);
 
