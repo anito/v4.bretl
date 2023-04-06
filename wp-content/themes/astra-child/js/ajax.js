@@ -345,6 +345,7 @@ jQuery(document).ready(function ($) {
   function processImageImport(data, transferObj = {}) {
     const handle_success = (data) => {
       parseResponse({ data, ...transferObj });
+      alert(msg);
     };
     const handle_error = (error) => {
       console.log(error);
@@ -372,8 +373,10 @@ jQuery(document).ready(function ($) {
     const ebaydata = { images };
 
     console.log(ebaydata);
-    if(!images.length) {
-      alert('Es konnten keine Fotos import werden.')
+    if(images.length) {
+      msg = `${images.length} Fotos importiert.` 
+    } else {
+      msg = 'Es konnten keine Fotos import werden.';
     }
 
     $.post({

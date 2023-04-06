@@ -1,3 +1,23 @@
 #woocommerce-product-data .panel-wrap.product_data {
   display: flex;
 }
+
+/**
+ * Foe edit-product screen
+ */
+.sync-column-content {
+  display:flex;
+  flex-direction: column; width: 113px;
+}
+.sync-column-content .button {
+  flex: 1;
+  margin: 0 3px 3px 0;
+}
+[id*=-action] {
+  display:flex;
+  position: relative;
+}
+.spinner {
+  position: absolute;
+  left: -35px;
+}

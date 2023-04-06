@@ -86,7 +86,6 @@ function wbp_save_post($post_ID, $post)
 
   require_once __DIR__ . '/includes/product_term_handler.php';
   wbp_process_sale($post_ID, $post);
-  $screen_id = get_current_screen();
   wbp_process_ebay($post_ID, $post);
 }
 add_filter('wp_insert_post_empty_content', function () {

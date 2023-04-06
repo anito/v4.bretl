@@ -49,13 +49,13 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     switch ($column_name) {
       case 'sync': {
 ?>
-          <div class="sync-column-content" style="display:flex; flex-direction: column; width: 113px;">
-            <div id="import-ebay-data-action-<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
-              <span class="spinner" style="position: absolute; left: -35px;"></span>
+          <div class="sync-column-content">
+            <div id="import-ebay-data-action-<?php echo $post_id ?>" style="flex: 1;">
+              <span class="spinner"></span>
               <input type="submit" id="import-ebay-data-<?php echo $post_id ?>" disabled name="import-ebay-data" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-data button button-primary button-small" style="" value="Daten importieren">
             </div>
-            <div id="import-ebay-images-action-<?php echo $post_id ?>" style="display:flex; position: relative; flex: 1;">
-              <span class="spinner" style="position: absolute; left: -35px;"></span>
+            <div id="import-ebay-images-action-<?php echo $post_id ?>" style="flex: 1;">
+              <span class="spinner"></span>
               <span class="ebay-images-wrapper" style="display: flex;">
                 <input type="submit" id="import-ebay-images-<?php echo $post_id ?>" disabled name="import-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-images button button-primary button-small" style="" value="Fotos importieren">
                 <button type="submit" id="delete-ebay-images-<?php echo $post_id ?>" disabled name="delete-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-ebay-images button button-primary button-small" style="">
@@ -63,17 +63,11 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
                 </button>
               </span>
             </div>
-            <div id="publish-post-action-<?php echo $post_id ?>" class="publish-column-content" style="display:flex; position: relative;">
-              <span class="spinner" style="position: absolute; left: -35px;"></span>
+            <div id="publish-post-action-<?php echo $post_id ?>" class="publish-column-content">
+              <span class="spinner"></span>
               <input type="submit" id="publish-post-<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-primary button-small" style="" value="<?php echo __('Publish') ?>">
             </div>
           </div>
-          <style>
-            .sync-column-content .button {
-              flex: 1;
-              margin: 0 3px 3px 0;
-            }
-          </style>
           <script>
             jQuery(document).ready(($) => {
               const {
