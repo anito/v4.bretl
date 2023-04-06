@@ -57,7 +57,7 @@ function wbp_wc_screen_styles($hook)
 
 function wbp_publish_guard($data)
 {
-  require_once __DIR__ . '/includes/ajax_handler.php';
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
   if (!is_valid_title($data['post_title']) && $data['post_status'] == 'publish') {
     $data['post_status'] = 'draft';
     // prevent adding duplicate DUPLIKAT info to title
@@ -273,31 +273,31 @@ function check_cert()
 
 function wbp_ebay_ad()
 {
-  require_once __DIR__ . '/includes/ajax_handler.php';
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
   wbp_get_ebay_ad();
 }
 
 function wbp_publish()
 {
-  require_once __DIR__ . '/includes/ajax_handler.php';
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
   wbp_publish_post();
 }
 
 function wbp_ebay_data()
 {
-  require_once __DIR__ . '/includes/ajax_handler.php';
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
   wbp_import_ebay_data();
 }
 
 function wbp_ebay_images()
 {
-  require_once __DIR__ . '/includes/ajax_handler.php';
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
   wbp_import_ebay_images();
 }
 
 function wbp_del_images()
 {
-  require_once __DIR__ . '/includes/ajax_handler.php';
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
   wbp_delete_images();
 }
 

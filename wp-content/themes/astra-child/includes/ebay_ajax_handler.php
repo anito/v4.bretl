@@ -115,7 +115,7 @@ function wbp_import_ebay_data()
       'post_type' => 'product',
       'post_status' => 'draft',
       'post_content' => $content,
-      'post_excerpt' => substr($content, 0, 200)
+      'post_excerpt' => wbp_sanitize_excerpt($content, 300)
     ), true);
   }
 
@@ -232,4 +232,10 @@ function remove_attachments($post_ID)
   for ($i = 0; $i < count($attachment_ids); $i++) {
     wp_delete_post($attachment_ids[$i]);
   }
+}
+
+function wbp_sanitize_excerpt($content, $count) {
+  $content = preg_replace('/<[^>]*>/', '', $content); //clear html tags
+  $content = preg_replace('/[\s+\n]/', ' ', $content); // clear whitespace
+  return substr($content, 0, $count);
 }
