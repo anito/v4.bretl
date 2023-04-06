@@ -68,11 +68,11 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       case 'sync': {
 ?>
           <div class="sync-column-content">
-            <div id="import-ebay-data-action-<?php echo $post_id ?>" style="flex: 1;">
+            <div id="import-ebay-data-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
               <input type="submit" id="import-ebay-data-<?php echo $post_id ?>" disabled name="import-ebay-data" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-data button button-primary button-small" style="" value="Daten importieren">
             </div>
-            <div id="import-ebay-images-action-<?php echo $post_id ?>" style="flex: 1;">
+            <div id="import-ebay-images-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
               <span class="ebay-images-wrapper" style="display: flex;">
                 <input type="submit" id="import-ebay-images-<?php echo $post_id ?>" disabled name="import-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-images button button-primary button-small" style="" value="Fotos importieren">
@@ -81,7 +81,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
                 </button>
               </span>
             </div>
-            <div id="publish-post-action-<?php echo $post_id ?>" class="publish-column-content">
+            <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="publish-column-content">
               <span class="spinner"></span>
               <input type="submit" id="publish-post-<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-primary button-small" style="" value="<?php echo __('Publish') ?>">
             </div>

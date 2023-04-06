@@ -1,23 +1,50 @@
 #woocommerce-product-data .panel-wrap.product_data {
   display: flex;
 }
-
+.button > * {
+  pointer-events: none;
+}
 /**
- * Foe edit-product screen
+ * For edit-product screen
  */
-.sync-column-content {
-  display:flex;
-  flex-direction: column; width: 113px;
+.edit-php .column-sync {
+  width: 13%;
 }
-.sync-column-content .button {
-  flex: 1;
-  margin: 0 3px 3px 0;
+.edit-php .sync-column-content {
+  display: flex;
+  flex-direction: column;
 }
-[id*=-action] {
-  display:flex;
+.edit-php .sync-column-content .button:first-child {
+  margin-right: 3px;
+}
+.edit-php .sync-column-content .button {
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+[id*="-wbp-action"] {
   position: relative;
 }
-.spinner {
+[id*="-wbp-action"] .spinner {
   position: absolute;
+}
+.edit-php [id*="-wbp-action"] .spinner {
   left: -35px;
+}
+.post-php [id*="-wbp-action"] .spinner {
+  left: 0;
+}
+.post-php [id*="-wbp-action"] {
+  display: flex;
+  justify-content: center;
+}
+.post-php .ebay-sync-action-button {
+  width: 180px;
+  align-self: center;
+}
+.post-php.ebay-sync-active .ebay-sync-action-button {
+  pointer-events: none;
+  opacity: 0.85;
 }
