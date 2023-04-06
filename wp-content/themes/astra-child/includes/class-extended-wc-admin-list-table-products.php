@@ -9,23 +9,38 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   function __construct()
   {
     $this->list_table_type = 'product';
+
+    $render_custom = true;
+    $render_wc = true;
+
+    // Ajax load
+    if (is_ajax() && isset($_POST['ID'])) {
+      // When quick editing woocommerce renders its own rows
+      $render_wc = false;
+    }
     
-    $screen = get_current_screen();
-    if (is_ajax() && $screen !== null) {
-      // add_action('manage_posts_extra_tablenav', array($this, 'maybe_render_blank_state'));
+    // Full page load - woocommerce renders its own rows
+    if(!function_exists('get_current_screen')) {
+      $render_wc = false;
+    }
+
+    if ($render_wc) {
+      add_action('manage_posts_extra_tablenav', array($this, 'maybe_render_blank_state'));
       // add_filter('view_mode_post_types', array($this, 'disable_view_mode'));
       // add_action('restrict_manage_posts', array($this, 'restrict_manage_posts'));
-      // add_filter('request', array($this, 'request_query'));
-      // add_filter('post_row_actions', array($this, 'row_actions'), 100, 2);
-      // add_filter('default_hidden_columns', array($this, 'default_hidden_columns'), 10, 2);
+      add_filter('request', array($this, 'request_query'));
+      add_filter('post_row_actions', array($this, 'row_actions'), 100, 2);
+      add_filter('default_hidden_columns', array($this, 'default_hidden_columns'), 10, 2);
       add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 1, 2);
       // add_filter('manage_edit-' . $this->list_table_type . '_sortable_columns', array($this, 'define_sortable_columns'));
       add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'), 1, 2);
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 1, 2);
     }
 
-    add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 1);
-    add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 1, 2);
+    if($render_custom) {
+      add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 1);
+      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 1, 2);
+    }
   }
 
   function render_row($id)

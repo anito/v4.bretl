@@ -4,13 +4,13 @@ require_once __DIR__ . '/includes/duplicate_content.php';
 require_once __DIR__ . '/includes/register_wc_taxonomies.php';
 require_once __DIR__ . '/includes/class-extended-wc-admin-list-table-products.php';
 
-function wbp_class_loader()
+function wbp_product_table_list_loader()
 {
   if (!is_ajax()) {
     new Extended_WC_Admin_List_Table_Products();
   }
 }
-add_filter('init', 'wbp_class_loader');
+add_filter('init', 'wbp_product_table_list_loader');
 
 /**
  * CSRF allowed domains
@@ -66,12 +66,14 @@ function wbp_publish_guard($data)
   return $data;
 }
 
-function wbp_product_quick_edit_save($post)
+function wbp_may_be_quick_edit_product_save($post)
 {
+  global $screen;
+  write_log('wbp_may_be_quick_edit_product_save screen', $screen);
   // This is probably a save sction from quick edit - render a row
-  $screen = get_current_screen();
-  if ((null === $screen) && isset($_POST['ID'])) {
+  if (isset($_POST['ID'])) {
     new Extended_WC_Admin_List_Table_Products();
+    write_log('wbp_may_be_quick_edit_product_save have post', $_POST['ID']);
   };
 }
 
@@ -98,7 +100,7 @@ add_filter('wp_insert_post_empty_content', function () {
   return false;
 });
 add_action("save_post", "wbp_save_post", 99, 3);
-add_action("woocommerce_product_quick_edit_save", "wbp_product_quick_edit_save", 99, 3);
+add_action("save_post", "wbp_may_be_quick_edit_product_save", 99, 3);
 add_action("wp_insert_post_data", "wbp_publish_guard", 99, 3);
 
 function wbp_product_before_save($product)
