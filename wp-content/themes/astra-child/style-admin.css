@@ -33,14 +33,22 @@
 .edit-php [id*="-wbp-action"] .spinner {
   left: -35px;
 }
-[class*=post-] [id*="-wbp-action"] .spinner {
+.post-php [id*="-wbp-action"] .spinner,
+.post-new-php [id*="-wbp-action"] .spinner {
   left: -20px;
 }
-[class*=post-] .ebay-sync-action-button {
+.post-php [id*="-wbp-action"],
+.post-new-php [id*="-wbp-action"] {
+  display: flex;
+  justify-content: center;
+}
+.post-php .ebay-sync-action-button,
+.post-new-php .ebay-sync-action-button {
   width: 180px;
   align-self: center;
 }
-[class*=post-].ebay-sync-active .ebay-sync-action-button {
+.post-php.ebay-sync-active .ebay-sync-action-button,
+.post-new-php.ebay-sync-active .ebay-sync-action-button {
   pointer-events: none;
   opacity: 0.85;
 }

@@ -114,7 +114,8 @@ function wbp_import_ebay_data()
       'post_title' => $title,
       'post_type' => 'product',
       'post_status' => 'draft',
-      'post_content' => $content
+      'post_content' => $content,
+      'post_excerpt' => substr($content, 0, 200)
     ), true);
   }
 
