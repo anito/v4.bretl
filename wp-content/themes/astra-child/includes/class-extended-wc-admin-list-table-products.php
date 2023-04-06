@@ -4,11 +4,14 @@ require_once WP_PLUGIN_DIR . '/woocommerce/includes/admin/list-tables/class-wc-a
 
 class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 {
+  protected $screen = '';
+
   function __construct()
   {
     $this->list_table_type = 'product';
-
-    if (is_ajax()) {
+    
+    $screen = get_current_screen();
+    if (is_ajax() && $screen !== null) {
       // add_action('manage_posts_extra_tablenav', array($this, 'maybe_render_blank_state'));
       // add_filter('view_mode_post_types', array($this, 'disable_view_mode'));
       // add_action('restrict_manage_posts', array($this, 'restrict_manage_posts'));

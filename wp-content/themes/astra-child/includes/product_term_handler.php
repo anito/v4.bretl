@@ -73,7 +73,6 @@ function wbp_process_ebay($post_id, $post)
   $meta = get_post_meta($post_id);
   $ebay_id = isset($meta['ebay_id'][0]) ? parse_ebay_id($meta['ebay_id'][0]) : "";
 
-
   if (!empty($ebay_id)) {
     if (empty($post->post_title)) {
       wp_insert_post([
