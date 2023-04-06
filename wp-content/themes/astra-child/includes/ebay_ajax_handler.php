@@ -33,7 +33,7 @@ function wbp_sanitize_title($title, $appendix = "")
 function wbp_sanitize_excerpt($content, $count)
 {
   $content = preg_replace('/<[^>]*>/', ' ', $content); //clear html tags
-  $content = preg_replace('/[\s+\n]/', ' ', $content); // clear whitespace
+  $content = preg_replace('/[\s+\n]/', ' ', $content); // clear multiple whitespace
   return substr($content, 0, $count);
 }
 
