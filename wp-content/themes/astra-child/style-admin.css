@@ -34,7 +34,7 @@
   left: -35px;
 }
 .post-php [id*="-wbp-action"] .spinner {
-  left: 0;
+  left: -20px;
 }
 .post-php [id*="-wbp-action"] {
   display: flex;
