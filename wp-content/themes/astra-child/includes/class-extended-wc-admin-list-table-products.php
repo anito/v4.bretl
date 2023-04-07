@@ -10,7 +10,6 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   {
     $this->list_table_type = 'product';
 
-    $render_custom = true;
     $render_wc = true;
 
     // Ajax load
@@ -26,21 +25,15 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
     if ($render_wc) {
       add_action('manage_posts_extra_tablenav', array($this, 'maybe_render_blank_state'));
-      // add_filter('view_mode_post_types', array($this, 'disable_view_mode'));
-      // add_action('restrict_manage_posts', array($this, 'restrict_manage_posts'));
       add_filter('request', array($this, 'request_query'));
       add_filter('post_row_actions', array($this, 'row_actions'), 100, 2);
       add_filter('default_hidden_columns', array($this, 'default_hidden_columns'), 10, 2);
-      add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 1, 2);
-      // add_filter('manage_edit-' . $this->list_table_type . '_sortable_columns', array($this, 'define_sortable_columns'));
-      add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'), 1, 2);
-      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 1, 2);
+      add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 11, 2);
+      add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'));
+      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
     }
-
-    if($render_custom) {
-      add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 1);
-      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 1, 2);
-    }
+    add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 11);
+    add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 1, 2);
   }
 
   function render_row($id)
@@ -49,9 +42,24 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     $wp_list_table->display_rows(array(get_post($id)), 0);
   }
 
+  public function list_table_primary_column($default, $screen_id)
+  {
+    if ('edit-' . $this->list_table_type === $screen_id && $this->get_primary_column()) {
+      return $this->get_primary_column();
+    }
+    return $default;
+  }
+
+  function get_primary_column()
+  {
+    return 'sku';
+  }
+
   function define_custom_columns($columns)
   {
-    $columns['sync'] = 'eBay Aktionen';
+    unset($columns['sku']);
+    $columns['sku'] = 'Ebay';
+    $columns['sync'] = 'Ebay Aktionen';
     return $columns;
   }
 
@@ -63,8 +71,13 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_id);
       $sku = is_numeric($sku) ? $sku : false;
-    }
+    } else return 0;
+
     switch ($column_name) {
+      case 'sku': {
+        echo $sku ? '<a href="'. esc_html(wbp_get_ebay_url($sku)) . '" target="_blank"</a>' : '<span class="na">&ndash;</span>';
+        break;
+      }
       case 'sync': {
 ?>
           <div class="sync-column-content">

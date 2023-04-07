@@ -66,15 +66,19 @@ function wbp_publish_guard($data)
   return $data;
 }
 
-function wbp_may_be_quick_edit_product_save($post)
+function wbp_quick_edit_product_save($post)
 {
-  global $screen;
-  write_log('wbp_may_be_quick_edit_product_save screen', $screen);
-  // This is probably a save sction from quick edit - render a row
-  if (isset($_POST['ID'])) {
+  if (!class_exists('WooCommerce', false)) return 0;
+
+  // Check for a quick editsave action
+  if (is_ajax() && isset($_POST['ID'])) {
+    // Render custom columns
     new Extended_WC_Admin_List_Table_Products();
-    write_log('wbp_may_be_quick_edit_product_save have post', $_POST['ID']);
   };
+}
+
+function wbp_get_ebay_url($id) {
+  return EBAY_URL . ($id ? '/s-' . $id . '/k0' : '/');
 }
 
 function wbp_save_post($post_ID, $post)
@@ -100,7 +104,7 @@ add_filter('wp_insert_post_empty_content', function () {
   return false;
 });
 add_action("save_post", "wbp_save_post", 99, 3);
-add_action("save_post", "wbp_may_be_quick_edit_product_save", 99, 3);
+add_action("save_post", "wbp_quick_edit_product_save", 99, 3);
 add_action("wp_insert_post_data", "wbp_publish_guard", 99, 3);
 
 function wbp_product_before_save($product)
@@ -356,7 +360,6 @@ add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', '
  */
 function wbp_woo_custom_description_tab($tabs)
 {
-  // Get $product object
   global $product;
 
   $tabs['description'] = array(
@@ -388,17 +391,18 @@ function wbp_woo_custom_description_tab($tabs)
 
 function wbp_woo_tab_content($tab_name, $tab)
 {
-
   global $product;
 
   $title = $product->get_title();
   $content = wpautop($product->get_description()); // prevent to strip out all \n !!!
   echo '<h6 style="font-weight:600; opacity: 0.5; margin-bottom: 10px;">Highlights</h6><h5 style="margin-bottom: 30px;">' . $title . '</h5>' . do_shortcode($content); // keep possible shortcode
 }
+
 function wbp_woo_tab_technical()
 {
   echo '<p>Der Tab <strong>' . __('Technical Details', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
 }
+
 function wbp_woo_tab_datasheets()
 {
   global $product;
@@ -507,9 +511,8 @@ function wbp_product_custom_fields()
 function wbp_product_custom_fields_save($post_id)
 {
   // Custom Product Text Field
-  $woocommerce_custom_product_text_field = $_POST['ebay_url'];
-  if (!empty($woocommerce_custom_product_text_field))
-    update_post_meta($post_id, 'ebay_url', esc_attr($woocommerce_custom_product_text_field));
+  if (isset($_POST['ebay_url']))
+    update_post_meta($post_id, 'ebay_url', esc_attr($_POST['ebay_url']));
 }
 // add_action('woocommerce_product_options_general_product_data', 'wbp_product_custom_fields');
 // add_action('woocommerce_process_product_meta', 'wbp_product_custom_fields_save');
