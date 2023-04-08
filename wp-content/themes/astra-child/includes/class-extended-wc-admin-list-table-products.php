@@ -25,6 +25,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
     if ($render_wc) {
       // add_filter('request', array($this, 'request_query'));
+      add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 10, 2);
       add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'));
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
     }
