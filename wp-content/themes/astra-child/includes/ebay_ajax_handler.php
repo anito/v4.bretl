@@ -37,14 +37,20 @@ function wbp_sanitize_excerpt($content, $count)
   return substr($content, 0, $count);
 }
 
-function wbp_get_ebay_ad()
+function wbp_get_remote()
 {
-  $formdata = $_POST['formdata'];
-  $post_ID = $formdata['post_ID'];
-  $ebay_id_raw = $formdata['ebay_id'];
-  $ebay_id = parse_ebay_id($ebay_id_raw);
+  if(isset($_POST['formdata'])) {
+    $formdata = $_POST['formdata'];
+    $post_ID = $formdata['post_ID'];
+    $ebay_id_raw = $formdata['ebay_id'];
+    $ebay_id = parse_ebay_id($ebay_id_raw);
+    
+    $remoteUrl = wbp_get_ebay_url($ebay_id);
+  } else {
+    $remoteUrl = home_url();
+  }
 
-  $response = wp_remote_get(wbp_get_ebay_url($ebay_id));
+  $response = wp_remote_get($remoteUrl);
 
   echo json_encode(
     [
@@ -202,6 +208,43 @@ function wbp_delete_images()
   echo json_encode([
     'html' => ob_get_clean(),
     'post' => compact(['post_ID'])
+  ]);
+  wp_die();
+}
+
+function wbp_get_product_categories()
+{
+  foreach (get_terms(['taxonomy' => 'product_cat']) as $key => $term) {
+    $cats[] = [
+      'id' => $term->term_id,
+      'slug' => $term->slug,
+      'name' => $term->name
+    ];
+  };
+  echo json_encode([
+    'cats' => $cats,
+  ]);
+  wp_die();
+}
+
+function wbp_get_brands()
+{
+  foreach (get_terms(['taxonomy' => 'brands']) as $key => $term) {
+    $image_ids = get_metadata('term', $term->term_id, 'image');
+    if(!empty($image_ids)) {
+      $image_url = wp_get_attachment_image_url($image_ids[0]);
+      
+      $brands[] = [
+        'id' => $term->term_id,
+        'slug' => $term->slug,
+        'name' => $term->name,
+        'image_url' => $image_url
+      ];
+    }
+
+  };
+  echo json_encode([
+    'brands' => $brands
   ]);
   wp_die();
 }

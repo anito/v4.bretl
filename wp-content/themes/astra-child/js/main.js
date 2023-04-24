@@ -54,56 +54,9 @@ const observe = (function () {
     });
   };
 
-  // animation css listeners
-  var add_animate_css_listeners = () => {
-    let icon = ".get-quotes-icon";
-    let trigger = ".get-quotes";
-
-    $(".get-quotes").on("mouseover", (e) => {
-      e.stopPropagation();
-      if (!$(icon).hasClass("over")) {
-        $(icon).addClass("over");
-        animateCSS(
-          icon,
-          "rotateIn",
-          {
-            repeat: "1",
-            duration: 3,
-          },
-          () => {
-            $(icon).css({ opacity: 1 });
-          }
-        );
-      }
-      return false;
-    });
-    $(trigger).on("mouseleave", (e) => {
-      e.stopPropagation();
-
-      console.log("out");
-      $(icon).removeClass("over");
-      animateCSS(
-        icon,
-        "rotateOut",
-        {
-          repeat: "1",
-          duration: 1,
-        },
-        () => $(icon).css({ opacity: 0 })
-      );
-      return false;
-    });
-  };
-
   // Copy and observe an elements wishlist count
-  var add_wishlist_hook = (targetSelector, storeName) => {
-    const className = ".jet-engine-data-store-count";
-    function getElement(name) {
-      const el = document.querySelector(name);
-      return el?.dataset.store === storeName ? el : null;
-    }
-
-    function callback(mutationList) {
+  var add_jet_engine_wishlist_hook = (targetSelector, storeName) => {
+    function observerCallback(mutationList) {
       for (const mutation of mutationList) {
         if (mutation.type === "childList") {
           if (mutation.addedNodes.length) {
@@ -116,36 +69,35 @@ const observe = (function () {
           console.log(`The ${mutation.attributeName} attribute was modified.`);
         }
       }
-      copy();
+      copyToTarget();
     }
 
-    function copy() {
+    function copyToTarget() {
       const targetEls = document.querySelectorAll(targetSelector);
       targetEls.forEach((el) => {
-        let spanEl = el.querySelector(".wishlist-widget");
-        if (!spanEl) {
-          spanEl = document.createElement("span");
-          spanEl.classList.add("wishlist-widget");
-          el.append(spanEl);
+        let targetEl = el.querySelector(".wishlist-widget");
+        if (!targetEl) {
+          targetEl = document.createElement("span");
+          targetEl.classList.add("wishlist-widget");
+          el.append(targetEl);
         }
         if (storeEl.innerHTML !== "0") {
-          spanEl.innerHTML = storeEl.innerHTML;
+          targetEl.innerHTML = storeEl.innerHTML;
         } else {
-          spanEl.remove();
+          targetEl.remove();
         }
       });
     }
 
-    const storeEl = getElement(className);
+    const el = document.querySelector(".jet-engine-data-store-count");
+    const storeEl = el?.dataset.store === storeName ? el : null;
     if (storeEl) {
-      copy();
-      observe(storeEl, callback);
+      copyToTarget();
+      observe(storeEl, observerCallback);
     }
   };
 
   // add_fb_div();
   // add_image_disclaimer();
-  // add_animate_scroll();
-  add_animate_css_listeners();
-  add_wishlist_hook(".wishlist-target [class*=title]", "wishlist");
+  add_jet_engine_wishlist_hook(".wishlist-target [class*=title]", "merkliste");
 })(jQuery);

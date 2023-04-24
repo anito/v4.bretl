@@ -19,6 +19,7 @@ function add_allowed_origins($origins)
 {
   return array_merge($origins, [
     'https://dev.auto-traktor-bretschneider.de',
+    'http://localhost:5173'
   ]);
 }
 add_filter('allowed_http_origins', 'add_allowed_origins');
@@ -39,6 +40,12 @@ define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.3');
 function child_enqueue_styles()
 {
   wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
+  wp_enqueue_script('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-e8026e35.js', false, '0.0.1', 'all');
+  wp_enqueue_style('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-ceeca691.css', false, '0.0.1', 'all');
+  wp_localize_script('app-hero', 'app_hero', array(
+    'app_url' => get_stylesheet_directory_uri() . '/js/hero/public/',
+    'stylesheet_url' => get_stylesheet_directory_uri()
+  ));
 }
 add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
 
@@ -211,13 +218,6 @@ function enqueue_vendors()
     wp_enqueue_style('consent-pro', get_stylesheet_directory_uri() . '/consent-pro/style.css');
     wp_enqueue_script('consent-pro', 'https://cookie-cdn.cookiepro.com/scripttemplates/otSDKStub.js');
   }
-
-  /**
-   * Animate css
-   * https://github.com/daneden/animate.css
-   *
-   */
-  wp_enqueue_style('animate.css', '/node_modules/animate.css/animate' . $suffix . '.css');
 }
 add_action('wp_enqueue_scripts', 'enqueue_vendors', 15);
 
@@ -275,10 +275,10 @@ function check_cert()
   return ($cont["options"]["ssl"]["peer_certificate"]);
 }
 
-function wbp_ebay_ad()
+function wbp_remote()
 {
   require_once __DIR__ . '/includes/ebay_ajax_handler.php';
-  wbp_get_ebay_ad();
+  wbp_get_remote();
 }
 
 function wbp_publish()
@@ -303,6 +303,18 @@ function wbp_del_images()
 {
   require_once __DIR__ . '/includes/ebay_ajax_handler.php';
   wbp_delete_images();
+}
+
+function wbp_product_categories()
+{
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
+  wbp_get_product_categories();
+}
+
+function wbp_brands()
+{
+  require_once __DIR__ . '/includes/ebay_ajax_handler.php';
+  wbp_get_brands();
 }
 
 function wbp_product_set_attributes($post_id, $attributes)
@@ -331,13 +343,19 @@ if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');
 
   add_action('wp_ajax_wbp_publish', 'wbp_publish');
-  add_action('wp_ajax_wbp_ebay_ad', 'wbp_ebay_ad');
+  add_action('wp_ajax_wbp_remote', 'wbp_remote');
+  add_action('wp_ajax_wbp_brands', 'wbp_brands');
   add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');
   add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_wbp_product_categories', 'wbp_product_categories');
+
   add_action('wp_ajax_nopriv_wbp_publish', 'wbp_publish', 1);
-  add_action('wp_ajax_nopriv_wbp_ebay_ad', 'wbp_ebay_ad');
+  add_action('wp_ajax_nopriv_wbp_remote', 'wbp_remote');
+  add_action('wp_ajax_nopriv_wbp_brands', 'wbp_brands');
   add_action('wp_ajax_nopriv_wbp_ebay_data', 'wbp_ebay_data');
   add_action('wp_ajax_nopriv_wbp_ebay_images', 'wbp_ebay_images');
+  add_action('wp_ajax_nopriv_wbp_product_categories', 'wbp_product_categories');
+
   add_action('wp_ajax_wbp_del_images', 'wbp_del_images');
 }
 

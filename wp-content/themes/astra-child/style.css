@@ -11,6 +11,11 @@ Template: astra
 */
 
 /**
+ * Import Fonts
+ */
+@import url(./css/fonts/styles.css);
+
+/**
  * Reset
  */
 @media (max-width: 1200px) {

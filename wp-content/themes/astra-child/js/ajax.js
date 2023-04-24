@@ -70,7 +70,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: remote_url,
       data: {
-        action: "wbp_ebay_ad",
+        action: "wbp_remote",
         formdata,
       },
       success: (data) => ajax_ad_callback(data, () => {
@@ -119,7 +119,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: remote_url,
       data: {
-        action: "wbp_ebay_ad",
+        action: "wbp_remote",
         formdata,
       },
       success,
@@ -168,7 +168,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: remote_url,
       data: {
-        action: "wbp_ebay_ad",
+        action: "wbp_remote",
         formdata,
       },
       success,

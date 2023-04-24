@@ -1,0 +1,141 @@
+@font-face {
+    font-family: "good-times";
+    src: url("./goodtimes_300_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 300;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "good-times";
+    src: url("./goodtimes_500_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 500;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "good-times";
+    src: url("./goodtimes_400_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "good-times";
+    src: url("./goodtimes_400_italic.woff2") format("woff2");
+    font-display: auto;
+    font-style: italic;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "good-times";
+    src: url("./goodtimes_700_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 700;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "good-times";
+    src: url("./goodtimes_700_italic.woff2") format("woff2");
+    font-display: auto;
+    font-style: italic;
+    font-weight: 700;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "good-times-bad-times";
+    src: url("./goodtimesbadtimes_900_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 900;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "canada-type-gibson";
+    src: url("./gibson_700_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 700;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "canada-type-gibson";
+    src: url("./gibson_700_italic.woff2") format("woff2");
+    font-display: auto;
+    font-style: italic;
+    font-weight: 700;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "canada-type-gibson";
+    src: url("./gibson_400_italic.woff2") format("woff2");
+    font-display: auto;
+    font-style: italic;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "canada-type-gibson";
+    src: url("./gibson_400_normal.woff2") format("woff2"),url("https://use.typekit.net/af/987a60/00000000000000007735a543/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/987a60/00000000000000007735a543/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "canada-type-gibson";
+    src: url("./gibson_100_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 100;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "canada-type-gibson";
+    src: url("./gibson_100_italic.woff2") format("woff2");
+    font-display: auto;
+    font-style: italic;
+    font-weight: 100;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "adobe-handwriting-ernie";
+    src: url("./handwriting_ernie_400_normal.woff2") format("woff2");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+.tk-good-times {
+    font-family: "good-times",sans-serif;
+}
+
+.tk-good-times-bad-times {
+    font-family: "good-times-bad-times",sans-serif;
+}
+
+.tk-canada-type-gibson {
+    font-family: "canada-type-gibson",sans-serif;
+}
+
+.tk-adobe-handwriting-ernie {
+    font-family: "adobe-handwriting-ernie",sans-serif;
+}
