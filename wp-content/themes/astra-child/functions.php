@@ -40,8 +40,8 @@ define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.3');
 function child_enqueue_styles()
 {
   wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
-  wp_enqueue_script('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-e8026e35.js', false, '0.0.1', 'all');
-  wp_enqueue_style('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-ceeca691.css', false, '0.0.1', 'all');
+  wp_enqueue_script('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-18d5f512.js', false, '0.0.1', 'all');
+  wp_enqueue_style('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-94df8f4b.css', false, '0.0.1', 'all');
   wp_localize_script('app-hero', 'app_hero', array(
     'app_url' => get_stylesheet_directory_uri() . '/js/hero/public/',
     'stylesheet_url' => get_stylesheet_directory_uri()
