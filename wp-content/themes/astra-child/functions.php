@@ -30,6 +30,15 @@ add_filter('allowed_http_origins', 'add_allowed_origins');
 define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.3');
 
 /**
+ * App asset names (e.g. *.js. *.css files) change per distribution
+ * This method takes care of it automatically using the glob
+ */
+function get_themes_file($file_path) {
+  $regex = '/^([\w\-\/.]*)(\/wp-content\/themes[\w\-\.\/]+)/';
+  return preg_replace($regex, '\2', glob($file_path)[0]);
+}
+
+/**
  * Astra Child Theme functions and definitions
  *
  * @link https://developer.wordpress.org/themes/basics/theme-functions/
@@ -40,10 +49,14 @@ define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.3');
 function child_enqueue_styles()
 {
   wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
-  wp_enqueue_script('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-7591cb7f.js', false, '0.0.1', 'all');
-  wp_enqueue_style('app-hero', get_stylesheet_directory_uri() . '/js/hero/dist/assets/index-19167309.css', false, '0.0.1', 'all');
+  
+  $js_uri = get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.js');
+  $css_uri = get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.css');
+
+  wp_enqueue_script('app-hero', $js_uri, false, '0.0.1', 'all');
+  wp_enqueue_style('app-hero', $css_uri, false, '0.0.1', 'all');
   wp_localize_script('app-hero', 'app_hero', array(
-    'app_url' => get_stylesheet_directory_uri() . '/js/hero/public/',
+    'app_url' => get_stylesheet_directory_uri() . '/js/hero/dist/',
     'stylesheet_url' => get_stylesheet_directory_uri()
   ));
 }

@@ -80,7 +80,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
             </div>
             <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="publish-column-content">
               <span class="spinner"></span>
-              <input type="submit" id="publish-post-<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-primary button-small" style="" value="<?php echo __('Publish') ?>">
+              <input type="submit" id="publish-post-<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small" style="" value="<?php echo __('Publish') ?>">
             </div>
           </div>
           <script>

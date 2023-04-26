@@ -22,6 +22,7 @@ const observe = (function () {
   };
 })();
 
+jQuery.noConflict();
 (function ($) {
   var add_fb_div = function () {
     $("body").prepend('<div id="fb-root"></div>');
