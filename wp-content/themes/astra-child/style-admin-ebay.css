@@ -13,6 +13,9 @@
 .wp-list-table.wp-list-ebay-ads .column-date {
   width: 10%;
 }
+.wp-list-table.wp-list-ebay-ads .column-price {
+  width: 10%;
+}
 .wp-list-table.wp-list-ebay-ads .column-description {
   width: auto;
 }

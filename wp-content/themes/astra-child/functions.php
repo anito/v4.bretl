@@ -726,7 +726,6 @@ function get_remote($url) {
     return $response['body'];
   } else {
     wbp_include_ebay_template('error-message.php');
-    wp_die();
   }
 }
 

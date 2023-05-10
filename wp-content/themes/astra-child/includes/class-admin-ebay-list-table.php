@@ -25,6 +25,7 @@ class Ebay_List_Table extends WP_List_Table
       'id' => __('ID'),
       'title' => __('Titel'),
       'date' => __('Datum'),
+      'price' => __('Preis'),
       'status' => __('Shop Status'),
       'description' => __('Description'),
     );
@@ -101,6 +102,9 @@ class Ebay_List_Table extends WP_List_Table
               break;
             case "date":
               echo '<td ' . $attributes . '><div class="column-content center">' . $record->date . '</div></td>';
+              break;
+            case "price":
+              echo '<td ' . $attributes . '><div class="column-content ">' . $record->price . '</div></td>';
               break;
             case "status":
               echo '<td ' . $attributes . '><div class="column-content">' . $stat . '</div></td>';
