@@ -64,6 +64,7 @@ class Ebay_List_Table extends WP_List_Table
 
           $product = wbp_get_product_by_sku($record->id);
           if(isset($product)) {
+            $classes = "";
             $status = $product->get_status();
             switch($status) {
               case 'draft':
@@ -74,6 +75,7 @@ class Ebay_List_Table extends WP_List_Table
                 break;
               case 'trash':
                 $stat = __("Trash");
+                $classes="hidden";
                 break;
               case 'publish':
               case 'publish':
@@ -81,7 +83,7 @@ class Ebay_List_Table extends WP_List_Table
                 break;
               }
             $editlink  = admin_url('post.php?action=edit&post=' . $product->id);
-            $stat = '<div><div>' . $stat . '</div><a href="' . $editlink . '">' . __('Edit') . '</div></div>';
+            $stat = '<div><div>' . $stat . '</div><a class="' . $classes . '" href="' . $editlink . '">' . __('Edit') . '</div></div>';
             
           } else {
             $stat = wbp_include_ebay_template('dashboard/import-data.php', true, array('sku' => $record->id));
