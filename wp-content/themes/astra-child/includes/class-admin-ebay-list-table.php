@@ -25,7 +25,7 @@ class Ebay_List_Table extends WP_List_Table
       'id' => __('ID'),
       'title' => __('Titel'),
       'date' => __('Datum'),
-      'status' => __('Status'),
+      'status' => __('Shop Status'),
       'description' => __('Description'),
     );
   }
@@ -121,7 +121,7 @@ class Ebay_List_Table extends WP_List_Table
   function prepare_items()
   {
     $columns = $this->get_columns();
-    $hidden = array();
+    $hidden = array('id');
     $sortable = array();
     $this->_column_headers = array($columns, $hidden, $sortable);
   }
