@@ -1,0 +1,32 @@
+.wp-list-table.wp-list-ebay-ads .column-image {
+  width: 10%;
+}
+.wp-list-table.wp-list-ebay-ads .column-id {
+  width: 10%;
+}
+.wp-list-table.wp-list-ebay-ads .column-title {
+  width: 20%;
+}
+.wp-list-table.wp-list-ebay-ads .column-status {
+  width: 140px;
+}
+.wp-list-table.wp-list-ebay-ads .column-date {
+  width: 10%;
+}
+.wp-list-table.wp-list-ebay-ads .column-description {
+  width: auto;
+}
+.wp-list-table.wp-list-ebay-ads .column-content {
+  position: relative;
+}
+.wp-list-table.wp-list-ebay-ads .column-content .spinner {
+  position: absolute;
+  left: -33px;
+}
+.wp-list-table.wp-list-ebay-ads .column-content input {
+  width: 110px;
+}
+form#ebay .pagination input {
+  width: 50px;
+  margin-right: 10px;
+}

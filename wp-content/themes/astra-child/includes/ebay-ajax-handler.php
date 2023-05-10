@@ -39,12 +39,12 @@ function wbp_sanitize_excerpt($content, $count)
 
 function wbp_get_remote()
 {
-  if(isset($_POST['formdata'])) {
+  if (isset($_POST['formdata'])) {
     $formdata = $_POST['formdata'];
-    $post_ID = $formdata['post_ID'];
-    $ebay_id_raw = $formdata['ebay_id'];
+    $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID']: new WC_Product();
+    $ebay_id_raw = isset($formdata['ebay_id']) ? $formdata['ebay_id'] : null;
     $ebay_id = parse_ebay_id($ebay_id_raw);
-    
+
     $remoteUrl = wbp_get_ebay_url($ebay_id);
   } else {
     $remoteUrl = home_url();
@@ -71,9 +71,9 @@ function wbp_publish_post()
       'post_status' => 'publish',
     ));
   }
-  
+
   ob_start();
-  
+
   $table = new Extended_WC_Admin_List_Table_Products();
   $table->render_row($post_ID);
 
@@ -108,7 +108,13 @@ function wbp_import_ebay_data()
     ($content = isset($ebaydata['description']) ? $ebaydata['description'] : null)
   ) {
 
-    $product = wc_get_product($post_ID);
+    if(!isset($post_ID)) {
+      $product = new WC_Product();
+      $post_ID = $product->save();
+    } else {
+      $product = wc_get_product($post_ID);
+    }
+
     if ($product) {
       $product->set_regular_price($price);
       try {
@@ -231,9 +237,9 @@ function wbp_get_brands()
 {
   foreach (get_terms(['taxonomy' => 'brands']) as $key => $term) {
     $image_ids = get_metadata('term', $term->term_id, 'image');
-    if(!empty($image_ids)) {
+    if (!empty($image_ids)) {
       $image_url = wp_get_attachment_image_url($image_ids[0]);
-      
+
       $brands[] = [
         'id' => $term->term_id,
         'slug' => $term->slug,
@@ -241,7 +247,6 @@ function wbp_get_brands()
         'image_url' => $image_url
       ];
     }
-
   };
   echo json_encode([
     'brands' => $brands
