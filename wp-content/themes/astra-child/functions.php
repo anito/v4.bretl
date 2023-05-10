@@ -702,9 +702,9 @@ function wbp_ebay_display_admin_page($page)
 
 function output_dashboard_tab()
 {
-  $results = [];
+  $data = wbp_get_json_data();
   $page = isset($_GET['page_number']) ? $_GET['page_number'] : 1;
-  wbp_include_ebay_template('dashboard/dashboard.php', false, array('results' => $results, 'page' => $page, 'pages' => 5, 'load_data' => false));
+  wbp_include_ebay_template('dashboard/dashboard.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'load_data' => false));
 }
 
 
@@ -712,8 +712,9 @@ function wbp_get_json_data()
 {
   $page = isset($_GET['page_number']) ? $_GET['page_number'] : 1;
   $remoteUrl = wbp_get_ebay_json_url($page);
-  $pages[] = get_remote($remoteUrl);
-  return $pages;
+  $response = get_remote($remoteUrl);
+  $data = json_decode($response);
+  return $data;
 }
 
 function get_remote($url) {

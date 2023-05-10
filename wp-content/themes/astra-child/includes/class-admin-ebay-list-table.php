@@ -85,7 +85,8 @@ class Ebay_List_Table extends WP_List_Table
               }
             $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
             $deletelink  = get_delete_post_link($product->get_id());
-            $stat = '<div><div>' . $stat . '</div><div><a class="' . $classes . '" href="' . $editlink . '">' . __('Edit') . '</a></div><div><a class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a></div></div>';
+            $permalink = get_permalink($product->get_id());
+            $stat = '<div><div>' . $stat . '</div><div><a class="' . $classes . '" href="' . $permalink . '" target="_blank">' . __('View') . '</a></div><div><a class="' . $classes . '" href="' . $editlink . '" target="_blank">' . __('Edit') . '</a></div><div><a class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a></div></div>';
             
           } else {
             $stat = wbp_include_ebay_template('dashboard/import-data.php', true, array('sku' => $record->id));
@@ -131,17 +132,16 @@ class Ebay_List_Table extends WP_List_Table
     $this->_column_headers = array($columns, $hidden, $sortable);
   }
 
-  function fetchItems() {
-    $results = [];
-    $pages = wbp_get_json_data();
-    foreach ($pages as $key => $page) {
-      if (!empty($page)) {
-        $ads = json_decode($page);
-        $results = $ads->ads;
-      }
-    }
-    $this->items = $results;
+  function setData($data) {
+  // function fetchItems() {
+    // $pages = wbp_get_json_data();
+    // foreach ($pages as $key => $page) {
+    //   if (!empty($page)) {
+    //     $data = json_decode($page);
+    //   }
+    // }
+    $this->items = $data;
     $this->prepare_items();
-    return $results;
+    // return $data;
   }
 }
