@@ -172,7 +172,7 @@ function wbp_import_ebay_images()
   $ebaydata = $_POST['ebaydata'];
   $ebay_images = isset($ebaydata['images']) ? $ebaydata['images'] : [];
 
-  remove_attachments($post_ID);
+  wbp_remove_attachments($post_ID);
 
   $ids = [];
   for ($i = 0; $i < count($ebay_images); $i++) {
@@ -208,7 +208,7 @@ function wbp_delete_images()
 {
   if (isset($_POST['post_ID'])) {
     $post_ID = $_POST['post_ID'];
-    remove_attachments($post_ID);
+    wbp_remove_attachments($post_ID);
   }
 
   ob_start();
@@ -280,15 +280,4 @@ function wbp_upload_image($url, $post_ID)
     }
   }
   return $attachmentId;
-}
-
-function remove_attachments($post_ID)
-{
-  $product = wc_get_product($post_ID);
-  $attachment_ids = array();
-  $attachment_ids[] = $product->get_image_id();
-  $attachment_ids = array_merge($attachment_ids, $product->get_gallery_image_ids());
-  for ($i = 0; $i < count($attachment_ids); $i++) {
-    wp_delete_post($attachment_ids[$i]);
-  }
 }

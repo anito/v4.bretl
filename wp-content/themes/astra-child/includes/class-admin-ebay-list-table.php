@@ -84,7 +84,8 @@ class Ebay_List_Table extends WP_List_Table
                 break;
               }
             $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
-            $stat = '<div><div>' . $stat . '</div><a class="' . $classes . '" href="' . $editlink . '">' . __('Edit') . '</div></div>';
+            $deletelink  = get_delete_post_link($product->get_id());
+            $stat = '<div><div>' . $stat . '</div><div><a class="' . $classes . '" href="' . $editlink . '">' . __('Edit') . '</a></div><div><a class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a></div></div>';
             
           } else {
             $stat = wbp_include_ebay_template('dashboard/import-data.php', true, array('sku' => $record->id));

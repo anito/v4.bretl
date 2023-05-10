@@ -141,14 +141,10 @@ function wbp_product_before_save($product)
 }
 add_action("woocommerce_before_product_object_save", "wbp_product_before_save", 99, 2);
 
-// remove ebay/sku from product before moving to trash
-function wbp_before_trash($post_ID) {
-  delete_post_meta((int) $post_ID, 'ebay_id');
-  delete_post_meta((int) $post_ID, 'ebay_url');
-  $product = wc_get_product($post_ID);
-  $product->save();
+function wbp_before_delete($post_ID) {
+  wbp_remove_attachments($post_ID);
 }
-add_action('wp_trash_post', 'wbp_before_trash');
+add_action('before_delete_post', 'wbp_before_delete');
 
 
 function wbp_remove_sku($product)
@@ -737,4 +733,16 @@ function wbp_get_product_by_sku($sku)
   if ($post_ID) return new WC_Product($post_ID);
 
   return null;
+}
+
+function wbp_remove_attachments($post_ID)
+{
+  $product = wc_get_product($post_ID);
+  if($product) {
+    $attachment_ids[] = $product->get_image_id();
+    $attachment_ids = array_merge($attachment_ids, $product->get_gallery_image_ids());
+    for ($i = 0; $i < count($attachment_ids); $i++) {
+      wp_delete_post($attachment_ids[$i]);
+    }
+  }
 }
