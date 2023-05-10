@@ -294,7 +294,7 @@ jQuery(document).ready(function ($) {
   const MSG_MISSING_EBAY_ID = "Keine eBay-Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
   const MSG_ERROR =
-    "Arrgh🥶, etwas scheint schiefgegangen zu sein.\n\nBitte nochnmal versuchen.";
+    "Arrgh🥶, etwas scheint schiefgegangen zu sein. Bitte noch einmal versuchen.";
 
   let form;
   switch (screen) {
@@ -348,7 +348,7 @@ jQuery(document).ready(function ($) {
         try {
           iframe.contentWindow.document.write(
             response.content?.body ||
-              "<h1>Arrgh🥶, etwas scheint schiefgegangen zu sein...</h1>"
+              `<h1>${MSG_ERROR}</h1>`
           );
         } catch (err) {}
       }

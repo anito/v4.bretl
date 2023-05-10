@@ -41,7 +41,7 @@ function wbp_get_remote()
 {
   if (isset($_POST['formdata'])) {
     $formdata = $_POST['formdata'];
-    $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID']: new WC_Product();
+    $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID'] : new WC_Product();
     $ebay_id_raw = isset($formdata['ebay_id']) ? $formdata['ebay_id'] : null;
     $ebay_id = parse_ebay_id($ebay_id_raw);
 
@@ -108,9 +108,11 @@ function wbp_import_ebay_data()
     ($content = isset($ebaydata['description']) ? $ebaydata['description'] : null)
   ) {
 
-    if(!isset($post_ID)) {
+    if (!isset($post_ID)) {
       $product = new WC_Product();
-      $post_ID = $product->save();
+      $product->set_name($title);
+      $product->save();
+      $post_ID = $product->get_id();
     } else {
       $product = wc_get_product($post_ID);
     }
@@ -121,6 +123,7 @@ function wbp_import_ebay_data()
         $product->set_sku($ebay_id);
       } catch (Exception $e) {
       }
+
       $product->save();
     }
 
@@ -151,6 +154,8 @@ function wbp_import_ebay_data()
   //   'success' => $post_ID === $result,
   //   'data' => compact(['post_ID', 'ebay_id', 'post_status', 'price', 'content']),
   // ]);
+
+  get_sample_permalink(get_post($post_ID));
   wp_die();
 }
 

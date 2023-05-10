@@ -82,7 +82,7 @@ class Ebay_List_Table extends WP_List_Table
                 $stat = __("Published");
                 break;
               }
-            $editlink  = admin_url('post.php?action=edit&post=' . $product->id);
+            $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
             $stat = '<div><div>' . $stat . '</div><a class="' . $classes . '" href="' . $editlink . '">' . __('Edit') . '</div></div>';
             
           } else {

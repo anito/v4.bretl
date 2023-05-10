@@ -3,7 +3,5 @@
 <?php
   echo 'Leider ist ein Fehler beim Abrufen der Daten aus <strong>Kleinanzeigen</strong> aufgetreten';
 ?>
-<form action="">
-  <button type="submit">Erneut versuchen</button>
-</form>
+<a href="'<?php echo admin_url('admin.php?page=ebay') ?>'">Erneut versuchen</a>
 </section>

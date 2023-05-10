@@ -141,6 +141,22 @@ function wbp_product_before_save($product)
 }
 add_action("woocommerce_before_product_object_save", "wbp_product_before_save", 99, 2);
 
+// remove ebay/sku from product before moving to trash
+function wbp_before_trash($post_ID) {
+  delete_post_meta((int) $post_ID, 'ebay_id');
+  delete_post_meta((int) $post_ID, 'ebay_url');
+  $product = wc_get_product($post_ID);
+  $product->save();
+}
+add_action('wp_trash_post', 'wbp_before_trash');
+
+
+function wbp_remove_sku($product)
+{
+  return false;
+}
+add_filter('wc_product_sku_enabled', 'wbp_remove_sku', 10);
+
 function add_scripts()
 {
   wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'));
@@ -408,7 +424,7 @@ function wbp_woo_custom_tabs($tabs)
   $tabs['request_form'] = array(
     'title'   => __('Anfrage', 'astra-child'),
     'priority'   => 30,
-    'callback'   => 'wbp_woo_tab_requst_form'
+    'callback'   => 'wbp_woo_tab_request_form'
   );
 
   // $tabs['technical'] = array(
@@ -441,7 +457,7 @@ function wbp_woo_tab_content($tab_name, $tab)
   echo '<h6 style="font-weight:600; opacity: 0.5; margin-bottom: 10px;">Highlights</h6><h5 style="margin-bottom: 30px;">' . $title . '</h5>' . do_shortcode($content); // keep possible shortcode
 }
 
-function wbp_woo_tab_requst_form()
+function wbp_woo_tab_request_form()
 {
   if (REQUEST_FORM_SHORTCODE_ID) {
     echo  do_shortcode('[elementor-template id="' . REQUEST_FORM_SHORTCODE_ID . '"]');
@@ -583,7 +599,7 @@ function wbp_add_ebay_admin_menu_page()
   $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCg0KPCEtLSBVcGxvYWRlZCB0bzogU1ZHIFJlcG8sIHd3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4NCjxzdmcgZmlsbD0iIzAwMDAwMCIgaGVpZ2h0PSI4MDBweCIgd2lkdGg9IjgwMHB4IiB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiANCgkgdmlld0JveD0iLTE0MyAxNDUgNTEyIDUxMiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMTEzLDE0NWMtMTQxLjQsMC0yNTYsMTE0LjYtMjU2LDI1NnMxMTQuNiwyNTYsMjU2LDI1NnMyNTYtMTE0LjYsMjU2LTI1NlMyNTQuNCwxNDUsMTEzLDE0NXogTTI3Mi44LDU2MC43DQoJCWMtMjAuOCwyMC44LTQ0LjksMzcuMS03MS44LDQ4LjRjLTI3LjgsMTEuOC01Ny40LDE3LjctODgsMTcuN2MtMzAuNSwwLTYwLjEtNi04OC0xNy43Yy0yNi45LTExLjQtNTEuMS0yNy43LTcxLjgtNDguNA0KCQljLTIwLjgtMjAuOC0zNy4xLTQ0LjktNDguNC03MS44Qy0xMDcsNDYxLjEtMTEzLDQzMS41LTExMyw0MDFzNi02MC4xLDE3LjctODhjMTEuNC0yNi45LDI3LjctNTEuMSw0OC40LTcxLjgNCgkJYzIwLjktMjAuOCw0NS0zNy4xLDcxLjktNDguNUM1Mi45LDE4MSw4Mi41LDE3NSwxMTMsMTc1czYwLjEsNiw4OCwxNy43YzI2LjksMTEuNCw1MS4xLDI3LjcsNzEuOCw0OC40DQoJCWMyMC44LDIwLjgsMzcuMSw0NC45LDQ4LjQsNzEuOGMxMS44LDI3LjgsMTcuNyw1Ny40LDE3LjcsODhjMCwzMC41LTYsNjAuMS0xNy43LDg4QzMwOS44LDUxNS44LDI5My41LDU0MCwyNzIuOCw1NjAuN3oiLz4NCgk8cGF0aCBkPSJNMTE3LjUsNDI0LjdjLTAuNi0xLjMtMS4xLTIuNy0xLjUtNC4xYy0wLjktMy4zLTEuNC03LTEuNC0xMC45di0wLjFjMC01LjcsMC45LTEwLjUsMi43LTE0LjRjMS43LTMuOCw0LjEtNi44LDcuMi05DQoJCWMtMy40LTIuMy03LjgtMy42LTEzLjktMy42Yy05LDAtMTUsMi4zLTIwLjMsOS4zSDkwVjM0OUg2NS4ydjM1LjdjMC40LDAuMSwwLjcsMC4zLDEuMSwwLjVjOS41LDMuNywxNSw5LDE3LjksMTUuNQ0KCQljMi45LDYuNCwzLjIsMTMuNiwyLjYsMjEuNWMtMC4xLDEuNS0xLjMsMi43LTIuOCwyLjdINjUuM3YyLjRoMThoMC4xYzEuNSwwLjEsMi43LDEuNCwyLjcsM2MtMC4yLDQuNy0yLjEsOC45LTUuNCwxMi40DQoJCWMtMy4xLDMuMy03LjUsNi4xLTEzLjEsOC40Yy0wLjcsMC42LTAuOSwwLjctMS43LDAuOGwtMC42LDAuM1Y0NjZoMjMuNnYtOC45aDAuNGM0LjUsNy44LDExLjMsMTAuNywyMSwxMC43DQoJCWMxOS4zLDAsMjMuNi0xNC44LDI0LjctMjkuMWwtMC4zLTAuM0MxMjYsNDM2LjYsMTIwLjUsNDMxLjUsMTE3LjUsNDI0Ljd6IE0xMTAuNyw0MjQuMWMwLDIwLjctMS40LDI5LjItMTAuNSwyOS4yDQoJCWMtOC42LDAtMTAuMS04LjYtMTAuMS0yOS4yYzAtMTYuMSwwLTI3LjUsMTAuMS0yNy41QzExMS4xLDM5Ni43LDExMC43LDQwOC4xLDExMC43LDQyNC4xeiIvPg0KCTxwYXRoIGQ9Ik02Niw0NDguNWMxMC45LTQuNCwxNi44LTEwLjYsMTcuMi0xOC41aC0xOEg1MmgtMC40SDM3YzAsNi4yLTMuMywxMy4xLTE5LjUsMTMuMWMtMjAsMC0yMC40LTEyLjgtMjAuNC0yMS40aDY4LjJIODQNCgkJYzEuMS0xNC44LTEuMi0yNy4yLTE4LjctMzRjLTMuOS0xLjgtOC4zLTIuOC0xMy42LTMuOGMtOC42LTEuNy0xOS45LTIuOC0zNC4xLTIuOGMtNTkuOCwwLTY2LjIsMTYuOS02Ni4yLDM2LjUNCgkJYzAsMjIuNiw3LjYsMzguNSw2Ni4yLDM4LjVjMTMuNSwwLDI1LjItMS40LDM0LjUtM2M0LjktMS4xLDkuNC0yLjUsMTMuMi00LjJDNjUuNiw0NDguOSw2NS42LDQ0OC45LDY2LDQ0OC41eiBNMTcuNSwzOTMuNg0KCQljMjEuOCwwLDIxLjEsMTAsMjEuMSwxNi44SC0yLjlDLTIuOSw0MDQuNS0zLjIsMzkzLjYsMTcuNSwzOTMuNnoiLz4NCgk8cGF0aCBkPSJNMTg4LDQwMy40aDAuMmwtMi41LTQuNmwtMjQuOS00Ni4xbC0wLjktMS43Yy0yLjQtMC4yLTUtMC40LTcuOC0wLjRjLTkuNSwwLTE3LjcsMS40LTIzLjQsNS41Yy02LDMuNS05LjQsMTAtOS40LDE5LjkNCgkJaDI0LjhjMC02LjQsMC40LTEyLjcsOS40LTEyLjdjOS4xLDAsMTAuMSw1LjIsMTAuMSwxMnY2LjZjLTE0LjItMC40LTI4LjEsMC0zNi45LDYuMmMtNiw0LjEtOS40LDExLTkuNCwyMS42DQoJCWMwLDEyLjQsNC45LDIzLjEsMTcuNywyNS44YzEuOCwwLjQsMy43LDAuNCw2LDAuNGMxMC45LDAsMTgtNC4xLDIzLjItMTIuM2gwLjRsMS4xLDEwLjloMjMuNGMtMC40LTUuMi0xLjEtMTAuMy0xLjEtMTUuNVY0MDMuNHoNCgkJIE0xNTEuNCw0MjEuOGMtOC4zLDAtOS41LTcuMy05LjUtMTNjMC0xNC40LDkuNS0xMy41LDIxLjgtMTQuMkMxNjMuNyw0MDMuNiwxNjYsNDIxLjgsMTUxLjQsNDIxLjh6Ii8+DQoJPHBvbHlnb24gcG9pbnRzPSIyMTYuNSwzODkuNCAxOTMuMSwzNDAuNCAxNTcuNCwzNDAuNCAxNjMuMywzNTEuMyAxODguMiwzOTcuNCAxOTguNCw0MTYuMyAxOTguNCw0NTYuNSAyMzEuMSw0NTYuNSAyMzEuMSw0MTYuMyANCgkJMjc0LjgsMzQwLjQgMjQxLjYsMzQwLjQgCSIvPg0KPC9nPg0KPC9zdmc+';
 
   add_menu_page('eBay', 'eBay', 'edit_posts', 'ebay', 'wbp_display_ebay', $icon_svg, 10);
-  if ('ebay' == $_GET['page']) {
+  if (!empty($_GET['page']) && 'ebay' == $_GET['page']) {
     wbp_ebay_register_scripts();
     register_admin_content();
   }
