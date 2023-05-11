@@ -4,11 +4,15 @@
   require_once get_stylesheet_directory() . '/includes/class-admin-ebay-list-table.php';
 
   $wp_list_table = new Ebay_List_Table();
-  $items = $wp_list_table->setData($data->ads);
-  $categories = $data->searchData;
-  $total = 0;
-  foreach ($categories as $category) {
-    $total += $category->totalAds;
+  if(isset($data)) {
+    $wp_list_table->setData($data->ads);
+    $categories = $data->searchData;
+    $total = 0;
+    foreach ($categories as $category) {
+      $total += $category->totalAds;
+    }
+  } else {
+    $wp_list_table->setData([]);
   }
   ?>
 

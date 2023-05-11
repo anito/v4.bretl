@@ -703,6 +703,9 @@ function wbp_ebay_display_admin_page($page)
 function output_dashboard_tab()
 {
   $data = wbp_get_json_data();
+  if(!isset($data)) {
+    echo __('Error:', 'wbp') . ' ' . __('Es wurden keine Daten empfangen', 'wbp');
+  }
   $page = isset($_GET['page_number']) ? $_GET['page_number'] : 1;
   wbp_include_ebay_template('dashboard/dashboard.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'load_data' => false));
 }
@@ -731,9 +734,9 @@ function wbp_get_product_by_sku($sku)
   global $wpdb;
   $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku));
 
-  if ($post_ID) return new WC_Product($post_ID);
-
-  return null;
+  if (isset($post_ID)) {
+    return wc_get_product($post_ID);
+  }
 }
 
 function wbp_remove_attachments($post_ID)

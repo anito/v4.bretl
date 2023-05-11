@@ -64,7 +64,7 @@ class Ebay_List_Table extends WP_List_Table
           $attributes = $class . $style;
 
           $product = wbp_get_product_by_sku($record->id);
-          if(isset($product)) {
+          if($product) {
             $classes = "";
             $status = $product->get_status();
             switch($status) {
@@ -86,7 +86,18 @@ class Ebay_List_Table extends WP_List_Table
             $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
             $deletelink  = get_delete_post_link($product->get_id());
             $permalink = get_permalink($product->get_id());
-            $stat = '<div><div>' . $stat . '</div><div><a class="' . $classes . '" href="' . $permalink . '" target="_blank">' . __('View') . '</a></div><div><a class="' . $classes . '" href="' . $editlink . '" target="_blank">' . __('Edit') . '</a></div><div><a class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a></div></div>';
+            $stat =
+              '<div><div>' . $stat . '</div>' .
+                '<div>' .
+                  '<a class="' . $classes . '" href="' . $permalink . '" target="_blank">' . __('View') . '</a>' .
+                '</div>' .
+                '<div>' .
+                  '<a class="' . $classes . '" href="' . $editlink . '" target="_blank">' . __('Edit') . '</a>' .
+                '</div>' .
+                '<div>' .
+              '<a onclick="() => confirm(\'Du bist dabei das Produkt ' . substr($product->get_title(), 15) . '... unwiderruflich zu löschen?\')" class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a>' .
+                '</div>' .
+              '</div>';
             
           } else {
             $stat = wbp_include_ebay_template('dashboard/import-data.php', true, array('sku' => $record->id));
@@ -133,15 +144,7 @@ class Ebay_List_Table extends WP_List_Table
   }
 
   function setData($data) {
-  // function fetchItems() {
-    // $pages = wbp_get_json_data();
-    // foreach ($pages as $key => $page) {
-    //   if (!empty($page)) {
-    //     $data = json_decode($page);
-    //   }
-    // }
     $this->items = $data;
     $this->prepare_items();
-    // return $data;
   }
 }
