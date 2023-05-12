@@ -17,9 +17,9 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       // When quick editing woocommerce renders its own rows
       $render_wc = false;
     }
-    
+
     // Full page load - woocommerce renders its own rows
-    if(!function_exists('get_current_screen')) {
+    if (!function_exists('get_current_screen')) {
       $render_wc = false;
     }
 
@@ -59,9 +59,9 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
     switch ($column_name) {
       case 'sku': {
-        echo '<a href="'. esc_html(wbp_get_ebay_url($sku)) . '" target="_blank"</a>';
-        break;
-      }
+          echo '<a href="' . esc_html(wbp_get_ebay_url($sku)) . '" target="_blank"</a>';
+          break;
+        }
       case 'sync': {
 ?>
           <div class="sync-column-content">

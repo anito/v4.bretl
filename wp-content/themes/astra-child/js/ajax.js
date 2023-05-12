@@ -2,7 +2,6 @@ jQuery(document).ready(function ($) {
   const {
     admin_ajax_local,
     admin_ajax_remote,
-    home_url,
     relocate_url,
     screen,
     edit_link,
@@ -17,7 +16,7 @@ jQuery(document).ready(function ($) {
       method: "POST",
       url: admin_ajax_local,
       data: {
-        action: "wbp_ebay_json_data",
+        action: "_ajax_ebay_json_data",
       },
       success: function (response, status, options) {
         if (status === "success") ajax_json_data_callback(status, that);
@@ -38,7 +37,7 @@ jQuery(document).ready(function ($) {
       method: "POST",
       url: admin_ajax_local,
       data: {
-        action: "wbp_update_post",
+        action: "_ajax_update_post",
         post_ID,
         post_status,
       },
@@ -60,7 +59,7 @@ jQuery(document).ready(function ($) {
       type: "POST",
       url: admin_ajax_local,
       data: {
-        action: "wbp_get_post",
+        action: "_ajax_get_post",
         post_ID,
       },
       success: function (response, status, options) {
@@ -100,7 +99,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_remote,
       data: {
-        action: "wbp_remote",
+        action: "_ajax_get_remote",
         formdata,
       },
       success: (data) =>
@@ -124,32 +123,14 @@ jQuery(document).ready(function ($) {
       spinner?.classList.remove("is-active");
     };
 
-    const success = (data) => {
-      processDataImport(data, { el, post_ID });
-      el.setAttribute("value", "Importiert");
-      el.dispatchEvent(
-        new CustomEvent("ebay:data-import", { detail: { success: true } })
-      );
-      removeSpinner();
-    };
-    const error = (error) => {
-      el.setAttribute("value", "Fehler");
-      el.dispatchEvent(new CustomEvent("ebay:data-import"), {
-        detail: { success: false, error },
-      });
-      removeSpinner();
-      console.log(error);
-    };
-
     if (form) {
       formdata = $(form).serializeJSON();
     } else {
-      const button = e.target;
-      const post_ID = button.dataset.postId;
-      const ebay_id = button.dataset.ebayId;
+      const target = e.target;
+      const post_ID = target.dataset.postId;
+      const ebay_id = target.dataset.ebayId;
       formdata = { post_ID, ebay_id };
     }
-    const { post_ID } = formdata;
 
     if (!formdata.ebay_id) {
       alert(MSG_MISSING_EBAY_ID);
@@ -159,11 +140,31 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_remote,
       data: {
-        action: "wbp_remote",
+        action: "_ajax_get_remote",
         formdata,
       },
-      success,
-      error,
+      beforeSend: () => {
+        $(el).html("Hole Daten...");
+      },
+      success: (ebaydata) => {
+        $(el).html("Verarbeite...");
+
+        removeSpinner();
+
+        setTimeout(() => {
+          processDataImport(ebaydata, el);
+        }, 3000);
+      },
+      error: (error) => {
+        $(el).html("Fehler");
+
+        el.dispatchEvent(new CustomEvent("ebay:data-import"), {
+          detail: { success: false, error },
+        });
+
+        removeSpinner();
+        console.log(error);
+      },
     });
   }
 
@@ -180,7 +181,7 @@ jQuery(document).ready(function ($) {
     };
 
     const success = (data) => {
-      processImageImport(data, { el, post_ID });
+      processImageImport(data, el);
     };
 
     const error = (error) => {
@@ -208,7 +209,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_remote,
       data: {
-        action: "wbp_remote",
+        action: "_ajax_get_remote",
         formdata,
       },
       success,
@@ -243,10 +244,10 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_local,
       data: {
-        action: "wbp_del_images",
+        action: "_ajax_delete_images",
         post_ID,
       },
-      success: (data) => parseResponse({ data, el }),
+      success: (data) => parseResponse(data, el),
       error: remove_spinner,
     });
   }
@@ -264,28 +265,49 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_local,
       data: {
-        action: "wbp_publish",
+        action: "_ajax_publish_post",
         post_ID,
       },
-      success: (data) => parseResponse({ data, el }),
+      success: (data) => parseResponse(data, el),
       error: (error) => console.log(error),
     });
   }
 
-  function parseResponse({ data, el }) {
-    const {
-      html,
-      post: { post_ID },
-    } = JSON.parse(data);
+  function deletePost(e) {
+    const el = e.target;
+    const ebay_id = el.dataset.ebayId;
+    const post_ID = el.dataset.postId;
 
+    $.post({
+      url: admin_ajax_local,
+      data: {
+        action: "_ajax_delete_post",
+        post_ID,
+        ebay_id,
+      },
+      success: (data) => parseResponse(data, el),
+      error: (error) => console.log(error),
+    });
+  }
+
+  function parseResponse(data, el) {
+    
+    const {
+      data: { row, post_ID, ebay_id },
+    } = JSON.parse(data);
+    
+    let rowEl;
     switch (screen) {
-      case "toplevel_page_ebay":
       case "product":
         location = `${edit_link}${post_ID}`;
         break;
       case "edit-product":
-        const row = el.closest(`#post-${post_ID}`);
-        $(row)?.replaceWith(html);
+        rowEl = el.closest(`#post-${post_ID}`);
+        $(rowEl)?.replaceWith(row);
+        break;
+      case "toplevel_page_ebay":
+        rowEl = el.closest(`tr#ad-id-${ebay_id}`);
+        $(rowEl)?.replaceWith(row);
         break;
     }
     finish();
@@ -300,11 +322,15 @@ jQuery(document).ready(function ($) {
   switch (screen) {
     case "toplevel_page_ebay":
     case "edit-product":
-      ajax_object.publishPost = publishPost;
-      ajax_object.importEbayData = importEbayData;
-      ajax_object.importEbayImages = importEbayImages;
-      ajax_object.deleteEbayImages = deleteEbayImages;
-      ajax_object.edit_link = edit_link;
+      ajax_object = {
+        ...ajax_object,
+        deletePost,
+        publishPost,
+        importEbayData,
+        importEbayImages,
+        deleteEbayImages,
+        processDataImport,
+      };
       break;
     case "product":
       form = document.getElementById("post");
@@ -347,8 +373,7 @@ jQuery(document).ready(function ($) {
       if (iframe.contentWindow.document) {
         try {
           iframe.contentWindow.document.write(
-            response.content?.body ||
-              `<h1>${MSG_ERROR}</h1>`
+            response.content?.body || `<h1>${MSG_ERROR}</h1>`
           );
         } catch (err) {}
       }
@@ -359,19 +384,23 @@ jQuery(document).ready(function ($) {
     }
   }
 
-  function processDataImport(data, transferObj = {}, callback = () => {}) {
+  function processDataImport(data, el, callback = () => {}) {
     const handle_success = (data) => {
-      parseResponse({ data, ...transferObj });
+      parseResponse(data, el);
+      el.dispatchEvent(
+        new CustomEvent("ebay:data-import", { detail: { success: true, data } })
+      );
     };
 
     const handle_error = (data) => {
       console.log(data);
+      el.dispatchEvent(
+        new CustomEvent("ebay:data-import", { detail: { success: false } })
+      );
       callback?.();
     };
 
     const response = JSON.parse(data);
-
-    console.log(response);
 
     const { post_ID, ebay_id, post_status, content } = response;
     const postdata = { post_ID, ebay_id, post_status };
@@ -396,7 +425,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_local,
       data: {
-        action: "wbp_ebay_data",
+        action: "_ajax_import_ebay_data",
         postdata,
         ebaydata,
       },
@@ -405,10 +434,10 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function processImageImport(data, transferObj = {}) {
+  function processImageImport(data, el) {
     const handle_success = (data) => {
       alert(msg);
-      parseResponse({ data, ...transferObj });
+      parseResponse(data, el);
     };
     const handle_error = (error) => {
       console.log(error);
@@ -435,8 +464,6 @@ jQuery(document).ready(function ($) {
 
     const ebaydata = { images };
 
-    console.log(ebaydata);
-
     if (images.length) {
       msg = `${images.length} Fotos wurden importiert.`;
     } else {
@@ -446,7 +473,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_local,
       data: {
-        action: "wbp_ebay_images",
+        action: "_ajax_import_ebay_images",
         postdata,
         ebaydata,
       },

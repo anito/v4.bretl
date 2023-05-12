@@ -141,7 +141,8 @@ function wbp_product_before_save($product)
 }
 add_action("woocommerce_before_product_object_save", "wbp_product_before_save", 99, 2);
 
-function wbp_before_delete($post_ID) {
+function wbp_before_delete($post_ID)
+{
   wbp_remove_attachments($post_ID);
 }
 add_action('before_delete_post', 'wbp_before_delete');
@@ -307,45 +308,43 @@ function check_cert()
   return ($cont["options"]["ssl"]["peer_certificate"]);
 }
 
-function wbp_remote()
+function _ajax_get_remote()
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
   wbp_get_remote();
 }
 
-function wbp_publish()
+function _ajax_publish_post()
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
   wbp_publish_post();
 }
 
-function wbp_ebay_data()
+function _ajax_import_ebay_data()
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
   wbp_import_ebay_data();
 }
 
-function wbp_ebay_images()
+function _ajax_import_ebay_images()
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
   wbp_import_ebay_images();
 }
 
-function wbp_del_images()
+function _ajax_delete_post()
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
+  wbp_delete_post();
+}
+
+function _ajax_delete_images()
+{
   wbp_delete_images();
 }
 
-function wbp_product_categories()
+function _ajax_get_product_categories()
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
   wbp_get_product_categories();
 }
 
-function wbp_brands()
+function _ajax_get_brands()
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
   wbp_get_brands();
 }
 
@@ -374,21 +373,26 @@ if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 10);
   add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');
 
-  add_action('wp_ajax_wbp_publish', 'wbp_publish');
-  add_action('wp_ajax_wbp_remote', 'wbp_remote');
-  add_action('wp_ajax_wbp_brands', 'wbp_brands');
-  add_action('wp_ajax_wbp_ebay_data', 'wbp_ebay_data');
-  add_action('wp_ajax_wbp_ebay_images', 'wbp_ebay_images');
-  add_action('wp_ajax_wbp_product_categories', 'wbp_product_categories');
+  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
+  require_once __DIR__ . '/includes/ajax-table.php';
 
-  add_action('wp_ajax_nopriv_wbp_publish', 'wbp_publish', 1);
-  add_action('wp_ajax_nopriv_wbp_remote', 'wbp_remote');
-  add_action('wp_ajax_nopriv_wbp_brands', 'wbp_brands');
-  add_action('wp_ajax_nopriv_wbp_ebay_data', 'wbp_ebay_data');
-  add_action('wp_ajax_nopriv_wbp_ebay_images', 'wbp_ebay_images');
-  add_action('wp_ajax_nopriv_wbp_product_categories', 'wbp_product_categories');
+  add_action('wp_ajax__ajax_get_remote', '_ajax_get_remote');
+  add_action('wp_ajax__ajax_get_brands', '_ajax_get_brands');
+  add_action('wp_ajax__ajax_publish_post', '_ajax_publish_post');
+  add_action('wp_ajax__ajax_import_ebay_data', '_ajax_import_ebay_data');
+  add_action('wp_ajax__ajax_import_ebay_images', '_ajax_import_ebay_images');
+  add_action('wp_ajax__ajax_get_product_categories', '_ajax_get_product_categories');
+  add_action('wp_ajax__ajax_delete_images', '_ajax_delete_images');
+  add_action('wp_ajax__ajax_delete_post', '_ajax_delete_post');
 
-  add_action('wp_ajax_wbp_del_images', 'wbp_del_images');
+  add_action('wp_ajax_nopriv__ajax_get_remote', '_ajax_get_remote');
+  add_action('wp_ajax_nopriv__ajax_get_brands', '_ajax_get_brands');
+  add_action('wp_ajax_nopriv__ajax_publish_post', '_ajax_publish_post', 1);
+  add_action('wp_ajax_nopriv__ajax_import_ebay_data', '_ajax_import_ebay_data');
+  add_action('wp_ajax_nopriv__ajax_import_ebay_images', '_ajax_import_ebay_images');
+  add_action('wp_ajax_nopriv__ajax_delete_post', '_ajax_delete_post');
+  add_action('wp_ajax_nopriv__ajax_get_product_categories', '_ajax_get_product_categories');
+  add_action('wp_ajax_nopriv__ajax_delete_images', '_ajax_delete_images');
 }
 
 /**
@@ -594,21 +598,26 @@ function wbp_add_ebay_admin_menu_page()
 {
   $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCg0KPCEtLSBVcGxvYWRlZCB0bzogU1ZHIFJlcG8sIHd3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4NCjxzdmcgZmlsbD0iIzAwMDAwMCIgaGVpZ2h0PSI4MDBweCIgd2lkdGg9IjgwMHB4IiB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiANCgkgdmlld0JveD0iLTE0MyAxNDUgNTEyIDUxMiIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMTEzLDE0NWMtMTQxLjQsMC0yNTYsMTE0LjYtMjU2LDI1NnMxMTQuNiwyNTYsMjU2LDI1NnMyNTYtMTE0LjYsMjU2LTI1NlMyNTQuNCwxNDUsMTEzLDE0NXogTTI3Mi44LDU2MC43DQoJCWMtMjAuOCwyMC44LTQ0LjksMzcuMS03MS44LDQ4LjRjLTI3LjgsMTEuOC01Ny40LDE3LjctODgsMTcuN2MtMzAuNSwwLTYwLjEtNi04OC0xNy43Yy0yNi45LTExLjQtNTEuMS0yNy43LTcxLjgtNDguNA0KCQljLTIwLjgtMjAuOC0zNy4xLTQ0LjktNDguNC03MS44Qy0xMDcsNDYxLjEtMTEzLDQzMS41LTExMyw0MDFzNi02MC4xLDE3LjctODhjMTEuNC0yNi45LDI3LjctNTEuMSw0OC40LTcxLjgNCgkJYzIwLjktMjAuOCw0NS0zNy4xLDcxLjktNDguNUM1Mi45LDE4MSw4Mi41LDE3NSwxMTMsMTc1czYwLjEsNiw4OCwxNy43YzI2LjksMTEuNCw1MS4xLDI3LjcsNzEuOCw0OC40DQoJCWMyMC44LDIwLjgsMzcuMSw0NC45LDQ4LjQsNzEuOGMxMS44LDI3LjgsMTcuNyw1Ny40LDE3LjcsODhjMCwzMC41LTYsNjAuMS0xNy43LDg4QzMwOS44LDUxNS44LDI5My41LDU0MCwyNzIuOCw1NjAuN3oiLz4NCgk8cGF0aCBkPSJNMTE3LjUsNDI0LjdjLTAuNi0xLjMtMS4xLTIuNy0xLjUtNC4xYy0wLjktMy4zLTEuNC03LTEuNC0xMC45di0wLjFjMC01LjcsMC45LTEwLjUsMi43LTE0LjRjMS43LTMuOCw0LjEtNi44LDcuMi05DQoJCWMtMy40LTIuMy03LjgtMy42LTEzLjktMy42Yy05LDAtMTUsMi4zLTIwLjMsOS4zSDkwVjM0OUg2NS4ydjM1LjdjMC40LDAuMSwwLjcsMC4zLDEuMSwwLjVjOS41LDMuNywxNSw5LDE3LjksMTUuNQ0KCQljMi45LDYuNCwzLjIsMTMuNiwyLjYsMjEuNWMtMC4xLDEuNS0xLjMsMi43LTIuOCwyLjdINjUuM3YyLjRoMThoMC4xYzEuNSwwLjEsMi43LDEuNCwyLjcsM2MtMC4yLDQuNy0yLjEsOC45LTUuNCwxMi40DQoJCWMtMy4xLDMuMy03LjUsNi4xLTEzLjEsOC40Yy0wLjcsMC42LTAuOSwwLjctMS43LDAuOGwtMC42LDAuM1Y0NjZoMjMuNnYtOC45aDAuNGM0LjUsNy44LDExLjMsMTAuNywyMSwxMC43DQoJCWMxOS4zLDAsMjMuNi0xNC44LDI0LjctMjkuMWwtMC4zLTAuM0MxMjYsNDM2LjYsMTIwLjUsNDMxLjUsMTE3LjUsNDI0Ljd6IE0xMTAuNyw0MjQuMWMwLDIwLjctMS40LDI5LjItMTAuNSwyOS4yDQoJCWMtOC42LDAtMTAuMS04LjYtMTAuMS0yOS4yYzAtMTYuMSwwLTI3LjUsMTAuMS0yNy41QzExMS4xLDM5Ni43LDExMC43LDQwOC4xLDExMC43LDQyNC4xeiIvPg0KCTxwYXRoIGQ9Ik02Niw0NDguNWMxMC45LTQuNCwxNi44LTEwLjYsMTcuMi0xOC41aC0xOEg1MmgtMC40SDM3YzAsNi4yLTMuMywxMy4xLTE5LjUsMTMuMWMtMjAsMC0yMC40LTEyLjgtMjAuNC0yMS40aDY4LjJIODQNCgkJYzEuMS0xNC44LTEuMi0yNy4yLTE4LjctMzRjLTMuOS0xLjgtOC4zLTIuOC0xMy42LTMuOGMtOC42LTEuNy0xOS45LTIuOC0zNC4xLTIuOGMtNTkuOCwwLTY2LjIsMTYuOS02Ni4yLDM2LjUNCgkJYzAsMjIuNiw3LjYsMzguNSw2Ni4yLDM4LjVjMTMuNSwwLDI1LjItMS40LDM0LjUtM2M0LjktMS4xLDkuNC0yLjUsMTMuMi00LjJDNjUuNiw0NDguOSw2NS42LDQ0OC45LDY2LDQ0OC41eiBNMTcuNSwzOTMuNg0KCQljMjEuOCwwLDIxLjEsMTAsMjEuMSwxNi44SC0yLjlDLTIuOSw0MDQuNS0zLjIsMzkzLjYsMTcuNSwzOTMuNnoiLz4NCgk8cGF0aCBkPSJNMTg4LDQwMy40aDAuMmwtMi41LTQuNmwtMjQuOS00Ni4xbC0wLjktMS43Yy0yLjQtMC4yLTUtMC40LTcuOC0wLjRjLTkuNSwwLTE3LjcsMS40LTIzLjQsNS41Yy02LDMuNS05LjQsMTAtOS40LDE5LjkNCgkJaDI0LjhjMC02LjQsMC40LTEyLjcsOS40LTEyLjdjOS4xLDAsMTAuMSw1LjIsMTAuMSwxMnY2LjZjLTE0LjItMC40LTI4LjEsMC0zNi45LDYuMmMtNiw0LjEtOS40LDExLTkuNCwyMS42DQoJCWMwLDEyLjQsNC45LDIzLjEsMTcuNywyNS44YzEuOCwwLjQsMy43LDAuNCw2LDAuNGMxMC45LDAsMTgtNC4xLDIzLjItMTIuM2gwLjRsMS4xLDEwLjloMjMuNGMtMC40LTUuMi0xLjEtMTAuMy0xLjEtMTUuNVY0MDMuNHoNCgkJIE0xNTEuNCw0MjEuOGMtOC4zLDAtOS41LTcuMy05LjUtMTNjMC0xNC40LDkuNS0xMy41LDIxLjgtMTQuMkMxNjMuNyw0MDMuNiwxNjYsNDIxLjgsMTUxLjQsNDIxLjh6Ii8+DQoJPHBvbHlnb24gcG9pbnRzPSIyMTYuNSwzODkuNCAxOTMuMSwzNDAuNCAxNTcuNCwzNDAuNCAxNjMuMywzNTEuMyAxODguMiwzOTcuNCAxOTguNCw0MTYuMyAxOTguNCw0NTYuNSAyMzEuMSw0NTYuNSAyMzEuMSw0MTYuMyANCgkJMjc0LjgsMzQwLjQgMjQxLjYsMzQwLjQgCSIvPg0KPC9nPg0KPC9zdmc+';
 
-  add_menu_page('eBay', 'eBay', 'edit_posts', 'ebay', 'wbp_display_ebay', $icon_svg, 10);
+  add_menu_page('eBay', 'eBay', 'edit_posts', 'ebay', 'wbp_display_ebay_list', $icon_svg, 10);
   if (!empty($_GET['page']) && 'ebay' == $_GET['page']) {
+
+    if (!defined('EBAY_TEMPLATE_PATH')) {
+      define('EBAY_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/ebay/');
+    }
+    require_once __DIR__ . '/includes/ajax-table.php';
+
     wbp_ebay_register_scripts();
     register_admin_content();
   }
 }
 add_action('admin_menu', 'wbp_add_ebay_admin_menu_page');
 
-function wbp_display_ebay()
+function wbp_display_ebay_list()
 {
-  define('EBAY_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/ebay/');
 
   echo '<div id="wbp-ebay-wrap">';
 
-  wbp_include_ebay_template('admin-page-header.php');
+  wbp_include_ebay_template('page-header.php');
 
   do_action('wbp_ebay_admin_after_header');
 
@@ -701,26 +710,23 @@ function wbp_ebay_display_admin_page($page)
 }
 
 function output_dashboard_tab()
-{
-  $data = wbp_get_json_data();
-  if(!isset($data)) {
-    echo __('Error:', 'wbp') . ' ' . __('Es wurden keine Daten empfangen', 'wbp');
-  }
-  $page = isset($_GET['page_number']) ? $_GET['page_number'] : 1;
-  wbp_include_ebay_template('dashboard/dashboard.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'load_data' => false));
+{ 
+  wbp_include_ebay_template('dashboard/dashboard.php', false, array('pages' => 5, 'load_data' => false));
 }
 
 
-function wbp_get_json_data()
+function wbp_get_json_data($page = 1)
 {
-  $page = isset($_GET['page_number']) ? $_GET['page_number'] : 1;
+
   $remoteUrl = wbp_get_ebay_json_url($page);
   $response = get_remote($remoteUrl);
-  $data = json_decode($response);
-  return $data;
+  // $response = file_get_contents(__DIR__ . '/sample' . $page . '.json');
+  return json_decode($response);
+
 }
 
-function get_remote($url) {
+function get_remote($url)
+{
   $response = wp_remote_get($url);
   if (!is_wp_error($response)) {
     return $response['body'];
@@ -742,7 +748,7 @@ function wbp_get_product_by_sku($sku)
 function wbp_remove_attachments($post_ID)
 {
   $product = wc_get_product($post_ID);
-  if($product) {
+  if ($product) {
     $attachment_ids[] = $product->get_image_id();
     $attachment_ids = array_merge($attachment_ids, $product->get_gallery_image_ids());
     for ($i = 0; $i < count($attachment_ids); $i++) {

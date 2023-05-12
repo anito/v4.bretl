@@ -1,3 +1,36 @@
+.wbp-ebay-main-header {
+  margin: 40px 0 10px;
+}
+.wbp-ebay-sub-header .pagination {
+  margin: 20px 0 0;
+}
+.wbp-ebay-sub-header .pagination a {
+  text-align: center;
+  width: 50px;
+  margin-right: 10px;
+}
+.wp-list-table {
+  position: relative;
+}
+.wp-list-table::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease-in;
+}
+.wp-list-table.loading::after {
+  opacity: .3;
+}
+.wp-list-table.wp-list-ebay-ads, .tablenav {
+  margin-right: 20px;
+  width: auto;
+}
 .wp-list-table.wp-list-ebay-ads .column-image {
   width: 120px;
 }
@@ -26,10 +59,7 @@
   position: absolute;
   left: -33px;
 }
-.wp-list-table.wp-list-ebay-ads .column-content input {
+.wp-list-table.wp-list-ebay-ads .column-content a {
+  text-align: center;
   width: 110px;
-}
-form#ebay .pagination input {
-  width: 50px;
-  margin-right: 10px;
 }

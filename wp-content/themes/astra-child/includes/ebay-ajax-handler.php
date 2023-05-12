@@ -39,9 +39,9 @@ function wbp_sanitize_excerpt($content, $count)
 
 function wbp_get_remote()
 {
-  if (isset($_POST['formdata'])) {
-    $formdata = $_POST['formdata'];
-    $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID'] : new WC_Product();
+  if (isset($_REQUEST['formdata'])) {
+    $formdata = $_REQUEST['formdata'];
+    $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID'] : null;
     $ebay_id_raw = isset($formdata['ebay_id']) ? $formdata['ebay_id'] : null;
     $ebay_id = parse_ebay_id($ebay_id_raw);
 
@@ -73,34 +73,33 @@ function wbp_publish_post()
   }
 
   ob_start();
-
-  $table = new Extended_WC_Admin_List_Table_Products();
-  $table->render_row($post_ID);
+  $wp_list_table = new Extended_WC_Admin_List_Table_Products();
+  $wp_list_table->render_row($post_ID);
+  $row = ob_get_clean();
 
   echo json_encode([
-    'html' => ob_get_clean(),
-    'post' => compact(['post_ID'])
+    'data' => compact(['row', 'post_ID'])
   ]);
 
-  // $post = get_post($post_ID);
-  // echo json_encode([
-  //   'success' => $post_ID === $result,
-  //   'data' => compact(['post_ID', 'error']),
-  // ]);
   wp_die();
 }
 
 function wbp_import_ebay_data()
 {
-  $postdata = isset($_POST['postdata']) ? $_POST['postdata'] : null;
-  if ($postdata && isset($postdata['post_ID'])) {
-    $post_ID = (int) $postdata['post_ID'];
+  if(isset($_REQUEST['postdata'])) {
+
+    $post_ID = !empty($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
+    $ebay_id = !empty($_REQUEST['postdata']['ebay_id']) ? $_REQUEST['postdata']['ebay_id'] : null;
+
   }
-  if ($postdata && isset($postdata['ebay_id'])) {
-    $ebay_id_raw = $postdata['ebay_id'];
-    $ebay_id = parse_ebay_id($ebay_id_raw);
+
+  if (isset($ebay_id)) {
+    $ebay_id = parse_ebay_id($ebay_id);
   }
-  $ebaydata = isset($_POST['ebaydata']) ? $_POST['ebaydata'] : null;
+
+  $pageNum = isset($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : null;
+  $ebaydata = isset($_REQUEST['ebaydata']) ? $_REQUEST['ebaydata'] : null;
+
   if (
     ($ebaydata) &&
     ($title = isset($ebaydata['title']) ? $ebaydata['title'] : null) &&
@@ -113,8 +112,10 @@ function wbp_import_ebay_data()
       $product->set_name($title);
       $product->save();
       $post_ID = $product->get_id();
+      $screen = 'ebay';
     } else {
       $product = wc_get_product($post_ID);
+      $screen = 'woo';
     }
 
     if ($product) {
@@ -139,23 +140,30 @@ function wbp_import_ebay_data()
       'post_excerpt' => wbp_sanitize_excerpt($content, 300)
     ), true);
   }
-
+  
   ob_start();
-
-  $table = new Extended_WC_Admin_List_Table_Products();
-  $table->render_row($post_ID);
+  switch($screen) {
+    case 'woo':
+      $wp_list_table = new Extended_WC_Admin_List_Table_Products();
+      $wp_list_table->render_row($post_ID);
+      break;
+    case 'ebay':
+      $wp_list_table = new Ebay_List_Table();
+      $data = wbp_get_json_data(!empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1);
+      $wp_list_table->setData($data);
+      list($columns, $hidden) = $wp_list_table->get_column_info();
+      $ads = $data->ads;
+      $ids = array_column($ads, 'id');
+      $record_key = array_search($ebay_id, $ids);
+      $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+      break;
+  }
+  $row = ob_get_clean();
 
   echo json_encode([
-    'html' => ob_get_clean(),
-    'post' => compact(['post_ID'])
+    'data' => compact(['row', 'post_ID', 'ebay_id'])
   ]);
 
-  // echo json_encode([
-  //   'success' => $post_ID === $result,
-  //   'data' => compact(['post_ID', 'ebay_id', 'post_status', 'price', 'content']),
-  // ]);
-
-  get_sample_permalink(get_post($post_ID));
   wp_die();
 }
 
@@ -193,32 +201,62 @@ function wbp_import_ebay_images()
   ));
 
   ob_start();
-
-  $table = new Extended_WC_Admin_List_Table_Products();
-  $table->render_row($post_ID);
+  $wp_list_table = new Extended_WC_Admin_List_Table_Products();
+  $wp_list_table->render_row($post_ID);
+  $row = ob_get_clean();
 
   echo json_encode([
-    'html' => ob_get_clean(),
-    'post' => compact(['post_ID'])
+    'data' => compact(['row', 'post_ID'])
   ]);
   wp_die();
 }
 
 function wbp_delete_images()
 {
-  if (isset($_POST['post_ID'])) {
-    $post_ID = $_POST['post_ID'];
+  if (isset($_REQUEST['post_ID'])) {
+    $post_ID = $_REQUEST['post_ID'];
     wbp_remove_attachments($post_ID);
   }
 
   ob_start();
-
-  $table = new Extended_WC_Admin_List_Table_Products();
-  $table->render_row($post_ID);
+  $wp_list_table = new Extended_WC_Admin_List_Table_Products();
+  $wp_list_table->render_row($post_ID);
+  $row = ob_get_clean();
 
   echo json_encode([
-    'html' => ob_get_clean(),
-    'post' => compact(['post_ID'])
+    'data' => compact(['row', 'post_ID'])
+  ]);
+  wp_die();
+}
+
+function wbp_delete_post()
+{
+  if (!empty($_REQUEST['post_ID'])) {
+    $post_ID = $_REQUEST['post_ID'];
+  }
+  if (!empty($_REQUEST['ebay_id'])) {
+    $ebay_id = $_REQUEST['ebay_id'];
+  }
+
+  $product = wc_get_product($post_ID);
+
+  if($product) {
+    $product->delete(true);
+  }
+
+  ob_start();
+  $wp_list_table = new Ebay_List_Table();
+  $data = wbp_get_json_data(!empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1);
+  $wp_list_table->setData($data);
+  list($columns, $hidden) = $wp_list_table->get_column_info();
+  $ads = $data->ads;
+  $ids = array_column($ads, 'id');
+  $record_key = array_search($ebay_id, $ids);
+  $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+  $row = ob_get_clean();
+
+  echo json_encode([
+    'data' => compact(['row', 'ebay_id'])
   ]);
   wp_die();
 }

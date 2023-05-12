@@ -1,40 +1,23 @@
 <div class="wpo_section wpo_group">
+  
+  <header id="head-wrap"></header>
+  
+  <form name="ebay-list" id="ebay-list" method="get">
+    
+    <input type="hidden" name="page" value="<?php echo $_REQUEST['page']; ?>" />
+    <input type="hidden" name="order" value="<?php echo $_REQUEST['order']; ?>" />
+    <input type="hidden" name="orderby" value="<?php echo $_REQUEST['orderby']; ?>" />
+    <input type="hidden" name="pageNum" value="<?php echo (!empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1 ); ?>" />
 
-  <?php
-  require_once get_stylesheet_directory() . '/includes/class-admin-ebay-list-table.php';
-
-  $wp_list_table = new Ebay_List_Table();
-  if(isset($data)) {
-    $wp_list_table->setData($data->ads);
-    $categories = $data->searchData;
-    $total = 0;
-    foreach ($categories as $category) {
-      $total += $category->totalAds;
-    }
-  } else {
-    $wp_list_table->setData([]);
-  }
-  ?>
-
-  <form name="ebay" id="ebay">
-
-    <h3><?php _e('eBay Anzeigen', 'wbp') ?></h3>
-    <h4 style="margin: 0;"><?php echo sprintf(__('Seite: %s', 'wbp'), $page) ?>&nbsp;<small>&nbsp;<?php echo sprintf(__('    Anzeigen: %s (Gesamt: %d)', 'wbp'), count($data->ads), $total); ?></small></h4>
-    <h4 style="margin: 5px 0 30px;"><small>
-        <?php foreach ($categories as $category) { ?>
-          <?php echo sprintf(__('%s (%s)', 'wbp'), $category->title, $category->totalAds) ?>
-        <?php } ?>
-      </small></h4>
-
-      <div class="pagination">
-        <?php for ($i = 1; $i <= $pages; $i++) {
-          echo '<input type="submit" class="button ' . ($i == $page ? ' button-primary' : '') . '" name="page_number" value="' . $i . '" />';
-        } ?>
-        <input type="hidden" name="page" value="ebay">
-      </div>
+    <div id="ts-history-table">
       <?php
-      $wp_list_table->display();
+      wp_nonce_field('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
       ?>
+    </div>
 
   </form>
+
 </div>
+
+<script>
+</script>

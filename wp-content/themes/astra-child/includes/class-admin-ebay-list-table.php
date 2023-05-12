@@ -1,6 +1,7 @@
 <?php
-
-use Automattic\WooCommerce\Internal\Admin\Orders\Edit;
+if (!class_exists('WP_List_Table')) {
+  require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+}
 
 class Ebay_List_Table extends WP_List_Table
 {
@@ -10,19 +11,116 @@ class Ebay_List_Table extends WP_List_Table
     parent::__construct(array(
       'singular' => 'wp-list-ebay-ad',
       'plural' => 'wp-list-ebay-ads',
-      'ajax' => false
+      'ajax' => true
     ));
+  }
+
+  /**
+   * @Override of display method
+   */
+
+  function display()
+  {
+
+    /**
+     * Adds a nonce field
+     */
+    wp_nonce_field('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
+
+    /**
+     * Adds field order and orderby
+     */
+    echo '<input type="hidden" id="order" name="order" value="' . $this->_pagination_args['order'] . '" />';
+    echo '<input type="hidden" id="orderby" name="orderby" value="' . $this->_pagination_args['orderby'] . '" />';
+    echo '<input type="hidden" id="page" name="page" value="' . $this->_pagination_args['orderby'] . '" />';
+
+    parent::display();
+  }
+
+  /**
+   * @Build Head
+   */
+
+  function display_head($page = 1)
+  {
+    $data = $this->data;
+
+    if (isset($data)) {
+      $categories = $data->searchData;
+      $total = 0;
+      foreach ($categories as $category) {
+        $total += $category->totalAds;
+      }
+    }
+
+    wbp_include_ebay_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total));
+  }
+
+  /**
+   * @Override ajax_response method
+   */
+
+  function ajax_response()
+  {
+
+    check_ajax_referer('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
+
+    $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
+    $data = wbp_get_json_data($pageNum);
+    $this->setData($data);
+
+    extract($this->_args);
+    extract($this->_pagination_args, EXTR_SKIP);
+
+    ob_start();
+    $this->display_head($pageNum);
+    $head = ob_get_clean();
+
+    ob_start();
+    if (!empty($_REQUEST['no_placeholder']))
+      $this->display_rows();
+    else
+      $this->display_rows_or_placeholder();
+    $rows = ob_get_clean();
+
+    ob_start();
+    $this->print_column_headers();
+    $headers = ob_get_clean();
+
+    ob_start();
+    $this->pagination('top');
+    $pagination_top = ob_get_clean();
+
+    ob_start();
+    $this->pagination('bottom');
+    $pagination_bottom = ob_get_clean();
+
+    $response = array('rows' => $rows);
+    $response['pagination']['top'] = $pagination_top;
+    $response['pagination']['bottom'] = $pagination_bottom;
+    $response['column_headers'] = $headers;
+    $response['head'] = $head;
+
+    if (isset($total_items))
+      $response['total_items_i18n'] = sprintf(_n('1 item', '%s items', $total_items), number_format_i18n($total_items));
+
+    if (isset($total_pages)) {
+      $response['total_pages'] = $total_pages;
+      $response['total_pages_i18n'] = number_format_i18n($total_pages);
+    }
+
+    die(json_encode($response));
   }
 
   /**
    * Define the columns that are going to be used in the table
    * @return array $columns, the array of columns to use with the table
    */
+
   function get_columns()
   {
     return array(
       'image' => __('Bild'),
-      'id' => __('ID'),
       'title' => __('Titel'),
       'date' => __('Datum'),
       'price' => __('Preis'),
@@ -35,11 +133,9 @@ class Ebay_List_Table extends WP_List_Table
    * Decide which columns to activate the sorting functionality on
    * @return array $sortable, the array of columns that can be sorted by the user
    */
-  public function get_sortable_columns()
+  function get_sortable_columns()
   {
-    return array(
-      'title' => 'title',
-    );
+    return array();
   }
 
   /**
@@ -49,102 +145,238 @@ class Ebay_List_Table extends WP_List_Table
   function display_rows()
   {
 
-    $records = $this->items;
     list($columns, $hidden) = $this->get_column_info();
 
-    if (!empty($records)) {
-      foreach ($records as $record) {
-
-        echo '<tr id="ad-id-' . $record->id . '">';
-        foreach ($columns as $column_name => $column_display_name) {
-
-          $class = 'class="' . $column_name . ' column-' . $column_name . '"';
-          $style = "";
-          if (in_array($column_name, $hidden)) $style = ' style="display:none;"';
-          $attributes = $class . $style;
-
-          $product = wbp_get_product_by_sku($record->id);
-          if($product) {
-            $classes = "";
-            $status = $product->get_status();
-            switch($status) {
-              case 'draft':
-                $stat = __("Draft");
-                break;
-              case 'pending':
-                $stat = __("Pending Review");
-                break;
-              case 'trash':
-                $stat = __("Trash");
-                $classes="hidden";
-                break;
-              case 'publish':
-              case 'publish':
-                $stat = __("Published");
-                break;
-              }
-            $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
-            $deletelink  = get_delete_post_link($product->get_id());
-            $permalink = get_permalink($product->get_id());
-            $stat =
-              '<div><div>' . $stat . '</div>' .
-                '<div>' .
-                  '<a class="' . $classes . '" href="' . $permalink . '" target="_blank">' . __('View') . '</a>' .
-                '</div>' .
-                '<div>' .
-                  '<a class="' . $classes . '" href="' . $editlink . '" target="_blank">' . __('Edit') . '</a>' .
-                '</div>' .
-                '<div>' .
-              '<a onclick="() => confirm(\'Du bist dabei das Produkt ' . substr($product->get_title(), 15) . '... unwiderruflich zu löschen?\')" class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a>' .
-                '</div>' .
-              '</div>';
-            
-          } else {
-            $stat = wbp_include_ebay_template('dashboard/import-data.php', true, array('sku' => $record->id));
-          }
-
-          switch ($column_name) {
-            case "image":
-              echo '<td ' . $attributes . '><div class="column-content"><a href="' . EBAY_URL . stripslashes($record->url) . '" target="_blank"><img src="' . stripslashes($record->image) . '" width="128" /></a></div></td>';
-              break;
-            case "id":
-              echo '<td ' . $attributes . '><div class="column-content center">' . stripslashes($record->id) . '</div></td>';
-              break;
-            case "title":
-              echo '<td ' . $attributes . '><div class="column-content"><a href="' . EBAY_URL . stripslashes($record->url) . '" target="_blank">' . stripslashes($record->title) . '</a></div></td>';
-              break;
-            case "date":
-              echo '<td ' . $attributes . '><div class="column-content center">' . $record->date . '</div></td>';
-              break;
-            case "price":
-              echo '<td ' . $attributes . '><div class="column-content ">' . $record->price . '</div></td>';
-              break;
-            case "status":
-              echo '<td ' . $attributes . '><div class="column-content">' . $stat . '</div></td>';
-              break;
-            case "description":
-              echo '<td ' . $attributes . '><div class="column-content">' . $record->description . '</div></td>';
-              break;
-          }
-        }
-        echo '</tr>';
-      }
+    $records = $this->items;
+    foreach ($records as $record) {
+      $this->render_row($record, $columns, $hidden);
     }
   }
+
+  private $hidden_columns = array(
+    'id'
+  );
+
+  private $data = array();
 
   /**
    * Prepare the table with different parameters, pagination, columns and table elements
    */
   function prepare_items()
   {
-    $columns = $this->get_columns();
-    $hidden = array('id');
-    $sortable = array();
+    /**
+     * How many records for page do you want to show?
+     */
+    $per_page = 25;
+
+    /**
+     * Define of column_headers. It's an array that contains:
+     * columns of List Table
+     * hiddens columns of table
+     * sortable columns of table
+     * optionally primary column of table
+     */
+    $columns  = $this->get_columns();
+    $hidden   = $this->hidden_columns;
+    $sortable = $this->get_sortable_columns();
     $this->_column_headers = array($columns, $hidden, $sortable);
+
+    $data = $this->items;
+
+    function usort_reorder($a, $b)
+    {
+
+      $orderby = (!empty($_REQUEST['orderby'])) ? $_REQUEST['orderby'] : 'date';
+      $order = (!empty($_REQUEST['order'])) ? $_REQUEST['order'] : 'asc';
+      $result = strcmp($a->{$orderby}, $b->{$orderby});
+      return ('asc' === $order) ? $result : -$result;
+    }
+    // usort($data, 'usort_reorder');
+
+    /**
+     * Get current page calling get_pagenum method
+     */
+    $current_page = $this->get_pagenum();
+
+    $total_items = count($data);
+
+    $data = array_slice($data, (($current_page - 1) * $per_page), $per_page);
+
+    $this->items = $data;
+
+    if (!empty($_REQUEST['row'])) {
+      $row = $_REQUEST['row'];
+    }
+
+    /**
+     * Call to _set_pagination_args method for informations about
+     * total items, items for page, total pages and ordering
+     */
+    $this->set_pagination_args(
+      array(
+        'total_items'  => $total_items,
+        'per_page'      => $per_page,
+        'total_pages'  => ceil($total_items / $per_page),
+        'orderby'      => !empty($_REQUEST['orderby']) && '' != $_REQUEST['orderby'] ? $_REQUEST['orderby'] : 'title',
+        'order'        => !empty($_REQUEST['order']) && '' != $_REQUEST['order'] ? $_REQUEST['order'] : 'asc'
+      )
+    );
   }
 
-  function setData($data) {
-    $this->items = $data;
+  function setData($data)
+  {
+    $this->data = $data;
+    $this->items = $data->ads;
+
     $this->prepare_items();
+  }
+
+  function getRecord($id)
+  {
+    foreach ($this->items as $item) {
+      if ($item->id === $id) {
+        $record = $item;
+      }
+    }
+    return $record;
+  }
+
+  function render_row($record, $columns, $hidden)
+  { ?>
+    <tr id="ad-id-<?php echo $record->id ?>">
+      <?php
+      foreach ($columns as $column_name => $column_display_name) {
+        $class = 'class="' . $column_name . ' column-' . $column_name . '"';
+        $style = "";
+        if (in_array($column_name, $hidden)) $style = ' style="display:none;"';
+        $attributes = $class . $style;
+
+        $product = wbp_get_product_by_sku($record->id);
+        if ($product) {
+          $classes = "";
+          $status = $product->get_status();
+          switch ($status) {
+            case 'draft':
+              $stat = __("Draft");
+              break;
+            case 'pending':
+              $stat = __("Pending Review");
+              break;
+            case 'trash':
+              $stat = __("Trash");
+              $classes = "hidden";
+              break;
+            case 'publish':
+            case 'publish':
+              $stat = __("Published");
+              break;
+          }
+          $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
+          $deletelink  = get_delete_post_link($product->get_id()) . '&screen=ebay';
+          $permalink = get_permalink($product->get_id());
+          $stat =
+            '<div><div>' . $stat . '</div>' .
+            '<div>' .
+            '<a class="' . $classes . '" href="' . $permalink . '" target="_blank">' . __('View') . '</a>' .
+            '</div>' .
+            '<div>' .
+            '<a class="' . $classes . '" href="' . $editlink . '" target="_blank">' . __('Edit') . '</a>' .
+            '</div>' .
+            '<div>' .
+            '<a data-name="delete-post" data-post-id="' . $product->get_id() . '" data-ebay-id="' . $record->id . '" data-ebay-page="' . $record->id . '" class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a>' .
+            '</div>' .
+            '</div>';
+        } else {
+          $stat = wbp_include_ebay_template('dashboard/import-data-button.php', true, array('sku' => $record->id));
+        }
+
+        switch ($column_name) {
+          case "image": {
+      ?>
+              <td <?php echo $$attributes ?>>
+                <div class="column-content"><a href="<?php echo EBAY_URL . stripslashes($record->url) ?>" target="_blank"><img src="<?php echo stripslashes($record->image) ?>" width="128" /></a></div>
+              </td>
+            <?php
+              break;
+            }
+          case "id": {
+            ?>
+              <td <?php echo $$attributes ?>>
+                <div class="column-content center"><?php echo $record->id ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "title": {
+            ?>
+              <td <?php echo $$attributes ?>>
+                <div class="column-content"><a href="<?php echo EBAY_URL . stripslashes($record->url) ?>" target="_blank"><?php echo $record->title ?></a></div>
+              </td>
+            <?php
+              break;
+            }
+          case "date": {
+            ?>
+              <td <?php echo $attributes ?>>
+                <div class="column-content center"><?php echo $record->date ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "price": {
+            ?>
+              <td <?php echo $attributes ?>>
+                <div class="column-content "><?php echo $record->price ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "status": {
+            ?>
+              <td <?php echo $attributes ?>>
+                <div class="column-content"><?php echo $stat ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "description": {
+            ?>
+              <td <?php echo $attributes ?>>
+                <div class="column-content"><?php echo $record->description ?></div>
+              </td>
+      <?php
+              break;
+            }
+        }
+      } ?>
+      <script>
+        jQuery(document).ready(($) => {
+          const {
+            importEbayData,
+            deletePost
+          } = ajax_object;
+
+          const ebay_id = "<?php echo $record->id ?>";
+
+          const impEl = $(`#ad-id-${ebay_id} a[data-name=import-ebay-data]`);
+          $(impEl).on('click', function(e) {
+            e.preventDefault();
+
+            importEbayData(e);
+          })
+
+          const delEl = $(`#ad-id-${ebay_id} a[data-name=delete-post]`)
+          $(delEl).on('click', function(e) {
+            e.preventDefault();
+
+            if (!confirm('Du bist dabei das Produkt unwiderruflich zu löschen. Möchtest Du fortfahren?')) return;
+
+            delEl.html('löschen...')
+            deletePost(e);
+          })
+        })
+      </script>
+    </tr>
+<?php
   }
 }
