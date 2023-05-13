@@ -40,7 +40,10 @@
 .wp-list-table.wp-list-ebay-ads .column-title {
   width: 20%;
 }
-.wp-list-table.wp-list-ebay-ads .column-status {
+.wp-list-table.wp-list-ebay-ads .column-shop-actions {
+  width: 140px;
+}
+.wp-list-table.wp-list-ebay-ads .column-actions {
   width: 140px;
 }
 .wp-list-table.wp-list-ebay-ads .column-date {
@@ -61,5 +64,14 @@
 }
 .wp-list-table.wp-list-ebay-ads .column-content a {
   text-align: center;
+  margin-bottom: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   width: 110px;
+}
+.wp-list-table.wp-list-ebay-ads .column-content .dashicons {
+  font-size: 1.3em;
+  line-height: 1.3em;
+  vertical-align: middle
 }
