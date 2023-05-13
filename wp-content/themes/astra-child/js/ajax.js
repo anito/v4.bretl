@@ -215,17 +215,22 @@ jQuery(document).ready(function ($) {
       data: {
         action: "_ajax_get_remote",
         formdata,
-        screen
+        screen,
       },
       beforeSend: () => {
         $(el).html("Hole Daten...");
       },
       success: (data) => {
-        $(el).html("Verarbeite...");
+        const json = JSON.parse(data);
+        if (json.content.response.code === 200) {
+          $(el).html("Verarbeite...");
 
-        setTimeout(() => {
-          processDataImport(data, el, removeSpinner);
-        }, 500);
+          setTimeout(() => {
+            processDataImport(json, el, removeSpinner);
+          }, 500);
+        } else {
+          $(el).html("Fehler");
+        }
       },
       error: (error) => {
         $(el).html("Fehler");
@@ -262,28 +267,16 @@ jQuery(document).ready(function ($) {
       return;
     }
 
-    console.log(screen)
     $.post({
       url: admin_ajax_remote,
       data: {
         action: "_ajax_get_remote",
         formdata,
-        screen
+        screen,
       },
-      beforeSend: () => {
-        if (el.constructor.name === "HTMLAnchorElement") {
-          el.innerHTML = "importiere Fotos...";
-        }
-      },
+      beforeSend: () => (el.innerHTML = "importiere Fotos..."),
       success: (data) => {
-        cb = () => {
-          if (el.constructor.name === "HTMLInputElement") {
-            spinner?.classList.remove("is-active");
-          } else if (el.constructor.name === "HTMLAnchorElement") {
-            el.innerHTML = "Fotos importiert";
-          }
-        };
-        processImageImport(data, el, cb);
+        processImageImport(data, el);
       },
       error: (error) => {
         spinner?.classList.remove("is-active");
@@ -312,8 +305,12 @@ jQuery(document).ready(function ($) {
     }
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    const remove_spinner = () => spinner?.classList.remove("is-active");
     spinner?.classList.add("is-active");
+    
+    const error_callback = () => {
+      el.innerHTML = "Fehler";
+      spinner?.classList.remove("is-active");
+    };
 
     $.post({
       url: admin_ajax_local,
@@ -322,7 +319,7 @@ jQuery(document).ready(function ($) {
         post_ID,
       },
       success: (data) => parseResponse(data, el),
-      error: () => spinner?.classList.remove("is-active"),
+      error: error_callback,
     });
   }
 
@@ -461,12 +458,10 @@ jQuery(document).ready(function ($) {
     }
   }
 
-  function processDataImport(data, el, callback = () => {}) {
-    const response = JSON.parse(data);
-
-    const { post_ID, ebay_id, post_status, content, screen } = response;
+  function processDataImport(json, el, callback = () => {}) {
+    const { post_ID, ebay_id, post_status, content, screen } = json;
     const postdata = { post_ID, ebay_id, post_status };
-    
+
     let doc;
     try {
       const parser = new DOMParser();
@@ -491,15 +486,16 @@ jQuery(document).ready(function ($) {
         action: "_ajax_import_ebay_data",
         postdata,
         ebaydata,
-        screen
+        screen,
       },
-      success: (data) => {
-        parseResponse(data, el, callback);
+      success: async (data) => {
         el.dispatchEvent(
           new CustomEvent("ebay:data-import", {
             detail: { success: true, data },
           })
         );
+        $(el).html("Fertig");
+        setTimeout(() => parseResponse(data, el, callback), 2000);
       },
       error: (data) => {
         console.log(data);
@@ -546,10 +542,11 @@ jQuery(document).ready(function ($) {
         action: "_ajax_import_ebay_images",
         postdata,
         ebaydata,
-        screen
+        screen,
       },
       success: (data) => {
-        parseResponse(data, el, callback);
+        $(el).html("Fertig");
+        setTimeout(() => parseResponse(data, el, callback), 2000);
         alert(msg);
       },
       error: (error) => {

@@ -5,7 +5,7 @@
   pointer-events: none;
 }
 /**
- * For edit-product screen
+ * For edit-product screen (WP_Table_List)
  */
 .edit-php .column-sync {
   width: 13%;
@@ -17,7 +17,8 @@
 .edit-php .sync-column-content .button:first-child {
   margin-right: 3px;
 }
-.edit-php .sync-column-content .button {
+.edit-php .sync-column-content a {
+  text-align: center;
   margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;

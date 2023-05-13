@@ -291,10 +291,9 @@ class Ebay_List_Table extends WP_List_Table
           $action = 'connect-' . $product->get_id();
           $icon = 'admin-links';
           $shop_actions = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('product', 'record', 'label', 'action', 'icon')) .
-          wbp_include_ebay_template('dashboard/common-links.php', true, compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'));
-          
+            wbp_include_ebay_template('dashboard/common-links.php', true, compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'));
         } else {
-          
+
           $label = __('Anlegen');
           $action = 'create';
           $icon = 'plus';
