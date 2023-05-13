@@ -1,4 +1,6 @@
 <section class="wbp-ebay-sub-header">
+	<?php
+	?>
 	<h2><small><?php echo sprintf(__('    Anzeigen: %s (Gesamt: %d)', 'wbp'), count($data->ads), $total); ?></small></h2>
 	<h4><small>
 		<?php foreach ($categories as $category) { ?>

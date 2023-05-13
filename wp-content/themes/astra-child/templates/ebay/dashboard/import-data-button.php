@@ -1,6 +1,6 @@
 <div id="import-ebay-data-wbp-action-<?php echo $sku ?>" class="column-content">
   <span class="spinner"></span>
-  <a id="import-ebay-data-<?php echo $sku ?>" href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku) ?>" data-name="import-ebay-data" data-ebay-id="<?php echo $sku ?>" class="import-ebay-data button button-primary button-small">Produkt anlegen</a>
+  <a id="import-ebay-data-<?php echo $sku ?>" href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=' . $action) ?>" data-action="<?php echo $action ?>" data-ebay-id="<?php echo $sku ?>" class="button button-primary button-small"><?php echo $label ?></a>
 </div>
 <script>
   jQuery(document).ready(($) => {

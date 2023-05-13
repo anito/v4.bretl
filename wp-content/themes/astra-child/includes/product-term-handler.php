@@ -65,7 +65,6 @@ function wbp_process_ebay($post_id, $post)
 {
   global $wpdb;
 
-  return;
   $product = wc_get_product(($post_id));
   $title = $post->post_title;
   $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);

@@ -147,13 +147,6 @@ function wbp_before_delete($post_ID)
 }
 add_action('before_delete_post', 'wbp_before_delete');
 
-
-function wbp_remove_sku($product)
-{
-  return false;
-}
-add_filter('wc_product_sku_enabled', 'wbp_remove_sku', 10);
-
 function add_scripts()
 {
   wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'));
@@ -313,39 +306,49 @@ function _ajax_get_remote()
   wbp_get_remote();
 }
 
+function _ajax_connect()
+{
+  wbp_ajax_connect();
+}
+
+function _ajax_disconnect()
+{
+  wbp_ajax_disconnect();
+}
+
 function _ajax_publish_post()
 {
-  wbp_publish_post();
+  wbp_ajax_publish_post();
 }
 
 function _ajax_import_ebay_data()
 {
-  wbp_import_ebay_data();
+  wbp_ajax_import_ebay_data();
 }
 
 function _ajax_import_ebay_images()
 {
-  wbp_import_ebay_images();
+  wbp_ajax_import_ebay_images();
 }
 
 function _ajax_delete_post()
 {
-  wbp_delete_post();
+  wbp_ajax_delete_post();
 }
 
 function _ajax_delete_images()
 {
-  wbp_delete_images();
+  wbp_ajax_delete_images();
 }
 
 function _ajax_get_product_categories()
 {
-  wbp_get_product_categories();
+  wbp_ajax_get_product_categories();
 }
 
 function _ajax_get_brands()
 {
-  wbp_get_brands();
+  wbp_ajax_get_brands();
 }
 
 function wbp_product_set_attributes($post_id, $attributes)
@@ -384,6 +387,8 @@ if (is_admin()) {
   add_action('wp_ajax__ajax_get_product_categories', '_ajax_get_product_categories');
   add_action('wp_ajax__ajax_delete_images', '_ajax_delete_images');
   add_action('wp_ajax__ajax_delete_post', '_ajax_delete_post');
+  add_action('wp_ajax__ajax_connect', '_ajax_connect');
+  add_action('wp_ajax__ajax_disconnect', '_ajax_disconnect');
 
   add_action('wp_ajax_nopriv__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax_nopriv__ajax_get_brands', '_ajax_get_brands');
@@ -393,6 +398,8 @@ if (is_admin()) {
   add_action('wp_ajax_nopriv__ajax_delete_post', '_ajax_delete_post');
   add_action('wp_ajax_nopriv__ajax_get_product_categories', '_ajax_get_product_categories');
   add_action('wp_ajax_nopriv__ajax_delete_images', '_ajax_delete_images');
+  add_action('wp_ajax_nopriv__ajax_connect', '_ajax_connect');
+  add_action('wp_ajax_nopriv__ajax_disconnect', '_ajax_disconnect');
 }
 
 /**
@@ -715,9 +722,9 @@ function output_dashboard_tab()
 }
 
 
-function wbp_get_json_data($page = 1)
+function wbp_get_json_data($page)
 {
-
+  setcookie('ebay-table-page', $page);
   $remoteUrl = wbp_get_ebay_json_url($page);
   $response = get_remote($remoteUrl);
   // $response = file_get_contents(__DIR__ . '/sample' . $page . '.json');
@@ -739,6 +746,27 @@ function wbp_get_product_by_sku($sku)
 {
   global $wpdb;
   $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku));
+
+  if (isset($post_ID)) {
+    return wc_get_product($post_ID);
+  }
+}
+
+function wbp_get_product_by_title($title)
+{
+  global $wpdb;
+
+  // $sql = $wpdb->prepare(
+  //   "
+	// 		SELECT ID
+	// 		FROM $wpdb->posts
+	// 		WHERE post_title = %s
+	// 		AND post_type = %s
+	// 	",
+  //   $title,
+  //   'product'
+  // );
+  $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_title='%s' AND post_type LIKE '%s' LIMIT 1", $title, 'product'));
 
   if (isset($post_ID)) {
     return wc_get_product($post_ID);

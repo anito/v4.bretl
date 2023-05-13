@@ -111,6 +111,100 @@ jQuery(document).ready(function ($) {
     });
   }
 
+  function connectEbayData(e) {
+    e.preventDefault();
+
+    const el = e.target;
+    const action = el.dataset.action;
+    const ebay_id = el.dataset.ebayId;
+    const post_ID = action.replace("connect-", "");
+
+    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    spinner?.classList.add("is-active");
+
+    const removeSpinner = () => {
+      spinner?.classList.remove("is-active");
+    };
+
+    $.post({
+      url: admin_ajax_local,
+      data: {
+        action: "_ajax_connect",
+        post_ID,
+        ebay_id
+      },
+      beforeSend: () => {
+        $(el).html("Verknüpfe");
+      },
+      success: (data) => {
+        $(el).html("Fertig");
+
+        removeSpinner();
+
+        setTimeout(() => {
+          parseResponse(data, el);
+        }, 500);
+      },
+      error: (error) => {
+        $(el).html("Fehler");
+
+        el.dispatchEvent(new CustomEvent("ebay:data-import"), {
+          detail: { success: false, error },
+        });
+
+        removeSpinner();
+        console.log(error);
+      },
+    })
+  }
+
+  function disconnectEbayData(e) {
+    e.preventDefault();
+
+    const el = e.target;
+    const action = el.dataset.action;
+    const ebay_id = el.dataset.ebayId;
+    const post_ID = action.replace("disconnect-", "");
+
+    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    spinner?.classList.add("is-active");
+
+    const removeSpinner = () => {
+      spinner?.classList.remove("is-active");
+    };
+
+    $.post({
+      url: admin_ajax_local,
+      data: {
+        action: "_ajax_disconnect",
+        post_ID,
+        ebay_id
+      },
+      beforeSend: () => {
+        $(el).html("Entknüpfe");
+      },
+      success: (data) => {
+        $(el).html("Fertig");
+
+        removeSpinner();
+
+        setTimeout(() => {
+          parseResponse(data, el);
+        }, 500);
+      },
+      error: (error) => {
+        $(el).html("Fehler");
+
+        el.dispatchEvent(new CustomEvent("ebay:data-import"), {
+          detail: { success: false, error },
+        });
+
+        removeSpinner();
+        console.log(error);
+      },
+    })
+  }
+
   function importEbayData(e) {
     e.preventDefault();
     start();
@@ -153,7 +247,7 @@ jQuery(document).ready(function ($) {
 
         setTimeout(() => {
           processDataImport(ebaydata, el);
-        }, 3000);
+        }, 500);
       },
       error: (error) => {
         $(el).html("Fehler");
@@ -327,6 +421,8 @@ jQuery(document).ready(function ($) {
         deletePost,
         publishPost,
         importEbayData,
+        connectEbayData,
+        disconnectEbayData,
         importEbayImages,
         deleteEbayImages,
         processDataImport,

@@ -1,13 +1,12 @@
 <div class="wpo_section wpo_group">
   
   <header id="head-wrap"></header>
-  
+
   <form name="ebay-list" id="ebay-list" method="get">
     
     <input type="hidden" name="page" value="<?php echo $_REQUEST['page']; ?>" />
     <input type="hidden" name="order" value="<?php echo $_REQUEST['order']; ?>" />
     <input type="hidden" name="orderby" value="<?php echo $_REQUEST['orderby']; ?>" />
-    <input type="hidden" name="pageNum" value="<?php echo (!empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1 ); ?>" />
 
     <div id="ts-history-table">
       <?php

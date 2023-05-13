@@ -62,7 +62,7 @@ function wbp_get_remote()
   wp_die();
 }
 
-function wbp_publish_post()
+function wbp_ajax_publish_post()
 {
   $post_ID = isset($_POST['post_ID']) ? (int) $_POST['post_ID'] : null;
   if ($post_ID) {
@@ -84,9 +84,95 @@ function wbp_publish_post()
   wp_die();
 }
 
-function wbp_import_ebay_data()
+function wbp_ajax_connect()
 {
-  if(isset($_REQUEST['postdata'])) {
+  $post_ID = isset($_POST['post_ID']) ? $_POST['post_ID'] : null;
+  $ebay_id = isset($_POST['ebay_id']) ? $_POST['ebay_id'] : null;
+
+  if (!isset($post_ID) || !isset($ebay_id)) {
+    $success = false;
+  } else {
+    $success = true;
+  }
+
+  $product = wc_get_product($post_ID);
+  if ($product) {
+    try {
+      $product->set_sku($ebay_id);
+    } catch (Exception $e) {
+    }
+    $product->save();
+  }
+
+  update_post_meta((int) $post_ID, 'ebay_id', $ebay_id);
+  update_post_meta((int) $post_ID, 'ebay_url', EBAY_URL . '/s-' . $ebay_id . '/k0');
+
+  $pageNum = $_COOKIE['ebay-table-page'];
+
+  ob_start();
+  $wp_list_table = new Ebay_List_Table();
+  $data = wbp_get_json_data($pageNum);
+  $wp_list_table->setData($data);
+  list($columns, $hidden) = $wp_list_table->get_column_info();
+  $ads = $data->ads;
+  $ids = array_column($ads, 'id');
+  $record_key = array_search($ebay_id, $ids);
+  $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+  $row = ob_get_clean();
+
+  echo json_encode([
+    'data' => compact(['row', 'post_ID', 'ebay_id', 'success'])
+  ]);
+
+  wp_die();
+}
+
+function wbp_ajax_disconnect()
+{
+  $post_ID = isset($_POST['post_ID']) ? $_POST['post_ID'] : null;
+  $ebay_id = isset($_POST['ebay_id']) ? $_POST['ebay_id'] : null;
+
+  if (!isset($post_ID) || !isset($ebay_id)) {
+    $success = false;
+  } else {
+    $success = true;
+  }
+
+  $product = wc_get_product($post_ID);
+  if ($product) {
+    try {
+      $product->set_sku('');
+    } catch (Exception $e) {
+    }
+    $product->save();
+  }
+
+  delete_post_meta((int) $post_ID, 'ebay_id');
+  delete_post_meta((int) $post_ID, 'ebay_url');
+
+  $pageNum = $_COOKIE['ebay-table-page'];
+
+  ob_start();
+  $wp_list_table = new Ebay_List_Table();
+  $data = wbp_get_json_data($pageNum);
+  $wp_list_table->setData($data);
+  list($columns, $hidden) = $wp_list_table->get_column_info();
+  $ads = $data->ads;
+  $ids = array_column($ads, 'id');
+  $record_key = array_search($ebay_id, $ids);
+  $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+  $row = ob_get_clean();
+
+  echo json_encode([
+    'data' => compact(['row', 'post_ID', 'ebay_id', 'success'])
+  ]);
+
+  wp_die();
+}
+
+function wbp_ajax_import_ebay_data()
+{
+  if (isset($_REQUEST['postdata'])) {
 
     $post_ID = !empty($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
     $ebay_id = !empty($_REQUEST['postdata']['ebay_id']) ? $_REQUEST['postdata']['ebay_id'] : null;
@@ -97,7 +183,7 @@ function wbp_import_ebay_data()
     $ebay_id = parse_ebay_id($ebay_id);
   }
 
-  $pageNum = isset($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : null;
+  $pageNum = $_COOKIE['ebay-table-page'];
   $ebaydata = isset($_REQUEST['ebaydata']) ? $_REQUEST['ebaydata'] : null;
 
   if (
@@ -140,16 +226,16 @@ function wbp_import_ebay_data()
       'post_excerpt' => wbp_sanitize_excerpt($content, 300)
     ), true);
   }
-  
+
   ob_start();
-  switch($screen) {
+  switch ($screen) {
     case 'woo':
       $wp_list_table = new Extended_WC_Admin_List_Table_Products();
       $wp_list_table->render_row($post_ID);
       break;
     case 'ebay':
       $wp_list_table = new Ebay_List_Table();
-      $data = wbp_get_json_data(!empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1);
+      $data = wbp_get_json_data($pageNum);
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
       $ads = $data->ads;
@@ -167,7 +253,7 @@ function wbp_import_ebay_data()
   wp_die();
 }
 
-function wbp_import_ebay_images()
+function wbp_ajax_import_ebay_images()
 {
   $postdata = $_POST['postdata'];
   if (isset($postdata['post_ID'])) {
@@ -211,7 +297,7 @@ function wbp_import_ebay_images()
   wp_die();
 }
 
-function wbp_delete_images()
+function wbp_ajax_delete_images()
 {
   if (isset($_REQUEST['post_ID'])) {
     $post_ID = $_REQUEST['post_ID'];
@@ -229,7 +315,7 @@ function wbp_delete_images()
   wp_die();
 }
 
-function wbp_delete_post()
+function wbp_ajax_delete_post()
 {
   if (!empty($_REQUEST['post_ID'])) {
     $post_ID = $_REQUEST['post_ID'];
@@ -237,16 +323,17 @@ function wbp_delete_post()
   if (!empty($_REQUEST['ebay_id'])) {
     $ebay_id = $_REQUEST['ebay_id'];
   }
+  $pageNum = $_COOKIE['ebay-table-page'];
 
   $product = wc_get_product($post_ID);
 
-  if($product) {
+  if ($product) {
     $product->delete(true);
   }
 
   ob_start();
   $wp_list_table = new Ebay_List_Table();
-  $data = wbp_get_json_data(!empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1);
+  $data = wbp_get_json_data($pageNum);
   $wp_list_table->setData($data);
   list($columns, $hidden) = $wp_list_table->get_column_info();
   $ads = $data->ads;
@@ -261,7 +348,7 @@ function wbp_delete_post()
   wp_die();
 }
 
-function wbp_get_product_categories()
+function wbp_ajax_get_product_categories()
 {
   foreach (get_terms(['taxonomy' => 'product_cat']) as $key => $term) {
     $cats[] = [
@@ -276,7 +363,7 @@ function wbp_get_product_categories()
   wp_die();
 }
 
-function wbp_get_brands()
+function wbp_ajax_get_brands()
 {
   foreach (get_terms(['taxonomy' => 'brands']) as $key => $term) {
     $image_ids = get_metadata('term', $term->term_id, 'image');

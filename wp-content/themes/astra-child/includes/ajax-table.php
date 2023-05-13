@@ -8,6 +8,7 @@ define('EBAY_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/ebay/');
 
 function _ajax_fetch_sts_history()
 {
+  setcookie('ebay-table-page', $_REQUEST['pageNum']);
   $wp_list_table = new Ebay_List_Table();
   $wp_list_table->ajax_response();
 }
@@ -38,7 +39,7 @@ function _ajax_sts_display()
   $display = ob_get_clean();
 
   ob_start();
-  $wp_list_table->display_head($pageNum);
+  $wp_list_table->display_head();
   $head = ob_get_clean();
 
   die(json_encode(array(

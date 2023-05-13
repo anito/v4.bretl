@@ -158,6 +158,7 @@ class Ebay_List_Table extends WP_List_Table
   );
 
   private $data = array();
+  private $pageNum = 1;
 
   /**
    * Prepare the table with different parameters, pagination, columns and table elements
@@ -246,10 +247,8 @@ class Ebay_List_Table extends WP_List_Table
     <tr id="ad-id-<?php echo $record->id ?>">
       <?php
       foreach ($columns as $column_name => $column_display_name) {
-        $class = 'class="' . $column_name . ' column-' . $column_name . '"';
-        $style = "";
+        $class = $column_name . ' column-' . $column_name;
         if (in_array($column_name, $hidden)) $style = ' style="display:none;"';
-        $attributes = $class . $style;
 
         $product = wbp_get_product_by_sku($record->id);
         if ($product) {
@@ -283,17 +282,28 @@ class Ebay_List_Table extends WP_List_Table
             '<a class="' . $classes . '" href="' . $editlink . '" target="_blank">' . __('Edit') . '</a>' .
             '</div>' .
             '<div>' .
-            '<a data-name="delete-post" data-post-id="' . $product->get_id() . '" data-ebay-id="' . $record->id . '" data-ebay-page="' . $record->id . '" class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a>' .
+            '<a class="' . $classes . '" href="' . admin_url(('admin-ajax.php?sku=') . $record->id  . '&action=disconnect') . '" data-ebay-id="' . $record->id . '" data-action="disconnect-' . $product->get_id() . '">' . __('Verknüpfung aufheben') . '</a>' .
+            '</div>' .
+            '<div>' .
+            '<a data-action="delete-post" data-post-id="' . $product->get_id() . '" data-ebay-id="' . $record->id . '" data-ebay-page="' . $record->id . '" class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a>' .
             '</div>' .
             '</div>';
         } else {
-          $stat = wbp_include_ebay_template('dashboard/import-data-button.php', true, array('sku' => $record->id));
+          $product = wbp_get_product_by_title($record->title);
+          if ($product) {
+            $label = __('Verknüpfen');
+            $action = 'connect-' . $product->get_id();
+          } else {
+            $label = __('Anlegen');
+            $action = 'create';
+          }
+          $stat = wbp_include_ebay_template('dashboard/import-data-button.php', true, array('sku' => $record->id, 'label' => $label, 'action' => $action));
         }
 
         switch ($column_name) {
           case "image": {
       ?>
-              <td <?php echo $$attributes ?>>
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><a href="<?php echo EBAY_URL . stripslashes($record->url) ?>" target="_blank"><img src="<?php echo stripslashes($record->image) ?>" width="128" /></a></div>
               </td>
             <?php
@@ -301,7 +311,7 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "id": {
             ?>
-              <td <?php echo $$attributes ?>>
+              <td <?php echo $class ?>>
                 <div class="column-content center"><?php echo $record->id ?></div>
               </td>
             <?php
@@ -309,7 +319,7 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "title": {
             ?>
-              <td <?php echo $$attributes ?>>
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><a href="<?php echo EBAY_URL . stripslashes($record->url) ?>" target="_blank"><?php echo $record->title ?></a></div>
               </td>
             <?php
@@ -317,7 +327,7 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "date": {
             ?>
-              <td <?php echo $attributes ?>>
+              <td class="<?php echo $class ?>">
                 <div class="column-content center"><?php echo $record->date ?></div>
               </td>
             <?php
@@ -325,7 +335,7 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "price": {
             ?>
-              <td <?php echo $attributes ?>>
+              <td class="<?php echo $class ?>">
                 <div class="column-content "><?php echo $record->price ?></div>
               </td>
             <?php
@@ -333,7 +343,7 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "status": {
             ?>
-              <td <?php echo $attributes ?>>
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo $stat ?></div>
               </td>
             <?php
@@ -341,7 +351,7 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "description": {
             ?>
-              <td <?php echo $attributes ?>>
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo $record->description ?></div>
               </td>
       <?php
@@ -352,20 +362,36 @@ class Ebay_List_Table extends WP_List_Table
       <script>
         jQuery(document).ready(($) => {
           const {
+            deletePost,
             importEbayData,
-            deletePost
+            connectEbayData,
+            disconnectEbayData,
           } = ajax_object;
 
           const ebay_id = "<?php echo $record->id ?>";
 
-          const impEl = $(`#ad-id-${ebay_id} a[data-name=import-ebay-data]`);
+          const connEl = $(`#ad-id-${ebay_id} a[data-action^=connect-]`);
+          $(connEl).on('click', function(e) {
+            e.preventDefault();
+
+            connectEbayData(e);
+          })
+
+          const disconnEl = $(`#ad-id-${ebay_id} a[data-action^=disconnect-]`);
+          $(disconnEl).on('click', function(e) {
+            e.preventDefault();
+
+            disconnectEbayData(e);
+          })
+
+          const impEl = $(`#ad-id-${ebay_id} a[data-action=create]`);
           $(impEl).on('click', function(e) {
             e.preventDefault();
 
             importEbayData(e);
           })
 
-          const delEl = $(`#ad-id-${ebay_id} a[data-name=delete-post]`)
+          const delEl = $(`#ad-id-${ebay_id} a[data-action=delete-post]`)
           $(delEl).on('click', function(e) {
             e.preventDefault();
 
