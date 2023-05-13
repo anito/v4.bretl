@@ -126,14 +126,16 @@ function wbp_save_post($post_ID, $post)
   require_once __DIR__ . '/includes/product-term-handler.php';
   wbp_process_sale($post_ID, $post);
   wbp_process_ebay($post_ID, $post);
+
 }
-add_filter('wp_insert_post_empty_content', function () {
-  return false;
-});
 add_action("save_post", "wbp_save_post", 99, 3);
 add_action("save_post", "wbp_quick_edit_product_save", 99, 3);
 add_action("wp_insert_post_data", "wbp_publish_guard", 99, 3);
+add_filter('wp_insert_post_empty_content', function () {
+  return false;
+});
 
+// Woo internal product save
 function wbp_product_before_save($product)
 {
   require_once __DIR__ . '/includes/product-term-handler.php';
@@ -151,12 +153,9 @@ function add_scripts()
 {
   wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'));
 
-  // wp_enqueue_style('fancybox', get_stylesheet_directory_uri() . '/css/fancybox/jquery.fancybox.css', wp_get_theme()->get('Version'));
-
-  // wp_enqueue_style('fancybox', get_stylesheet_directory_uri() . '/css/fancybox/jquery.fancybox.css', wp_get_theme()->get('Version'));
-
   $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
-  // Function to add analyticstracking.js to the site
+
+  // Add analyticstracking.js to the site
   if (!IS_DEV_MODE) {
     $current_user = wp_get_current_user();
     $user_id = (0 == $current_user->ID) ? '' : $current_user->ID;
@@ -379,27 +378,27 @@ if (is_admin()) {
   require_once __DIR__ . '/includes/ebay-ajax-handler.php';
   require_once __DIR__ . '/includes/ajax-table.php';
 
+  add_action('wp_ajax__ajax_connect', '_ajax_connect');
+  add_action('wp_ajax__ajax_disconnect', '_ajax_disconnect');
   add_action('wp_ajax__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax__ajax_get_brands', '_ajax_get_brands');
+  add_action('wp_ajax__ajax_delete_post', '_ajax_delete_post');
   add_action('wp_ajax__ajax_publish_post', '_ajax_publish_post');
+  add_action('wp_ajax__ajax_delete_images', '_ajax_delete_images');
   add_action('wp_ajax__ajax_import_ebay_data', '_ajax_import_ebay_data');
   add_action('wp_ajax__ajax_import_ebay_images', '_ajax_import_ebay_images');
   add_action('wp_ajax__ajax_get_product_categories', '_ajax_get_product_categories');
-  add_action('wp_ajax__ajax_delete_images', '_ajax_delete_images');
-  add_action('wp_ajax__ajax_delete_post', '_ajax_delete_post');
-  add_action('wp_ajax__ajax_connect', '_ajax_connect');
-  add_action('wp_ajax__ajax_disconnect', '_ajax_disconnect');
 
-  add_action('wp_ajax_nopriv__ajax_get_remote', '_ajax_get_remote');
-  add_action('wp_ajax_nopriv__ajax_get_brands', '_ajax_get_brands');
-  add_action('wp_ajax_nopriv__ajax_publish_post', '_ajax_publish_post', 1);
-  add_action('wp_ajax_nopriv__ajax_import_ebay_data', '_ajax_import_ebay_data');
-  add_action('wp_ajax_nopriv__ajax_import_ebay_images', '_ajax_import_ebay_images');
-  add_action('wp_ajax_nopriv__ajax_delete_post', '_ajax_delete_post');
-  add_action('wp_ajax_nopriv__ajax_get_product_categories', '_ajax_get_product_categories');
-  add_action('wp_ajax_nopriv__ajax_delete_images', '_ajax_delete_images');
   add_action('wp_ajax_nopriv__ajax_connect', '_ajax_connect');
   add_action('wp_ajax_nopriv__ajax_disconnect', '_ajax_disconnect');
+  add_action('wp_ajax_nopriv__ajax_get_remote', '_ajax_get_remote');
+  add_action('wp_ajax_nopriv__ajax_get_brands', '_ajax_get_brands');
+  add_action('wp_ajax_nopriv__ajax_delete_post', '_ajax_delete_post');
+  add_action('wp_ajax_nopriv__ajax_publish_post', '_ajax_publish_post');
+  add_action('wp_ajax_nopriv__ajax_delete_images', '_ajax_delete_images');
+  add_action('wp_ajax_nopriv__ajax_import_ebay_data', '_ajax_import_ebay_data');
+  add_action('wp_ajax_nopriv__ajax_import_ebay_images', '_ajax_import_ebay_images');
+  add_action('wp_ajax_nopriv__ajax_get_product_categories', '_ajax_get_product_categories');
 }
 
 /**
@@ -488,7 +487,6 @@ function wbp_woo_tab_datasheets()
   echo do_shortcode($dg);
 }
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_tabs', 98);
-
 add_filter('woocommerce_cart_needs_payment', '__return_false');
 
 /**

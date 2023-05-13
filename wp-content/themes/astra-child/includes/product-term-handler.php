@@ -30,6 +30,7 @@ function wbp_process_sale($post_id, $post)
   }
 }
 
+// Woo featured taxonomy
 function wbp_process_featured($product)
 {
   $product_id = $product->get_id();
@@ -65,8 +66,9 @@ function wbp_process_ebay($post_id, $post)
 {
   global $wpdb;
 
-  $product = wc_get_product(($post_id));
-  $title = $post->post_title;
+  $product = wc_get_product($post_id);
+
+  $title = $product->get_title();
   $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
   $posts_like_title = $wpdb->get_results($prepare);
 
@@ -74,7 +76,7 @@ function wbp_process_ebay($post_id, $post)
   $ebay_id = isset($meta['ebay_id'][0]) ? parse_ebay_id($meta['ebay_id'][0]) : "";
 
   if (!empty($ebay_id)) {
-    if (empty($post->post_title)) {
+    if (empty($title)) {
       wp_insert_post([
         'ID' => $post_id,
         'post_type' => 'product',
@@ -105,6 +107,11 @@ function wbp_process_ebay($post_id, $post)
     delete_post_meta($post_id, 'ebay_id');
     delete_post_meta($post_id, 'ebay_url');
   }
+
+  // Finally set product 'ebay' tag if sku is present
+  $term = get_term_by('slug', 'ebay', 'product_tag');
+  $term_id = $term->term_id;
+  wbp_set_product_term($product, $term_id, 'tag', !empty($ebay_id));
 }
 
 function wbp_set_product_term($product, $term_id, $type, $bool)
@@ -125,11 +132,11 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
 }
 
 /**
- * Add or remove the "sale" term to/from product attribute "Besonderheiten"
+ * Add or remove term to/from product attribute
  */
-function wbp_set_pa_term($product, $term_name, $bool)
+function wbp_set_pa_term($product, $term_name, $bool, $attr = 'specials')
 {
-  $name = WC_CUSTOM_PRODUCT_ATTRIBUTES['default'];
+  $name = WC_CUSTOM_PRODUCT_ATTRIBUTES[$attr];
   $slug = wc_sanitize_taxonomy_name(stripslashes($name));
 
   $taxonomy = 'pa_' . $slug;

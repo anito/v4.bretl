@@ -1,22 +1,39 @@
 <?php
+function wbp_create_terms()
+{
+  if (defined('WC_TERMS')) {
+
+    $tags = get_terms('product_tag', array('hide_empty' => false));
+    $tag_slugs = wp_list_pluck($tags, 'slug');
+
+    foreach (WC_TERMS as $slug => $name) {
+
+      if (!in_array($slug, $tag_slugs)) {
+        wbp_add_product_term($slug, 'tag');
+      }
+    }
+  }
+}
+add_action('admin_init', 'wbp_create_terms');
+
 function wbp_create_attribute_taxonomies()
 {
   if (!class_exists('WooCommerce', false)) {
     return;
   }
-  
+
   $attributes_taxonomies = [];
-  if(defined('WC_CUSTOM_PRODUCT_ATTRIBUTES')) {
-    foreach(WC_CUSTOM_PRODUCT_ATTRIBUTES as $attribute) {
+  if (defined('WC_CUSTOM_PRODUCT_ATTRIBUTES')) {
+    foreach (WC_CUSTOM_PRODUCT_ATTRIBUTES as $attribute) {
       $attributes_taxonomies[] = $attribute;
     }
   }
 
   foreach ($attributes_taxonomies as $tax) {
     $attributes = wc_get_attribute_taxonomies();
-    $plucked = wp_list_pluck($attributes, 'attribute_name');
-    if (empty($plucked[$tax])) {
-      $id = wc_create_attribute([
+    $attribute = wp_list_pluck($attributes, 'attribute_name');
+    if (empty($attribute[$tax])) {
+      wc_create_attribute([
         'name' => $tax,
         'has_archives' => 1
       ]);
@@ -25,31 +42,31 @@ function wbp_create_attribute_taxonomies()
 }
 add_action('admin_init', 'wbp_create_attribute_taxonomies');
 
-function wbp_get_wc_taxonomies() {
+function wbp_get_wc_taxonomies()
+{
   $taxonomies = get_terms('product_cat', array('hide_empty' => false));
   $tax_names = wp_list_pluck($taxonomies, 'name');
-  
+
   $tags = get_terms('product_tag', array('hide_empty' => false));
   $tag_names = wp_list_pluck($tags, 'name');
-  
-  if(defined('WC_COMMON_TAXONOMIES')) {
 
-    foreach(WC_COMMON_TAXONOMIES as $name) {
-      
-      if(! in_array($name, $tax_names)) {
+  if (defined('WC_COMMON_TAXONOMIES')) {
+
+    foreach (WC_COMMON_TAXONOMIES as $name) {
+
+      if (!in_array($name, $tax_names)) {
         wbp_add_product_term($name, 'cat');
       }
-      if(! in_array($name, $tag_names)) {
+      if (!in_array($name, $tag_names)) {
         wbp_add_product_term($name, 'tag');
       }
     }
-
   }
-
 }
 add_action('admin_init', 'wbp_get_wc_taxonomies');
 
-function wbp_add_product_term($name, $type) {
+function wbp_add_product_term($name, $type)
+{
   $term = wp_insert_term(
     $name,
     'product_' . $type,

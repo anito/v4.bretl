@@ -1,17 +1,17 @@
-<div id="import-ebay-data-wbp-action-<?php echo $sku ?>" class="column-content">
+<div id="import-ebay-data-wbp-action-<?php echo $record->id ?>" class="column-content">
   <span class="spinner"></span>
-  <a id="import-ebay-data-<?php echo $sku ?>" href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=' . $action) ?>" data-action="<?php echo $action ?>" data-ebay-id="<?php echo $sku ?>" class="button button-primary button-small"><?php echo $label ?></a>
+  <a id="import-ebay-data-<?php echo $record->id ?>" href="<?php echo admin_url(('admin-ajax.php?sku=') . $record->id . '&action=' . $action) ?>" data-action="<?php echo $action ?>" data-ebay-id="<?php echo $record->id ?>" class="button button-primary button-small"><?php echo $label ?></a>
 </div>
 <script>
   jQuery(document).ready(($) => {
     const {
-      importEbayData,
+      importData,
       edit_link
     } = ajax_object;
 
-    const sku = '<?php echo $sku; ?>';
+    const sku = '<?php echo $record->id; ?>';
 
-    const importDataButton = document.getElementById('import-ebay-data-<?php echo $sku ?>');
+    const importDataButton = document.getElementById('import-ebay-data-<?php echo $record->id ?>');
 
     function handleEvent(e) {
       const {

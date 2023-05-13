@@ -5,8 +5,8 @@
   <form name="ebay-list" id="ebay-list" method="get">
     
     <input type="hidden" name="page" value="<?php echo $_REQUEST['page']; ?>" />
-    <input type="hidden" name="order" value="<?php echo $_REQUEST['order']; ?>" />
-    <input type="hidden" name="orderby" value="<?php echo $_REQUEST['orderby']; ?>" />
+    <input type="hidden" name="order" value="<?php echo isset($_REQUEST['order']) ? $_REQUEST['order'] : ''; ?>" />
+    <input type="hidden" name="orderby" value="<?php echo isset($_REQUEST['orderby']) ? $_REQUEST['orderby'] : ''; ?>" />
 
     <div id="ts-history-table">
       <?php

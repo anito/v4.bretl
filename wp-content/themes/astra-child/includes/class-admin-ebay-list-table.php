@@ -205,10 +205,6 @@ class Ebay_List_Table extends WP_List_Table
 
     $this->items = $data;
 
-    if (!empty($_REQUEST['row'])) {
-      $row = $_REQUEST['row'];
-    }
-
     /**
      * Call to _set_pagination_args method for informations about
      * total items, items for page, total pages and ordering
@@ -250,8 +246,16 @@ class Ebay_List_Table extends WP_List_Table
         $class = $column_name . ' column-' . $column_name;
         if (in_array($column_name, $hidden)) $style = ' style="display:none;"';
 
-        $product = wbp_get_product_by_sku($record->id);
+        $product_by_sku = wbp_get_product_by_sku($record->id);
+        if (!$product_by_sku) {
+          $product_by_title = wbp_get_product_by_title($record->title);
+        }
+        $product = $product_by_sku ?? $product_by_title ?? false;
+
         if ($product) {
+          $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
+          $deletelink  = get_delete_post_link($product->get_id()) . '&screen=ebay';
+          $permalink = get_permalink($product->get_id());
           $classes = "";
           $status = $product->get_status();
           switch ($status) {
@@ -270,35 +274,37 @@ class Ebay_List_Table extends WP_List_Table
               $stat = __("Published");
               break;
           }
-          $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
-          $deletelink  = get_delete_post_link($product->get_id()) . '&screen=ebay';
-          $permalink = get_permalink($product->get_id());
+        }
+
+        if ($product_by_sku) {
+
           $stat =
             '<div><div>' . $stat . '</div>' .
+            wbp_include_ebay_template('dashboard/common-links.php', true, compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
             '<div>' .
-            '<a class="' . $classes . '" href="' . $permalink . '" target="_blank">' . __('View') . '</a>' .
+            '<a class="' . $classes . '" href="' . admin_url(('admin-ajax.php?sku=') . $record->id  . '&action=import_data') . '" data-screen="ebay" data-post-id="' . $product->get_id() . '" data-ebay-id="' . $record->id . '" data-action="import-data-' . $record->id . '">' . __('Daten importieren', 'wbp') . '</a>' .
             '</div>' .
             '<div>' .
-            '<a class="' . $classes . '" href="' . $editlink . '" target="_blank">' . __('Edit') . '</a>' .
+            '<a class="' . $classes . '" href="' . admin_url(('admin-ajax.php?sku=') . $record->id  . '&action=import_images') . '" data-post-id="' . $product->get_id() . '" data-ebay-id="' . $record->id . '" data-action="import-images-' . $record->id . '">' . __('Fotos importieren', 'wbp') . '</a>' .
             '</div>' .
             '<div>' .
-            '<a class="' . $classes . '" href="' . admin_url(('admin-ajax.php?sku=') . $record->id  . '&action=disconnect') . '" data-ebay-id="' . $record->id . '" data-action="disconnect-' . $product->get_id() . '">' . __('Verknüpfung aufheben') . '</a>' .
-            '</div>' .
-            '<div>' .
-            '<a data-action="delete-post" data-post-id="' . $product->get_id() . '" data-ebay-id="' . $record->id . '" data-ebay-page="' . $record->id . '" class="' . $classes . '" href="' . $deletelink . '">' . __('Delete') . '</a>' .
+            '<a class="' . $classes . '" href="' . admin_url(('admin-ajax.php?sku=') . $record->id  . '&action=disconnect') . '" data-ebay-id="' . $record->id . '" data-action="disconnect-' . $product->get_id() . '">' . __('Verknüpfung aufheben', 'wbp') . '</a>' .
             '</div>' .
             '</div>';
+        } elseif ($product) {
+
+          $label = __('Verknüpfen');
+          $action = 'connect-' . $product->get_id();
+
+          $stat = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('product', 'record', 'label', 'action')) .
+            wbp_include_ebay_template('dashboard/common-links.php', true, compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'));
         } else {
-          $product = wbp_get_product_by_title($record->title);
-          if ($product) {
-            $label = __('Verknüpfen');
-            $action = 'connect-' . $product->get_id();
-          } else {
-            $label = __('Anlegen');
-            $action = 'create';
-          }
-          $stat = wbp_include_ebay_template('dashboard/import-data-button.php', true, array('sku' => $record->id, 'label' => $label, 'action' => $action));
+
+          $label = __('Anlegen');
+          $action = 'create';
+          $stat = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('record', 'label', 'action'));
         }
+
 
         switch ($column_name) {
           case "image": {
@@ -358,14 +364,16 @@ class Ebay_List_Table extends WP_List_Table
               break;
             }
         }
-      } ?>
+      }
+      ?>
       <script>
         jQuery(document).ready(($) => {
           const {
             deletePost,
-            importEbayData,
-            connectEbayData,
-            disconnectEbayData,
+            importImages,
+            importData,
+            connectEbay,
+            disconnectEbay,
           } = ajax_object;
 
           const ebay_id = "<?php echo $record->id ?>";
@@ -374,21 +382,28 @@ class Ebay_List_Table extends WP_List_Table
           $(connEl).on('click', function(e) {
             e.preventDefault();
 
-            connectEbayData(e);
+            connectEbay(e);
           })
 
           const disconnEl = $(`#ad-id-${ebay_id} a[data-action^=disconnect-]`);
           $(disconnEl).on('click', function(e) {
             e.preventDefault();
 
-            disconnectEbayData(e);
+            disconnectEbay(e);
           })
 
-          const impEl = $(`#ad-id-${ebay_id} a[data-action=create]`);
-          $(impEl).on('click', function(e) {
+          const impDataEl = $(`#ad-id-${ebay_id} a[data-action=create], #ad-id-${ebay_id} a[data-action^=import-data-]`);
+          $(impDataEl).on('click', function(e) {
             e.preventDefault();
 
-            importEbayData(e);
+            importData(e);
+          })
+
+          const impImagesEl = $(`#ad-id-${ebay_id} a[data-action^=import-images-]`);
+          $(impImagesEl).on('click', function(e) {
+            e.preventDefault();
+
+            importImages(e);
           })
 
           const delEl = $(`#ad-id-${ebay_id} a[data-action=delete-post]`)
@@ -403,6 +418,7 @@ class Ebay_List_Table extends WP_List_Table
         })
       </script>
     </tr>
+
 <?php
   }
 }

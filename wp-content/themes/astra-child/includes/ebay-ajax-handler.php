@@ -40,9 +40,10 @@ function wbp_sanitize_excerpt($content, $count)
 function wbp_get_remote()
 {
   if (isset($_REQUEST['formdata'])) {
+    $screen = $_REQUEST['screen'];
     $formdata = $_REQUEST['formdata'];
-    $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID'] : null;
-    $ebay_id_raw = isset($formdata['ebay_id']) ? $formdata['ebay_id'] : null;
+    $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID'] : false;
+    $ebay_id_raw = isset($formdata['ebay_id']) ? $formdata['ebay_id'] : false;
     $ebay_id = parse_ebay_id($ebay_id_raw);
 
     $remoteUrl = wbp_get_ebay_url($ebay_id);
@@ -56,7 +57,8 @@ function wbp_get_remote()
     [
       'post_ID' => $post_ID,
       'ebay_id' => $ebay_id,
-      'content' => $response
+      'content' => $response,
+      'screen' => $screen
     ]
   );
   wp_die();
@@ -174,17 +176,18 @@ function wbp_ajax_import_ebay_data()
 {
   if (isset($_REQUEST['postdata'])) {
 
-    $post_ID = !empty($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
-    $ebay_id = !empty($_REQUEST['postdata']['ebay_id']) ? $_REQUEST['postdata']['ebay_id'] : null;
+    $post_ID = isset($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
+    $ebay_id = isset($_REQUEST['postdata']['ebay_id']) ? $_REQUEST['postdata']['ebay_id'] : null;
 
   }
+  $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+  $ebaydata = isset($_REQUEST['ebaydata']) ? $_REQUEST['ebaydata'] : null;
 
-  if (isset($ebay_id)) {
+  if ($ebay_id) {
     $ebay_id = parse_ebay_id($ebay_id);
   }
 
   $pageNum = $_COOKIE['ebay-table-page'];
-  $ebaydata = isset($_REQUEST['ebaydata']) ? $_REQUEST['ebaydata'] : null;
 
   if (
     ($ebaydata) &&
@@ -193,15 +196,13 @@ function wbp_ajax_import_ebay_data()
     ($content = isset($ebaydata['description']) ? $ebaydata['description'] : null)
   ) {
 
-    if (!isset($post_ID)) {
+    if (!$post_ID) {
       $product = new WC_Product();
       $product->set_name($title);
       $product->save();
       $post_ID = $product->get_id();
-      $screen = 'ebay';
     } else {
       $product = wc_get_product($post_ID);
-      $screen = 'woo';
     }
 
     if ($product) {
@@ -229,11 +230,11 @@ function wbp_ajax_import_ebay_data()
 
   ob_start();
   switch ($screen) {
-    case 'woo':
+    case 'edit-product':
       $wp_list_table = new Extended_WC_Admin_List_Table_Products();
       $wp_list_table->render_row($post_ID);
       break;
-    case 'ebay':
+    case 'toplevel_page_ebay':
       $wp_list_table = new Ebay_List_Table();
       $data = wbp_get_json_data($pageNum);
       $wp_list_table->setData($data);
@@ -255,16 +256,20 @@ function wbp_ajax_import_ebay_data()
 
 function wbp_ajax_import_ebay_images()
 {
-  $postdata = $_POST['postdata'];
-  if (isset($postdata['post_ID'])) {
-    $post_ID = (int) $postdata['post_ID'];
+  if (isset($_REQUEST['postdata'])) {
+
+    $post_ID = isset($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
+    $ebay_id = isset($_REQUEST['postdata']['ebay_id']) ? $_REQUEST['postdata']['ebay_id'] : null;
+
   }
-  if (isset($postdata['ebay_id'])) {
-    $ebay_id_raw = $postdata['ebay_id'];
-    $ebay_id = parse_ebay_id($ebay_id_raw);
+
+  if($ebay_id) {
+    $ebay_id = parse_ebay_id($ebay_id);
   }
-  $ebaydata = $_POST['ebaydata'];
+  $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+  $ebaydata = isset($_REQUEST['ebaydata']) ? $_REQUEST['ebaydata'] : null;
   $ebay_images = isset($ebaydata['images']) ? $ebaydata['images'] : [];
+  $pageNum = $_COOKIE['ebay-table-page'];
 
   wbp_remove_attachments($post_ID);
 
@@ -277,7 +282,7 @@ function wbp_ajax_import_ebay_images()
     }
   }
 
-  unset($ids[0]);
+  unset($ids[0]); // remove main image from gallery
   update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
   update_post_meta((int) $post_ID, 'ebay_id', $ebay_id);
 
@@ -287,8 +292,22 @@ function wbp_ajax_import_ebay_images()
   ));
 
   ob_start();
-  $wp_list_table = new Extended_WC_Admin_List_Table_Products();
-  $wp_list_table->render_row($post_ID);
+  switch ($screen) {
+    case 'edit-product':
+      $wp_list_table = new Extended_WC_Admin_List_Table_Products();
+      $wp_list_table->render_row($post_ID);
+      break;
+    case 'toplevel_page_ebay':
+      $wp_list_table = new Ebay_List_Table();
+      $data = wbp_get_json_data($pageNum);
+      $wp_list_table->setData($data);
+      list($columns, $hidden) = $wp_list_table->get_column_info();
+      $ads = $data->ads;
+      $ids = array_column($ads, 'id');
+      $record_key = array_search($ebay_id, $ids);
+      $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+      break;
+  }
   $row = ob_get_clean();
 
   echo json_encode([
