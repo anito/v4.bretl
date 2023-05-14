@@ -1,4 +1,7 @@
 <div>
+  <?php echo $status_name ?>
+</div>
+<div>
   <a data-action="view-post" href="<?php echo  $permalink ?>" target="_blank" class="<?php echo $classes ?>"><?php echo  __('View') ?></a>
 </div>
 <div>

@@ -120,6 +120,7 @@ class Ebay_List_Table extends WP_List_Table
   function get_columns()
   {
     return array(
+      'status_start' => __(''),
       'image' => __('Bild'),
       'title' => __('Titel'),
       'date' => __('Datum'),
@@ -127,6 +128,7 @@ class Ebay_List_Table extends WP_List_Table
       'shop_actions' => __('Shop Aktionen'),
       'actions' => __('Ebay Aktionen'),
       'description' => __('Description'),
+      'status_end' => __('')
     );
   }
 
@@ -244,7 +246,7 @@ class Ebay_List_Table extends WP_List_Table
     <tr id="ad-id-<?php echo $record->id ?>">
       <?php
       foreach ($columns as $column_name => $column_display_name) {
-        $class = $column_name . ' column-' . $column_name;
+        $class = $column_name . ' column column-' . $column_name;
         if (in_array($column_name, $hidden)) $style = ' style="display:none;"';
 
         $product_by_sku = wbp_get_product_by_sku($record->id);
@@ -262,38 +264,40 @@ class Ebay_List_Table extends WP_List_Table
           $prod_status = $product->get_status();
           switch ($prod_status) {
             case 'draft':
-              $status = __("Draft");
+              $status_name = __("Draft");
               break;
             case 'pending':
-              $status = __("Pending Review");
+              $status_name = __("Pending Review");
               break;
             case 'trash':
-              $status = __("Trash");
+              $status_name = __("Trash");
               $classes = "hidden";
               break;
             case 'publish':
-              $status = __("Published");
+              $status_name = __("Published");
               break;
           }
         }
 
         if ($product_by_sku) {
 
+          $status = $prod_status === 'publish' ? 'connected-publish' : ($prod_status === 'draft' ? 'connected-draft' : 'connected-unknown');
           $shop_actions =
             '<div>' .
             wbp_include_ebay_template('dashboard/import-data-button.php', true, array_merge(compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'), array('action' => 'disconnect-' . $product->get_id(), 'label' => 'Lösen', 'icon' => 'editor-unlink'))) .
-            '<div>' . $status . '</div>' .
-            wbp_include_ebay_template('dashboard/common-links.php', true, compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'product', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
             '</div>';
         } elseif ($product) {
 
+          $status = $prod_status === 'publish' ? 'disconnected-publish' : ($prod_status === 'draft' ? 'disconnected-draft' : 'disconnected-unknown');
           $label = __('Verknüpfen');
           $action = 'connect-' . $product->get_id();
           $icon = 'admin-links';
           $shop_actions = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('product', 'record', 'label', 'action', 'icon')) .
-            wbp_include_ebay_template('dashboard/common-links.php', true, compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'));
+            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'));
         } else {
 
+          $status = 'invalid';
           $label = __('Anlegen');
           $action = 'create';
           $icon = 'plus';
@@ -302,8 +306,14 @@ class Ebay_List_Table extends WP_List_Table
 
 
         switch ($column_name) {
-          case "image": {
+          case "status_start": {
       ?>
+              <td class="status <?php echo $status . ' ' . $class ?>"></td>
+            <?php
+              break;
+            }
+          case "image": {
+            ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content"><a href="<?php echo EBAY_URL . stripslashes($record->url) ?>" target="_blank"><img src="<?php echo stripslashes($record->image) ?>" width="128" /></a></div>
               </td>
@@ -363,6 +373,12 @@ class Ebay_List_Table extends WP_List_Table
               <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo $record->description ?></div>
               </td>
+            <?php
+              break;
+            }
+          case "status_end": {
+            ?>
+              <td class="status <?php echo $status . ' ' . $class ?>"></td>
       <?php
               break;
             }

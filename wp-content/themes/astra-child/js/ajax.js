@@ -222,7 +222,7 @@ jQuery(document).ready(function ($) {
       },
       success: (data) => {
         const json = JSON.parse(data);
-        if (json.content.response.code === 200) {
+        if (json.content.response?.code === 200) {
           $(el).html("Verarbeite...");
 
           setTimeout(() => {
