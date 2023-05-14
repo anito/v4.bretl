@@ -250,8 +250,13 @@ jQuery(document).ready(function ($) {
     start();
 
     const el = e.target;
+
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
+    
+    const removeSpinner = () => {
+      spinner?.classList.remove("is-active");
+    };
 
     if (form) {
       formdata = $(form).serializeJSON();
@@ -274,9 +279,18 @@ jQuery(document).ready(function ($) {
         formdata,
         screen,
       },
-      beforeSend: () => (el.innerHTML = "importiere Fotos..."),
+      beforeSend: () => (el.innerHTML = "Importiere..."),
       success: (data) => {
-        processImageImport(data, el);
+        const json = JSON.parse(data);
+        if (json.content.response?.code === 200) {
+          $(el).html("Verarbeite...");
+
+          setTimeout(() => {
+            processImageImport(json, el, removeSpinner);
+          }, 500);
+        } else {
+          $(el).html("Fehler");
+        }
       },
       error: (error) => {
         spinner?.classList.remove("is-active");
@@ -331,7 +345,7 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const post_ID = el.dataset.postId;
     const ebay_id = el.dataset.ebayId;
-    
+
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
 
@@ -511,9 +525,8 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function processImageImport(data, el, callback) {
-    const response = JSON.parse(data);
-    const { post_ID, ebay_id, post_status, content, screen } = response;
+  function processImageImport(json, el, callback) {
+    const { post_ID, ebay_id, post_status, content, screen } = json;
     const postdata = { post_ID, ebay_id, post_status };
 
     let doc;

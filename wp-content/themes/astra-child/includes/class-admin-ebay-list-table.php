@@ -292,7 +292,7 @@ class Ebay_List_Table extends WP_List_Table
           $ebay_actions =
             '<div>' .
             wbp_include_ebay_template('dashboard/ebay-actions.php', true, array_merge(compact('post_id', 'record', 'post_status', 'classes'), array('connected' => $product_by_sku))) .
-            wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('post_id', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
+            wbp_include_ebay_template('dashboard/ebay-activate-control.php', true, compact('post_id', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
             '</div>';
         }
 
@@ -321,7 +321,7 @@ class Ebay_List_Table extends WP_List_Table
           $action = 'create';
           $icon = 'plus';
           $type = 'button';
-          $ebay_actions = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('record', 'label', 'action', 'icon', 'type'));
+          $ebay_actions = wbp_include_ebay_template('dashboard/ebay-activate-control.php', true, compact('record', 'label', 'action', 'icon', 'type'));
         }
 
 

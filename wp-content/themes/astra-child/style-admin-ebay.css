@@ -4,15 +4,19 @@
 #head-wrap {
   margin-right: 20px;
   padding: 20px;
+  display: flex;
 }
 #head-wrap .section-wrapper {
   display: flex;
-  justify-content: space-between;
-}
-#head-wrap .section-wrapper section {
-  padding: 20px;
   background-color: #ffffff;
   border-radius: 5px;
+  border: 1px solid #ddd;
+}
+#head-wrap .section-wrapper section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
 }
 .wbp-ebay-sub-header .pagination {
   margin: 20px 0 0;
@@ -84,6 +88,9 @@ section .color-box.invalid {
 .color-box.unknown {
   background-color: rgb(71, 71, 71);
 }
+section h2, section h4 {
+  margin: 5px 0;
+}
 section#color-definitions {
   display: flex;
   flex-direction: column;
@@ -95,13 +102,13 @@ section .color-box {
   height: 20px;
   line-height: 0;
   padding: 0;
-  border: 3px solid #aaa;
+  border: 3px solid #000;
 }
 section .description {
   font-size: .8em;
   line-height: 3em;
   padding-left: 10px;
-  color: #afafaf;
+  color: #000;
 }
 section .box-wrapper {
   display: flex;
@@ -144,6 +151,9 @@ section .box-wrapper .description {
 .wp-list-table.wp-list-ebay-ads .column-content {
   position: relative;
 }
+.wp-list-table.wp-list-ebay-ads [id*="-wbp-action"] {
+  position: relative;
+}
 .wp-list-table.wp-list-ebay-ads .column-content .spinner {
   position: absolute;
   left: -25px;
@@ -166,4 +176,8 @@ section .box-wrapper .description {
 .wp-list-table.wp-list-ebay-ads .column-content .button .dashicons {
   font-size: 1.3em;
   line-height: 1.3em;
+}
+.wp-list-table.wp-list-ebay-ads .column-content a[disabled],
+.wp-list-table.wp-list-ebay-ads .column-content .button[disabled] {
+  pointer-events: none;
 }
