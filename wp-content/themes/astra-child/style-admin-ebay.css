@@ -146,7 +146,9 @@ section .box-wrapper .description {
 }
 .wp-list-table.wp-list-ebay-ads .column-content .spinner {
   position: absolute;
-  left: -33px;
+  left: -25px;
+  top: 3px;
+  margin: 0;
 }
 .wp-list-table.wp-list-ebay-ads .column-content a.button {
   text-align: center;
@@ -157,7 +159,11 @@ section .box-wrapper .description {
   width: 110px;
 }
 .wp-list-table.wp-list-ebay-ads .column-content .dashicons {
+  font-size: 1em;
+  line-height: 1em;
+  vertical-align: middle;
+}
+.wp-list-table.wp-list-ebay-ads .column-content .button .dashicons {
   font-size: 1.3em;
   line-height: 1.3em;
-  vertical-align: middle;
 }

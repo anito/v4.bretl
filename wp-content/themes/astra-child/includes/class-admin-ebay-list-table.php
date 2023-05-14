@@ -120,15 +120,15 @@ class Ebay_List_Table extends WP_List_Table
   function get_columns()
   {
     return array(
-      'status_start' => __(''),
+      'status-start' => __(''),
       'image' => __('Bild'),
       'title' => __('Titel'),
       'date' => __('Datum'),
       'price' => __('Preis'),
-      'shop_actions' => __('Shop Aktionen'),
+      'shop-actions' => __('Shop Aktionen'),
       'actions' => __('Ebay Aktionen'),
       'description' => __('Description'),
-      'status_end' => __('')
+      'status-end' => __('')
     );
   }
 
@@ -256,13 +256,13 @@ class Ebay_List_Table extends WP_List_Table
         $product = $product_by_sku ?? $product_by_title ?? false;
 
         if ($product) {
-          $editlink  = admin_url('post.php?action=edit&post=' . $product->get_id());
-          $deletelink  = get_delete_post_link($product->get_id());
-          $permalink = get_permalink($product->get_id());
+          $post_id = $product->get_id();
+          $editlink  = admin_url('post.php?action=edit&post=' . $post_id);
+          $deletelink  = get_delete_post_link($post_id);
+          $permalink = get_permalink($post_id);
           $classes = "";
-          $actions = wbp_include_ebay_template('dashboard/ebay-actions.php', true, array_merge(compact('product', 'record'), array('connected' => $product_by_sku)));
-          $prod_status = $product->get_status();
-          switch ($prod_status) {
+          $post_status = $product->get_status();
+          switch ($post_status) {
             case 'draft':
               $status_name = __("Draft");
               break;
@@ -277,36 +277,56 @@ class Ebay_List_Table extends WP_List_Table
               $status_name = __("Published");
               break;
           }
+
+          if (!$product_by_sku) {
+            $label = __('Verknüpfen');
+            $action = 'connect-' . $post_id;
+            $icon = 'admin-links';
+            $type = 'link';
+          } else {
+            $label = __('Lösen');
+            $action = 'disconnect-' . $post_id;
+            $icon = 'editor-unlink';
+            $type = 'link';
+          }
+          $ebay_actions =
+            '<div>' .
+            wbp_include_ebay_template('dashboard/ebay-actions.php', true, array_merge(compact('post_id', 'record', 'post_status', 'classes'), array('connected' => $product_by_sku))) .
+            wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('post_id', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
+            '</div>';
         }
+
 
         if ($product_by_sku) {
 
-          $status = $prod_status === 'publish' ? 'connected-publish' : ($prod_status === 'draft' ? 'connected-draft' : 'connected-unknown');
+          $status = $post_status === 'publish' ? 'connected-publish' : ($post_status === 'draft' ? 'connected-draft' : 'connected-unknown');
           $shop_actions =
             '<div>' .
-            wbp_include_ebay_template('dashboard/import-data-button.php', true, array_merge(compact('product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'), array('action' => 'disconnect-' . $product->get_id(), 'label' => 'Lösen', 'icon' => 'editor-unlink'))) .
-            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'product', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
             '</div>';
         } elseif ($product) {
 
-          $status = $prod_status === 'publish' ? 'disconnected-publish' : ($prod_status === 'draft' ? 'disconnected-draft' : 'disconnected-unknown');
+          $status = $post_status === 'publish' ? 'disconnected-publish' : ($post_status === 'draft' ? 'disconnected-draft' : 'disconnected-unknown');
           $label = __('Verknüpfen');
-          $action = 'connect-' . $product->get_id();
+          $action = 'connect-' . $post_id;
           $icon = 'admin-links';
-          $shop_actions = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('product', 'record', 'label', 'action', 'icon')) .
-            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'product', 'record', 'classes', 'deletelink', 'editlink', 'permalink'));
+          $shop_actions =
+            '<div>' .
+            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            '</div>';
         } else {
 
           $status = 'invalid';
           $label = __('Anlegen');
           $action = 'create';
           $icon = 'plus';
-          $shop_actions = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('record', 'label', 'action', 'icon'));
+          $type = 'button';
+          $ebay_actions = wbp_include_ebay_template('dashboard/import-data-button.php', true, compact('record', 'label', 'action', 'icon', 'type'));
         }
 
 
         switch ($column_name) {
-          case "status_start": {
+          case "status-start": {
       ?>
               <td class="status <?php echo $status . ' ' . $class ?>"></td>
             <?php
@@ -352,7 +372,7 @@ class Ebay_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "shop_actions": {
+          case "shop-actions": {
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo $shop_actions ?></div>
@@ -363,7 +383,7 @@ class Ebay_List_Table extends WP_List_Table
           case "actions": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo $actions ?></div>
+                <div class="column-content"><?php echo $ebay_actions ?></div>
               </td>
             <?php
               break;
@@ -376,7 +396,7 @@ class Ebay_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "status_end": {
+          case "status-end": {
             ?>
               <td class="status <?php echo $status . ' ' . $class ?>"></td>
       <?php
@@ -393,9 +413,18 @@ class Ebay_List_Table extends WP_List_Table
             importData,
             connectEbay,
             disconnectEbay,
+            publishPost
           } = ajax_object;
 
           const ebay_id = "<?php echo $record->id ?>";
+          const post_id = "<?php echo $product ? $post_id : '' ?>";
+
+          const publishEl = $(`#ad-id-${ebay_id} #publish-post-${post_id}`);
+          $(publishEl).on('click', function(e) {
+            e.preventDefault();
+
+            publishPost(e);
+          })
 
           const connEl = $(`#ad-id-${ebay_id} a[data-action^=connect-]`);
           $(connEl).on('click', function(e) {

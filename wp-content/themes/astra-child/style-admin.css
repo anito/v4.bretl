@@ -16,6 +16,7 @@
 }
 .edit-php .sync-column-content .button:first-child {
   margin-right: 3px;
+  flex-basis: 200%;
 }
 .edit-php .sync-column-content a {
   text-align: center;

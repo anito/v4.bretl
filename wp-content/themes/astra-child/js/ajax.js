@@ -330,6 +330,8 @@ jQuery(document).ready(function ($) {
 
     const el = e.target;
     const post_ID = el.dataset.postId;
+    const ebay_id = el.dataset.ebayId;
+    
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
 
@@ -338,6 +340,8 @@ jQuery(document).ready(function ($) {
       data: {
         action: "_ajax_publish_post",
         post_ID,
+        ebay_id,
+        screen
       },
       success: (data) => parseResponse(data, el),
       error: (error) => console.log(error),
@@ -546,8 +550,8 @@ jQuery(document).ready(function ($) {
       },
       success: (data) => {
         $(el).html("Fertig");
-        setTimeout(() => parseResponse(data, el, callback), 2000);
         alert(msg);
+        setTimeout(() => parseResponse(data, el, callback), 2000);
       },
       error: (error) => {
         console.log(error);
