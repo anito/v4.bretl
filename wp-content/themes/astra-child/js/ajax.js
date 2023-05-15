@@ -184,6 +184,10 @@ jQuery(document).ready(function ($) {
     });
   }
 
+  function createPost(e) {
+    importData(e);
+  }
+
   function importData(e) {
     e.preventDefault();
     start();
@@ -224,7 +228,6 @@ jQuery(document).ready(function ($) {
         const json = JSON.parse(data);
         if (json.content.response?.code === 200) {
           $(el).html("Verarbeite...");
-
           setTimeout(() => {
             processDataImport(json, el, removeSpinner);
           }, 500);
@@ -322,7 +325,7 @@ jQuery(document).ready(function ($) {
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
-    
+
     const error_callback = () => {
       el.innerHTML = "Fehler";
       spinner?.classList.remove("is-active");
@@ -357,7 +360,7 @@ jQuery(document).ready(function ($) {
         action: "_ajax_publish_post",
         post_ID,
         ebay_id,
-        screen
+        screen,
       },
       success: (data) => parseResponse(data, el),
       error: (error) => console.log(error),
@@ -399,8 +402,25 @@ jQuery(document).ready(function ($) {
 
       case "toplevel_page_ebay":
         rowEl = el.closest(`tr#ad-id-${ebay_id}`);
+        if (head) $("#head-wrap").html(head);
+        el.dispatchEvent(
+          new CustomEvent("data:action", {
+            detail: { data: $(el).data() },
+          })
+        );
         $(rowEl)?.replaceWith(row);
-        if(head) $("#head-wrap").html(head);
+
+        if ("create" === el.dataset.action) {
+          rowEl = document.querySelector(`tr#ad-id-${ebay_id}`);
+
+          setTimeout(() => {
+            rowEl.dispatchEvent(
+              new CustomEvent("data:action", {
+                detail: { action: el.dataset.action},
+              })
+            );
+          }, 200);
+        }
         break;
     }
     callback?.();
@@ -418,6 +438,7 @@ jQuery(document).ready(function ($) {
     case "edit-product":
       ajax_object = {
         ...ajax_object,
+        createPost,
         deletePost,
         publishPost,
         importData,
@@ -553,7 +574,7 @@ jQuery(document).ready(function ($) {
     if (images.length) {
       msg = `${images.length} Fotos wurden importiert.`;
     } else {
-      msg = "Es konnten keine Fotos importiert werden.";
+      msg = "Es wurden keine Fotos importiert.";
     }
 
     $.post({
@@ -566,7 +587,11 @@ jQuery(document).ready(function ($) {
       },
       success: (data) => {
         $(el).html("Fertig");
-        alert(msg);
+        if(!$(el).data('bulk-action')) {
+          alert(msg);
+        } else {
+          $(el).data('image-count', images.length);
+        }
         setTimeout(() => parseResponse(data, el, callback), 2000);
       },
       error: (error) => {

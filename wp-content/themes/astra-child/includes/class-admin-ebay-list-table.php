@@ -55,7 +55,7 @@ class Ebay_List_Table extends WP_List_Table
     $products = array('publish' => array(), 'draft' => array());
     foreach ($this->items as $item) {
       $product = wbp_get_product_by_sku($item->id);
-      if($product) {
+      if ($product) {
         $id = $product->get_id();
         switch ($product->get_status()) {
           case 'publish':
@@ -414,6 +414,7 @@ class Ebay_List_Table extends WP_List_Table
       <script>
         jQuery(document).ready(($) => {
           const {
+            createPost,
             deletePost,
             importImages,
             importData,
@@ -422,8 +423,9 @@ class Ebay_List_Table extends WP_List_Table
             publishPost
           } = ajax_object;
 
-          const ebay_id = "<?php echo $record->id ?>";
           const post_id = "<?php echo $product ? $post_id : '' ?>";
+          const record = <?php echo json_encode($record) ?>;
+          const ebay_id = record.id;
 
           const publishEl = $(`#ad-id-${ebay_id} #publish-post-${post_id}`);
           $(publishEl).on('click', function(e) {
@@ -446,7 +448,14 @@ class Ebay_List_Table extends WP_List_Table
             disconnectEbay(e);
           })
 
-          const impDataEl = $(`#ad-id-${ebay_id} a[data-action=create], #ad-id-${ebay_id} a[data-action^=import-data-]`);
+          const createEl = $(`#ad-id-${ebay_id} a[data-action=create]`);
+          $(createEl).on('click', function(e) {
+            e.preventDefault();
+
+            createPost(e);
+          })
+
+          const impDataEl = $(`#ad-id-${ebay_id} a[data-action^=import-data-]`);
           $(impDataEl).on('click', function(e) {
             e.preventDefault();
 
@@ -468,6 +477,31 @@ class Ebay_List_Table extends WP_List_Table
 
             delEl.html('löschen...')
             deletePost(e);
+          })
+
+          const trEl = $(`#ad-id-${ebay_id}`);
+          trEl.get()[0].addEventListener('data:action', (e) => {
+
+            if ('create' === e.detail?.action) {
+              $(impImagesEl).get()[0].addEventListener('data:action', function(e) {
+
+                $('a[data-action=edit-post]', trEl)
+                const href = $('a[data-action=edit-post]', trEl).attr('href');
+                const {
+                  data: {
+                    imageCount
+                  }
+                } = e.detail;
+                if (confirm(`Das Produkt "${record.title}" inklusive ${imageCount} Produktfotos wurde erstellt.\n\nDas Produkt jetzt öffnen um Eigenschaften wie Produkt-Kategorie, Hersteller usw. hinzuzufügen?`)) {
+                  const tab = window.open(href, 'edit-tab');
+                  tab.focus();
+                }
+
+              });
+              impImagesEl.data('bulk-action', 'create');
+              impImagesEl.click();
+            }
+
           })
         })
       </script>

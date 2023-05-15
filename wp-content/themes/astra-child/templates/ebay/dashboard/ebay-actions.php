@@ -7,7 +7,7 @@
   </div>
   <div id="import-ebay-images-wbp-action-<?php echo $record->id ?>">
     <span class="spinner"></span>
-    <a class="button button-primary button-small <?php echo $classes ?>" href="<?php echo admin_url('admin-ajax.php?sku=') . $record->id  ?>&action=import_images" data-post-id="<?php echo $post_id ?>" data-ebay-id="<?php echo $record->id ?>" data-action="import-images-' . $record->id ?>"><?php echo __('Fotos importieren', 'wbp') ?></a>
+    <a class="button button-primary button-small <?php echo $classes ?>" href="<?php echo admin_url('admin-ajax.php?sku=') . $record->id  ?>&action=import_images" data-post-id="<?php echo $post_id ?>" data-ebay-id="<?php echo $record->id ?>" data-action="import-images-<?php echo $record->id ?>"><?php echo __('Fotos importieren', 'wbp') ?></a>
   </div>
   <div id="publish-post-wbp-action-<?php echo $post_id ?>">
     <span class="spinner"></span>
