@@ -39,7 +39,7 @@ function _ajax_sts_display()
   $display = ob_get_clean();
 
   ob_start();
-  $wp_list_table->display_head();
+  $wp_list_table->render_head();
   $head = ob_get_clean();
 
   die(json_encode(array(
@@ -163,6 +163,20 @@ function fetch_ts_script()
             }, delay);
           });
 
+          $('#ebay-list').on('submit', function(e) {
+
+            e.preventDefault();
+
+          });
+
+          list.init_header();
+          
+          $('.wp-list-table').removeClass('loading');
+          
+        },
+
+        init_header: function() {
+
           $('.pagination a').on('click', function(e) {
             e.preventDefault();
 
@@ -173,14 +187,6 @@ function fetch_ts_script()
             };
             list.update(data);
           })
-
-          $('#ebay-list').on('submit', function(e) {
-
-            e.preventDefault();
-
-          });
-
-          $('.wp-list-table').removeClass('loading');
 
         },
 
@@ -250,6 +256,8 @@ function fetch_ts_script()
       }
 
       list.display();
+
+      ajax_object.init_header = list.init_header;
 
     })(jQuery);
   </script>

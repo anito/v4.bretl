@@ -102,8 +102,16 @@ function wbp_ajax_publish_post()
   }
   $row = ob_get_clean();
 
+  ob_start();
+  switch ($screen) {
+    case 'toplevel_page_ebay':
+      $wp_list_table->render_head($pageNum);
+      break;
+  }
+  $head = ob_get_clean();
+
   echo json_encode([
-    'data' => compact(['row', 'post_ID', 'ebay_id'])
+    'data' => compact(['row', 'head', 'post_ID', 'ebay_id'])
   ]);
 
   wp_die();
@@ -265,12 +273,21 @@ function wbp_ajax_import_ebay_data()
       $ids = array_column($ads, 'id');
       $record_key = array_search($ebay_id, $ids);
       $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+
       break;
   }
   $row = ob_get_clean();
 
+  ob_start();
+  switch ($screen) {
+    case 'toplevel_page_ebay':
+      $wp_list_table->render_head($pageNum);
+      break;
+  }
+  $head = ob_get_clean();
+
   echo json_encode([
-    'data' => compact(['row', 'post_ID', 'ebay_id'])
+    'data' => compact(['row', 'head', 'post_ID', 'ebay_id'])
   ]);
 
   wp_die();
@@ -327,12 +344,13 @@ function wbp_ajax_import_ebay_images()
       $ids = array_column($ads, 'id');
       $record_key = array_search($ebay_id, $ids);
       $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+
       break;
   }
   $row = ob_get_clean();
 
   echo json_encode([
-    'data' => compact(['row','post_ID', 'ebay_id'])
+    'data' => compact(['row', 'post_ID', 'ebay_id'])
   ]);
   wp_die();
 }
@@ -382,8 +400,12 @@ function wbp_ajax_delete_post()
   $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
   $row = ob_get_clean();
 
+  ob_start();
+  $wp_list_table->render_head($pageNum);
+  $head = ob_get_clean();
+
   echo json_encode([
-    'data' => compact(['row', 'ebay_id'])
+    'data' => compact(['row', 'head', 'ebay_id'])
   ]);
   wp_die();
 }

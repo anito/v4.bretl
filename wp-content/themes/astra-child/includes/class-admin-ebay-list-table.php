@@ -41,7 +41,7 @@ class Ebay_List_Table extends WP_List_Table
    * @Build Head
    */
 
-  function display_head($page = 1)
+  function render_head($page = 1)
   {
     $data = $this->data;
 
@@ -52,8 +52,24 @@ class Ebay_List_Table extends WP_List_Table
         $total += $category->totalAds;
       }
     }
+    $products = array('publish' => array(), 'draft' => array());
+    foreach ($this->items as $item) {
+      $product = wbp_get_product_by_sku($item->id);
+      if($product) {
+        $id = $product->get_id();
+        switch ($product->get_status()) {
+          case 'publish':
+            $products['publish'][] = $id;
+            break;
+          case 'draft':
+            $products['draft'][] = $id;
+            break;
+        }
+      }
+    }
+    $products['unknown'] = count($this->items) - count($products['publish']) - count($products['draft']);
 
-    wbp_include_ebay_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total));
+    wbp_include_ebay_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'products' => $products));
   }
 
   /**
@@ -73,7 +89,7 @@ class Ebay_List_Table extends WP_List_Table
     extract($this->_pagination_args, EXTR_SKIP);
 
     ob_start();
-    $this->display_head($pageNum);
+    $this->render_head($pageNum);
     $head = ob_get_clean();
 
     ob_start();
@@ -161,7 +177,6 @@ class Ebay_List_Table extends WP_List_Table
   );
 
   private $data = array();
-  private $pageNum = 1;
 
   /**
    * Prepare the table with different parameters, pagination, columns and table elements
@@ -229,16 +244,6 @@ class Ebay_List_Table extends WP_List_Table
     $this->items = $data->ads;
 
     $this->prepare_items();
-  }
-
-  function getRecord($id)
-  {
-    foreach ($this->items as $item) {
-      if ($item->id === $id) {
-        $record = $item;
-      }
-    }
-    return $record;
   }
 
   function render_row($record, $columns, $hidden)
@@ -322,6 +327,7 @@ class Ebay_List_Table extends WP_List_Table
           $icon = 'plus';
           $type = 'button';
           $ebay_actions = wbp_include_ebay_template('dashboard/ebay-activate-control.php', true, compact('record', 'label', 'action', 'icon', 'type'));
+          $shop_actions = '';
         }
 
 

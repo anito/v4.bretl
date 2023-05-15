@@ -230,6 +230,7 @@ jQuery(document).ready(function ($) {
           }, 500);
         } else {
           $(el).html("Fehler");
+          removeSpinner();
         }
       },
       error: (error) => {
@@ -253,7 +254,7 @@ jQuery(document).ready(function ($) {
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
-    
+
     const removeSpinner = () => {
       spinner?.classList.remove("is-active");
     };
@@ -290,6 +291,7 @@ jQuery(document).ready(function ($) {
           }, 500);
         } else {
           $(el).html("Fehler");
+          removeSpinner();
         }
       },
       error: (error) => {
@@ -381,7 +383,7 @@ jQuery(document).ready(function ($) {
 
   function parseResponse(data, el, callback) {
     const {
-      data: { row, post_ID, ebay_id },
+      data: { row, head, post_ID, ebay_id },
     } = JSON.parse(data);
 
     let rowEl;
@@ -398,6 +400,7 @@ jQuery(document).ready(function ($) {
       case "toplevel_page_ebay":
         rowEl = el.closest(`tr#ad-id-${ebay_id}`);
         $(rowEl)?.replaceWith(row);
+        if(head) $("#head-wrap").html(head);
         break;
     }
     callback?.();
@@ -506,7 +509,7 @@ jQuery(document).ready(function ($) {
         ebaydata,
         screen,
       },
-      success: async (data) => {
+      success: (data) => {
         el.dispatchEvent(
           new CustomEvent("ebay:data-import", {
             detail: { success: true, data },
