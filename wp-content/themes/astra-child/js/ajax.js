@@ -125,6 +125,7 @@ jQuery(document).ready(function ($) {
         }, 500);
       },
       error: (error) => {
+        $(el).removeClass('busy');
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("ebay:data-import"), {
@@ -172,6 +173,7 @@ jQuery(document).ready(function ($) {
         }, 500);
       },
       error: (error) => {
+        $(el).removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("ebay:data-import"), {
@@ -222,6 +224,7 @@ jQuery(document).ready(function ($) {
         screen,
       },
       beforeSend: () => {
+        $(el).addClass("busy");
         $(el).html("Hole Daten...");
       },
       success: (data) => {
@@ -232,11 +235,13 @@ jQuery(document).ready(function ($) {
             processDataImport(json, el, removeSpinner);
           }, 500);
         } else {
+          $(el).removeClass("busy");
           $(el).html("Fehler");
           removeSpinner();
         }
       },
       error: (error) => {
+        $(el).removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("ebay:data-import"), {
@@ -283,7 +288,10 @@ jQuery(document).ready(function ($) {
         formdata,
         screen,
       },
-      beforeSend: () => (el.innerHTML = "Importiere..."),
+      beforeSend: () => {
+        $(el).addClass('busy');
+        $(el).html("Importiere...");
+      },
       success: (data) => {
         const json = JSON.parse(data);
         if (json.content.response?.code === 200) {
@@ -293,6 +301,7 @@ jQuery(document).ready(function ($) {
             processImageImport(json, el, removeSpinner);
           }, 500);
         } else {
+          $(el).removeClass("busy");
           $(el).html("Fehler");
           removeSpinner();
         }
@@ -328,6 +337,7 @@ jQuery(document).ready(function ($) {
 
     const error_callback = () => {
       el.innerHTML = "Fehler";
+      $(el).removeClass("busy");
       spinner?.classList.remove("is-active");
     };
 

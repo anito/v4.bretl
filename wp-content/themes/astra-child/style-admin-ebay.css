@@ -223,7 +223,9 @@ section .summary .count:nth-child(2) {
   vertical-align: middle;
 }
 .wp-list-table.wp-list-ebay-ads .column-content a[disabled],
-.wp-list-table.wp-list-ebay-ads .column-content .button[disabled] {
+.wp-list-table.wp-list-ebay-ads .column-content .button[disabled],
+.wp-list-table.wp-list-ebay-ads .column-content a.busy,
+.wp-list-table.wp-list-ebay-ads .column-content .button.busy {
   pointer-events: none;
 }
 .divider-bottom {

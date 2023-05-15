@@ -12,5 +12,5 @@
 			</svg></span>
 		<span>Kleinanzeigen</span>
 	</h1>
-	<h5>Kleinanzeigen Interface <small>&copy; Axel Nitzschner</small></h5>
+	<h5>Kleinanzeigen Import <small>&copy; Axel Nitzschner</small></h5>
 </header>
