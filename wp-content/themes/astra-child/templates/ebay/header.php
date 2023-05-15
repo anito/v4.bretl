@@ -28,9 +28,9 @@
       <div class="">
 
         <h2><?php echo __('Shop:', 'wbp') ?></h2>
-        <h2><small><?php echo sprintf(__('Veröffentlicht: %s ', 'wbp'), count($products['publish'])); ?></small></h2>
-        <h2><small><?php echo sprintf(__('Entwürfe: %s', 'wbp'), count($products['draft'])); ?></small></h2>
-        <h2><small><?php echo sprintf(__('Unbekannt: %s', 'wbp'), $products['unknown']); ?></small></h2>
+        <h2><i class="dashicons dashicons-visibility"></i><small><?php echo sprintf(__('Veröffentlicht: %s ', 'wbp'), count($products['publish'])); ?></small></h2>
+        <h2><i class="dashicons dashicons-hidden"></i><small><?php echo sprintf(__('Entwürfe: %s', 'wbp'), count($products['draft'])); ?></small></h2>
+        <h2><i class="dashicons dashicons-warning"></i><small><?php echo sprintf(__('Unbekannt: %s', 'wbp'), $products['unknown']); ?></small></h2>
 
       </div>
 

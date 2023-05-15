@@ -12,6 +12,9 @@
   border-radius: 5px;
   border: 1px solid #ddd;
 }
+#head-wrap section .dashicons {
+  margin-right: 10px;
+}
 #head-wrap .section-wrapper .section-inner {
   display: flex;
   flex: 1;
@@ -126,7 +129,7 @@ section .color-box {
   border: 3px solid #000;
 }
 section .description {
-  font-size: .8em;
+  font-size: 0.8em;
   line-height: 3em;
   padding-left: 10px;
   color: #000;
@@ -191,13 +194,16 @@ section .box-wrapper .description {
 }
 .wp-list-table.wp-list-ebay-ads .column-content .dashicons {
   font-size: 1em;
+  display: inline-block;
   line-height: 1em;
-  vertical-align: middle;
+  height: auto;
+  vertical-align: baseline;
+  pointer-events: none;
 }
 .wp-list-table.wp-list-ebay-ads .column-content .button .dashicons {
   font-size: 1.3em;
   line-height: 1.3em;
-  pointer-events: none;
+  vertical-align: middle;
 }
 .wp-list-table.wp-list-ebay-ads .column-content a[disabled],
 .wp-list-table.wp-list-ebay-ads .column-content .button[disabled] {
