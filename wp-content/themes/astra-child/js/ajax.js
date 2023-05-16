@@ -161,7 +161,7 @@ jQuery(document).ready(function ($) {
         ebay_id,
       },
       beforeSend: () => {
-        $(el).html("Löse Verbindung...");
+        $(el).html("Verknüpfung lösen...");
       },
       success: (data) => {
         $(el).html("Fertig");

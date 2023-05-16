@@ -143,8 +143,8 @@ class Ebay_List_Table extends WP_List_Table
       'price' => __('Preis'),
       'categories' => __('Kategorien'),
       'brands' => __('Hersteller'),
-      'shop-actions' => __('Shop Aktionen'),
-      'actions' => __('Ebay Aktionen'),
+      'shop-actions' => __('Aktionen'),
+      'actions' => __('Import'),
       'status-end' => __('')
     );
   }
@@ -382,17 +382,9 @@ class Ebay_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "shop-actions": {
-            ?>
-              <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo $shop_actions ?></div>
-              </td>
-            <?php
-              break;
-            }
           case "categories": {
             ?>
-              <td class="<?php echo $class ?>">
+              <td class="shop <?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', $cats) ?></div>
               </td>
             <?php
@@ -400,15 +392,23 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "brands": {
             ?>
-              <td class="<?php echo $class ?>">
+              <td class="shop <?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', $brands) ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "shop-actions": {
+            ?>
+              <td class="shop <?php echo $class ?>">
+                <div class="column-content"><?php echo $shop_actions ?></div>
               </td>
             <?php
               break;
             }
           case "actions": {
             ?>
-              <td class="<?php echo $class ?>">
+              <td class="shop <?php echo $class ?>">
                 <div class="column-content"><?php echo $ebay_actions ?></div>
               </td>
             <?php

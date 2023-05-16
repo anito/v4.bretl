@@ -204,7 +204,8 @@ section .summary .count:nth-child(2) {
   width: 140px;
 }
 .wp-list-table.wp-list-ebay-ads .column-actions {
-  min-width: 140px;
+  min-width: 130px;
+  text-align: right;
 }
 .wp-list-table.wp-list-ebay-ads .column-date {
   width: auto;
@@ -223,6 +224,9 @@ section .summary .count:nth-child(2) {
 }
 .wp-list-table.wp-list-ebay-ads .column-content {
   position: relative;
+}
+.wp-list-table.wp-list-ebay-ads .column.shop {
+  background-color: rgb(193 227 250 / 12%);
 }
 .wp-list-table.wp-list-ebay-ads [id*="-wbp-action"] {
   position: relative;
