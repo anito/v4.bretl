@@ -346,7 +346,7 @@ function _ajax_get_product_categories()
 
 function _ajax_get_brands()
 {
-  wbp_ajax_get_brands();
+  wbp_ajax_get_brand_images();
 }
 
 function wbp_get_product_brands($post)

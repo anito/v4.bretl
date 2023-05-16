@@ -52,9 +52,16 @@ class Ebay_List_Table extends WP_List_Table
         $total += $category->totalAds;
       }
     }
-    $products = array('publish' => array(), 'draft' => array());
+
+    $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array());
     foreach ($this->items as $item) {
-      $product = wbp_get_product_by_sku($item->id);
+
+      $product_by_sku = wbp_get_product_by_sku($item->id);
+      if (!$product_by_sku) {
+        $product_by_title = wbp_get_product_by_title($item->title);
+      }
+      $product = $product_by_sku ?? $product_by_title ?? false;
+
       if ($product) {
         $id = $product->get_id();
         switch ($product->get_status()) {
@@ -64,10 +71,13 @@ class Ebay_List_Table extends WP_List_Table
           case 'draft':
             $products['draft'][] = $id;
             break;
+          default:
+            $products['other'][] = $id;
         }
+      } else {
+        $products['unknown'][] = $item->id;
       }
     }
-    $products['unknown'] = count($this->items) - count($products['publish']) - count($products['draft']);
 
     wbp_include_ebay_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'products' => $products));
   }
@@ -251,17 +261,21 @@ class Ebay_List_Table extends WP_List_Table
   { ?>
     <tr id="ad-id-<?php echo $record->id ?>">
       <?php
+      
+      $product_by_sku = wbp_get_product_by_sku($record->id);
+      if (!$product_by_sku) {
+        $product_by_title = wbp_get_product_by_title($record->title);
+      }
+      $product = $product_by_sku ?? $product_by_title ?? false;
+      
+      $brands = array();
+      $cats = array();
+
       foreach ($columns as $column_name => $column_display_name) {
         $class = $column_name . ' column column-' . $column_name;
         if (in_array($column_name, $hidden)) $style = ' style="display:none;"';
 
-        $product_by_sku = wbp_get_product_by_sku($record->id);
-        if (!$product_by_sku) {
-          $product_by_title = wbp_get_product_by_title($record->title);
-        }
-        $product = $product_by_sku ?? $product_by_title ?? false;
-        $brands = array();
-        $cats = array();
+        // Setup Ebay actions
         if ($product) {
           $post_id = $product->get_id();
           $editlink  = admin_url('post.php?action=edit&post=' . $post_id);
@@ -305,7 +319,7 @@ class Ebay_List_Table extends WP_List_Table
             '</div>';
         }
 
-
+        // Setup Shop actions
         if ($product_by_sku) {
 
           $status = $post_status === 'publish' ? 'connected-publish' : ($post_status === 'draft' ? 'connected-draft' : 'connected-unknown');
@@ -504,7 +518,7 @@ class Ebay_List_Table extends WP_List_Table
                     imageCount
                   }
                 } = e.detail;
-                if (confirm(`Das Produkt "${record.title}" inklusive ${imageCount} Produktfotos wurde angelegt.\n\nJetzt zum Produkt gehen um Eigenschaften wie Produkt-Kategorie, Hersteller usw. hinzuzufügen?`)) {
+                if (confirm(`Das Produkt "${record.title}" inklusive ${imageCount} Produktfotos wurde angelegt.\n\nJetzt zum Produkt gehen um Eigenschaften wie Produkt-Kategorie, Hersteller etc. hinzuzufügen?`)) {
                   const tab = window.open(href, 'edit-tab');
                   tab.focus();
                 }

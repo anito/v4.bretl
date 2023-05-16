@@ -44,7 +44,7 @@
           <h2><small>
               <div class="summary">
                 <span><i class="dashicons dashicons-warning"></i><?php echo __('Unbekannt:', 'wbp') ?></span>
-                <span class="count"><?php echo $products['unknown'] ?></span>
+                <span class="count"><?php echo count($products['unknown']) ?></span>
               </div>
             </small></h2>
   

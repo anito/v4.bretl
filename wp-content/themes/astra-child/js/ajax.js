@@ -290,7 +290,7 @@ jQuery(document).ready(function ($) {
       },
       beforeSend: () => {
         $(el).addClass('busy');
-        $(el).html("Importiere...");
+        $(el).html("Hole Fotos...");
       },
       success: (data) => {
         const json = JSON.parse(data);

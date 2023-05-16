@@ -425,7 +425,7 @@ function wbp_ajax_get_product_categories()
   wp_die();
 }
 
-function wbp_ajax_get_brands()
+function wbp_ajax_get_brand_images()
 {
   $brands = array();
   foreach (get_terms(['taxonomy' => 'brands']) as $key => $term) {
