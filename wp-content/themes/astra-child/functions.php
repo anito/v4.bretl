@@ -126,7 +126,6 @@ function wbp_save_post($post_ID, $post)
   require_once __DIR__ . '/includes/product-term-handler.php';
   wbp_process_sale($post_ID, $post);
   wbp_process_ebay($post_ID, $post);
-
 }
 add_action("save_post", "wbp_save_post", 99, 3);
 add_action("save_post", "wbp_quick_edit_product_save", 99, 3);
@@ -348,6 +347,16 @@ function _ajax_get_product_categories()
 function _ajax_get_brands()
 {
   wbp_ajax_get_brands();
+}
+
+function wbp_get_product_brands($post)
+{
+  return get_the_terms($post, 'brands');
+}
+
+function wbp_get_product_cats($post)
+{
+  return get_the_terms($post, 'product_cat');
 }
 
 function wbp_product_set_attributes($post_id, $attributes)
@@ -715,7 +724,7 @@ function wbp_ebay_display_admin_page($page)
 }
 
 function output_dashboard_tab()
-{ 
+{
   wbp_include_ebay_template('dashboard/dashboard.php', false, array('pages' => 5, 'load_data' => false));
 }
 
@@ -727,7 +736,6 @@ function wbp_get_json_data($page)
   $response = get_remote($remoteUrl);
   // $response = file_get_contents(__DIR__ . '/sample' . $page . '.json');
   return json_decode($response);
-
 }
 
 function get_remote($url)
@@ -756,11 +764,11 @@ function wbp_get_product_by_title($title)
 
   // $sql = $wpdb->prepare(
   //   "
-	// 		SELECT ID
-	// 		FROM $wpdb->posts
-	// 		WHERE post_title = %s
-	// 		AND post_type = %s
-	// 	",
+  // 		SELECT ID
+  // 		FROM $wpdb->posts
+  // 		WHERE post_title = %s
+  // 		AND post_type = %s
+  // 	",
   //   $title,
   //   'product'
   // );

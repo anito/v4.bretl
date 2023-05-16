@@ -141,9 +141,10 @@ class Ebay_List_Table extends WP_List_Table
       'title' => __('Titel'),
       'date' => __('Datum'),
       'price' => __('Preis'),
+      'categories' => __('Kategorien'),
+      'brands' => __('Hersteller'),
       'shop-actions' => __('Shop Aktionen'),
       'actions' => __('Ebay Aktionen'),
-      'description' => __('Description'),
       'status-end' => __('')
     );
   }
@@ -259,7 +260,8 @@ class Ebay_List_Table extends WP_List_Table
           $product_by_title = wbp_get_product_by_title($record->title);
         }
         $product = $product_by_sku ?? $product_by_title ?? false;
-
+        $brands = array();
+        $cats = array();
         if ($product) {
           $post_id = $product->get_id();
           $editlink  = admin_url('post.php?action=edit&post=' . $post_id);
@@ -267,6 +269,8 @@ class Ebay_List_Table extends WP_List_Table
           $permalink = get_permalink($post_id);
           $classes = "";
           $post_status = $product->get_status();
+          $brands = wp_list_pluck(wbp_get_product_brands($post_id), 'name');
+          $cats = wp_list_pluck(wbp_get_product_cats($post_id), 'name');
           switch ($post_status) {
             case 'draft':
               $status_name = __("Draft");
@@ -386,18 +390,26 @@ class Ebay_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "actions": {
+          case "categories": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo $ebay_actions ?></div>
+                <div class="column-content"><?php echo implode(', ', $cats) ?></div>
               </td>
             <?php
               break;
             }
-          case "description": {
+          case "brands": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo $record->description ?></div>
+                <div class="column-content"><?php echo implode(', ', $brands) ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "actions": {
+            ?>
+              <td class="<?php echo $class ?>">
+                <div class="column-content"><?php echo $ebay_actions ?></div>
               </td>
             <?php
               break;
@@ -492,7 +504,7 @@ class Ebay_List_Table extends WP_List_Table
                     imageCount
                   }
                 } = e.detail;
-                if (confirm(`Das Produkt "${record.title}" inklusive ${imageCount} Produktfotos wurde erstellt.\n\nDas Produkt jetzt öffnen um Eigenschaften wie Produkt-Kategorie, Hersteller usw. hinzuzufügen?`)) {
+                if (confirm(`Das Produkt "${record.title}" inklusive ${imageCount} Produktfotos wurde angelegt.\n\nJetzt zum Produkt gehen um Eigenschaften wie Produkt-Kategorie, Hersteller usw. hinzuzufügen?`)) {
                   const tab = window.open(href, 'edit-tab');
                   tab.focus();
                 }

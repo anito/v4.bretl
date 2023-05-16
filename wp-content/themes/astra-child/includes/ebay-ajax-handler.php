@@ -427,6 +427,7 @@ function wbp_ajax_get_product_categories()
 
 function wbp_ajax_get_brands()
 {
+  $brands = array();
   foreach (get_terms(['taxonomy' => 'brands']) as $key => $term) {
     $image_ids = get_metadata('term', $term->term_id, 'image');
     if (!empty($image_ids)) {
@@ -440,6 +441,7 @@ function wbp_ajax_get_brands()
       ];
     }
   };
+
   echo json_encode([
     'brands' => $brands
   ]);
