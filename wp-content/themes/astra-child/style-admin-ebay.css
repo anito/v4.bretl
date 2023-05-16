@@ -233,7 +233,7 @@ section .summary .count:nth-child(2) {
 }
 .wp-list-table.wp-list-ebay-ads .column-content .spinner {
   position: absolute;
-  left: -25px;
+  left: -5px;
   top: 3px;
   margin: 0;
 }
