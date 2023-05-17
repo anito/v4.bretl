@@ -2,9 +2,9 @@
   <div class="left-sections">
     <section class="wbp-ebay-section">
       <div class="section-inner">
-  
+
         <div class="">
-  
+
           <h2><?php echo sprintf(__('Seite: %s', 'wbp'), $page) ?></h2>
           <h2><small><?php echo sprintf(__('Anzeigen: %s (Gesamt: %d)', 'wbp'), count($data->ads), $total); ?></small></h2>
           <h4><small>
@@ -13,7 +13,7 @@
               <?php } ?>
             </small>
           </h4>
-  
+
         </div>
         <div class="pagination">
           <?php for ($i = 1; $i <= $pages; $i++) {
@@ -25,29 +25,38 @@
     </section>
     <section class="wbp-shop-section">
       <div class="section-inner">
-  
+
         <div class="divider-bottom">
-  
+
           <h2>&nbsp;</h2>
           <h2><small>
               <div class="summary">
                 <span><i class="dashicons dashicons-visibility"></i><?php echo __('Veröffentlicht:', 'wbp') ?></span>
-                <span class="count"><?php echo count($products['publish']) ?></span>
+                <span>
+                  <span class="count"><?php echo count($products['publish']) ?></span>
+                  <span class="indicator indicator-publish"></span>
+                </span>
               </div>
             </small></h2>
           <h2><small>
               <div class="summary">
                 <span><i class="dashicons dashicons-hidden"></i><?php echo __('Entwürfe:', 'wbp') ?></span>
-                <span class="count"><?php echo count($products['draft']) ?></span>
+                <span>
+                  <span class="count"><?php echo count($products['draft']) ?></span>
+                  <span class="indicator indicator-draft"></span>
+                </span>
               </div>
             </small></h2>
           <h2><small>
               <div class="summary">
                 <span><i class="dashicons dashicons-warning"></i><?php echo __('Unbekannt:', 'wbp') ?></span>
-                <span class="count"><?php echo count($products['unknown']) ?></span>
+                <span>
+                  <span class="count"><?php echo count($products['unknown']) ?></span>
+                  <span class="indicator indicator-unknown"></span>
+                </span>
               </div>
             </small></h2>
-  
+
         </div>
         <div class="info-box">
           <ul>
@@ -57,31 +66,39 @@
             </li>
           </ul>
         </div>
-  
+
       </div>
     </section>
   </div>
   <div class="right-sections">
     <section id="color-definitions">
       <div class="section-inner">
-  
+
         <h4>Farbschlüssel</h4>
-          <div class="box-wrapper">
-            <span class="color-box status connected-publish"></span>
+        <div class="box-wrapper">
+          <span class="status-wrapper">
+            <span class="color-box status connected-publish"><?php echo count($products['publish']) ?></span>
             <span class="description">Veröffentlicht</span>
-          </div>
-          <div class="box-wrapper">
-            <span class="color-box status connected-draft"></span>
+          </span>
+        </div>
+        <div class="box-wrapper">
+          <span class="status-wrapper">
+            <span class="color-box status connected-draft"><?php echo count($products['draft']) ?></span>
             <span class="description">Entwurf </span>
-          </div>
-          <div class="box-wrapper divider-bottom">
-            <span class="color-box status invalid"></span>
-            <span class="description">Produkt unbekannt</span>
-          </div>
-          <div class="box-wrapper">
-            <span class="color-box status disconnected"></span>
+          </span>
+        </div>
+        <div class="box-wrapper divider-bottom">
+          <span class="status-wrapper">
+            <span class="color-box status invalid"><?php echo count($products['unknown']) ?></span>
+            <span class="description">Unbekannt</span>
+          </span>
+        </div>
+        <div class="box-wrapper">
+          <span class="status-wrapper">
+            <span class="color-box status disconnected"><span class="inner"><?php echo count($products['no-sku']) ?></span></span>
             <span class="description">Nicht verknüpft</span>
-          </div>
+          </span>
+        </div>
       </div>
     </section>
   </div>
@@ -90,10 +107,10 @@
   jQuery(document).ready(($) => {
 
     const {
-      init_header
+      init_head
     } = ajax_object;
 
-    init_header();
+    init_head();
 
   })
 </script>

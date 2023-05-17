@@ -154,8 +154,12 @@ function wbp_ajax_connect()
   $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
   $row = ob_get_clean();
 
+  ob_start();
+  $wp_list_table->render_head($pageNum);
+  $head = ob_get_clean();
+
   echo json_encode([
-    'data' => compact(['row', 'post_ID', 'ebay_id', 'success'])
+    'data' => compact(['row', 'head', 'post_ID', 'ebay_id', 'success'])
   ]);
 
   wp_die();
@@ -197,8 +201,12 @@ function wbp_ajax_disconnect()
   $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
   $row = ob_get_clean();
 
+  ob_start();
+  $wp_list_table->render_head($pageNum);
+  $head = ob_get_clean();
+
   echo json_encode([
-    'data' => compact(['row', 'post_ID', 'ebay_id', 'success'])
+    'data' => compact(['row', 'head', 'post_ID', 'ebay_id', 'success'])
   ]);
 
   wp_die();

@@ -9,9 +9,9 @@
     <span class="spinner"></span>
     <a class="button button-primary button-small <?php echo $classes ?>" href="<?php echo admin_url('admin-ajax.php?sku=') . $record->id  ?>&action=import_images" data-post-id="<?php echo $post_id ?>" data-ebay-id="<?php echo $record->id ?>" data-action="import-images-<?php echo $record->id ?>"><?php echo __('Fotos importieren', 'wbp') ?></a>
   </div>
-  <div id="publish-post-wbp-action-<?php echo $post_id ?>">
+  <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="hidden">
     <span class="spinner"></span>
-    <a data-action="publish-post" id="publish-post-<?php echo $post_id ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-ebay-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><?php echo ($post_status === 'publish') ?  __('Draft') : __('Publish') ?></a>
+    <a data-action="publish-post" id="publish-post-<?php echo $post_id ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-ebay-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Draft') : __('Publish') ?></a>
   </div>
 
 <?php }

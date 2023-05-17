@@ -1,3 +1,8 @@
+.wbp-ebay-page {
+  --publish: #1cc71c;
+  --draft: orange;
+  --unknown: #ff5b5b;
+}
 .wbp-ebay-main-header {
   margin: 40px 0 10px;
 }
@@ -71,7 +76,7 @@ section#color-definitions .section-inner {
 .info-box li {
   color: #999;
   font-weight: 100;
-  font-size: .8em;
+  font-size: 0.8em;
 }
 #head-wrap .left-sections section h2 {
   margin: 5px 0 20px;
@@ -113,14 +118,17 @@ section#color-definitions .section-inner {
 }
 .wp-list-table.wp-list-ebay-ads .column.status.connected-publish,
 .color-box.connected-publish {
-  background-color: green;
+  background-color: var(--publish);
+}
+.color-box.status {
+  align-self: center;
 }
 .wp-list-table.wp-list-ebay-ads .column.status.disconnected-publish {
-  background-color: rgb(104, 221, 135);
+  background-color: var(--publish);
   background-image: repeating-linear-gradient(
     -45deg,
     white 0 5px,
-    green 5px 10px
+    var(--publish) 5px 10px
   );
 }
 .color-box.disconnected {
@@ -129,35 +137,53 @@ section#color-definitions .section-inner {
     -45deg,
     white 0 2px,
     rgb(56, 56, 56) 2px 4px
-  )
+  );
 }
 .wp-list-table.wp-list-ebay-ads .column.status.connected-draft,
 .color-box.connected-draft {
-  background-color: orange;
+  background-color: var(--draft);
 }
 .wp-list-table.wp-list-ebay-ads .column.status.disconnected-draft,
 .color-box.disconnected-draft {
-  background-color: rgb(255, 207, 117);
+  background-color: var(--draft);
   background-image: repeating-linear-gradient(
     -45deg,
     white 0 5px,
-    orange 5px 10px
+    var(--draft) 5px 10px
   );
 }
 .wp-list-table.wp-list-ebay-ads .column.status.invalid,
 section .color-box.invalid {
-  background-color: red;
+  background-color: var(--unknown);
 }
 .wp-list-table.wp-list-ebay-ads .column.status.connected-unknown,
 .color-box.unknown {
   background-color: rgb(71, 71, 71);
 }
 section .color-box {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 99px;
+  line-height: 1rem;
+  padding: 3px;
+  text-align: center;
+  font-size: 0.9em;
+  color: #fff;
+}
+section .color-box .inner {
+  background: #000000;
+  color: #ffffff;
   width: 10px;
   height: 10px;
-  line-height: 0;
-  padding: 0;
+  border-radius: 99px;
+  padding: 3px;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 section .description {
   font-size: 0.8em;
@@ -168,17 +194,25 @@ section .description {
 section .box-wrapper {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+section .box-wrapper .count {
+  font-size: 0.9em;
+  font-weight: 300;
+  line-height: 1.6em;
+  margin-left: 10px;
+  text-align: center;
 }
 section .box-wrapper .description {
   display: flex;
   align-items: center;
 }
 section .summary {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 section .summary .count:nth-child(2) {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 .wp-list-table.wp-list-ebay-ads .manage-column[class*="status"],
 .column[class*="column-status"] {
@@ -258,17 +292,39 @@ section .summary .count:nth-child(2) {
 .wp-list-table.wp-list-ebay-ads .column-content .button .dashicons {
   font-size: 1.3em;
   line-height: 1.3em;
-  vertical-align: middle;
+  vertical-align: sub;
 }
 .wp-list-table.wp-list-ebay-ads .column-content a[disabled],
 .wp-list-table.wp-list-ebay-ads .column-content .button[disabled],
 .wp-list-table.wp-list-ebay-ads .column-content a.busy,
 .wp-list-table.wp-list-ebay-ads .column-content .button.busy {
   pointer-events: none;
+  cursor: auto;
+}
+.wp-list-table.wp-list-ebay-ads .column-content a,
+.wp-list-table.wp-list-ebay-ads .column-content .button {
+  cursor: pointer;
 }
 .divider-bottom {
   margin-bottom: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
-
+.indicator.indicator-publish {
+  background-color: var(--publish);
+}
+.indicator.indicator-draft {
+  background-color: var(--draft);
+}
+.indicator.indicator-unknown {
+  background-color: var(--unknown);
+}
+.indicator {
+  display: inline-block;
+  width: 5px;
+  height: 0.8em;
+  margin-left: 10px;
+}
+.status-wrapper {
+  display: flex;
+}

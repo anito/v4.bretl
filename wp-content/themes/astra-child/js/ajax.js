@@ -372,6 +372,10 @@ jQuery(document).ready(function ($) {
         ebay_id,
         screen,
       },
+      beforeSend: () => {
+        $(el).addClass("busy");
+        $(el).html("Moment...");
+      },
       success: (data) => parseResponse(data, el),
       error: (error) => console.log(error),
     });

@@ -169,13 +169,13 @@ function fetch_ts_script()
 
           });
 
-          list.init_header();
+          list.init_head();
           
           $('.wp-list-table').removeClass('loading');
           
         },
 
-        init_header: function() {
+        init_head: function() {
 
           $('.pagination a').on('click', function(e) {
             e.preventDefault();
@@ -257,7 +257,7 @@ function fetch_ts_script()
 
       list.display();
 
-      ajax_object.init_header = list.init_header;
+      ajax_object.init_head = list.init_head;
 
     })(jQuery);
   </script>

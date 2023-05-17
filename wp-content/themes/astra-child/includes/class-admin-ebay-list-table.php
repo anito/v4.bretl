@@ -53,7 +53,7 @@ class Ebay_List_Table extends WP_List_Table
       }
     }
 
-    $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array());
+    $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array());
     foreach ($this->items as $item) {
 
       $product_by_sku = wbp_get_product_by_sku($item->id);
@@ -61,6 +61,7 @@ class Ebay_List_Table extends WP_List_Table
         $product_by_title = wbp_get_product_by_title($item->title);
       }
       $product = $product_by_sku ?? $product_by_title ?? false;
+      $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null ;
 
       if ($product) {
         $id = $product->get_id();
@@ -346,6 +347,7 @@ class Ebay_List_Table extends WP_List_Table
           $shop_actions =
             '<div>' .
             wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_ebay_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
             '</div>';
         } elseif ($product) {
 
@@ -356,6 +358,7 @@ class Ebay_List_Table extends WP_List_Table
           $shop_actions =
             '<div>' .
             wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_ebay_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
             '</div>';
         } else {
 
