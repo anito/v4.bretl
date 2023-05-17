@@ -64,7 +64,7 @@ function wbp_get_remote()
   wp_die();
 }
 
-function wbp_ajax_publish_post()
+function wbp_ajax_toggle_publish_post()
 {
   $post_ID = isset($_REQUEST['post_ID']) ? (int) $_REQUEST['post_ID'] : null;
   $ebay_id = isset($_REQUEST['ebay_id']) ? (int) $_REQUEST['ebay_id'] : null;
@@ -72,10 +72,11 @@ function wbp_ajax_publish_post()
 
   $pageNum = $_COOKIE['ebay-table-page'];
 
+  $curr_status = get_post_status($post_ID);
   if ($post_ID) {
     wp_update_post(array(
       'ID' => $post_ID,
-      'post_status' => 'publish',
+      'post_status' => $curr_status === 'draft' ? 'publish' : 'draft',
     ));
   }
 

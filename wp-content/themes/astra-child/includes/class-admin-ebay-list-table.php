@@ -149,13 +149,14 @@ class Ebay_List_Table extends WP_List_Table
       'status-start' => __(''),
       'image' => __('Bild'),
       'title' => __('Titel'),
-      'date' => __('Datum'),
-      'price' => __('Preis'),
-      'categories' => __('Kategorien'),
-      'brands' => __('Hersteller'),
+      'date' => __('Änd.-Datum'),
+      'price' => __('Ebay Preis'),
+      'shop-price' => __('Shop Preis'),
+      'shop-categories' => __('Kategorien'),
+      'shop-brands' => __('Hersteller'),
       'shop-actions' => __('Aktionen'),
-      'actions' => __('Import'),
-      'status-end' => __('')
+      'shop-actions-import' => __('Import'),
+      'shop-status-end' => __('')
     );
   }
 
@@ -258,18 +259,37 @@ class Ebay_List_Table extends WP_List_Table
   }
 
   function render_row($record, $columns, $hidden)
-  { ?>
-    <tr id="ad-id-<?php echo $record->id ?>">
+  {
+    $product_by_sku = wbp_get_product_by_sku($record->id);
+    if (!$product_by_sku) {
+      $product_by_title = wbp_get_product_by_title($record->title);
+    }
+    $product = $product_by_sku ?? $product_by_title ?? false;
+
+
+    $diff_classes = array();
+    $brands = array();
+    $cats = array();
+
+    if ($product) {
+
+      $regex = '/^([\d.]+)/';
+      preg_match($regex, $record->price, $matches);
+      $raw_ebay_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+
+      $raw_shop_price = $product->get_price();
+      $price = wc_price($raw_shop_price);
+
+      if($raw_ebay_price !== $raw_shop_price) $diff_classes[] = 'diff-price';
+    } else {
+      $price = '';
+    }
+
+?>
+    <tr id="ad-id-<?php echo $record->id ?>" <?php if(!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes)?>" <?php } ?>>
       <?php
-      
-      $product_by_sku = wbp_get_product_by_sku($record->id);
-      if (!$product_by_sku) {
-        $product_by_title = wbp_get_product_by_title($record->title);
-      }
-      $product = $product_by_sku ?? $product_by_title ?? false;
-      
-      $brands = array();
-      $cats = array();
+
+
 
       foreach ($columns as $column_name => $column_display_name) {
         $class = $column_name . ' column column-' . $column_name;
@@ -307,7 +327,7 @@ class Ebay_List_Table extends WP_List_Table
             $icon = 'admin-links';
             $type = 'link';
           } else {
-            $label = __('Lösen');
+            $label = __('Loslösen');
             $action = 'disconnect-' . $post_id;
             $icon = 'editor-unlink';
             $type = 'link';
@@ -396,17 +416,25 @@ class Ebay_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "categories": {
+          case "shop-price": {
             ?>
-              <td class="shop <?php echo $class ?>">
+              <td class="<?php echo $class ?>">
+                <div class="column-content "><?php echo $price ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "shop-categories": {
+            ?>
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', $cats) ?></div>
               </td>
             <?php
               break;
             }
-          case "brands": {
+          case "shop-brands": {
             ?>
-              <td class="shop <?php echo $class ?>">
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', $brands) ?></div>
               </td>
             <?php
@@ -414,21 +442,21 @@ class Ebay_List_Table extends WP_List_Table
             }
           case "shop-actions": {
             ?>
-              <td class="shop <?php echo $class ?>">
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo $shop_actions ?></div>
               </td>
             <?php
               break;
             }
-          case "actions": {
+          case "shop-actions-import": {
             ?>
-              <td class="shop <?php echo $class ?>">
+              <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo $ebay_actions ?></div>
               </td>
             <?php
               break;
             }
-          case "status-end": {
+          case "shop-status-end": {
             ?>
               <td class="status <?php echo $status . ' ' . $class ?>"></td>
       <?php

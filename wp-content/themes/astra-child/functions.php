@@ -30,8 +30,8 @@ add_filter('allowed_http_origins', 'add_allowed_origins');
 define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.3');
 
 /**
- * App asset names (e.g. *.js. *.css files) change per distribution
- * This method takes care of it automatically using the glob
+ * App asset names (e.g. *.js. *.css files) changing per app distribution
+ * This method takes care of it automatically using glob
  */
 function get_themes_file($file_path)
 {
@@ -316,7 +316,7 @@ function _ajax_disconnect()
 
 function _ajax_publish_post()
 {
-  wbp_ajax_publish_post();
+  wbp_ajax_toggle_publish_post();
 }
 
 function _ajax_import_ebay_data()

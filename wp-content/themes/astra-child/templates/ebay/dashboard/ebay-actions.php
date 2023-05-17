@@ -11,7 +11,7 @@
   </div>
   <div id="publish-post-wbp-action-<?php echo $post_id ?>">
     <span class="spinner"></span>
-    <a data-action="publish-post" id="publish-post-<?php echo $post_id ?>" <?php if ($post_status === 'publish') echo 'disabled' ?> name="publish-post" data-post-status="<?php echo $post_status ?>" data-ebay-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><?php echo __('Publish') ?></a>
+    <a data-action="publish-post" id="publish-post-<?php echo $post_id ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-ebay-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><?php echo ($post_status === 'publish') ?  __('Draft') : __('Publish') ?></a>
   </div>
 
 <?php }

@@ -198,8 +198,8 @@ section .summary .count:nth-child(2) {
 .wp-list-table.wp-list-ebay-ads .column-shop-actions {
   width: 140px;
 }
-.wp-list-table.wp-list-ebay-ads .column-actions {
-  width: 110px;
+.wp-list-table.wp-list-ebay-ads .column-shop-actions-import {
+  width: 130px;
   padding-left: 30px;
 }
 .wp-list-table.wp-list-ebay-ads .column-empty {
@@ -208,26 +208,30 @@ section .summary .count:nth-child(2) {
 .wp-list-table.wp-list-ebay-ads .column-date {
   width: auto;
 }
-.wp-list-table.wp-list-ebay-ads .column-price {
+.wp-list-table.wp-list-ebay-ads .column-price,
+.wp-list-table.wp-list-ebay-ads .column-shop-price {
   width: 90px;
 }
 .wp-list-table.wp-list-ebay-ads .column-description {
   width: auto;
 }
-.wp-list-table.wp-list-ebay-ads .column-categories {
+.wp-list-table.wp-list-ebay-ads .column-shop-categories {
   width: auto;
 }
-.wp-list-table.wp-list-ebay-ads .column-brands {
+.wp-list-table.wp-list-ebay-ads .column-shop-brands {
   width: auto;
 }
 .wp-list-table.wp-list-ebay-ads .column-content {
   position: relative;
 }
-.wp-list-table.wp-list-ebay-ads .column.shop {
+.wp-list-table.wp-list-ebay-ads [class*="column-shop-"] {
   background-color: rgb(193 227 250 / 12%);
 }
 .wp-list-table.wp-list-ebay-ads [id*="-wbp-action"] {
   position: relative;
+}
+.wp-list-table.wp-list-ebay-ads tr[class*="diff-"] {
+  background-color: #ff00001e;
 }
 .wp-list-table.wp-list-ebay-ads .column-content .spinner {
   position: absolute;
@@ -241,7 +245,7 @@ section .summary .count:nth-child(2) {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  width: 110px;
+  width: 130px;
 }
 .wp-list-table.wp-list-ebay-ads .column-content .dashicons {
   font-size: 1em;
@@ -267,3 +271,4 @@ section .summary .count:nth-child(2) {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
+
