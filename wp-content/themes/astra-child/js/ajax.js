@@ -125,7 +125,7 @@ jQuery(document).ready(function ($) {
         }, 500);
       },
       error: (error) => {
-        $(el).removeClass('busy');
+        $(el).parents("td").removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("ebay:data-import"), {
@@ -173,7 +173,7 @@ jQuery(document).ready(function ($) {
         }, 500);
       },
       error: (error) => {
-        $(el).removeClass("busy");
+        $(el).parents("td").removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("ebay:data-import"), {
@@ -224,7 +224,7 @@ jQuery(document).ready(function ($) {
         screen,
       },
       beforeSend: () => {
-        $(el).addClass("busy");
+        $(el).parents("td").addClass("busy");
         $(el).html("Hole Daten...");
       },
       success: (data) => {
@@ -235,13 +235,13 @@ jQuery(document).ready(function ($) {
             processDataImport(json, el, removeSpinner);
           }, 500);
         } else {
-          $(el).removeClass("busy");
+          $(el).parents("td").removeClass("busy");
           $(el).html("Fehler");
           removeSpinner();
         }
       },
       error: (error) => {
-        $(el).removeClass("busy");
+        $(el).parents("td").removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("ebay:data-import"), {
@@ -289,7 +289,7 @@ jQuery(document).ready(function ($) {
         screen,
       },
       beforeSend: () => {
-        $(el).addClass('busy');
+        $(el).parents("td").addClass("busy");
         $(el).html("Hole Fotos...");
       },
       success: (data) => {
@@ -301,7 +301,7 @@ jQuery(document).ready(function ($) {
             processImageImport(json, el, removeSpinner);
           }, 500);
         } else {
-          $(el).removeClass("busy");
+          $(el).parents("td").removeClass("busy");
           $(el).html("Fehler");
           removeSpinner();
         }
@@ -337,7 +337,7 @@ jQuery(document).ready(function ($) {
 
     const error_callback = () => {
       el.innerHTML = "Fehler";
-      $(el).removeClass("busy");
+      $(el).parents("td").removeClass("busy");
       spinner?.classList.remove("is-active");
     };
 
@@ -373,7 +373,7 @@ jQuery(document).ready(function ($) {
         screen,
       },
       beforeSend: () => {
-        $(el).addClass("busy");
+        $(el).parents("td").addClass("busy");
         $(el).html("Moment...");
       },
       success: (data) => parseResponse(data, el),
@@ -430,7 +430,7 @@ jQuery(document).ready(function ($) {
           setTimeout(() => {
             rowEl.dispatchEvent(
               new CustomEvent("data:action", {
-                detail: { action: el.dataset.action},
+                detail: { action: el.dataset.action },
               })
             );
           }, 200);
@@ -601,10 +601,10 @@ jQuery(document).ready(function ($) {
       },
       success: (data) => {
         $(el).html("Fertig");
-        if(!$(el).data('bulk-action')) {
+        if (!$(el).data("bulk-action")) {
           alert(msg);
         } else {
-          $(el).data('image-count', images.length);
+          $(el).data("image-count", images.length);
         }
         setTimeout(() => parseResponse(data, el, callback), 2000);
       },

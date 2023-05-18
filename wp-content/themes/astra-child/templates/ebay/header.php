@@ -6,7 +6,7 @@
         <div class="">
 
           <h2><?php echo sprintf(__('Seite: %s', 'wbp'), $page) ?></h2>
-          <h2><small><?php echo sprintf(__('Anzeigen: %s (Gesamt: %d)', 'wbp'), count($data->ads), $total); ?></small></h2>
+          <h2><small><?php echo sprintf(__('Anzeigen: %s', 'wbp'), count($data->ads)); ?><span style="padding-left: 20px; font-size: 0.8em; font-weight: 100;"><?php echo sprintf(__('(Gesamt: %d)', 'wbp'), $total); ?></span></small></h2>
           <h4><small>
               <?php foreach ($categories as $category) { ?>
                 <?php echo sprintf(__('%s (%s)', 'wbp'), $category->title, $category->totalAds) ?>
@@ -72,9 +72,8 @@
   </div>
   <div class="right-sections">
     <section id="color-definitions">
-      <div class="section-inner">
+      <div class="section-inner" style="padding-top: 50px;">
 
-        <h4>Farbschlüssel</h4>
         <div class="box-wrapper">
           <span class="status-wrapper">
             <span class="color-box status connected-publish"><?php echo count($products['publish']) ?></span>
@@ -87,7 +86,7 @@
             <span class="description">Entwurf </span>
           </span>
         </div>
-        <div class="box-wrapper divider-bottom">
+        <div class="box-wrapper">
           <span class="status-wrapper">
             <span class="color-box status invalid"><?php echo count($products['unknown']) ?></span>
             <span class="description">Unbekannt</span>
@@ -97,6 +96,36 @@
           <span class="status-wrapper">
             <span class="color-box status disconnected"><span class="inner"><?php echo count($products['no-sku']) ?></span></span>
             <span class="description">Nicht verknüpft</span>
+          </span>
+        </div>
+        <div class="box-wrapper summary-status divider-top">
+          <span class="status-wrapper">
+            <?php if (0 === count($todos)) : ?>
+
+              <i class="dashicons dashicons-yes"></i><?php echo  __('Alles erledigt');
+                                                    else : ?>
+              <span class="trigger">
+                <?php if (1 === count($todos)) :
+                                                        echo sprintf(__('%d Meldung'), count($todos));
+                                                      else :
+                                                        echo sprintf(__('%d Meldungen'), count($todos)); ?>
+                  <i class="dashicons dashicons-arrow-right"></i>
+                  <i class="dashicons dashicons-arrow-down"></i>
+              </span>
+              <div class="outer">
+                <div class="content">
+                  <ul>
+                    <?php foreach ($todos as $todo) { ?>
+                      <li class="todo">
+                        <span class="title"><?php echo $todo['title'] ?>:</span>
+                        <span class="reason"><?php echo $todo['reason'] ?></span>
+                      </li>
+                    <?php } ?>
+                  </ul class="todos">
+                </div>
+              </div>
+            <?php endif ?>
+          <?php endif ?>
           </span>
         </div>
       </div>
@@ -111,6 +140,10 @@
     } = ajax_object;
 
     init_head();
+
+    $('.trigger').click(function() {
+      $(this).toggleClass('active');
+    })
 
   })
 </script>

@@ -37,6 +37,9 @@ class Ebay_List_Table extends WP_List_Table
     parent::display();
   }
 
+  protected const INVISIBLE = 'Nicht sichtbar';
+  protected const PRICE_DIFF = 'Preisdifferenz';
+
   /**
    * @Build Head
    */
@@ -53,7 +56,7 @@ class Ebay_List_Table extends WP_List_Table
       }
     }
 
-    $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array());
+    $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array(), 'todos' => array());
     foreach ($this->items as $item) {
 
       $product_by_sku = wbp_get_product_by_sku($item->id);
@@ -62,25 +65,27 @@ class Ebay_List_Table extends WP_List_Table
       }
       $product = $product_by_sku ?? $product_by_title ?? false;
       $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null ;
+      $product ? ($this->has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Ebay_List_Table::PRICE_DIFF) : null) : null;
 
       if ($product) {
-        $id = $product->get_id();
         switch ($product->get_status()) {
           case 'publish':
-            $products['publish'][] = $id;
+            $products['publish'][] = $product;
             break;
           case 'draft':
-            $products['draft'][] = $id;
+            $products['draft'][] = $product;
+            $products['todos'][] = array('title' => $item->title, 'reason' => Ebay_List_Table::INVISIBLE);
             break;
           default:
-            $products['other'][] = $id;
-        }
-      } else {
-        $products['unknown'][] = $item->id;
+            $products['other'][] = $product;
+          }
+        } else {
+          $products['unknown'][] = $item->id;
+          $products['todos'][] = array('title' => $item->title, 'reason' => Ebay_List_Table::INVISIBLE);
       }
     }
-
-    wbp_include_ebay_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'products' => $products));
+    $todos = count($products['todos']);
+    wbp_include_ebay_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'products' => $products, 'todos' => $products['todos']));
   }
 
   /**
@@ -251,6 +256,15 @@ class Ebay_List_Table extends WP_List_Table
     );
   }
 
+  function has_price_diff($record, $product) {
+    $regex = '/^([\d.]+)/';
+      preg_match($regex, $record->price, $matches);
+      $raw_ebay_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+      $raw_shop_price = $product->get_price();
+
+      return $raw_ebay_price !== $raw_shop_price;
+  }
+
   function setData($data)
   {
     $this->data = $data;
@@ -273,15 +287,8 @@ class Ebay_List_Table extends WP_List_Table
     $cats = array();
 
     if ($product) {
-
-      $regex = '/^([\d.]+)/';
-      preg_match($regex, $record->price, $matches);
-      $raw_ebay_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
-
-      $raw_shop_price = $product->get_price();
-      $price = wc_price($raw_shop_price);
-
-      if($raw_ebay_price !== $raw_shop_price) $diff_classes[] = 'diff-price';
+      $price = wc_price($product->get_price());
+      if($this->has_price_diff($record, $product)) $diff_classes[] = 'diff-price';
     } else {
       $price = '';
     }

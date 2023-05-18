@@ -37,6 +37,19 @@ function wbp_sanitize_excerpt($content, $count)
   return substr($content, 0, $count);
 }
 
+function remote_call($url, $tries = 3, $retry = 1)
+{
+  $response = wp_remote_get($url);
+
+  if (($response['response']['code'] === 200)) {
+    return $response;
+  } elseif($retry++ < $tries) {
+    sleep($retry * 2);
+    return remote_call($url, $tries, $retry);
+  }
+  return $response;
+}
+
 function wbp_get_remote()
 {
   if (isset($_REQUEST['formdata'])) {
@@ -50,8 +63,8 @@ function wbp_get_remote()
   } else {
     $remoteUrl = home_url();
   }
-
-  $response = wp_remote_get($remoteUrl);
+  
+  $response = remote_call($remoteUrl, 5);
 
   echo json_encode(
     [

@@ -11,7 +11,7 @@
   </div>
   <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="hidden">
     <span class="spinner"></span>
-    <a data-action="publish-post" id="publish-post-<?php echo $post_id ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-ebay-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Draft') : __('Publish') ?></a>
+    <a data-action="publish-post" id="publish-post-<?php echo $post_id ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-ebay-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><?php echo ($post_status === 'publish') ?  __('Draft') : __('Publish') ?></a>
   </div>
 
 <?php }
