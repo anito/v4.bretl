@@ -247,9 +247,11 @@ jQuery(document).ready(function ($) {
         el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
           detail: { success: false, error },
         });
-
+        
         removeSpinner();
-        console.log(error);
+        
+        const {responseText} = error;
+        console.log(responseText);
       },
     });
   }
