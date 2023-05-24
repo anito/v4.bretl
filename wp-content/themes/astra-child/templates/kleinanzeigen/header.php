@@ -1,6 +1,6 @@
 <div class="section-wrapper">
   <div class="left-sections">
-    <section class="wbp-ebay-section">
+    <section class="wbp-kleinanzeigen-section">
       <div class="section-inner">
 
         <div class="">
@@ -18,7 +18,7 @@
         <div class="pagination">
           <?php for ($i = 1; $i <= $pages; $i++) {
           ?>
-            <a href="<?php echo EBAY_CUSTOMER_URL . '?pageNum=' . $i ?>" type="button" class="button <?php echo ($i == (int) $page ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
+            <a href="<?php echo KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $i ?>" type="button" class="button <?php echo ($i == (int) $page ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
           <?php } ?>
         </div>
       </div>

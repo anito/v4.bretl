@@ -9,8 +9,8 @@ class Ebay_List_Table extends WP_List_Table
   function __construct()
   {
     parent::__construct(array(
-      'singular' => 'wp-list-ebay-ad',
-      'plural' => 'wp-list-ebay-ads',
+      'singular' => 'wp-list-kleinanzeigen-ad',
+      'plural' => 'wp-list-kleinanzeigen-ads',
       'ajax' => true
     ));
   }
@@ -85,7 +85,7 @@ class Ebay_List_Table extends WP_List_Table
       }
     }
     $todos = count($products['todos']);
-    wbp_include_ebay_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'products' => $products, 'todos' => $products['todos']));
+    wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'products' => $products, 'todos' => $products['todos']));
   }
 
   /**
@@ -259,10 +259,10 @@ class Ebay_List_Table extends WP_List_Table
   function has_price_diff($record, $product) {
     $regex = '/^([\d.]+)/';
       preg_match($regex, $record->price, $matches);
-      $raw_ebay_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+      $raw_kleinanzeigen_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
       $raw_shop_price = $product->get_price();
 
-      return $raw_ebay_price !== $raw_shop_price;
+      return $raw_kleinanzeigen_price !== $raw_shop_price;
   }
 
   function setData($data)
@@ -340,10 +340,10 @@ class Ebay_List_Table extends WP_List_Table
             $icon = 'editor-unlink';
             $type = 'link';
           }
-          $ebay_actions =
+          $kleinanzeigen_actions =
             '<div>' .
-            wbp_include_ebay_template('dashboard/ebay-actions.php', true, array_merge(compact('post_id', 'record', 'post_status', 'classes'), array('connected' => $product_by_sku))) .
-            wbp_include_ebay_template('dashboard/ebay-activate-control.php', true, compact('post_id', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
+            wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_id', 'record', 'post_status', 'classes'), array('connected' => $product_by_sku))) .
+            wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-activate-control.php', true, compact('post_id', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
             '</div>';
         }
 
@@ -353,8 +353,8 @@ class Ebay_List_Table extends WP_List_Table
           $status = $post_status === 'publish' ? 'connected-publish' : ($post_status === 'draft' ? 'connected-draft' : 'connected-unknown');
           $shop_actions =
             '<div>' .
-            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
-            wbp_include_ebay_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
+            wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_kleinanzeigen_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
             '</div>';
         } elseif ($product) {
 
@@ -364,8 +364,8 @@ class Ebay_List_Table extends WP_List_Table
           $icon = 'admin-links';
           $shop_actions =
             '<div>' .
-            wbp_include_ebay_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
-            wbp_include_ebay_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
+            wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_kleinanzeigen_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
             '</div>';
         } else {
 
@@ -374,7 +374,7 @@ class Ebay_List_Table extends WP_List_Table
           $action = 'create';
           $icon = 'plus';
           $type = 'button';
-          $ebay_actions = wbp_include_ebay_template('dashboard/ebay-activate-control.php', true, compact('record', 'label', 'action', 'icon', 'type'));
+          $kleinanzeigen_actions = wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-activate-control.php', true, compact('record', 'label', 'action', 'icon', 'type'));
           $shop_actions = '';
         }
 
@@ -389,7 +389,7 @@ class Ebay_List_Table extends WP_List_Table
           case "image": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><a href="<?php echo EBAY_URL . stripslashes($record->url) ?>" target="_blank"><img src="<?php echo stripslashes($record->image) ?>" width="128" /></a></div>
+                <div class="column-content"><a href="<?php echo KLEINANZEIGEN_URL . stripslashes($record->url) ?>" target="_blank"><img src="<?php echo stripslashes($record->image) ?>" width="128" /></a></div>
               </td>
             <?php
               break;
@@ -405,7 +405,7 @@ class Ebay_List_Table extends WP_List_Table
           case "title": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><a href="<?php echo EBAY_URL . stripslashes($record->url) ?>" target="_blank"><?php echo $record->title ?></a></div>
+                <div class="column-content"><a href="<?php echo KLEINANZEIGEN_URL . stripslashes($record->url) ?>" target="_blank"><?php echo $record->title ?></a></div>
               </td>
             <?php
               break;
@@ -461,7 +461,7 @@ class Ebay_List_Table extends WP_List_Table
           case "shop-actions-import": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo $ebay_actions ?></div>
+                <div class="column-content"><?php echo $kleinanzeigen_actions ?></div>
               </td>
             <?php
               break;
@@ -489,51 +489,51 @@ class Ebay_List_Table extends WP_List_Table
 
           const post_id = "<?php echo $product ? $post_id : '' ?>";
           const record = <?php echo json_encode($record) ?>;
-          const ebay_id = record.id;
+          const kleinanzeigen_id = record.id;
 
-          const publishEl = $(`#ad-id-${ebay_id} #publish-post-${post_id}`);
+          const publishEl = $(`#ad-id-${kleinanzeigen_id} #publish-post-${post_id}`);
           $(publishEl).on('click', function(e) {
             e.preventDefault();
 
             publishPost(e);
           })
 
-          const connEl = $(`#ad-id-${ebay_id} a[data-action^=connect-]`);
+          const connEl = $(`#ad-id-${kleinanzeigen_id} a[data-action^=connect-]`);
           $(connEl).on('click', function(e) {
             e.preventDefault();
 
             connectEbay(e);
           })
 
-          const disconnEl = $(`#ad-id-${ebay_id} a[data-action^=disconnect-]`);
+          const disconnEl = $(`#ad-id-${kleinanzeigen_id} a[data-action^=disconnect-]`);
           $(disconnEl).on('click', function(e) {
             e.preventDefault();
 
             disconnectEbay(e);
           })
 
-          const createEl = $(`#ad-id-${ebay_id} a[data-action=create]`);
+          const createEl = $(`#ad-id-${kleinanzeigen_id} a[data-action=create]`);
           $(createEl).on('click', function(e) {
             e.preventDefault();
 
             createPost(e);
           })
 
-          const impDataEl = $(`#ad-id-${ebay_id} a[data-action^=import-data-]`);
+          const impDataEl = $(`#ad-id-${kleinanzeigen_id} a[data-action^=import-data-]`);
           $(impDataEl).on('click', function(e) {
             e.preventDefault();
 
             importData(e);
           })
 
-          const impImagesEl = $(`#ad-id-${ebay_id} a[data-action^=import-images-]`);
+          const impImagesEl = $(`#ad-id-${kleinanzeigen_id} a[data-action^=import-images-]`);
           $(impImagesEl).on('click', function(e) {
             e.preventDefault();
 
             importImages(e);
           })
 
-          const delEl = $(`#ad-id-${ebay_id} a[data-action=delete-post]`)
+          const delEl = $(`#ad-id-${kleinanzeigen_id} a[data-action=delete-post]`)
           $(delEl).on('click', function(e) {
             e.preventDefault();
 
@@ -543,7 +543,7 @@ class Ebay_List_Table extends WP_List_Table
             deletePost(e);
           })
 
-          const trEl = $(`#ad-id-${ebay_id}`);
+          const trEl = $(`#ad-id-${kleinanzeigen_id}`);
           trEl.get()[0].addEventListener('data:action', (e) => {
 
             if ('create' === e.detail?.action) {

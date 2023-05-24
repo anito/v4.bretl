@@ -78,7 +78,7 @@ function wbp_wc_screen_styles($hook)
 
 function wbp_publish_guard($data)
 {
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
+  require_once __DIR__ . '/includes/kleinanzeigen-ajax-handler.php';
   if (!is_valid_title($data['post_title']) && $data['post_status'] == 'publish') {
     $data['post_status'] = 'draft';
     // prevent adding duplicate DUPLIKAT info to title
@@ -98,14 +98,14 @@ function wbp_quick_edit_product_save($post)
   };
 }
 
-function wbp_get_ebay_url($id)
+function wbp_get_kleinanzeigen_url($id)
 {
-  return EBAY_URL . ($id ? '/s-' . $id . '/k0' : '/');
+  return KLEINANZEIGEN_URL . ($id ? '/s-' . $id . '/k0' : '/');
 }
 
-function wbp_get_ebay_json_url($page)
+function wbp_get_kleinanzeigen_json_url($page)
 {
-  return EBAY_CUSTOMER_URL . '?pageNum=' . $page ?? 1;
+  return KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $page ?? 1;
 }
 
 function wbp_save_post($post_ID, $post)
@@ -125,7 +125,7 @@ function wbp_save_post($post_ID, $post)
 
   require_once __DIR__ . '/includes/product-term-handler.php';
   wbp_process_sale($post_ID, $post);
-  wbp_process_ebay($post_ID, $post);
+  wbp_process_kleinanzeigen($post_ID, $post);
 }
 add_action("save_post", "wbp_save_post", 99, 3);
 add_action("save_post", "wbp_quick_edit_product_save", 99, 3);
@@ -258,7 +258,7 @@ function wbp_add_admin_ajax_scripts()
 {
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
-  // ebay doesn't accept a wc_remote_get from referrers w/o valid certificates
+  // kleinanzeigen doesn't accept a wc_remote_get from referrers w/o valid certificates
   // if validation fails, fallback to https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php
   $valid_cert = !!check_cert();
   $admin_ajax_local = admin_url('admin-ajax.php');
@@ -319,14 +319,14 @@ function _ajax_publish_post()
   wbp_ajax_toggle_publish_post();
 }
 
-function _ajax_import_ebay_data()
+function _ajax_import_kleinanzeigen_data()
 {
-  wbp_ajax_import_ebay_data();
+  wbp_ajax_import_kleinanzeigen_data();
 }
 
-function _ajax_import_ebay_images()
+function _ajax_import_kleinanzeigen_images()
 {
-  wbp_ajax_import_ebay_images();
+  wbp_ajax_import_kleinanzeigen_images();
 }
 
 function _ajax_delete_post()
@@ -384,7 +384,7 @@ if (is_admin()) {
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 10);
   add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');
 
-  require_once __DIR__ . '/includes/ebay-ajax-handler.php';
+  require_once __DIR__ . '/includes/kleinanzeigen-ajax-handler.php';
   require_once __DIR__ . '/includes/ajax-table.php';
 
   add_action('wp_ajax__ajax_connect', '_ajax_connect');
@@ -394,8 +394,8 @@ if (is_admin()) {
   add_action('wp_ajax__ajax_delete_post', '_ajax_delete_post');
   add_action('wp_ajax__ajax_publish_post', '_ajax_publish_post');
   add_action('wp_ajax__ajax_delete_images', '_ajax_delete_images');
-  add_action('wp_ajax__ajax_import_ebay_data', '_ajax_import_ebay_data');
-  add_action('wp_ajax__ajax_import_ebay_images', '_ajax_import_ebay_images');
+  add_action('wp_ajax__ajax_import_kleinanzeigen_data', '_ajax_import_kleinanzeigen_data');
+  add_action('wp_ajax__ajax_import_kleinanzeigen_images', '_ajax_import_kleinanzeigen_images');
   add_action('wp_ajax__ajax_get_product_categories', '_ajax_get_product_categories');
 
   add_action('wp_ajax_nopriv__ajax_connect', '_ajax_connect');
@@ -405,8 +405,8 @@ if (is_admin()) {
   add_action('wp_ajax_nopriv__ajax_delete_post', '_ajax_delete_post');
   add_action('wp_ajax_nopriv__ajax_publish_post', '_ajax_publish_post');
   add_action('wp_ajax_nopriv__ajax_delete_images', '_ajax_delete_images');
-  add_action('wp_ajax_nopriv__ajax_import_ebay_data', '_ajax_import_ebay_data');
-  add_action('wp_ajax_nopriv__ajax_import_ebay_images', '_ajax_import_ebay_images');
+  add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_data', '_ajax_import_kleinanzeigen_data');
+  add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_images', '_ajax_import_kleinanzeigen_images');
   add_action('wp_ajax_nopriv__ajax_get_product_categories', '_ajax_get_product_categories');
 }
 
@@ -579,8 +579,8 @@ function wbp_product_custom_fields()
 
   woocommerce_wp_text_input(
     array(
-      'id' => 'ebay_url',
-      'label' => __('EBAY URL', 'astra-child'),
+      'id' => 'kleinanzeigen_url',
+      'label' => __('KLEINANZEIGEN URL', 'astra-child'),
       'placeholder' => 'Link to eBay Kleinanzeigen',
       'desc_tip' => 'true',
       'description' => __("Enable eBay link for this product", 'astra-child'),
@@ -593,8 +593,8 @@ function wbp_product_custom_fields()
 function wbp_product_custom_fields_save($post_id)
 {
   // Custom Product Text Field
-  if (isset($_POST['ebay_url']))
-    update_post_meta($post_id, 'ebay_url', esc_attr($_POST['ebay_url']));
+  if (isset($_POST['kleinanzeigen_url']))
+    update_post_meta($post_id, 'kleinanzeigen_url', esc_attr($_POST['kleinanzeigen_url']));
 }
 // add_action('woocommerce_product_options_general_product_data', 'wbp_product_custom_fields');
 // add_action('woocommerce_process_product_meta', 'wbp_product_custom_fields_save');
@@ -608,70 +608,70 @@ function custom_elementor_placeholder_image()
 }
 add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');
 
-function wbp_add_ebay_admin_menu_page()
+function wbp_add_kleinanzeigen_admin_menu_page()
 {
   $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJ1dWlkLWNmNTA5MjcyLTAwZTItNGIyZS1iZmVlLTU2ZWYwOWQ4YTA0ZiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTE0Ljk4IDEzMC45OCI+PGcgaWQ9InV1aWQtZGFkMmZmYTQtODM3Ny00ODc2LTg5NjQtZDc4MTJhYTQ0ZTkxIj48cGF0aCBkPSJtODQuOTksMTMwLjk4Yy0xNy41NiwwLTI2LjE1LTEyLjI1LTI3Ljg5LTE0Ljc5LTUuMTgsNS4xLTEzLjAxLDE0Ljc5LTI3LjEsMTQuNzktMTYuMjcsMC0yOS45OS0xMi4zLTI5Ljk5LTMyLjI0VjMyLjI0QzAsMTIuMjUsMTMuNzQsMCwyOS45OSwwczI5Ljk5LDEzLjAyLDI5Ljk5LDMxLjk0YzMuMTctMS4xMyw2LjU0LTEuNzEsMTAtMS43MSwxNi43NCwwLDI5Ljk5LDEzLjczLDI5Ljk5LDMwLjIzLDAsNC42My0uODcsOC43NC0yLjc5LDEyLjY4LDEwLjYyLDQuNzYsMTcuNzgsMTUuNDYsMTcuNzgsMjcuNjMsMCwxNi42Ny0xMy40NiwzMC4yMy0yOS45OSwzMC4yM1ptLTIwLjY0LTIyLjA5YzQuMzEsNy41NSwxMS41NywxMi4wMiwyMC42NCwxMi4wMiwxMS4wMiwwLDIwLTkuMDQsMjAtMjAuMTUsMC04Ljc5LTUuNjEtMTYuNDQtMTMuNjctMTkuMTNsLTI2Ljk3LDI3LjI2aDBaTTMwLDEwLjA4Yy05Ljk1LDAtMjAsNi44NS0yMCwyMi4xN3Y2Ni41YzAsMTUuMzEsMTAuMDQsMjIuMTcsMjAsMjIuMTcsNy45LDAsMTIuMjctNC4wMiwxOS4zMS0xMS4xMmwzLjEyLTMuMTRjLTEuNjEtNC44My0yLjQ0LTEwLjItMi40NC0xNS45N3YtNTguNDRjMC0xNS4zMS0xMC4wNC0yMi4xNy0yMC0yMi4xN2gwWm0yOS45OSwzMi45MnY0Ny42OWMwLDIuNy4yMyw1LjI3LjY1LDcuNjlsMjEuNzMtMjEuOWM2LjMxLTYuMzYsNy42MS0xMSw3LjYxLTE2LjAxLDAtMTAuNy04LjU0LTIwLjE1LTIwLTIwLjE1LTMuNTcsMC02Ljk4LjkyLTEwLDIuNjloMFoiIGZpbGw9IiMxZDRiMDAiLz48L2c+PC9zdmc+';
 
-  add_menu_page('kleinanzeigen', 'kleinanzeigen', 'edit_posts', 'ebay', 'wbp_display_ebay_list', $icon_svg, 10);
-  if (!empty($_GET['page']) && 'ebay' == $_GET['page']) {
+  add_menu_page('kleinanzeigen', 'kleinanzeigen', 'edit_posts', 'kleinanzeigen', 'wbp_display_kleinanzeigen_list', $icon_svg, 10);
+  if (!empty($_GET['page']) && 'kleinanzeigen' == $_GET['page']) {
 
-    if (!defined('EBAY_TEMPLATE_PATH')) {
-      define('EBAY_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/ebay/');
+    if (!defined('KLEINANZEIGEN_TEMPLATE_PATH')) {
+      define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/kleinanzeigen/');
     }
     require_once __DIR__ . '/includes/ajax-table.php';
 
-    wbp_ebay_register_scripts();
+    wbp_kleinanzeigen_register_scripts();
     register_admin_content();
   }
 }
-add_action('admin_menu', 'wbp_add_ebay_admin_menu_page');
+add_action('admin_menu', 'wbp_add_kleinanzeigen_admin_menu_page');
 
-function wbp_display_ebay_list()
+function wbp_display_kleinanzeigen_list()
 {
 
-  echo '<div id="wbp-ebay-wrap">';
+  echo '<div id="wbp-kleinanzeigen-wrap">';
 
-  wbp_include_ebay_template('page-header.php');
+  wbp_include_kleinanzeigen_template('page-header.php');
 
-  do_action('wbp_ebay_admin_after_header');
+  do_action('wbp_kleinanzeigen_admin_after_header');
 
   echo '<div id="pages-results"></div>';
 
-  $pages = wbp_ebay_get_submenu_items();
+  $pages = wbp_kleinanzeigen_get_submenu_items();
 
   foreach ($pages as $page) {
     if (isset($page['menu_slug'])) {
-      wbp_ebay_display_admin_page($page['menu_slug']);
+      wbp_kleinanzeigen_display_admin_page($page['menu_slug']);
     }
   }
 
-  do_action('wbp_ebay_admin_before_closing_wrap');
+  do_action('wbp_kleinanzeigen_admin_before_closing_wrap');
 
   // closes main plugin wrapper div. #wp-optimize-wrap
-  echo '</div><!-- END #wbp-ebay-wrap -->';
+  echo '</div><!-- END #wbp-kleinanzeigen-wrap -->';
 }
 
 function register_admin_content()
 {
-  add_action('wbp_ebay_admin_page_wbp_ebay_dashboard', 'output_dashboard_tab', 20);
+  add_action('wbp_kleinanzeigen_admin_page_wbp_kleinanzeigen_dashboard', 'output_dashboard_tab', 20);
 }
 
-function wbp_ebay_register_scripts()
+function wbp_kleinanzeigen_register_scripts()
 {
-  add_action('admin_enqueue_scripts', 'wbp_ebay_admin_enqueue_styles');
+  add_action('admin_enqueue_scripts', 'wbp_kleinanzeigen_admin_enqueue_styles');
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts');
 }
 
-function wbp_ebay_admin_enqueue_styles()
+function wbp_kleinanzeigen_admin_enqueue_styles()
 {
-  wp_enqueue_style('ajax-ebay-json', get_stylesheet_directory_uri() . '/style-admin-ebay.css');
+  wp_enqueue_style('ajax-kleinanzeigen-json', get_stylesheet_directory_uri() . '/style-admin-kleinanzeigen.css');
 }
 
-function wbp_include_ebay_template($path, $return_instead_of_echo = false, $extract_these = array())
+function wbp_include_kleinanzeigen_template($path, $return_instead_of_echo = false, $extract_these = array())
 {
   if ($return_instead_of_echo) ob_start();
 
-  $template_file = EBAY_TEMPLATE_PATH . $path;
+  $template_file = KLEINANZEIGEN_TEMPLATE_PATH . $path;
 
   if (!file_exists($template_file)) {
     error_log("WBP Ebay: template not found: " . $template_file);
@@ -684,13 +684,13 @@ function wbp_include_ebay_template($path, $return_instead_of_echo = false, $extr
   if ($return_instead_of_echo) return ob_get_clean();
 }
 
-function wbp_ebay_get_submenu_items()
+function wbp_kleinanzeigen_get_submenu_items()
 {
   $sub_menu_items = array(
     array(
       'page_title' => __('Dashborad', 'wbp'),
       'menu_title' => __('Dashboard', 'wbp'),
-      'menu_slug' => 'wbp_ebay_dashboard',
+      'menu_slug' => 'wbp_kleinanzeigen_dashboard',
       'function' => 'display_admin',
       'icon' => 'admin-settings',
       'create_submenu' => true,
@@ -701,38 +701,38 @@ function wbp_ebay_get_submenu_items()
   return $sub_menu_items;
 }
 
-function wbp_ebay_display_admin_page($page)
+function wbp_kleinanzeigen_display_admin_page($page)
 {
 
   $active_page = !empty($_REQUEST['page']) ? $_REQUEST['page'] : '';
 
-  echo '<div class="wbp-ebay-page' . ($active_page == $page ? ' active' : '') . '" data-whichpage="' . $page . '">';
+  echo '<div class="wbp-kleinanzeigen-page' . ($active_page == $page ? ' active' : '') . '" data-whichpage="' . $page . '">';
 
-  echo '<div class="wbp-ebay-main">';
+  echo '<div class="wbp-kleinanzeigen-main">';
 
 
   // if no tabs defined for $page then use $page as $active_tab for load template, doing related actions e t.c.
   $active_tab = $page;
 
-  do_action('wbp_ebay_admin_page_' . $page, $active_tab);
+  do_action('wbp_kleinanzeigen_admin_page_' . $page, $active_tab);
 
-  echo '</div><!-- END .wbp-ebay-main -->';
+  echo '</div><!-- END .wbp-kleinanzeigen-main -->';
 
-  do_action('wbp_ebay_admin_after_page_' . $page, $active_tab);
+  do_action('wbp_kleinanzeigen_admin_after_page_' . $page, $active_tab);
 
-  echo '</div><!-- END .wbp-ebay-page -->';
+  echo '</div><!-- END .wbp-kleinanzeigen-page -->';
 }
 
 function output_dashboard_tab()
 {
-  wbp_include_ebay_template('dashboard/dashboard.php', false, array('pages' => 5, 'load_data' => false));
+  wbp_include_kleinanzeigen_template('dashboard/dashboard.php', false, array('pages' => 5, 'load_data' => false));
 }
 
 
 function wbp_get_json_data($page)
 {
-  setcookie('ebay-table-page', $page);
-  $remoteUrl = wbp_get_ebay_json_url($page);
+  setcookie('kleinanzeigen-table-page', $page);
+  $remoteUrl = wbp_get_kleinanzeigen_json_url($page);
   $response = get_remote($remoteUrl);
   // $response = file_get_contents(__DIR__ . '/sample' . $page . '.json');
   return json_decode($response);
@@ -744,7 +744,7 @@ function get_remote($url)
   if (!is_wp_error($response)) {
     return $response['body'];
   } else {
-    wbp_include_ebay_template('error-message.php');
+    wbp_include_kleinanzeigen_template('error-message.php');
   }
 }
 

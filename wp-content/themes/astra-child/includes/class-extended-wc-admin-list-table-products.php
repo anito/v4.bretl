@@ -59,21 +59,21 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
     switch ($column_name) {
       case 'sku': {
-          echo '<a href="' . esc_html(wbp_get_ebay_url($sku)) . '" target="_blank"</a>';
+          echo '<a href="' . esc_html(wbp_get_kleinanzeigen_url($sku)) . '" target="_blank"</a>';
           break;
         }
       case 'sync': {
 ?>
           <div class="sync-column-content">
-            <div id="import-ebay-data-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
+            <div id="import-kleinanzeigen-data-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
-              <a id="import-ebay-data-<?php echo $post_id ?>" disabled name="import-ebay-data" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-data button button-primary button-small" style="">Daten importieren</a>
+              <a id="import-kleinanzeigen-data-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-data" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-data button button-primary button-small" style="">Daten importieren</a>
             </div>
-            <div id="import-ebay-images-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
+            <div id="import-kleinanzeigen-images-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
-              <span class="ebay-images-wrapper" style="display: flex;">
-                <a id="import-ebay-images-<?php echo $post_id ?>" disabled name="import-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-ebay-images button button-primary button-small" style="">Fotos importieren</a>
-                <a id="delete-ebay-images-<?php echo $post_id ?>" name="delete-ebay-images" data-ebay-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-ebay-images button button-primary button-small" style="">
+              <span class="kleinanzeigen-images-wrapper" style="display: flex;">
+                <a id="import-kleinanzeigen-images-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-images button button-primary button-small" style="">Fotos importieren</a>
+                <a id="delete-kleinanzeigen-images-<?php echo $post_id ?>" name="delete-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-kleinanzeigen-images button button-primary button-small" style="">
                   <i class="dashicons dashicons-trash" style="font-size: 1.3em; vertical-align: middle"></i>
                 </a>
               </span>
@@ -97,9 +97,9 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
               const tr = document.getElementById('post-<?php echo $post_id ?>');
               const publishButton = tr?.querySelector('#publish-post-<?php echo $post_id ?>');
-              const importDataButton = tr?.querySelector('#import-ebay-data-<?php echo $post_id ?>');
-              const importImagesButton = tr?.querySelector('#import-ebay-images-<?php echo $post_id ?>');
-              const deleteImagesButton = tr?.querySelector('#delete-ebay-images-<?php echo $post_id ?>');
+              const importDataButton = tr?.querySelector('#import-kleinanzeigen-data-<?php echo $post_id ?>');
+              const importImagesButton = tr?.querySelector('#import-kleinanzeigen-images-<?php echo $post_id ?>');
+              const deleteImagesButton = tr?.querySelector('#delete-kleinanzeigen-images-<?php echo $post_id ?>');
 
               setTimeout(() => {
                 publishButton?.addEventListener("click", publishPost);

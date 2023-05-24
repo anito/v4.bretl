@@ -4,6 +4,6 @@
   echo 'Leider ist ein Fehler beim Abrufen der Daten aus <strong>Kleinanzeigen</strong> aufgetreten';
   ?>
   <p>
-    <a href="<?php echo admin_url('/admin.php?page=ebay') ?>">Erneut versuchen</a>
+    <a href="<?php echo admin_url('/admin.php?page=kleinanzeigen') ?>">Erneut versuchen</a>
   </p>
 </section>

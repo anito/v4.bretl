@@ -2,7 +2,7 @@
   
   <header id="head-wrap"></header>
 
-  <form name="ebay-list" id="ebay-list" method="get">
+  <form name="kleinanzeigen-list" id="kleinanzeigen-list" method="get">
     
     <input type="hidden" name="page" value="<?php echo $_REQUEST['page']; ?>" />
     <input type="hidden" name="order" value="<?php echo isset($_REQUEST['order']) ? $_REQUEST['order'] : ''; ?>" />

@@ -1,6 +1,6 @@
 <?php
-require_once get_stylesheet_directory() . '/includes/class-admin-ebay-list-table.php';
-define('EBAY_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/ebay/');
+require_once get_stylesheet_directory() . '/includes/class-admin-kleinanzeigen-list-table.php';
+define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/kleinanzeigen/');
 
 /**
  * Action wp_ajax for fetching ajax_response
@@ -8,7 +8,7 @@ define('EBAY_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/ebay/');
 
 function _ajax_fetch_sts_history()
 {
-  setcookie('ebay-table-page', $_REQUEST['pageNum']);
+  setcookie('kleinanzeigen-table-page', $_REQUEST['pageNum']);
   $wp_list_table = new Ebay_List_Table();
   $wp_list_table->ajax_response();
 }
@@ -72,7 +72,7 @@ function fetch_ts_script()
 
   <?php
 
-  if ($screen->id != "toplevel_page_ebay")
+  if ($screen->id != "toplevel_page_kleinanzeigen")
     return;
 
   ?>
@@ -163,7 +163,7 @@ function fetch_ts_script()
             }, delay);
           });
 
-          $('#ebay-list').on('submit', function(e) {
+          $('#kleinanzeigen-list').on('submit', function(e) {
 
             e.preventDefault();
 

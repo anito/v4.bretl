@@ -62,7 +62,7 @@ function wbp_process_featured($product)
   }
 }
 
-function wbp_process_ebay($post_id, $post)
+function wbp_process_kleinanzeigen($post_id, $post)
 {
   global $wpdb;
 
@@ -73,14 +73,14 @@ function wbp_process_ebay($post_id, $post)
   $posts_like_title = $wpdb->get_results($prepare);
 
   $meta = get_post_meta($post_id);
-  $ebay_id = isset($meta['ebay_id'][0]) ? parse_ebay_id($meta['ebay_id'][0]) : "";
+  $kleinanzeigen_id = isset($meta['kleinanzeigen_id'][0]) ? parse_kleinanzeigen_id($meta['kleinanzeigen_id'][0]) : "";
 
-  if (!empty($ebay_id)) {
+  if (!empty($kleinanzeigen_id)) {
     if (empty($title)) {
       wp_insert_post([
         'ID' => $post_id,
         'post_type' => 'product',
-        'post_title' => "Entwurf ID " . $ebay_id
+        'post_title' => "Entwurf ID " . $kleinanzeigen_id
       ]);
     }
     if (count($posts_like_title) >= 2) {
@@ -88,30 +88,30 @@ function wbp_process_ebay($post_id, $post)
         'ID' => $post_id,
         'post_type' => 'product',
         'post_content' => $post->post_content,
-        'post_title' => wp_strip_all_tags(wbp_sanitize_title($title . " [ DUPLIKAT " . 0 . " ID " . $ebay_id . " ]"))
+        'post_title' => wp_strip_all_tags(wbp_sanitize_title($title . " [ DUPLIKAT " . 0 . " ID " . $kleinanzeigen_id . " ]"))
       ]);
     }
 
     try {
-      $product->set_sku($ebay_id);
+      $product->set_sku($kleinanzeigen_id);
     } catch (Exception $e) {
     }
     $product->save();
 
-    update_post_meta((int) $post_id, 'ebay_id', $ebay_id);
-    update_post_meta((int) $post_id, 'ebay_url', wbp_get_ebay_url($ebay_id));
+    update_post_meta((int) $post_id, 'kleinanzeigen_id', $kleinanzeigen_id);
+    update_post_meta((int) $post_id, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($kleinanzeigen_id));
   } else {
     $product->set_sku('');
     $product->save();
 
-    delete_post_meta($post_id, 'ebay_id');
-    delete_post_meta($post_id, 'ebay_url');
+    delete_post_meta($post_id, 'kleinanzeigen_id');
+    delete_post_meta($post_id, 'kleinanzeigen_url');
   }
 
-  // Finally set product 'ebay' tag if sku is present
-  $term = get_term_by('slug', 'ebay', 'product_tag');
+  // Finally set product 'kleinanzeigen' tag if sku is present
+  $term = get_term_by('slug', 'kleinanzeigen', 'product_tag');
   $term_id = $term->term_id;
-  wbp_set_product_term($product, $term_id, 'tag', !empty($ebay_id));
+  wbp_set_product_term($product, $term_id, 'tag', !empty($kleinanzeigen_id));
 }
 
 function wbp_set_product_term($product, $term_id, $type, $bool)
