@@ -101,16 +101,19 @@
         <div class="box-wrapper summary-status divider-top">
           <span class="status-wrapper">
             <?php if (0 === count($todos)) : ?>
-
-              <i class="dashicons dashicons-yes"></i><?php echo  __('Alles erledigt');
-                                                    else : ?>
+              <div>
+                <i class="dashicons dashicons-yes"></i><span><?php echo  __('Alles erledigt'); ?></span>
+              </div>
+            <?php else : ?>
               <span class="trigger">
                 <?php if (1 === count($todos)) :
-                                                        echo sprintf(__('%d Meldung'), count($todos));
-                                                      else :
-                                                        echo sprintf(__('%d Meldungen'), count($todos)); ?>
-                  <i class="dashicons dashicons-arrow-right"></i>
-                  <i class="dashicons dashicons-arrow-down"></i>
+                  echo sprintf(__('%d Meldung'), count($todos));
+                else :
+                  echo sprintf(__('%d Meldungen'), count($todos)); ?>
+
+                <?php endif ?>
+                <i class="dashicons dashicons-arrow-right"></i>
+                <i class="dashicons dashicons-arrow-down"></i>
               </span>
               <div class="outer">
                 <div class="content">
@@ -125,7 +128,6 @@
                 </div>
               </div>
             <?php endif ?>
-          <?php endif ?>
           </span>
         </div>
       </div>

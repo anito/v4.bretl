@@ -24,6 +24,10 @@ body {
   margin: 0;
 }
 
+body {
+  font-family: 'Gibson', sans-serif;
+}
+
 p {
   margin: 0;
   overflow: unset;

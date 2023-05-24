@@ -62,7 +62,7 @@
 }
 
 @font-face {
-    font-family: "canada-type-gibson";
+    font-family: "Gibson";
     src: url("./gibson_700_normal.woff2") format("woff2");
     font-display: auto;
     font-style: normal;
@@ -71,7 +71,7 @@
 }
 
 @font-face {
-    font-family: "canada-type-gibson";
+    font-family: "Gibson";
     src: url("./gibson_700_italic.woff2") format("woff2");
     font-display: auto;
     font-style: italic;
@@ -80,7 +80,7 @@
 }
 
 @font-face {
-    font-family: "canada-type-gibson";
+    font-family: "Gibson";
     src: url("./gibson_400_italic.woff2") format("woff2");
     font-display: auto;
     font-style: italic;
@@ -89,7 +89,7 @@
 }
 
 @font-face {
-    font-family: "canada-type-gibson";
+    font-family: "Gibson";
     src: url("./gibson_400_normal.woff2") format("woff2");
     font-display: auto;
     font-style: normal;
@@ -98,7 +98,7 @@
 }
 
 @font-face {
-    font-family: "canada-type-gibson";
+    font-family: "Gibson";
     src: url("./gibson_100_normal.woff2") format("woff2");
     font-display: auto;
     font-style: normal;
@@ -107,7 +107,7 @@
 }
 
 @font-face {
-    font-family: "canada-type-gibson";
+    font-family: "Gibson";
     src: url("./gibson_100_italic.woff2") format("woff2");
     font-display: auto;
     font-style: italic;
@@ -236,8 +236,8 @@
     font-family: "good-times-bad-times",sans-serif;
 }
 
-.tk-canada-type-gibson {
-    font-family: "canada-type-gibson",sans-serif;
+.tk-Gibson {
+    font-family: "Gibson",sans-serif;
 }
 
 .tk-adobe-handwriting-ernie {
