@@ -107,11 +107,6 @@ function wbp_process_kleinanzeigen($post_id, $post)
     delete_post_meta($post_id, 'kleinanzeigen_id');
     delete_post_meta($post_id, 'kleinanzeigen_url');
   }
-
-  // Finally set product 'kleinanzeigen' tag if sku is present
-  $term = get_term_by('slug', 'kleinanzeigen', 'product_tag');
-  $term_id = $term->term_id;
-  wbp_set_product_term($product, $term_id, 'tag', !empty($kleinanzeigen_id));
 }
 
 function wbp_set_product_term($product, $term_id, $type, $bool)
