@@ -42,8 +42,8 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   function define_custom_columns($columns)
   {
     unset($columns['sku']);
-    $columns['sku'] = 'Ebay';
-    $columns['sync'] = 'Ebay Aktionen';
+    $columns['sku'] = 'KA';
+    $columns['sync'] = 'KA Aktionen';
     return $columns;
   }
 
@@ -67,20 +67,24 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           <div class="sync-column-content">
             <div id="import-kleinanzeigen-data-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
-              <a id="import-kleinanzeigen-data-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-data" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-data button button-primary button-small" style="">Daten importieren</a>
+              <a id="import-kleinanzeigen-data-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-data" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-data button button-primary button-small">Daten importieren</a>
             </div>
             <div id="import-kleinanzeigen-images-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
               <span class="kleinanzeigen-images-wrapper" style="display: flex;">
-                <a id="import-kleinanzeigen-images-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-images button button-primary button-small" style="">Fotos importieren</a>
-                <a id="delete-kleinanzeigen-images-<?php echo $post_id ?>" name="delete-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-kleinanzeigen-images button button-primary button-small" style="">
+                <a id="import-kleinanzeigen-images-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-images button button-primary button-small">Fotos importieren</a>
+                <a id="delete-kleinanzeigen-images-<?php echo $post_id ?>" name="delete-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-kleinanzeigen-images button button-primary button-small">
                   <i class="dashicons dashicons-trash" style="font-size: 1.3em; vertical-align: middle"></i>
                 </a>
               </span>
             </div>
+            <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
+              <span class="spinner"></span>
+              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Loslösen') ?></a>
+            </div>
             <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="publish-column-content">
               <span class="spinner"></span>
-              <a id="publish-post-<?php echo $post_id ?>" disabled name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small" style=""><?php echo __('Publish') ?></a>
+              <a id="publish-post-<?php echo $post_id ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Verbergen') : __('Publish') ?></a>
             </div>
           </div>
           <script>
@@ -89,7 +93,8 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
                 publishPost,
                 importData,
                 importImages,
-                deleteImages
+                deleteImages,
+                disconnect
               } = ajax_object;
 
               const sku = '<?php echo $sku; ?>';
@@ -100,6 +105,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
               const importDataButton = tr?.querySelector('#import-kleinanzeigen-data-<?php echo $post_id ?>');
               const importImagesButton = tr?.querySelector('#import-kleinanzeigen-images-<?php echo $post_id ?>');
               const deleteImagesButton = tr?.querySelector('#delete-kleinanzeigen-images-<?php echo $post_id ?>');
+              const disconnectButton = tr?.querySelector('#disconnect-kleinanzeigen-<?php echo $sku ?>');
 
               setTimeout(() => {
                 publishButton?.addEventListener("click", publishPost);
@@ -110,9 +116,11 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
                 if (sku) {
                   importDataButton?.addEventListener("click", importData);
                   importImagesButton?.addEventListener("click", importImages);
+                  disconnectButton?.addEventListener("click", disconnect);
 
                   importDataButton?.removeAttribute('disabled');
                   importImagesButton?.removeAttribute('disabled');
+                  disconnectButton?.removeAttribute('disabled');
                 }
               }, 200)
             });

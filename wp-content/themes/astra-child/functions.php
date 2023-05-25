@@ -436,27 +436,23 @@ function wbp_woo_custom_tabs($tabs)
     'priority'   => 10,
     'callback' => 'wbp_woo_tab_content',
   );
-  $tabs['request_form'] = array(
-    'title'   => __('Anfrage', 'astra-child'),
-    'priority'   => 30,
-    'callback'   => 'wbp_woo_tab_request_form'
-  );
-
-  // $tabs['technical'] = array(
-  //   'title'   => __('Technical Details', 'astra-child'),
-  //   'priority'   => 20,
-  //   'callback'   => 'wbp_woo_tab_technical'
-  // );
 
   $meta = get_post_meta($product->id);
   $datasheets = $meta['_datasheet'][0];
   if (!empty($datasheets)) {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
-      'priority'   => 30,
+      'priority'   => 20,
       'callback'   => 'wbp_woo_tab_datasheets'
     );
   }
+
+  $tabs['request_form'] = array(
+    'title'   => __('Anfrage', 'astra-child'),
+    'priority'   => 30,
+    'callback'   => 'wbp_woo_tab_request_form'
+  );
+  
   unset($tabs['reviews']);
   unset($tabs['additional_information']);
 
@@ -674,7 +670,7 @@ function wbp_include_kleinanzeigen_template($path, $return_instead_of_echo = fal
   $template_file = KLEINANZEIGEN_TEMPLATE_PATH . $path;
 
   if (!file_exists($template_file)) {
-    error_log("WBP Ebay: template not found: " . $template_file);
+    error_log("WBP Kleinanzeigen: template not found: " . $template_file);
     echo __('Error:', 'wbp') . ' ' . __('template not found', 'wbp') . " (" . $path . ")";
   } else {
     extract($extract_these);

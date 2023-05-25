@@ -59,9 +59,8 @@ jQuery(document).ready(function ($) {
     document.body.classList.remove("kleinanzeigen-sync-active");
   }
 
-  function getEbayAd(e) {
+  function getAd(e) {
     e.preventDefault();
-    start();
 
     const formdata = $(form).serializeJSON();
 
@@ -69,11 +68,18 @@ jQuery(document).ready(function ($) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
-    const spinner = e.target
-      .closest("[id*=-action]")
-      ?.querySelector(".spinner");
-    const remove_spinner = () => spinner?.classList.remove("is-active");
-    spinner?.classList.add("is-active");
+
+    const el = e.target;
+    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    const addSpinner = () => {
+      spinner?.classList.add("is-active");
+    };
+    const removeSpinner = () => {
+      spinner?.classList.remove("is-active");
+    };
+
+    start();
+    addSpinner();
 
     $.post({
       url: admin_ajax_remote,
@@ -83,14 +89,14 @@ jQuery(document).ready(function ($) {
       },
       success: (data) =>
         ajax_ad_callback(data, () => {
-          remove_spinner();
+          removeSpinner();
           finish();
         }),
-      error: remove_spinner,
+      error: removeSpinner,
     });
   }
 
-  function connectEbay(e) {
+  function connect(e) {
     e.preventDefault();
 
     const el = e.target;
@@ -99,11 +105,14 @@ jQuery(document).ready(function ($) {
     const post_ID = action.replace("connect-", "");
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
-
+    const addSpinner = () => {
+      spinner?.classList.add("is-active");
+    };
     const removeSpinner = () => {
       spinner?.classList.remove("is-active");
     };
+
+    addSpinner();
 
     $.post({
       url: admin_ajax_local,
@@ -111,6 +120,7 @@ jQuery(document).ready(function ($) {
         action: "_ajax_connect",
         post_ID,
         kleinanzeigen_id,
+        screen
       },
       beforeSend: () => {
         $(el).html("Verknüpfe...");
@@ -138,7 +148,7 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function disconnectEbay(e) {
+  function disconnect(e) {
     e.preventDefault();
 
     const el = e.target;
@@ -147,11 +157,14 @@ jQuery(document).ready(function ($) {
     const post_ID = action.replace("disconnect-", "");
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
-
+    const addSpinner = () => {
+      spinner?.classList.add("is-active");
+    };
     const removeSpinner = () => {
       spinner?.classList.remove("is-active");
     };
+
+    addSpinner();
 
     $.post({
       url: admin_ajax_local,
@@ -159,6 +172,7 @@ jQuery(document).ready(function ($) {
         action: "_ajax_disconnect",
         post_ID,
         kleinanzeigen_id,
+        screen
       },
       beforeSend: () => {
         $(el).html("Verknüpfung lösen...");
@@ -192,15 +206,6 @@ jQuery(document).ready(function ($) {
 
   function importData(e) {
     e.preventDefault();
-    start();
-
-    const el = e.target;
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
-
-    const removeSpinner = () => {
-      spinner?.classList.remove("is-active");
-    };
 
     if (form) {
       formdata = $(form).serializeJSON();
@@ -215,6 +220,19 @@ jQuery(document).ready(function ($) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
+
+    const el = e.target;
+    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+
+    const addSpinner = () => {
+      spinner?.classList.add("is-active");
+    };
+    const removeSpinner = () => {
+      spinner?.classList.remove("is-active");
+    };
+
+    start();
+    addSpinner();
 
     $.post({
       url: admin_ajax_remote,
@@ -247,10 +265,10 @@ jQuery(document).ready(function ($) {
         el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
           detail: { success: false, error },
         });
-        
+
         removeSpinner();
-        
-        const {responseText} = error;
+
+        const { responseText } = error;
         console.log(responseText);
       },
     });
@@ -258,16 +276,6 @@ jQuery(document).ready(function ($) {
 
   function importImages(e) {
     e.preventDefault();
-    start();
-
-    const el = e.target;
-
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
-
-    const removeSpinner = () => {
-      spinner?.classList.remove("is-active");
-    };
 
     if (form) {
       formdata = $(form).serializeJSON();
@@ -282,6 +290,19 @@ jQuery(document).ready(function ($) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
+
+    const el = e.target;
+    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+
+    const addSpinner = () => {
+      spinner?.classList.add("is-active");
+    };
+    const removeSpinner = () => {
+      spinner?.classList.remove("is-active");
+    };
+
+    start();
+    addSpinner();
 
     $.post({
       url: admin_ajax_remote,
@@ -376,7 +397,7 @@ jQuery(document).ready(function ($) {
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
-        $(el).html("Moment...");
+        $(el).html("Einen Moment...");
       },
       success: (data) => parseResponse(data, el),
       error: (error) => console.log(error),
@@ -443,7 +464,7 @@ jQuery(document).ready(function ($) {
     finish();
   }
 
-  const MSG_MISSING_KLEINANZEIGEN_ID = "Keine eBay-Kleinanzeigen ID gefunden.";
+  const MSG_MISSING_KLEINANZEIGEN_ID = "Keine Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
   const MSG_ERROR =
     "Arrgh🥶, etwas scheint schiefgegangen zu sein. Bitte noch einmal versuchen.";
@@ -458,8 +479,8 @@ jQuery(document).ready(function ($) {
         deletePost,
         publishPost,
         importData,
-        connectEbay,
-        disconnectEbay,
+        connect,
+        disconnect,
         importImages,
         deleteImages,
         processDataImport,
@@ -468,17 +489,21 @@ jQuery(document).ready(function ($) {
     case "product":
       form = document.getElementById("post");
 
-      const getEbayAdButton = document.getElementById("get-kleinanzeigen-ad");
-      const importDataButton = document.getElementById("import-kleinanzeigen-data");
-      const importImagesButton = document.getElementById("import-kleinanzeigen-images");
+      const getAdButton = document.getElementById("get-kleinanzeigen-ad");
+      const importDataButton = document.getElementById(
+        "import-kleinanzeigen-data"
+      );
+      const importImagesButton = document.getElementById(
+        "import-kleinanzeigen-images"
+      );
       const delImagesButton = document.getElementById("del-images");
 
       importDataButton?.addEventListener("click", importData);
       importImagesButton?.addEventListener("click", importImages);
-      getEbayAdButton?.addEventListener("click", getEbayAd);
+      getAdButton?.addEventListener("click", getAd);
       delImagesButton?.addEventListener("click", deleteImages);
 
-      getEbayAdButton?.removeAttribute("disabled");
+      getAdButton?.removeAttribute("disabled");
       importDataButton?.removeAttribute("disabled");
       importImagesButton?.removeAttribute("disabled");
       delImagesButton?.removeAttribute("disabled");
@@ -558,7 +583,9 @@ jQuery(document).ready(function ($) {
       error: (data) => {
         console.log(data);
         el.dispatchEvent(
-          new CustomEvent("kleinanzeigen:data-import", { detail: { success: false } })
+          new CustomEvent("kleinanzeigen:data-import", {
+            detail: { success: false },
+          })
         );
         callback?.();
       },

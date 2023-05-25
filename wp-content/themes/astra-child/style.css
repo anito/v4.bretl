@@ -25,7 +25,7 @@ body {
 }
 
 body {
-  font-family: 'Gibson', sans-serif;
+  font-family: "Gibson", sans-serif;
 }
 
 p {
@@ -151,4 +151,52 @@ h6.after-header-line {
   height: 20px;
   vertical-align: baseline;
   display: flex;
+}
+#tab-datasheets p {
+  display: none;
+}
+.document-gallery {
+  display: flex;
+  max-width: 700px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.document-gallery::before {
+  content: "";
+  position: absolute;
+  top: -35px;
+  font-size: 1em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.document-gallery .document-icon-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  grid-gap: 5px;
+}
+.document-gallery .document-icon {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 0 none;
+  box-shadow: 0 1px 3px -2px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 10%);
+  transition: all 0.3s ease-in-out;
+  width: unset !important;
+}
+.document-gallery .document-icon:hover {
+  box-shadow: 0 10px 20px rgb(0 0 0 / 10%), 0 4px 8px rgb(0 0 0 / 10%);
+  transition: all 0.3s ease-in-out;
+}
+.document-gallery .document-icon a {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.document-gallery .document-icon img {
+  width: 150px;
+}
+.document-gallery .document-icon img ~ .title {
+  font-size: 1.2em;
+  margin-top: 10px;
 }

@@ -9,7 +9,7 @@ define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/k
 function _ajax_fetch_sts_history()
 {
   setcookie('kleinanzeigen-table-page', $_REQUEST['pageNum']);
-  $wp_list_table = new Ebay_List_Table();
+  $wp_list_table = new Kleinanzeigen_List_Table();
   $wp_list_table->ajax_response();
 }
 add_action('wp_ajax__ajax_fetch_sts_history', '_ajax_fetch_sts_history');
@@ -24,7 +24,7 @@ function _ajax_sts_display()
 
   check_ajax_referer('ajax-custom-list-nonce', '_ajax_custom_list_nonce', true);
 
-  $wp_list_table = new Ebay_List_Table();
+  $wp_list_table = new Kleinanzeigen_List_Table();
 
   $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
   $data = wbp_get_json_data($pageNum);

@@ -3,7 +3,7 @@ if (!class_exists('WP_List_Table')) {
   require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class Ebay_List_Table extends WP_List_Table
+class Kleinanzeigen_List_Table extends WP_List_Table
 {
 
   function __construct()
@@ -65,7 +65,7 @@ class Ebay_List_Table extends WP_List_Table
       }
       $product = $product_by_sku ?? $product_by_title ?? false;
       $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null ;
-      $product ? ($this->has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Ebay_List_Table::PRICE_DIFF) : null) : null;
+      $product ? ($this->has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::PRICE_DIFF) : null) : null;
 
       if ($product) {
         switch ($product->get_status()) {
@@ -74,14 +74,14 @@ class Ebay_List_Table extends WP_List_Table
             break;
           case 'draft':
             $products['draft'][] = $product;
-            $products['todos'][] = array('title' => $item->title, 'reason' => Ebay_List_Table::INVISIBLE);
+            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::INVISIBLE);
             break;
           default:
             $products['other'][] = $product;
           }
         } else {
           $products['unknown'][] = $item->id;
-          $products['todos'][] = array('title' => $item->title, 'reason' => Ebay_List_Table::INVISIBLE);
+          $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::INVISIBLE);
       }
     }
     $todos = count($products['todos']);
@@ -156,7 +156,7 @@ class Ebay_List_Table extends WP_List_Table
       'image' => __('Bild'),
       'title' => __('Titel'),
       'date' => __('Änd.-Datum'),
-      'price' => __('Ebay Preis'),
+      'price' => __('KA Preis'),
       'shop-price' => __('Shop Preis'),
       'shop-categories' => __('Kategorien'),
       'shop-brands' => __('Hersteller'),
@@ -303,7 +303,7 @@ class Ebay_List_Table extends WP_List_Table
         $class = $column_name . ' column column-' . $column_name;
         if (in_array($column_name, $hidden)) $style = ' style="display:none;"';
 
-        // Setup Ebay actions
+        // Setup Kleinanzeigen actions
         if ($product) {
           $post_id = $product->get_id();
           $editlink  = admin_url('post.php?action=edit&post=' . $post_id);
@@ -333,12 +333,12 @@ class Ebay_List_Table extends WP_List_Table
             $label = __('Verknüpfen');
             $action = 'connect-' . $post_id;
             $icon = 'admin-links';
-            $type = 'link';
+            $type = 'button';
           } else {
             $label = __('Loslösen');
             $action = 'disconnect-' . $post_id;
             $icon = 'editor-unlink';
-            $type = 'link';
+            $type = 'button';
           }
           $kleinanzeigen_actions =
             '<div>' .
@@ -354,7 +354,7 @@ class Ebay_List_Table extends WP_List_Table
           $shop_actions =
             '<div>' .
             wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
-            wbp_include_kleinanzeigen_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
+            wbp_include_kleinanzeigen_template('dashboard/toggle-publish-link.php', true, compact('post_status', 'post_id', 'record')) .
             '</div>';
         } elseif ($product) {
 
@@ -365,7 +365,7 @@ class Ebay_List_Table extends WP_List_Table
           $shop_actions =
             '<div>' .
             wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
-            wbp_include_kleinanzeigen_template('dashboard/toggle-pulish-link.php', true, compact('post_status', 'post_id', 'record')) .
+            wbp_include_kleinanzeigen_template('dashboard/toggle-publish-link.php', true, compact('post_status', 'post_id', 'record')) .
             '</div>';
         } else {
 
@@ -482,8 +482,8 @@ class Ebay_List_Table extends WP_List_Table
             deletePost,
             importImages,
             importData,
-            connectEbay,
-            disconnectEbay,
+            connect,
+            disconnect,
             publishPost
           } = ajax_object;
 
@@ -502,14 +502,14 @@ class Ebay_List_Table extends WP_List_Table
           $(connEl).on('click', function(e) {
             e.preventDefault();
 
-            connectEbay(e);
+            connect(e);
           })
 
           const disconnEl = $(`#ad-id-${kleinanzeigen_id} a[data-action^=disconnect-]`);
           $(disconnEl).on('click', function(e) {
             e.preventDefault();
 
-            disconnectEbay(e);
+            disconnect(e);
           })
 
           const createEl = $(`#ad-id-${kleinanzeigen_id} a[data-action=create]`);

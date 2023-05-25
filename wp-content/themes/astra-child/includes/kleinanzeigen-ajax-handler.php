@@ -103,7 +103,7 @@ function wbp_ajax_toggle_publish_post()
       break;
     case 'toplevel_page_kleinanzeigen':
 
-      $wp_list_table = new Ebay_List_Table();
+      $wp_list_table = new Kleinanzeigen_List_Table();
       $data = wbp_get_json_data($pageNum);
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
@@ -157,7 +157,7 @@ function wbp_ajax_connect()
   $pageNum = $_COOKIE['kleinanzeigen-table-page'];
 
   ob_start();
-  $wp_list_table = new Ebay_List_Table();
+  $wp_list_table = new Kleinanzeigen_List_Table();
   $data = wbp_get_json_data($pageNum);
   $wp_list_table->setData($data);
   list($columns, $hidden) = $wp_list_table->get_column_info();
@@ -183,6 +183,8 @@ function wbp_ajax_disconnect()
   $post_ID = isset($_POST['post_ID']) ? $_POST['post_ID'] : null;
   $kleinanzeigen_id = isset($_POST['kleinanzeigen_id']) ? $_POST['kleinanzeigen_id'] : null;
 
+  $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+
   if (!isset($post_ID) || !isset($kleinanzeigen_id)) {
     $success = false;
   } else {
@@ -204,18 +206,28 @@ function wbp_ajax_disconnect()
   $pageNum = $_COOKIE['kleinanzeigen-table-page'];
 
   ob_start();
-  $wp_list_table = new Ebay_List_Table();
-  $data = wbp_get_json_data($pageNum);
-  $wp_list_table->setData($data);
-  list($columns, $hidden) = $wp_list_table->get_column_info();
-  $ads = $data->ads;
-  $ids = array_column($ads, 'id');
-  $record_key = array_search($kleinanzeigen_id, $ids);
-  $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+  switch ($screen) {
+    case 'edit-product':
+      $wp_list_table = new Extended_WC_Admin_List_Table_Products();
+      $wp_list_table->render_row($post_ID);
+      break;
+    case 'toplevel_page_kleinanzeigen':
+      $wp_list_table = new Kleinanzeigen_List_Table();
+      $data = wbp_get_json_data($pageNum);
+      $wp_list_table->setData($data);
+      list($columns, $hidden) = $wp_list_table->get_column_info();
+      $ads = $data->ads;
+      $ids = array_column($ads, 'id');
+      $record_key = array_search($kleinanzeigen_id, $ids);
+      $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
+      break;
+    }
   $row = ob_get_clean();
 
-  ob_start();
-  $wp_list_table->render_head($pageNum);
+  if('toplevel_page_kleinanzeigen' === $screen) {
+    ob_start();
+    $wp_list_table->render_head($pageNum);
+  }
   $head = ob_get_clean();
 
   echo json_encode([
@@ -287,7 +299,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       $wp_list_table->render_row($post_ID);
       break;
     case 'toplevel_page_kleinanzeigen':
-      $wp_list_table = new Ebay_List_Table();
+      $wp_list_table = new Kleinanzeigen_List_Table();
       $data = wbp_get_json_data($pageNum);
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
@@ -358,7 +370,7 @@ function wbp_ajax_import_kleinanzeigen_images()
       $wp_list_table->render_row($post_ID);
       break;
     case 'toplevel_page_kleinanzeigen':
-      $wp_list_table = new Ebay_List_Table();
+      $wp_list_table = new Kleinanzeigen_List_Table();
       $data = wbp_get_json_data($pageNum);
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
@@ -412,7 +424,7 @@ function wbp_ajax_delete_post()
   }
 
   ob_start();
-  $wp_list_table = new Ebay_List_Table();
+  $wp_list_table = new Kleinanzeigen_List_Table();
   $data = wbp_get_json_data($pageNum);
   $wp_list_table->setData($data);
   list($columns, $hidden) = $wp_list_table->get_column_info();
