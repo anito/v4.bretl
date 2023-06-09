@@ -42,6 +42,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   function define_custom_columns($columns)
   {
     unset($columns['sku']);
+    unset($columns['product_tag']);
     $columns['sku'] = 'KA';
     $columns['sync'] = 'KA Aktionen';
     return $columns;

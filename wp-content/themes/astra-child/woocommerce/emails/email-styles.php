@@ -12,7 +12,7 @@
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 4.0.0
+ * @version 7.4.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,15 +44,21 @@ $text_lighter_40 = wc_hex_lighter( $text, 40 );
 // body{padding: 0;} ensures proper scale/positioning of the email in the iOS native email app.
 ?>
 body {
+	background-color: <?php echo esc_attr( $bg ); ?>;
 	padding: 0;
+	text-align: center;
+}
+
+#outer_wrapper {
+	background-color: <?php echo esc_attr( $bg ); ?>;
 }
 
 #wrapper {
-	background-color: <?php echo esc_attr( $bg ); ?>;
-	margin: 0;
+	margin: 0 auto;
 	padding: 70px 0;
 	-webkit-text-size-adjust: none !important;
 	width: 100%;
+	max-width: 600px;
 }
 
 #template_container {
@@ -227,6 +233,25 @@ img {
 	height: auto;
 }
 
+/**
+ * Media queries are not supported by all email clients, however they do work on modern mobile
+ * Gmail clients and can help us achieve better consistency there.
+ */
+@media screen and (max-width: 600px) {
+	#header_wrapper {
+		padding: 27px 36px !important;
+		font-size: 24px;
+	}
+
+	#body_content table > tbody > tr > td {
+		padding: 10px !important;
+	}
+
+	#body_content_inner {
+		font-size: 10px !important;
+	}
+}
+
 #blockquote-customer-note {
 	padding: 10px;
 	border: 3px solid #0474be;
@@ -249,7 +274,7 @@ img {
 	left: 0px;
 	width: 15px;
 	height: 15px;
-	border: 2px solid <?php echo esc_attr( $bg_darker_10 ); ?>
+	border: 2px solid <?php echo esc_attr($bg_darker_10); ?>
 }
 .price-hidden, .admin-remark:before {
 	background-color: #ff000005;
@@ -269,6 +294,4 @@ img {
 	padding: 0px;
 	line-height: 1em;
 }
-
 <?php
-

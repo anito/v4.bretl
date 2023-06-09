@@ -39,6 +39,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
   protected const INVISIBLE = 'Nicht sichtbar';
   protected const PRICE_DIFF = 'Preisdifferenz';
+  protected const WRONG_CAT = 'Kategorie';
 
   /**
    * @Build Head
@@ -64,7 +65,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $product_by_title = wbp_get_product_by_title($item->title);
       }
       $product = $product_by_sku ?? $product_by_title ?? false;
-      $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null ;
+      $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null;
       $product ? ($this->has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::PRICE_DIFF) : null) : null;
 
       if ($product) {
@@ -78,13 +79,17 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             break;
           default:
             $products['other'][] = $product;
-          }
-        } else {
-          $products['unknown'][] = $item->id;
-          $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::INVISIBLE);
+        }
+        $cats = get_the_terms($product->get_id(), 'product_cat');
+        $slugs = wp_list_pluck($cats, 'slug');
+        if (in_array(DEFAULT_CAT_SLUG, $slugs)) {
+          $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::WRONG_CAT . ' (' . implode(', ', wp_list_pluck($cats, 'name')) . ')');
+        }
+      } else {
+        $products['unknown'][] = $item->id;
+        $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::INVISIBLE);
       }
     }
-    $todos = count($products['todos']);
     wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'products' => $products, 'todos' => $products['todos']));
   }
 
@@ -256,13 +261,14 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     );
   }
 
-  function has_price_diff($record, $product) {
+  function has_price_diff($record, $product)
+  {
     $regex = '/^([\d.]+)/';
-      preg_match($regex, $record->price, $matches);
-      $raw_kleinanzeigen_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
-      $raw_shop_price = $product->get_price();
+    preg_match($regex, $record->price, $matches);
+    $raw_kleinanzeigen_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+    $raw_shop_price = $product->get_price();
 
-      return $raw_kleinanzeigen_price !== $raw_shop_price;
+    return $raw_kleinanzeigen_price !== $raw_shop_price;
   }
 
   function setData($data)
@@ -288,13 +294,13 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     if ($product) {
       $price = wc_price($product->get_price());
-      if($this->has_price_diff($record, $product)) $diff_classes[] = 'diff-price';
+      if ($this->has_price_diff($record, $product)) $diff_classes[] = 'diff-price';
     } else {
       $price = '';
     }
 
 ?>
-    <tr id="ad-id-<?php echo $record->id ?>" <?php if(!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes)?>" <?php } ?>>
+    <tr id="ad-id-<?php echo $record->id ?>" <?php if (!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes) ?>" <?php } ?>>
       <?php
 
 

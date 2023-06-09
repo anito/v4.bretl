@@ -41,7 +41,7 @@ function remote_call($url, $tries = 3, $retry = 1)
 {
   $response = wp_remote_get($url);
 
-  if (($response['response']['code'] === 200)) {
+  if (! is_wp_error($response) && ($response['response']['code'] === 200)) {
     return $response;
   } elseif($retry++ < $tries) {
     sleep($retry * 2);

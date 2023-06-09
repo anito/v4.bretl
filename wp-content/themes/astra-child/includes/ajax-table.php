@@ -29,9 +29,14 @@ function _ajax_sts_display()
   $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
   $data = wbp_get_json_data($pageNum);
 
-  if (!isset($data)) {
-    echo __('Error:', 'wbp') . ' ' . __('Es wurden keine Daten empfangen', 'wbp');
+  if (is_wp_error($data)) {
+    die(json_encode(array(
+
+      "head" => wbp_include_kleinanzeigen_template('error-message.php', true, array('message' => $data->get_error_message()))
+      
+    )));
   }
+
   $wp_list_table->setData($data);
 
   ob_start();
@@ -44,8 +49,8 @@ function _ajax_sts_display()
 
   die(json_encode(array(
 
-    "display" => $display,
-    "head" => $head
+    "head" => $head,
+    "display" => $display
 
   )));
 }
@@ -100,7 +105,6 @@ function fetch_ts_script()
             },
             success: function(response) {
 
-
               $('.wp-list-table').removeClass('loading');
 
               $("#ts-history-table").html(response.display);
@@ -124,6 +128,9 @@ function fetch_ts_script()
               })
 
               list.init();
+            },
+            error: function(ajax, error, message) {
+              $("#head-wrap").html(message);
             }
           });
 
@@ -170,9 +177,9 @@ function fetch_ts_script()
           });
 
           list.init_head();
-          
+
           $('.wp-list-table').removeClass('loading');
-          
+
         },
 
         init_head: function() {

@@ -33,7 +33,7 @@ define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.4');
  * App asset names (e.g. *.js. *.css files) changing per app distribution
  * This method takes care of it automatically using glob
  */
-function get_themes_file($file_path)
+function wbp_get_themes_file($file_path)
 {
   $regex = '/^([\w\-\/.]*)(\/wp-content\/themes[\w\-\.\/]+)/';
   return preg_replace($regex, '\2', glob($file_path)[0]);
@@ -47,12 +47,18 @@ function get_themes_file($file_path)
  * @package Astra Child
  * @since 1.0.0
  */
-function child_enqueue_styles()
+function add_scripts()
 {
+
+  $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
+
+  // Theme styles
+  wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'));
   wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
 
-  $js_uri = get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.js');
-  $css_uri = get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.css');
+  // Homepage hero
+  $js_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.js');
+  $css_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.css');
 
   wp_enqueue_script('app-hero', $js_uri, false, '0.0.1', 'all');
   wp_enqueue_style('app-hero', $css_uri, false, '0.0.1', 'all');
@@ -60,11 +66,29 @@ function child_enqueue_styles()
     'app_url' => get_stylesheet_directory_uri() . '/js/hero/dist/',
     'stylesheet_url' => get_stylesheet_directory_uri()
   ));
+
+  wp_register_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), '1.0', true);
+  wp_enqueue_script('main');
+
+  if (!IS_DEV_MODE) {
+
+    // Analyticstracking
+    $current_user = wp_get_current_user();
+    $user_id = (0 == $current_user->ID) ? '' : $current_user->ID;
+    wp_register_script('google-analytics', get_stylesheet_directory_uri() . '/js/analyticstracking.js', false, '1.0', true);
+    wp_enqueue_script('google-analytics');
+    wp_localize_script('google-analytics', 'atts', array('user_id' => $user_id, 'ga_id' => GA_ID));
+
+    // Consent Pro
+    wp_enqueue_style('consent-pro', get_stylesheet_directory_uri() . '/consent-pro/style.css');
+    wp_enqueue_script('consent-pro', 'https://cookie-cdn.cookiepro.com/scripttemplates/otSDKStub.js');
+
+  }
 }
-add_action('wp_enqueue_scripts', 'child_enqueue_styles', 15);
+add_action('wp_enqueue_scripts', 'add_scripts');
 
 /**
- * Admin Styles fpr WC Screens
+ * Admin Styles for WC Screens
  */
 function wbp_wc_screen_styles($hook)
 {
@@ -125,7 +149,9 @@ function wbp_save_post($post_ID, $post)
 
   require_once __DIR__ . '/includes/product-term-handler.php';
   wbp_process_sale($post_ID, $post);
-  wbp_process_kleinanzeigen($post_ID, $post);
+  if(! is_ajax()) {
+    wbp_process_kleinanzeigen($post_ID, $post);
+  }
 }
 add_action("save_post", "wbp_save_post", 99, 3);
 add_action("save_post", "wbp_quick_edit_product_save", 99, 3);
@@ -147,29 +173,6 @@ function wbp_before_delete($post_ID)
   wbp_remove_attachments($post_ID);
 }
 add_action('before_delete_post', 'wbp_before_delete');
-
-function add_scripts()
-{
-  wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'));
-
-  $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
-
-  // Add analyticstracking.js to the site
-  if (!IS_DEV_MODE) {
-    $current_user = wp_get_current_user();
-    $user_id = (0 == $current_user->ID) ? '' : $current_user->ID;
-    wp_register_script('google-analytics', get_stylesheet_directory_uri() . '/js/analyticstracking.js', false, '1.0', true);
-    wp_enqueue_script('google-analytics');
-    // hand over the userID to the analytics script
-    wp_localize_script('google-analytics', 'atts', array('user_id' => $user_id, 'ga_id' => GA_ID));
-  }
-
-  wp_register_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), '1.0', true);
-  wp_enqueue_script('main');
-  wp_register_script('helper', get_stylesheet_directory_uri() . '/js/helper.js', array('jquery'), '1.0', true);
-  wp_enqueue_script('helper');
-}
-add_action('wp_enqueue_scripts', 'add_scripts');
 
 /**
  * Default sort for shop and specific categories
@@ -225,25 +228,7 @@ function unsupported_browsers_template()
 {
   get_template_part('custom-templates/custom', 'unsupported-browser');
 }
-add_action('wp_enqueue_scripts', 'wbp_detectTrident');
-
-/**
- * Enqueue vendor scripts
- */
-function enqueue_vendors()
-{
-  $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
-
-  if (!IS_DEV_MODE) {
-
-    /**
-     * Consens Pro
-     */
-    wp_enqueue_style('consent-pro', get_stylesheet_directory_uri() . '/consent-pro/style.css');
-    wp_enqueue_script('consent-pro', 'https://cookie-cdn.cookiepro.com/scripttemplates/otSDKStub.js');
-  }
-}
-add_action('wp_enqueue_scripts', 'enqueue_vendors', 15);
+// add_action('wp_enqueue_scripts', 'wbp_detectTrident');
 
 function add_cp_data_attribute($tag, $handle, $src)
 {
@@ -259,13 +244,13 @@ function wbp_add_admin_ajax_scripts()
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
 
   // kleinanzeigen doesn't accept a wc_remote_get from referrers w/o valid certificates
-  // if validation fails, fallback to https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php
   $valid_cert = !!check_cert();
   $admin_ajax_local = admin_url('admin-ajax.php');
-  if (!$valid_cert) {
-    $admin_ajax_remote = 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
-  } else {
+  if ($valid_cert) {
     $admin_ajax_remote = $admin_ajax_local;
+  } else {
+    // fallback to https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php
+    $admin_ajax_remote = 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
   }
 
   $screen_id = get_current_screen()->id;
@@ -452,7 +437,7 @@ function wbp_woo_custom_tabs($tabs)
     'priority'   => 30,
     'callback'   => 'wbp_woo_tab_request_form'
   );
-  
+
   unset($tabs['reviews']);
   unset($tabs['additional_information']);
 
@@ -493,6 +478,8 @@ function wbp_woo_tab_datasheets()
 }
 add_filter('woocommerce_product_tabs', 'wbp_woo_custom_tabs', 98);
 add_filter('woocommerce_cart_needs_payment', '__return_false');
+// add_filter('woocommerce_cart_hide_zero_taxes', '__return_false');
+// add_filter('woocommerce_order_hide_zero_taxes', '__return_false');
 
 /**
  * Quote Plugin
@@ -731,17 +718,16 @@ function wbp_get_json_data($page)
   $remoteUrl = wbp_get_kleinanzeigen_json_url($page);
   $response = get_remote($remoteUrl);
   // $response = file_get_contents(__DIR__ . '/sample' . $page . '.json');
-  return json_decode($response);
+  if (!is_wp_error($response)) {
+    return json_decode($response['body']);
+  } else {
+    return $response;
+  }
 }
 
 function get_remote($url)
 {
-  $response = wp_remote_get($url);
-  if (!is_wp_error($response)) {
-    return $response['body'];
-  } else {
-    wbp_include_kleinanzeigen_template('error-message.php');
-  }
+  return wp_remote_get($url);
 }
 
 function wbp_get_product_by_sku($sku)
@@ -786,3 +772,18 @@ function wbp_remove_attachments($post_ID)
     }
   }
 }
+
+
+function wbp_modify_cart_product_subtotal_label($product_subtotal, $product, $quantity, $cart)
+{
+  $tax_class = $product->get_tax_class();
+  $rates = WC_Tax::get_rates_for_tax_class($tax_class);
+  foreach ($rates as $rate) {
+    $label = $rate->tax_rate_name;
+    if (str_contains(strtolower($tax_class), DIFF_TAX)) {
+      $product_subtotal .= ' <small class="tax-label">' . $label . '</small>';
+    }
+  }
+  return $product_subtotal;
+}
+add_filter('woocommerce_cart_product_subtotal', 'wbp_modify_cart_product_subtotal_label', 10, 4);

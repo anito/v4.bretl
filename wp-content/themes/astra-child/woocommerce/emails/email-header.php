@@ -3,10 +3,6 @@
  * Email Header
  *
  * This template can be overridden by copying it to yourtheme/woocommerce/emails/email-header.php.
-
- * @author      WooThemes
- * @package     WooCommerce/Templates/Emails
- * @version     4.0.0
  *
  * HOWEVER, on occasion WooCommerce will need to update template files and you
  * (the theme developer) will need to copy the new files to your theme to
@@ -15,9 +11,11 @@
  * the readme will list any important changes.
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
- * @package WooCommerce/Templates/Emails
- * @version 4.0.0
+ * @package WooCommerce\Templates\Emails
+ * @version 7.4.0
+ */
 
+/**
  * changes: hardcoded path to email header logo: $url_logo
  */
 
@@ -27,7 +25,7 @@ if (!defined('ABSPATH')) {
 
 $image = get_option('woocommerce_email_header_image');
 
-// Load colours
+// Load colors
 $bg = get_option('woocommerce_email_background_color');
 $body = get_option('woocommerce_email_body_background_color');
 $base = get_option('woocommerce_email_base_color');

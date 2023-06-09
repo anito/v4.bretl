@@ -100,7 +100,27 @@ jQuery.noConflict();
     }
   };
 
+  function add_solis_script() {
+    const el = document.getElementById('iframe-solis');
+    console.log(el)
+
+    if(!el) return;
+
+    const src = "https://solis-traktor.de/";
+    if(undefined !== IntersectionObserver) {
+        const onenter = (o) => o.forEach((entry) => {
+            if(entry.isIntersecting) entry.target.src=src;
+            else entry.target.src="";
+        });
+        const observer = new IntersectionObserver(onenter, {threshold: 0.5});
+        observer.observe(el, onenter);
+    } else {
+        el.src=src;
+    }
+  }
+
   // add_fb_div();
   // add_image_disclaimer();
   add_jet_engine_wishlist_hook(".wishlist-target [class*=title]", "wishlist");
+  // add_solis_script();
 })(jQuery);
