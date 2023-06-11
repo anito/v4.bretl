@@ -6,7 +6,7 @@
         <div class="">
 
           <h2><?php echo sprintf(__('Seite: %s', 'wbp'), $page) ?></h2>
-          <h2><small><?php echo sprintf(__('Anzeigen: %s', 'wbp'), count($data->ads)); ?><span style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Gesamt: %d / %s)', 'wbp'), $total, $total_published_count); ?></span></small></h2>
+          <h2><small><?php echo sprintf(__('Anzeigen: %s', 'wbp'), count($data->ads)); ?><span class="<?php echo $total != $total_published_count ? 'warning' : '' ?>" style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Gesamt: %d / %s)', 'wbp'), $total, $total_published_count); ?></span></small></h2>
           <h4><small>
               <?php foreach ($categories as $category) { ?>
                 <?php echo sprintf(__('%s (%s)', 'wbp'), $category->title, $category->totalAds) ?>

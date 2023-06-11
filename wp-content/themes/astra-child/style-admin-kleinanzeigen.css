@@ -55,6 +55,9 @@ section#color-definitions {
   justify-content: space-between;
   padding: 20px;
 }
+#head-wrap .section-inner .warning {
+  color: red;
+}
 #head-wrap .left-sections section:not(:last-child) .section-inner {
   border-right: 1px solid #eee;
 }
