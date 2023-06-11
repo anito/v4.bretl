@@ -61,7 +61,7 @@
         <div class="info-box">
           <ul>
             <li>
-              <i class="dashicons dashicons-editor-help"></i>
+              <i class="dashicons dashicons-warning"></i>
               <span>Bitte beachte, dass nach einem Datenimport der Produktstatus immer zu <strong>Entwurf</strong> wechselt.</span>
             </li>
           </ul>
