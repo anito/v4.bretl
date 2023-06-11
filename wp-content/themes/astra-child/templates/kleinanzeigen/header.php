@@ -49,7 +49,7 @@
             </small></h2>
           <h2><small>
               <div class="summary">
-                <span><i class="dashicons dashicons-warning"></i><?php echo __('Unbekannt:', 'wbp') ?></span>
+                <span><i class="dashicons dashicons-editor-help"></i><?php echo __('Unbekannt:', 'wbp') ?></span>
                 <span>
                   <span class="count"><?php echo count($products['unknown']) ?></span>
                   <span class="indicator indicator-unknown"></span>
@@ -61,7 +61,7 @@
         <div class="info-box">
           <ul>
             <li>
-              <i class="dashicons dashicons-warning"></i>
+              <i class="dashicons dashicons-editor-help"></i>
               <span>Bitte beachte, dass nach einem Datenimport der Produktstatus immer zu <strong>Entwurf</strong> wechselt.</span>
             </li>
           </ul>
