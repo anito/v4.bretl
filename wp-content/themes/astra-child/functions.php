@@ -730,7 +730,7 @@ function get_remote($url)
   return wp_remote_get($url);
 }
 
-function wbp_get_product_by_sku($sku)
+function wbp_get_product_by_sku_($sku)
 {
   global $wpdb;
   $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku));
@@ -738,6 +738,19 @@ function wbp_get_product_by_sku($sku)
   if (isset($post_ID)) {
     return wc_get_product($post_ID);
   }
+}
+
+function wbp_get_product_by_sku($sku)
+{
+  $p = wc_get_products(array(
+    'sku' => $sku
+  ));
+
+  if(!empty($p)) {
+    return $p[0];
+  }
+
+  return false;
 }
 
 function wbp_get_product_by_title($title)

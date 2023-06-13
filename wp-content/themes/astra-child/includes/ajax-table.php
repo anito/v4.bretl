@@ -33,7 +33,7 @@ function _ajax_sts_display()
     die(json_encode(array(
 
       "head" => wbp_include_kleinanzeigen_template('error-message.php', true, array('message' => $data->get_error_message()))
-      
+
     )));
   }
 
@@ -56,6 +56,55 @@ function _ajax_sts_display()
 }
 add_action('wp_ajax__ajax_sts_display', '_ajax_sts_display');
 add_action('wp_ajax_nopriv__ajax_sts_display', '_ajax_sts_display');
+
+function _ajax_sts_scan()
+{
+
+  $data = array();
+  for ($pageNum = 1; $pageNum <= 6; $pageNum++) {
+    $page_data  = wbp_get_json_data($pageNum);
+
+    if (is_wp_error($page_data)) {
+      die(json_encode(array(
+
+        "head" => wbp_include_kleinanzeigen_template('error-message.php', true, array('message' => $page_data->get_error_message()))
+
+      )));
+    }
+    $data = array_merge($data, $page_data->ads);
+  }
+
+  $args = array(
+    'status' => 'publish',
+    'limit' => -1
+  );
+  $published = wc_get_products($args);
+
+  $skus = wp_list_pluck($data, 'id');
+
+  foreach ($published as $product) {
+    $sku = $product->get_sku();
+    if (!empty($sku) && !in_array($sku, $skus)) {
+      wp_update_post(
+        array(
+          'ID' => $product->get_id(),
+          'post_status' => 'draft'
+        ),
+        true
+      );
+    }
+  }
+
+
+  die(json_encode(array(
+
+    "data" => $data,
+    "pageNum" => $_COOKIE['kleinanzeigen-table-page']
+
+  )));
+}
+add_action('wp_ajax__ajax_sts_scan', '_ajax_sts_scan');
+add_action('wp_ajax_nopriv__ajax_sts_scan', '_ajax_sts_scan');
 
 /**
  * fetch_ts_script function based from Charlie's original function
@@ -176,13 +225,13 @@ function fetch_ts_script()
 
           });
 
-          list.init_head();
-
           $('.wp-list-table').removeClass('loading');
 
         },
 
         init_head: function() {
+
+          console.log('init_head')
 
           $('.pagination a').on('click', function(e) {
             e.preventDefault();
@@ -195,6 +244,31 @@ function fetch_ts_script()
             list.update(data);
           })
 
+          $('.scan-pages a.scan').on('click', function(e) {
+            e.preventDefault();
+            console.log('scanning')
+
+            $.ajax({
+
+              url: ajaxurl,
+              dataType: 'json',
+              data: {
+                _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
+                action: '_ajax_sts_scan'
+              },
+              success: function(response) {
+                console.log(response)
+                const data = {
+                  pageNum: response.pageNum || '1',
+                };
+                list.update(data);
+              },
+              error: function(response) {
+                console.log(response)
+              },
+            })
+
+          })
         },
 
         /** AJAX call

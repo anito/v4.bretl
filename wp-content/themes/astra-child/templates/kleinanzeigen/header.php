@@ -6,7 +6,7 @@
         <div class="">
 
           <h2><?php echo sprintf(__('Seite: %s', 'wbp'), $page) ?></h2>
-          <h2><small><?php echo sprintf(__('Anzeigen: %s', 'wbp'), count($data->ads)); ?><span class="<?php echo $total != $total_published_count ? 'warning' : '' ?>" style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Gesamt: %d / %s)', 'wbp'), $total, $total_published_count); ?></span></small></h2>
+          <h2><small><?php echo sprintf(__('Anzeigen: %s', 'wbp'), count($data->ads)); ?><span class="<?php echo $total != count($published) ? 'warning' : '' ?>" style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Gesamt: %d / %s)', 'wbp'), $total, count($published)); ?></span></small></h2>
           <h4><small>
               <?php foreach ($categories as $category) { ?>
                 <?php echo sprintf(__('%s (%s)', 'wbp'), $category->title, $category->totalAds) ?>
@@ -15,11 +15,18 @@
           </h4>
 
         </div>
+
         <div class="pagination">
           <?php for ($i = 1; $i <= $pages; $i++) {
           ?>
             <a href="<?php echo KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $i ?>" type="button" class="button <?php echo ($i == (int) $page ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
           <?php } ?>
+        </div>
+
+        <?php $title = "Verberge mit Kleinanzeigen verlinkte Produkte im Shop, welche aufgrund Verkauf o.ä. nicht mehr auf Kleinanzeigen gefunden werden können." ?>
+        <div class="scan-pages">
+          <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
+          <a href="" type="button" class="scan" title="<?php echo $title ?>">Alle verwaisten Produkte im Shop verbergen</a>
         </div>
       </div>
     </section>
