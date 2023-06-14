@@ -75,6 +75,10 @@ section#color-definitions {
 #head-wrap .left-sections .wbp-shop-section {
   max-width: 220px;
 }
+#head-wrap .left-sections .info {
+  display: inline-block;
+  max-width: 300px;
+}
 #head-wrap .info-box li .dashicons {
   margin-right: 0.2em;
   display: inline;

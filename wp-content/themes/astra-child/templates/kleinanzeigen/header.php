@@ -23,10 +23,10 @@
           <?php } ?>
         </div>
 
-        <?php $title = "Verberge mit Kleinanzeigen verlinkte Produkte im Shop, welche aufgrund Verkauf o.ä. nicht mehr auf Kleinanzeigen gefunden werden können." ?>
+        <?php $title = "Verberge alle mit Kleinanzeigen verlinkten Produkte im Shop, welche aufgrund Verkauf o.ä. nicht mehr auf Kleinanzeigen gefunden werden können." ?>
         <div class="scan-pages">
           <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
-          <a href="" type="button" class="scan" title="<?php echo $title ?>">Alle verwaisten Produkte im Shop verbergen</a>
+          <a href="" type="button" class="scan info" title="<?php echo $title ?>">Alle Produkte mit Bezug auf eine verwaiste (ungültige) Kleinanzeige verbergen</a>
         </div>
       </div>
     </section>
