@@ -71,7 +71,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       if (!$product_by_sku) {
         $product_by_title = wbp_get_product_by_title($item->title);
       }
-      $product = $product_by_sku ?? $product_by_title ?? false;
+      $product = $product_by_sku ? $product_by_sku : ($product_by_title ? $product_by_title : false);
       $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null;
       $product ? ($this->has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::PRICE_DIFF) : null) : null;
 
@@ -97,7 +97,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::INVISIBLE);
       }
     }
-    wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 5, 'categories' => $categories, 'total' => $total, 'published' => $published, 'products' => $products, 'todos' => $products['todos']));
+    wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => 6, 'categories' => $categories, 'total' => $total, 'published' => $published, 'products' => $products, 'todos' => $products['todos']));
   }
 
   /**
@@ -292,7 +292,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     if (!$product_by_sku) {
       $product_by_title = wbp_get_product_by_title($record->title);
     }
-    $product = $product_by_sku ?? $product_by_title ?? false;
+    $product = $product_by_sku ? $product_by_sku : ($product_by_title ? $product_by_title : false);
 
     $diff_classes = array();
     $brands = array();

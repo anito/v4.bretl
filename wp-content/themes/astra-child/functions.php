@@ -72,16 +72,7 @@ function add_scripts()
 
   if (!IS_DEV_MODE) {
 
-    // Analyticstracking
-    $current_user = wp_get_current_user();
-    $user_id = (0 == $current_user->ID) ? '' : $current_user->ID;
-    wp_register_script('google-analytics', get_stylesheet_directory_uri() . '/js/analyticstracking.js', false, '1.0', true);
-    wp_enqueue_script('google-analytics');
-    wp_localize_script('google-analytics', 'atts', array('user_id' => $user_id, 'ga_id' => GA_ID));
-
-    // Consent Pro
-    wp_enqueue_style('consent-pro', get_stylesheet_directory_uri() . '/consent-pro/style.css');
-    wp_enqueue_script('consent-pro', 'https://cookie-cdn.cookiepro.com/scripttemplates/otSDKStub.js');
+    // Vendor scripts
 
   }
 }
