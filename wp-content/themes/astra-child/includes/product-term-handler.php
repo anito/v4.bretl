@@ -24,7 +24,14 @@ function wbp_process_sale($post_id, $post)
     wbp_set_product_term($product, $term_id, 'tag', $is_on_sale);
   }
 
-  // Product Sale attribute
+  // Product Sale Label
+  $term = get_term_by('name', WC_PRODUCT_LABELS['sale'], 'product_label');
+  $term_id = $term->term_id;
+  if ($term_id) {
+    wbp_set_product_term($product, $term_id, 'label', $is_on_sale);
+  }
+
+  // Product Sale Attribute
   if (SYNC_COMMON_TAX_AND_ATTS) {
     wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['sale'], $is_on_sale);
   }
@@ -119,6 +126,15 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
       break;
     case 'tag':
       $term_ids = $product->get_tag_ids();
+    case 'label':
+      $terms = get_the_terms($product_id, 'product_label');
+      $term_ids =
+        array_map(
+          function ($item) {
+            return $item->term_id;
+          },
+          !is_wp_error($terms) ? ($terms ? $terms : []) : []
+        );
   }
   $term_ids = array_unique(array_map('intval', $term_ids));
   $term_ids = wbp_sanitize_ids($term_ids, $term_id, $bool);

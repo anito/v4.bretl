@@ -41,8 +41,15 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
   function define_custom_columns($columns)
   {
+    $featured = $columns['featured'];
+    $date = $columns['date'];
+    unset($columns['date']);
+    unset($columns['featured']);
     unset($columns['sku']);
     unset($columns['product_tag']);
+    $columns['product_label'] = 'Labels';
+    $columns['featured'] = $featured;
+    $columns['date'] = $date;
     $columns['sku'] = 'KA';
     $columns['sync'] = 'KA Aktionen';
     return $columns;
@@ -53,12 +60,23 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     $post = get_post($post_id);
     $product = wc_get_product($post_id);
     if ($product) {
+
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_id);
       $sku = is_numeric($sku) ? $sku : false;
+
+      $product_label_terms = get_the_terms($post_id, 'product_label');
+      $product_labels = array_map(function ($item) {
+        return $item->name;
+      }, !is_wp_error($product_label_terms) ? ($product_label_terms ? $product_label_terms : []) : []);
+
     } else return 0;
 
     switch ($column_name) {
+      case 'product_label': {
+          echo implode(', ', $product_labels);
+          break;
+        }
       case 'sku': {
           echo '<a href="' . esc_html(wbp_get_kleinanzeigen_url($sku)) . '" target="_blank"</a>';
           break;
@@ -81,7 +99,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
             </div>
             <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
               <span class="spinner"></span>
-              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Loslösen') ?></a>
+              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Trennen') ?></a>
             </div>
             <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="publish-column-content">
               <span class="spinner"></span>

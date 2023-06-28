@@ -34,7 +34,7 @@ section#color-definitions {
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  background-color: #ffffffe6;
+  background-color: #ffffff;
   border-bottom-left-radius: 20px;
   border-left: 1px solid;
   border-bottom: 1px solid;
@@ -43,7 +43,8 @@ section#color-definitions {
 }
 .status-wrapper {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  flex: 1 0 100%;
 }
 #head-wrap section .dashicons {
   margin-right: 10px;
@@ -203,9 +204,16 @@ section .description {
 }
 section .box-wrapper {
   display: flex;
+  flex: 0 1 auto;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
+  width: 100%;
+}
+.box-wrapper.inset {
+  padding: 5px;
+  border-radius: 99px;
+  background-color: #eee;
 }
 section .box-wrapper .count {
   font-size: 0.9em;
@@ -217,6 +225,8 @@ section .box-wrapper .count {
 section .box-wrapper .description {
   display: flex;
   align-items: center;
+  padding-right: 10px;
+  font-weight: 300;
 }
 section .summary {
   display: flex;
@@ -263,8 +273,14 @@ section .summary .count:nth-child(2) {
 .wp-list-table.wp-list-kleinanzeigen-ads .column-shop-categories {
   width: auto;
 }
+.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-labels {
+  width: 90px;
+}
 .wp-list-table.wp-list-kleinanzeigen-ads .column-shop-brands {
   width: auto;
+}
+.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-price .woocommerce-price-suffix {
+    display: none;
 }
 .wp-list-table.wp-list-kleinanzeigen-ads .column-content {
   position: relative;
@@ -347,32 +363,34 @@ section .summary .count:nth-child(2) {
   height: 0.8em;
   margin-left: 10px;
 }
-section .summary-status {
-  margin-bottom: -7px;
-  justify-content: center !important;
+section .box-wrapper.summary-status {
+  justify-content: center;
   font-size: 0.8em;
   font-weight: 300;
+  margin-bottom: 0;
 }
-section .summary-status .trigger {
+section .box-wrapper.summary-status .trigger {
   cursor: pointer;
-} 
-section .summary-status .outer {
-  display: none;
 }
-section .summary-status .trigger .dashicons-arrow-down {
-  display: none;
+section .box-wrapper.summary-status .trigger .text {
+  text-decoration: underline;
 }
-section .summary-status .trigger.active .dashicons-arrow-down {
-  display: inline-block;
+section .box-wrapper.summary-status .outer {
+  height: 0;
+  overflow: hidden;
+  width: 100px;
+  transition: all 0.3s;
 }
-section .summary-status .trigger .dashicons-arrow-right {
-  display: inline-block;
+section .box-wrapper.summary-status .trigger.active ~ .outer {
+  height: auto;
+  width: 300px;
 }
-section .summary-status .trigger.active .dashicons-arrow-right {
-  display: none;
+section .box-wrapper.summary-status .status-wrapper {
+  display: flex;
+  flex-direction: column;
 }
-section .summary-status .trigger.active ~ .outer {
-  display: block;
+section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
+  transform: rotate(90deg);
 }
 .todo {
   display: flex;

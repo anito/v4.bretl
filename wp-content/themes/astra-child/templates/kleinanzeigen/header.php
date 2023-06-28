@@ -79,27 +79,27 @@
   </div>
   <div class="right-sections">
     <section id="color-definitions">
-      <div class="section-inner" style="padding-top: 50px;">
+      <div class="section-inner" style="padding-top: 50px; min-width: 140px;">
 
-        <div class="box-wrapper">
+        <div class="box-wrapper inset">
           <span class="status-wrapper">
             <span class="color-box status connected-publish"><?php echo count($products['publish']) ?></span>
             <span class="description">Veröffentlicht</span>
           </span>
         </div>
-        <div class="box-wrapper">
+        <div class="box-wrapper inset">
           <span class="status-wrapper">
             <span class="color-box status connected-draft"><?php echo count($products['draft']) ?></span>
             <span class="description">Entwurf </span>
           </span>
         </div>
-        <div class="box-wrapper">
+        <div class="box-wrapper inset">
           <span class="status-wrapper">
             <span class="color-box status invalid"><?php echo count($products['unknown']) ?></span>
             <span class="description">Unbekannt</span>
           </span>
         </div>
-        <div class="box-wrapper">
+        <div class="box-wrapper inset">
           <span class="status-wrapper">
             <span class="color-box status disconnected"><span class="inner"><?php echo count($products['no-sku']) ?></span></span>
             <span class="description">Nicht verknüpft</span>
@@ -112,16 +112,15 @@
                 <i class="dashicons dashicons-yes"></i><span><?php echo  __('Alles erledigt'); ?></span>
               </div>
             <?php else : ?>
-              <span class="trigger">
-                <?php if (1 === count($todos)) :
-                  echo sprintf(__('%d Meldung'), count($todos));
-                else :
-                  echo sprintf(__('%d Meldungen'), count($todos)); ?>
+              <div class="trigger"><span class="text">
+                  <?php if (1 === count($todos)) :
+                    echo sprintf(__('%d Meldung'), count($todos));
+                  else :
+                    echo sprintf(__('%d Meldungen'), count($todos)); ?>
 
-                <?php endif ?>
-                <i class="dashicons dashicons-arrow-right"></i>
-                <i class="dashicons dashicons-arrow-down"></i>
-              </span>
+                  <?php endif ?>
+                </span><i class="dashicons dashicons-arrow-right"></i>
+              </div>
               <div class="outer">
                 <div class="content">
                   <ul>

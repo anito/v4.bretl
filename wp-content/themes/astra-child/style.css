@@ -33,6 +33,10 @@ p {
   overflow: unset;
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
 .bold h1,
 .bold h2,
 .bold h3,
@@ -100,6 +104,11 @@ h6.after-header-line {
   font-size: 18px;
   font-weight: 400;
   font-style: italic;
+}
+
+.before-header-line {
+    font-weight: 100;
+    font-size: 15px;
 }
 
 .text-line {

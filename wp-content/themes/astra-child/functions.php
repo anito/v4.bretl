@@ -91,6 +91,59 @@ function wbp_wc_screen_styles($hook)
   }
 }
 
+function wbp_has_price_diff($record, $product)
+{
+  $regex = '/^([\d.]+)/';
+  preg_match($regex, $record->price, $matches);
+  $kleinanzeigen_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+
+  return $kleinanzeigen_price !== $product->get_price();
+}
+
+
+function wbp_title_contains($string, $title, $searchtype = 'default')
+{
+  switch ($searchtype) {
+    case 'exact':
+      preg_match('/\b' . strtolower($string) . '\b/', strtolower($title), $matches);
+      break;
+    default:
+      preg_match('/' . strtolower($string) . '/', strtolower($title), $matches);
+  }
+
+  if (!empty($matches[0])) {
+    return true;
+  }
+  return false;
+}
+
+// Callable product title functions
+function wbp_handle_product_title_sale($args)
+{
+  $product = $args['product'];
+  $price = $args['price'];
+
+  $regular_price = (int) $price + (int) $price * 10 / 100;
+  $product->set_regular_price($regular_price);
+  $product->set_sale_price($price);
+  return wbp_handle_product_term($args['term_name'], $product);;
+}
+
+function wbp_handle_product_title_simple($args)
+{
+  $product = $args['product'];
+  return wbp_handle_product_term($args['term_name'], $product);
+}
+
+function wbp_handle_product_term($name, $product) {
+  $term_id = wbp_add_product_term($name, 'label');
+  if ($term_id) {
+    require_once __DIR__ . '/includes/product-term-handler.php';
+    wbp_set_product_term($product, $term_id, 'label', true);
+  }
+  return $product;
+}
+
 function wbp_publish_guard($data)
 {
   require_once __DIR__ . '/includes/kleinanzeigen-ajax-handler.php';
@@ -140,7 +193,7 @@ function wbp_save_post($post_ID, $post)
 
   require_once __DIR__ . '/includes/product-term-handler.php';
   wbp_process_sale($post_ID, $post);
-  if(! is_ajax()) {
+  if (!is_ajax()) {
     wbp_process_kleinanzeigen($post_ID, $post);
   }
 }
@@ -737,7 +790,7 @@ function wbp_get_product_by_sku($sku)
     'sku' => $sku
   ));
 
-  if(!empty($p)) {
+  if (!empty($p)) {
     return $p[0];
   }
 

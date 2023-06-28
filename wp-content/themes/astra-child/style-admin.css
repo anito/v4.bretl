@@ -7,6 +7,9 @@
 /**
  * For edit-product screen (WP_Table_List)
  */
+.edit-php .column-product_label {
+  width: 10%;
+}
 .edit-php .column-sync {
   width: 13%;
 }

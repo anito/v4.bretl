@@ -61,7 +61,7 @@ function _ajax_sts_scan()
 {
 
   $data = array();
-  for ($pageNum = 1; $pageNum <= 6; $pageNum++) {
+  for ($pageNum = 1; $pageNum <= KLEINANZEIGEN_TOTAL_PAGES; $pageNum++) {
     $page_data  = wbp_get_json_data($pageNum);
 
     if (is_wp_error($page_data)) {
@@ -84,6 +84,7 @@ function _ajax_sts_scan()
 
   foreach ($published as $product) {
     $sku = $product->get_sku();
+
     if (!empty($sku) && !in_array($sku, $skus)) {
       wp_update_post(
         array(

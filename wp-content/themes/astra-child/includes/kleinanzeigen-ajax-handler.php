@@ -41,9 +41,9 @@ function remote_call($url, $tries = 3, $retry = 1)
 {
   $response = wp_remote_get($url);
 
-  if (! is_wp_error($response) && ($response['response']['code'] === 200)) {
+  if (!is_wp_error($response) && ($response['response']['code'] === 200)) {
     return $response;
-  } elseif($retry++ < $tries) {
+  } elseif ($retry++ < $tries) {
     sleep($retry * 2);
     return remote_call($url, $tries, $retry);
   }
@@ -63,7 +63,7 @@ function wbp_get_remote()
   } else {
     $remoteUrl = home_url();
   }
-  
+
   $response = remote_call($remoteUrl, 5);
 
   echo json_encode(
@@ -221,10 +221,10 @@ function wbp_ajax_disconnect()
       $record_key = array_search($kleinanzeigen_id, $ids);
       $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
       break;
-    }
+  }
   $row = ob_get_clean();
 
-  if('toplevel_page_kleinanzeigen' === $screen) {
+  if ('toplevel_page_kleinanzeigen' === $screen) {
     ob_start();
     $wp_list_table->render_head($pageNum);
   }
@@ -271,6 +271,45 @@ function wbp_ajax_import_kleinanzeigen_data()
 
     if ($product) {
       $product->set_regular_price($price);
+      $title_parts = array(
+        'aktionspreis' => array(
+          'term_name' => 'Aktionspreis',
+          'fn' => 'sale',
+        ),
+        'neu' => array(
+          'term_name' => 'Neu',
+          'match_type' => 'exact'
+        ),
+        'aktion' => array(
+          'term_name' => 'Aktion',
+          'match_type' => 'exact'
+        ),
+        'neumaschine' => 'Neu',
+        'mietmaschine' => 'Mieten',
+        'allrad' => 'Allrad',
+        'klima' => 'Klima',
+        'am lager' => 'Am Lager',
+        'neues modell' => 'Neues Modell',
+        'leicht gebraucht' => 'Leicht Gebraucht',
+      );
+
+      foreach ($title_parts as $key => $val) {
+
+        if (wbp_title_contains($key, $title, isset($val['match_type']) ? $val['match_type'] : null)) {
+
+          $fn = isset($val['fn']) ? $val['fn'] : 'simple';
+          if (is_callable('wbp_handle_product_title_' . $fn, false, $callable_name)) {
+
+            if (!is_array($val)) {
+              $term_name = $val;
+            } else {
+              $term_name = isset($val['term_name']) ? $val['term_name'] : $key;
+            }
+            $product = call_user_func('wbp_handle_product_title_' . $fn, compact('product', 'price', 'title', 'content', 'term_name'));
+          }
+        }
+      }
+
       try {
         $product->set_sku($kleinanzeigen_id);
       } catch (Exception $e) {

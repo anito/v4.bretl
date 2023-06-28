@@ -42,10 +42,27 @@ function wbp_create_attribute_taxonomies()
 }
 add_action('admin_init', 'wbp_create_attribute_taxonomies');
 
+function wbp_create_taxonomy_product_labels()
+{
+  $terms = get_terms('product_label', array('hide_empty' => false));
+  $term_names = wp_list_pluck($terms, 'name');
+
+  if (defined('WC_PRODUCT_LABELS')) {
+
+    foreach (WC_PRODUCT_LABELS as $name) {
+
+      if (!in_array($name, $term_names)) {
+        wbp_add_product_term($name, 'label');
+      }
+    }
+  }
+}
+add_action('init', 'wbp_create_taxonomy_product_labels');
+
 function wbp_get_wc_taxonomies()
 {
-  $taxonomies = get_terms('product_cat', array('hide_empty' => false));
-  $tax_names = wp_list_pluck($taxonomies, 'name');
+  $cats = get_terms('product_cat', array('hide_empty' => false));
+  $cat_names = wp_list_pluck($cats, 'name');
 
   $tags = get_terms('product_tag', array('hide_empty' => false));
   $tag_names = wp_list_pluck($tags, 'name');
@@ -54,7 +71,7 @@ function wbp_get_wc_taxonomies()
 
     foreach (WC_COMMON_TAXONOMIES as $name) {
 
-      if (!in_array($name, $tax_names)) {
+      if (!in_array($name, $cat_names)) {
         wbp_add_product_term($name, 'cat');
       }
       if (!in_array($name, $tag_names)) {
