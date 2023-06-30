@@ -104,11 +104,11 @@ function wbp_has_price_diff($record, $product)
 function wbp_title_contains($string, $title, $searchtype = 'default')
 {
   switch ($searchtype) {
-    case 'exact':
-      preg_match('/\b' . strtolower($string) . '\b/', strtolower($title), $matches);
+    case 'like':
+      preg_match('/' . strtolower($string) . '/', strtolower($title), $matches);
       break;
     default:
-      preg_match('/' . strtolower($string) . '/', strtolower($title), $matches);
+      preg_match('/\b' . strtolower($string) . '\b/', strtolower($title), $matches);
   }
 
   if (!empty($matches[0])) {
@@ -129,13 +129,14 @@ function wbp_handle_product_title_sale($args)
   return wbp_handle_product_term($args['term_name'], $product);;
 }
 
-function wbp_handle_product_title_simple($args)
+function wbp_handle_product_title_default($args)
 {
   $product = $args['product'];
   return wbp_handle_product_term($args['term_name'], $product);
 }
 
-function wbp_handle_product_term($name, $product) {
+function wbp_handle_product_term($name, $product)
+{
   $term_id = wbp_add_product_term($name, 'label');
   if ($term_id) {
     require_once __DIR__ . '/includes/product-term-handler.php';

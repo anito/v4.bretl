@@ -276,17 +276,11 @@ function wbp_ajax_import_kleinanzeigen_data()
           'term_name' => 'Aktionspreis',
           'fn' => 'sale',
         ),
-        'neu' => array(
-          'term_name' => 'Neu',
-          'match_type' => 'exact'
-        ),
-        'aktion' => array(
-          'term_name' => 'Aktion',
-          'match_type' => 'exact'
-        ),
+        'allrad' => array('term_name' => 'Allrad', 'match_type' => 'like'),
+        'neu' => 'Neu',
+        'aktion' => 'Aktion',
         'neumaschine' => 'Neu',
         'mietmaschine' => 'Mieten',
-        'allrad' => 'Allrad',
         'klima' => 'Klima',
         'am lager' => 'Am Lager',
         'neues modell' => 'Neues Modell',
@@ -297,7 +291,7 @@ function wbp_ajax_import_kleinanzeigen_data()
 
         if (wbp_title_contains($key, $title, isset($val['match_type']) ? $val['match_type'] : null)) {
 
-          $fn = isset($val['fn']) ? $val['fn'] : 'simple';
+          $fn = isset($val['fn']) ? $val['fn'] : 'default';
           if (is_callable('wbp_handle_product_title_' . $fn, false, $callable_name)) {
 
             if (!is_array($val)) {

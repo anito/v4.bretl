@@ -16,6 +16,16 @@ Template: astra
 @import url(./css/fonts/styles.css);
 
 /**
+ * No right/left padding on smaller displays (defined by elementors container class .e-con)
+ */
+@media (max-width: 921px) {
+  :root {
+    --container-default-padding-right: 0;
+    --container-default-padding-left: 0;
+  }
+}
+
+/**
  * Astra Reset
  */
 html,
