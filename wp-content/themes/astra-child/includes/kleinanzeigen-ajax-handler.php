@@ -279,6 +279,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'allrad' => array('term_name' => 'Allrad', 'match_type' => 'like'),
         'neu' => 'Neu',
         'aktion' => 'Aktion',
+        'aktionsmodell' => 'Aktion',
         'neumaschine' => 'Neu',
         'mietmaschine' => 'Mieten',
         'klima' => 'Klima',
