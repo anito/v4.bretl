@@ -125,8 +125,6 @@ jQuery.noConflict();
     const polygonEl = svgEl.querySelector('polygon');
     const root = document.querySelector('body');
 
-    let isOpen = false;
-
     if(!toggleEl) return;
 
     const points = {
@@ -143,8 +141,9 @@ jQuery.noConflict();
     }
 
     const clickHandler = (active) => {
-      isOpen = root.classList.toggle("sidebar-open", active);
-      isOpen ? opened() : closed();
+      root.classList.toggle("sidebar-open", active)
+        ? opened()
+        : closed();
     }
 
     toggleEl.addEventListener('click', function() {
