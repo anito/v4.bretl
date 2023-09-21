@@ -33,20 +33,21 @@ body {
   padding: 0;
   margin: 0;
 }
-
 body {
   font-family: "Gibson", sans-serif;
 }
-
 p {
-  margin: 0;
   overflow: unset;
 }
-
+ol[type="I"] {
+  list-style: upper-roman;
+}
+ol[type="i"] {
+  list-style: lower-roman;
+}
 .overflow-hidden {
   overflow: hidden;
 }
-
 .bold h1,
 .bold h2,
 .bold h3,
@@ -55,7 +56,6 @@ p {
 .bold h6 {
   font-weight: 600;
 }
-
 .thin h1,
 .thin h2,
 .thin h3,
@@ -64,7 +64,6 @@ p {
 .thin h6 {
   font-weight: 100;
 }
-
 .italic h1,
 .italic h2,
 .italic h3,
@@ -73,7 +72,6 @@ p {
 .italic h6 {
   font-style: italic;
 }
-
 .header-line h1,
 .header-line h2,
 .header-line h3,
@@ -88,7 +86,6 @@ h5.header-line,
 h6.header-line {
   margin: 30px 0 20px !important;
 }
-
 .after-header-line h1,
 .after-header-line h2,
 .after-header-line h3,
@@ -103,24 +100,20 @@ h5.after-header-line,
 h6.after-header-line {
   margin: 20px 0 10px !important;
 }
-
 .header-line {
   font-size: 26px;
   font-weight: 400;
   font-style: italic;
 }
-
 .after-header-line {
   font-size: 18px;
   font-weight: 400;
   font-style: italic;
 }
-
 .before-header-line {
     font-weight: 100;
     font-size: 15px;
 }
-
 .text-line {
   font-size: 18px;
   font-weight: 100;
@@ -129,11 +122,9 @@ h6.after-header-line {
   .wp-block-group {
     padding: 0;
   }
-
   .wp-block-group .wp-block-group {
     padding: 0;
   }
-
   .wp-block-columns,
   .wp-block-column {
     margin: 0;

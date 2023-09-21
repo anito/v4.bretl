@@ -119,8 +119,45 @@ jQuery.noConflict();
     }
   }
 
+  function add_toggle_sidebar(active) {
+    const toggleEl = document.getElementById("sidebar-toggle");
+    const svgEl = toggleEl.querySelector('svg');
+    const polygonEl = svgEl.querySelector('polygon');
+    const root = document.querySelector('body');
+
+    let isOpen = false;
+
+    if(!toggleEl) return;
+
+    const points = {
+      arrow: "8.39 0 7.61 0 7.61 7.64 0 7.64 0 8.4 8.39 8.4 8.39 0",
+      plus: "8.39 7.64 8.39 0 7.61 0 7.61 7.64 0 7.64 0 8.4 7.61 8.4 7.61 16 8.39 16 8.39 8.4 16 8.4 16 7.64 8.39 7.64",
+    }
+
+    const opened = () => {
+      polygonEl.setAttribute("points", points.plus);
+    }
+    
+    const closed = () => {
+      polygonEl.setAttribute("points", points.arrow);
+    }
+
+    const clickHandler = (active) => {
+      isOpen = root.classList.toggle("sidebar-open", active);
+      isOpen ? opened() : closed();
+    }
+
+    toggleEl.addEventListener('click', function() {
+      clickHandler();
+    })
+
+    clickHandler(active);
+    
+  }
+
   // add_fb_div();
   // add_image_disclaimer();
   add_jet_engine_wishlist_hook(".wishlist-target [class*=title]", "wishlist");
+  add_toggle_sidebar(true);
   // add_solis_script();
 })(jQuery);

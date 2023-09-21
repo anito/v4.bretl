@@ -60,12 +60,12 @@ function add_scripts()
   $js_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.js');
   $css_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.css');
 
-  wp_enqueue_script('app-hero', $js_uri, false, '0.0.1', 'all');
-  wp_enqueue_style('app-hero', $css_uri, false, '0.0.1', 'all');
-  wp_localize_script('app-hero', 'app_hero', array(
-    'app_url' => get_stylesheet_directory_uri() . '/js/hero/dist/',
-    'stylesheet_url' => get_stylesheet_directory_uri()
-  ));
+  // wp_enqueue_script('app-hero', $js_uri, false, '0.0.1', 'all');
+  // wp_enqueue_style('app-hero', $css_uri, false, '0.0.1', 'all');
+  // wp_localize_script('app-hero', 'app_hero', array(
+  //   'app_url' => get_stylesheet_directory_uri() . '/js/hero/dist/',
+  //   'stylesheet_url' => get_stylesheet_directory_uri()
+  // ));
 
   wp_register_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), '1.0', true);
   wp_enqueue_script('main');

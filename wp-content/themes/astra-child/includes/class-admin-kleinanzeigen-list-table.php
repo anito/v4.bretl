@@ -50,7 +50,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $data = $this->data;
 
     if (isset($data)) {
-      $categories = $data->searchData;
+      $categories = $data->categoriesSearchData;
       $total = 0;
       foreach ($categories as $category) {
         $total += $category->totalAds;
