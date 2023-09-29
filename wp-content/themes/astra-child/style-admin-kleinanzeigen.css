@@ -291,10 +291,10 @@ section .summary .count:nth-child(2) {
 .wp-list-table.wp-list-kleinanzeigen-ads [id*="-wbp-action"] {
   position: relative;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads tr[class*="diff-"] {
+.wp-list-table.wp-list-kleinanzeigen-ads tr[class*="diff"] {
   background-color: #ff00001e;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .diff-price .column[class*="-price"] {
+.wp-list-table.wp-list-kleinanzeigen-ads .diff.price-diff .column[class*="-price"] {
   text-decoration: underline;
   text-decoration-style: wavy;
   text-decoration-thickness: 0.06em;

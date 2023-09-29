@@ -292,13 +292,16 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     if ($product) {
 
-      $price = wp_kses_post($product->get_price_html());
-      if (wbp_has_price_diff($record, $product)) $diff_classes[] = 'diff-price';
+      if (wbp_has_price_diff($record, $product)) {
+        $diff_classes[] = 'diff price-diff';
+      }
 
       $product_label_terms = get_the_terms($product->get_id(), 'product_label');
       $product_labels = array_map(function ($item) {
         return $item->name;
       }, !is_wp_error($product_label_terms) ? ($product_label_terms ? $product_label_terms : []) : []);
+
+      $price = wp_kses_post($product->get_price_html());
 
     } else {
 

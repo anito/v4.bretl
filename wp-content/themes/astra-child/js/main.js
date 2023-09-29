@@ -102,7 +102,6 @@ jQuery.noConflict();
 
   function add_solis_script() {
     const el = document.getElementById('iframe-solis');
-    console.log(el)
 
     if(!el) return;
 
@@ -119,13 +118,14 @@ jQuery.noConflict();
     }
   }
 
-  function add_toggle_sidebar(active) {
+  function add_toggle_sidebar() {
     const toggleEl = document.getElementById("sidebar-toggle");
+	  
+    if(!toggleEl) return;
+	
     const svgEl = toggleEl.querySelector('svg');
     const polygonEl = svgEl.querySelector('polygon');
     const root = document.querySelector('body');
-
-    if(!toggleEl) return;
 
     const points = {
       arrow: "8.39 0 7.61 0 7.61 7.64 0 7.64 0 8.4 8.39 8.4 8.39 0",
@@ -134,29 +134,29 @@ jQuery.noConflict();
 
     const opened = () => {
       polygonEl.setAttribute("points", points.plus);
+      toggleEl.style.display = 'unset';
     }
     
     const closed = () => {
       polygonEl.setAttribute("points", points.arrow);
+      toggleEl.style.display = 'unset';
     }
 
-    const clickHandler = (active) => {
-      root.classList.toggle("sidebar-open", active)
+    const clickHandler = () => {
+      root.classList.toggle("sidebar-open")
         ? opened()
         : closed();
     }
 
-    toggleEl.addEventListener('click', function() {
-      clickHandler();
-    })
+    toggleEl.addEventListener('click', clickHandler);
 
-    clickHandler(active);
+    clickHandler();
     
   }
 
   // add_fb_div();
   // add_image_disclaimer();
   add_jet_engine_wishlist_hook(".wishlist-target [class*=title]", "wishlist");
-  add_toggle_sidebar(true);
+  add_toggle_sidebar();
   // add_solis_script();
 })(jQuery);

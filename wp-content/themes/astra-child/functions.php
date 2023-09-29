@@ -96,8 +96,9 @@ function wbp_has_price_diff($record, $product)
   $regex = '/^([\d.]+)/';
   preg_match($regex, $record->price, $matches);
   $kleinanzeigen_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+  $woo_price = $product->get_price();
 
-  return $kleinanzeigen_price !== $product->get_price();
+  return $kleinanzeigen_price !== $woo_price;
 }
 
 
@@ -581,7 +582,7 @@ function wbp_return_theme_author($author)
 add_filter('astra_theme_author', 'wbp_return_theme_author');
 
 /**
- * Change Variable Price Html
+ * Change Variable Price Range Html
  */
 function wbp_format_variation_price_range($price, $from, $to)
 {
@@ -590,11 +591,6 @@ function wbp_format_variation_price_range($price, $from, $to)
   return $price;
 }
 add_filter('woocommerce_format_price_range', 'wbp_format_variation_price_range', 10, 3);
-
-if (class_exists('gpls_woo_rfq_product_meta')) {
-  remove_action('woocommerce_product_options_advanced', array('gpls_woo_rfq_product_meta', 'gpls_woo_rfq_add_custom_general_fields'), 11, 0);
-  remove_action('woocommerce_process_product_meta', array('gpls_woo_rfq_product_meta', 'gpls_woo_rfq_add_custom_general_fields_save'), 11, 1);
-}
 
 function wbp_product_custom_fields()
 {
