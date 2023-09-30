@@ -542,26 +542,34 @@ jQuery(document).ready(function ($) {
   }
 
   function processDataImport(json, el, callback = () => {}) {
+    const { title, price: raw_price, tags: raw_tags, excerpt } = $(el).data();
+    // const title = raw_title?.replace(/\s*/, "");
+    const tags = raw_tags.split(",");
+    const price = raw_price?.replace(/[\s\.€]*/g, "");
     const { post_ID, kleinanzeigen_id, post_status, content, screen } = json;
     const postdata = { post_ID, kleinanzeigen_id, post_status };
 
-    let doc;
+    let doc, description;
     try {
       const parser = new DOMParser();
       doc = parser.parseFromString(content.body, "text/html");
+      description = doc.getElementById(
+        "viewad-description-text"
+      )?.outerHTML;
     } catch (err) {
-      console.error(err);
-      return;
+      description = `Document parse error: ${err}`;
     }
 
-    const title_raw = doc.getElementById("viewad-title")?.innerText;
-    const price_raw = doc.getElementById("viewad-price")?.innerText;
-    const description = doc.getElementById(
-      "viewad-description-text"
-    )?.outerHTML;
-    const title = title_raw?.replace(/\s*/, "");
-    const price = price_raw?.replace(/[\s\.€]*/g, "");
-    const kleinanzeigendata = { title, price, description };
+    // const raw_title = doc.getElementById("viewad-title")?.innerText;
+    // const raw_price = doc.getElementById("viewad-price")?.innerText;
+    
+    const kleinanzeigendata = {
+      title,
+      price,
+      description,
+      excerpt,
+      tags,
+    };
 
     $.post({
       url: admin_ajax_local,

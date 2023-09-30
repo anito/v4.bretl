@@ -417,6 +417,7 @@ if (is_admin()) {
 
   require_once __DIR__ . '/includes/kleinanzeigen-ajax-handler.php';
   require_once __DIR__ . '/includes/ajax-table.php';
+  require_once __DIR__ . '/includes/product-term-handler.php';
 
   add_action('wp_ajax__ajax_connect', '_ajax_connect');
   add_action('wp_ajax__ajax_disconnect', '_ajax_disconnect');

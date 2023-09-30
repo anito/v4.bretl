@@ -243,7 +243,9 @@ function wbp_ajax_import_kleinanzeigen_data()
 
     $post_ID = isset($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
     $kleinanzeigen_id = isset($_REQUEST['postdata']['kleinanzeigen_id']) ? $_REQUEST['postdata']['kleinanzeigen_id'] : null;
+
   }
+
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
   $kleinanzeigendata = isset($_REQUEST['kleinanzeigendata']) ? $_REQUEST['kleinanzeigendata'] : null;
 
@@ -257,7 +259,9 @@ function wbp_ajax_import_kleinanzeigen_data()
     ($kleinanzeigendata) &&
     ($title = isset($kleinanzeigendata['title']) ? $kleinanzeigendata['title'] : null) &&
     ($price = isset($kleinanzeigendata['price']) ? $kleinanzeigendata['price'] : null) &&
-    ($content = isset($kleinanzeigendata['description']) ? $kleinanzeigendata['description'] : null)
+    ($content = isset($kleinanzeigendata['description']) ? $kleinanzeigendata['description'] : null) &&
+    ($excerpt = isset($kleinanzeigendata['excerpt']) ? $kleinanzeigendata['excerpt'] : null) &&
+    ($tags = isset($kleinanzeigendata['tags']) ? $kleinanzeigendata['tags'] : [])
   ) {
 
     if (!$post_ID) {
@@ -288,6 +292,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'leicht gebraucht' => 'Leicht Gebraucht',
       );
 
+      // handle title sensitive product labels
       foreach ($title_parts as $key => $val) {
 
         if (wbp_title_contains($key, $title, isset($val['match_type']) ? $val['match_type'] : null)) {
@@ -303,6 +308,11 @@ function wbp_ajax_import_kleinanzeigen_data()
             $product = call_user_func('wbp_handle_product_title_' . $fn, compact('product', 'price', 'title', 'content', 'term_name'));
           }
         }
+      }
+
+      // set product attributes
+      foreach ($tags as $key => $tag) {
+        wbp_set_pa_term($product, $tag, true);
       }
 
       try {
@@ -322,7 +332,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       'post_type' => 'product',
       'post_status' => 'draft',
       'post_content' => $content,
-      'post_excerpt' => wbp_sanitize_excerpt($content, 300)
+      'post_excerpt' => $excerpt //wbp_sanitize_excerpt($content, 300)
     ), true);
   }
 
