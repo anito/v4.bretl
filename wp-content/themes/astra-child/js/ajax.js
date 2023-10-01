@@ -544,7 +544,7 @@ jQuery(document).ready(function ($) {
   function processDataImport(json, el, callback = () => {}) {
     const { title, price: raw_price, tags: raw_tags, excerpt } = $(el).data();
     // const title = raw_title?.replace(/\s*/, "");
-    const tags = raw_tags.split(",");
+    const tags = raw_tags?.split(",");
     const price = raw_price?.replace(/[\s\.€]*/g, "");
     const { post_ID, kleinanzeigen_id, post_status, content, screen } = json;
     const postdata = { post_ID, kleinanzeigen_id, post_status };
