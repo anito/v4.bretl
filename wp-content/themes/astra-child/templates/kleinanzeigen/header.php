@@ -26,7 +26,7 @@
         <?php $title = "Verberge alle mit Kleinanzeigen verlinkten Produkte im Shop, welche aufgrund Verkauf o.ä. nicht mehr auf Kleinanzeigen gefunden werden können." ?>
         <div class="scan-pages">
           <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
-          <a href="" type="button" class="scan info" title="<?php echo $title ?>">Alle Produkte im Shop verbergen (auf Entwurf umstellen), die keiner Kleinanzeige mehr zugeordnet werden können (z.B. durch Verkauf).</a>
+          <a href="" type="button" class="scan info" title="<?php echo $title ?>">Alle Produkte im Shop verbergen (auf Entwurf umstellen), deren Kleinanzeige nicht mehr auffindbar ist (z.B. durch Verkauf).</a>
         </div>
       </div>
     </section>
