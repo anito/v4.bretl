@@ -5,32 +5,48 @@ require_once WP_PLUGIN_DIR . '/woocommerce/includes/admin/list-tables/class-wc-a
 class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 {
   protected $screen = '';
+  protected $is_fetch = false;
+  protected $is_quickedit = false;
+  protected $is_pageload = false;
 
   function __construct()
   {
     $this->list_table_type = 'product';
 
-    $render_wc = true;
-
-    // Ajax load
-    if (is_ajax() && isset($_POST['ID'])) {
-      // When quick editing woocommerce renders its own rows
-      $render_wc = false;
+    if(is_ajax()) {
+      if (isset($_POST['ID'])) {
+        $this->is_quickedit = true;
+      } else {
+        $this->is_fetch = true;
+      }
+    } else {
+      $this->is_pageload = true;
     }
 
-    // Full page load - woocommerce renders its own rows
-    if (!function_exists('get_current_screen')) {
-      $render_wc = false;
-    }
+    // if (is_ajax()) {
+    //   $render_wc = true;
+    // } elseif (!function_exists('get_current_screen')) {
+    //   $render_wc = false;
+    // }
 
-    if ($render_wc) {
-      // add_filter('request', array($this, 'request_query'));
-      add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 10, 2);
-      add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'));
-      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
-    }
+    // No screen ID on full page load (render build in woo rows)
+    // if (!function_exists('get_current_screen')) {
+    //   $render_wc = false;
+    // }
+
+    add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 10, 2);
+    add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'));
     add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 11);
-    add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 1, 2);
+
+    if (($this->is_fetch)) {
+      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
+      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
+    }
+
+    if ($this->is_pageload | $this->is_quickedit) {
+      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
+    }
+
   }
 
   function render_row($id)
@@ -41,17 +57,28 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
   function define_custom_columns($columns)
   {
-    $featured = $columns['featured'];
     $date = $columns['date'];
+    $price = $columns['price'];
+    $tag = $columns['product_tag'];
+    $cat = $columns['product_cat'];
+    $featured = $columns['featured'];
+
+    unset($columns['sku']);
+    unset($columns['price']);
     unset($columns['date']);
     unset($columns['featured']);
-    unset($columns['sku']);
+    unset($columns['product_cat']);
     unset($columns['product_tag']);
+
+    $columns['price'] = $price;
     $columns['product_label'] = 'Labels';
     $columns['featured'] = $featured;
     $columns['date'] = $date;
+    $columns['product_tag'] = $tag;
+    $columns['product_cat'] = $cat;
     $columns['sku'] = 'KA';
     $columns['sync'] = 'KA Aktionen';
+    
     return $columns;
   }
 

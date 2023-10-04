@@ -72,7 +72,6 @@ function wbp_process_featured($product)
 function wbp_find_kleinanzeige(int $id): stdClass | null
 {
   $pageNum = 1;
-  // $ad = null;
   while ($pageNum <= KLEINANZEIGEN_TOTAL_PAGES) {
     $data = wbp_get_json_data($pageNum);
     $ads = $data->ads;
@@ -90,8 +89,6 @@ function wbp_find_kleinanzeige(int $id): stdClass | null
 
 function wbp_process_kleinanzeigen($post_ID, $post)
 {
-  global $wpdb;
-
   // If this is an autosave, our form has not been submitted, so we don't want to do anything.
   if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
     return;
@@ -115,16 +112,8 @@ function wbp_process_kleinanzeigen($post_ID, $post)
   $title = $product->get_title();
   $content = $product->get_description();
 
-  // $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
-  // $posts_like_title = $wpdb->get_results($prepare);
-
-  // $_id = get_post_meta($post_ID, 'kleinanzeigen_id', true);
-  // $kleinanzeigen_id = $_id ?? parse_kleinanzeigen_id($_id) : "";
-
-  
   if (!empty($kleinanzeigen_id)) {
 
-    // new product
     $ad = wbp_find_kleinanzeige($kleinanzeigen_id);
     $ad_title = $ad->title;
     $sku_error = false;
@@ -147,26 +136,27 @@ function wbp_process_kleinanzeigen($post_ID, $post)
     }
 
     // $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $ad_title);
-    // $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE WHERE post_status != '%s' AND post_title != '' AND post_title = %s", 'trash', $ad_title);
     // $results = $wpdb->get_results($prepare);
     // $title_exists = count($results) >= 2;
 
     if($sku_error) {
       $title = wp_strip_all_tags(wbp_sanitize_title($ad_title . " [ DUPLIKAT " . 0 . " ID " . $kleinanzeigen_id . " ]"));
-      $content = __('Ad already exists. Please delete this product.', 'astra-child');
+      $content = '<b style="color: red;">' . __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child') . '</b>';
     }
 
     wp_insert_post([
       'ID' => $post_ID,
       'post_type' => 'product',
+      'post_status' => $_POST['post_status'],
       'post_content' => $content,
+      'post_excerpt' => $product->get_short_description(),
       'post_title' => $title
     ]);
 
     if ($sku_error) {
-      enable_sku($post_ID, $ad);
-    } else {
       disable_sku($post_ID);
+    } else {
+      enable_sku($post_ID, $ad);
     }
   } else {
     disable_sku($post_ID);

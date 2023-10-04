@@ -5,11 +5,11 @@
 
         <div class="">
 
-          <h2><?php echo sprintf(__('Seite: %s', 'wbp'), $page) ?></h2>
-          <h2><small><?php echo sprintf(__('Anzeigen: %s', 'wbp'), count($data->ads)); ?><span class="<?php echo $total != count($published) ? 'warning' : '' ?>" style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Gesamt: %d / %s)', 'wbp'), $total, count($published)); ?></span></small></h2>
+          <h2><?php echo sprintf(__('Page: %s', 'astra-child'), $page) ?></h2>
+          <h2><small><?php echo sprintf(__('Ads: %s', 'astra-child'), count($data->ads)); ?><span class="<?php echo $total != count($published) ? 'warning' : '' ?>" style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Total: %d / %s)', 'astra-child'), $total, count($published)); ?></span></small></h2>
           <h4><small>
               <?php foreach ($categories as $category) { ?>
-                <?php echo sprintf(__('%s (%s)', 'wbp'), $category->title, $category->totalAds) ?>
+                <?php echo sprintf(__('%s (%s)', 'astra-child'), $category->title, $category->totalAds) ?>
               <?php } ?>
             </small>
           </h4>
@@ -24,9 +24,15 @@
         </div>
 
         <?php $title = "Verberge alle mit Kleinanzeigen verlinkten Produkte im Shop, welche aufgrund Verkauf o.ä. nicht mehr auf Kleinanzeigen gefunden werden können." ?>
-        <div class="scan-pages">
+        <div class="scan-pages" style="display: flex; margin: 15px 0px 5px; font-size: 12px;">
           <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
-          <a href="" type="button" class="scan info" title="<?php echo $title ?>">Alle Produkte im Shop verbergen (auf Entwurf umstellen), deren Kleinanzeige nicht mehr auffindbar ist (z.B. durch Verkauf).</a>
+          <div class="">
+            <span><b>Bei Verkauf auf Kleinanzeigen:</b></span>
+            <div>
+              <span>Alle auf Kleinanzeigen verkauften Produkte </span>
+              <a href="" type="button" class="start-scan info" title="<?php echo $title ?>">jetzt im Shop ausblenden</a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -38,7 +44,7 @@
           <h2>&nbsp;</h2>
           <h2><small>
               <div class="summary">
-                <span><i class="dashicons dashicons-visibility"></i><?php echo __('Veröffentlicht:', 'wbp') ?></span>
+                <span><i class="dashicons dashicons-visibility"></i><?php echo __('Published', 'astra-child') ?>:</span>
                 <span>
                   <span class="count"><?php echo count($products['publish']) ?></span>
                   <span class="indicator indicator-publish"></span>
@@ -47,7 +53,7 @@
             </small></h2>
           <h2><small>
               <div class="summary">
-                <span><i class="dashicons dashicons-hidden"></i><?php echo __('Entwürfe:', 'wbp') ?></span>
+                <span><i class="dashicons dashicons-hidden"></i><?php echo __('Drafts', 'astra-child') ?>:</span>
                 <span>
                   <span class="count"><?php echo count($products['draft']) ?></span>
                   <span class="indicator indicator-draft"></span>
@@ -56,7 +62,7 @@
             </small></h2>
           <h2><small>
               <div class="summary">
-                <span><i class="dashicons dashicons-editor-help"></i><?php echo __('Unbekannt:', 'wbp') ?></span>
+                <span><i class="dashicons dashicons-editor-help"></i><?php echo __('Unknown', 'astra-child') ?>:</span>
                 <span>
                   <span class="count"><?php echo count($products['unknown']) ?></span>
                   <span class="indicator indicator-unknown"></span>
@@ -69,7 +75,7 @@
           <ul>
             <li>
               <i class="dashicons dashicons-warning"></i>
-              <span>Bitte beachte, dass nach einem Datenimport der Produktstatus immer zu <strong>Entwurf</strong> wechselt.</span>
+              <span>Bitte beachte, dass nach einem Datenimport das Produkt immer den Status <strong>Entwurf</strong> erhält und erneut veröffentlicht werden muss.</span>
             </li>
           </ul>
         </div>
@@ -90,7 +96,7 @@
         <div class="box-wrapper inset">
           <span class="status-wrapper">
             <span class="color-box status connected-draft"><?php echo count($products['draft']) ?></span>
-            <span class="description">Entwurf </span>
+            <span class="description">Ausgeblendet</span>
           </span>
         </div>
         <div class="box-wrapper inset">
@@ -109,7 +115,7 @@
           <span class="status-wrapper">
             <?php if (0 === count($todos)) : ?>
               <div>
-                <i class="dashicons dashicons-yes"></i><span><?php echo  __('Alles erledigt'); ?></span>
+                <i class="dashicons dashicons-yes"></i><span><?php echo  __('All done', 'astra-child'); ?></span>
               </div>
             <?php else : ?>
               <div class="trigger"><span class="text">

@@ -60,7 +60,7 @@ add_action('wp_ajax_nopriv__ajax_sts_display', '_ajax_sts_display');
 function _ajax_sts_scan()
 {
 
-  $data = array();
+  $all_ads = array();
   for ($pageNum = 1; $pageNum <= KLEINANZEIGEN_TOTAL_PAGES; $pageNum++) {
     $page_data  = wbp_get_json_data($pageNum);
 
@@ -71,7 +71,7 @@ function _ajax_sts_scan()
 
       )));
     }
-    $data = array_merge($data, $page_data->ads);
+    $all_ads = array_merge($all_ads, $page_data->ads);
   }
 
   $args = array(
@@ -80,12 +80,12 @@ function _ajax_sts_scan()
   );
   $published = wc_get_products($args);
 
-  $skus = wp_list_pluck($data, 'id');
+  $ids = wp_list_pluck($all_ads, 'id');
 
   foreach ($published as $product) {
-    $sku = $product->get_sku();
+    $id = $product->get_sku();
 
-    if (!empty($sku) && !in_array($sku, $skus)) {
+    if (!empty($id) && !in_array($id, $ids)) {
       wp_update_post(
         array(
           'ID' => $product->get_id(),
@@ -99,7 +99,7 @@ function _ajax_sts_scan()
 
   die(json_encode(array(
 
-    "data" => $data,
+    "data" => $all_ads,
     "pageNum" => $_COOKIE['kleinanzeigen-table-page']
 
   )));
@@ -245,9 +245,8 @@ function fetch_ts_script()
             list.update(data);
           })
 
-          $('.scan-pages a.scan').on('click', function(e) {
+          $('.scan-pages a.start-scan').on('click', function(e) {
             e.preventDefault();
-            console.log('scanning')
 
             $.ajax({
 
