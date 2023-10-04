@@ -29,8 +29,8 @@
           <div class="">
             <span><b>Bei Verkauf auf Kleinanzeigen:</b></span>
             <div>
-              <span>Alle auf Kleinanzeigen verkauften Produkte </span>
-              <a href="" type="button" class="start-scan info" title="<?php echo $title ?>">jetzt im Shop ausblenden</a>
+              <span>Alle auf Kleinanzeigen.de verkaufte/deaktivierte Artikel </span>
+              <a href="" type="button" class="start-scan info" title="<?php echo $title ?>">im Shop ausblenden</a>
             </div>
           </div>
         </div>
