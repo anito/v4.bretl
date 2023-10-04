@@ -3,11 +3,11 @@
 
   <div id="import-kleinanzeigen-data-wbp-action-<?php echo $record->id ?>">
     <span class="spinner"></span>
-    <a class="button button-primary button-small <?php echo $classes ?>" href="<?php echo admin_url('admin-ajax.php?sku=') . $record->id  ?>&action=import_data')" data-post-id="<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $record->id ?>" data-title="<?php echo $record->title; ?>" data-price="<?php echo $record->price; ?>" data-excerpt="<?php echo $record->description; ?>" data-tags="<?php echo implode(',', isset($record->tags) ? $record->tags : []); ?>" data-action="import-data-<?php echo $record->id ?>"><?php echo __('Daten importieren', 'wbp') ?></a>
+    <a class="button button-primary button-small <?php echo $classes ?>" href="<?php echo admin_url('admin-ajax.php?sku=') . $record->id  ?>&action=import_data')" data-post-id="<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $record->id ?>" data-action="import-data-<?php echo $record->id ?>"><?php echo __('Import Data', 'astra-child') ?></a>
   </div>
   <div id="import-kleinanzeigen-images-wbp-action-<?php echo $record->id ?>">
     <span class="spinner"></span>
-    <a class="button button-primary button-small <?php echo $classes ?>" href="<?php echo admin_url('admin-ajax.php?sku=') . $record->id  ?>&action=import_images" data-post-id="<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $record->id ?>" data-action="import-images-<?php echo $record->id ?>"><?php echo __('Fotos importieren', 'wbp') ?></a>
+    <a class="button button-primary button-small <?php echo $classes ?>" href="<?php echo admin_url('admin-ajax.php?sku=') . $record->id  ?>&action=import_images" data-post-id="<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $record->id ?>" data-action="import-images-<?php echo $record->id ?>"><?php echo __('Import Images', 'astra-child') ?></a>
   </div>
   <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="hidden">
     <span class="spinner"></span>

@@ -455,6 +455,70 @@ function wbp_get_wc_placeholder_image($default_placeholder)
 add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', 'wbp_get_wc_placeholder_image');
 
 /**
+ * Add Metabox to product screen
+ *
+ */
+function kleinanzeigen_meta_box()
+{
+
+  $screens = array('edit-product', 'product');
+
+  foreach ($screens as $screen) {
+    add_meta_box(
+      'kleinanzeigen',
+      __('Ads', 'astra-child'),
+      'kleinanzeigen_metabox_callback',
+      $screen
+    );
+  }
+}
+// add_action('add_meta_boxes', 'kleinanzeigen_meta_box');
+
+function kleinanzeigen_metabox_callback($post) {
+
+  wp_nonce_field('kleinanzeigen_nonce', 'kleinanzeigen_nonce');
+
+  $id = get_post_meta($post->ID, 'kleinanzeigen_id', true);
+  wbp_include_kleinanzeigen_template('metaboxes/kleinanzeigen-import.php', false, array('id' => $id));
+}
+
+function save_kleinanzeigen_meta_box_data($post_id)
+{
+
+  // Check if our nonce is set.
+  if (!isset($_POST['kleinanzeigen_nonce'])) {
+    return;
+  }
+
+  // Verify that the nonce is valid.
+  if (!wp_verify_nonce($_POST['kleinanzeigen_nonce'], 'kleinanzeigen_nonce')) {
+    return;
+  }
+
+  // If this is an autosave, our form has not been submitted, so we don't want to do anything.
+  if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+    return;
+  }
+
+  // Check the user's permissions.
+  if (isset($_POST['post_type']) && 'product' == $_POST['post_type']) {
+
+    if (!current_user_can('edit_post', $post_id)) {
+      return;
+    }
+  }
+
+  if (!isset($_POST['kleinanzeigen_id'])) {
+    return;
+  }
+
+  $id = sanitize_text_field($_POST['kleinanzeigen_id']);
+
+  update_post_meta($post_id, 'kleinanzeigen_id', $id);
+}
+// add_action('save_post', 'save_kleinanzeigen_meta_box_data');
+
+/**
  * In order to improve SEO,
  * display the product title again in product description
  *
@@ -605,7 +669,7 @@ function wbp_product_custom_fields()
   woocommerce_wp_text_input(
     array(
       'id' => 'kleinanzeigen_url',
-      'label' => __('KLEINANZEIGEN URL', 'astra-child'),
+      'label' => __('Ad Url', 'astra-child'),
       'placeholder' => 'Link to eBay Kleinanzeigen',
       'desc_tip' => 'true',
       'description' => __("Enable eBay link for this product", 'astra-child'),

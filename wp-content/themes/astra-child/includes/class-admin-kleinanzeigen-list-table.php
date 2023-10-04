@@ -346,12 +346,12 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           }
 
           if (!$product_by_sku) {
-            $label = __('Verknüpfen');
+            $label = __('Connect', 'astra-child');
             $action = 'connect-' . $post_id;
             $icon = 'admin-links';
             $type = 'button';
           } else {
-            $label = __('Trennen');
+            $label = __('Disconnect', 'astra-child');
             $action = 'disconnect-' . $post_id;
             $icon = 'editor-unlink';
             $type = 'button';

@@ -69,50 +69,107 @@ function wbp_process_featured($product)
   }
 }
 
-function wbp_process_kleinanzeigen($post_id, $post)
+function wbp_find_kleinanzeige(int $id): stdClass | null
+{
+  $pageNum = 1;
+  // $ad = null;
+  while ($pageNum <= KLEINANZEIGEN_TOTAL_PAGES) {
+    $data = wbp_get_json_data($pageNum);
+    $ads = $data->ads;
+    foreach ($ads as $val) {
+      if ($val->id == (int) $id) {
+        $ad = $val;
+        $pageNum = KLEINANZEIGEN_TOTAL_PAGES;
+        break;
+      }
+    };
+    $pageNum++;
+  }
+  return $ad ?? null;
+}
+
+function wbp_process_kleinanzeigen($post_ID, $post)
 {
   global $wpdb;
 
-  $product = wc_get_product($post_id);
+  // If this is an autosave, our form has not been submitted, so we don't want to do anything.
+  if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+    return;
+  }
 
+  // Check the user's permissions.
+  if (isset($_POST['post_type']) && 'product' == $_POST['post_type']) {
+
+    if (!current_user_can('edit_post', $post_ID)) {
+      return;
+    }
+  }
+
+  if (!isset($_POST['kleinanzeigen_id'])) {
+    return;
+  }
+
+  $kleinanzeigen_id = sanitize_text_field($_POST['kleinanzeigen_id']);
+
+  $product = wc_get_product($post_ID);
   $title = $product->get_title();
-  $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
-  $posts_like_title = $wpdb->get_results($prepare);
+  $content = $product->get_description();
 
-  $meta = get_post_meta($post_id);
-  $kleinanzeigen_id = isset($meta['kleinanzeigen_id'][0]) ? parse_kleinanzeigen_id($meta['kleinanzeigen_id'][0]) : "";
+  // $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
+  // $posts_like_title = $wpdb->get_results($prepare);
 
+  // $_id = get_post_meta($post_ID, 'kleinanzeigen_id', true);
+  // $kleinanzeigen_id = $_id ?? parse_kleinanzeigen_id($_id) : "";
+
+  
   if (!empty($kleinanzeigen_id)) {
+
+    // new product
+    $ad = wbp_find_kleinanzeige($kleinanzeigen_id);
+    $ad_title = $ad->title;
+    $sku_error = false;
+
+    remove_action('save_post', 'wbp_save_post', 99);
+
     if (empty($title)) {
-      wp_insert_post([
-        'ID' => $post_id,
-        'post_type' => 'product',
-        'post_title' => "Entwurf ID " . $kleinanzeigen_id
-      ]);
-    }
-    if (count($posts_like_title) >= 2) {
-      wp_insert_post([
-        'ID' => $post_id,
-        'post_type' => 'product',
-        'post_content' => $post->post_content,
-        'post_title' => wp_strip_all_tags(wbp_sanitize_title($title . " [ DUPLIKAT " . 0 . " ID " . $kleinanzeigen_id . " ]"))
-      ]);
+      $title = $ad_title;
+      $content = __('Ready to import ad. Click "Import ad" to start.', 'astra-child');
     }
 
-    try {
-      $product->set_sku($kleinanzeigen_id);
-    } catch (Exception $e) {
+    $sku = $product->get_sku();
+    if ($sku !== $kleinanzeigen_id) {
+      try {
+        $product->set_sku($kleinanzeigen_id);
+        $product->save();
+      } catch (Exception $e) {
+        $sku_error = true;
+      }
     }
-    $product->save();
 
-    update_post_meta((int) $post_id, 'kleinanzeigen_id', $kleinanzeigen_id);
-    update_post_meta((int) $post_id, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($kleinanzeigen_id));
+    // $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $ad_title);
+    // $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE WHERE post_status != '%s' AND post_title != '' AND post_title = %s", 'trash', $ad_title);
+    // $results = $wpdb->get_results($prepare);
+    // $title_exists = count($results) >= 2;
+
+    if($sku_error) {
+      $title = wp_strip_all_tags(wbp_sanitize_title($ad_title . " [ DUPLIKAT " . 0 . " ID " . $kleinanzeigen_id . " ]"));
+      $content = __('Ad already exists. Please delete this product.', 'astra-child');
+    }
+
+    wp_insert_post([
+      'ID' => $post_ID,
+      'post_type' => 'product',
+      'post_content' => $content,
+      'post_title' => $title
+    ]);
+
+    if ($sku_error) {
+      enable_sku($post_ID, $ad);
+    } else {
+      disable_sku($post_ID);
+    }
   } else {
-    $product->set_sku('');
-    $product->save();
-
-    delete_post_meta($post_id, 'kleinanzeigen_id');
-    delete_post_meta($post_id, 'kleinanzeigen_url');
+    disable_sku($post_ID);
   }
 }
 
@@ -137,7 +194,7 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
         );
   }
   $term_ids = array_unique(array_map('intval', $term_ids));
-  $term_ids = wbp_sanitize_ids($term_ids, $term_id, $bool);
+  $term_ids = wbp_toggle_array_item($term_ids, $term_id, $bool);
 
   wp_set_object_terms($product_id, $term_ids, 'product_' . $type);
 }
@@ -165,7 +222,7 @@ function wbp_set_pa_term($product, $term_name, $bool, $attr = 'specials')
   }
 
   $term_id = get_term_by('name', $term_name, $taxonomy)->term_id;
-  $term_ids = wbp_sanitize_ids($term_ids, $term_id, $bool); // remove or add the term
+  $term_ids = wbp_toggle_array_item($term_ids, $term_id, $bool); // remove or add the term
 
   wp_set_object_terms($product_id, $term_ids, $taxonomy);
 
@@ -186,8 +243,11 @@ function wbp_get_product_term($name, $type)
   $term_id = get_term_by('name', 'product_' . $type);
 }
 
-function wbp_sanitize_ids($ids, $id, $bool)
+function wbp_toggle_array_item($ids, $id, $bool)
 {
+  if(!isset($bool)) {
+    $bool = in_array($id, $ids);
+  }
   if (!$bool) {
     # remove id
     $ids = array_diff($ids, array($id));
@@ -207,4 +267,20 @@ function __get_the_terms($post_id, $taxonomy)
   } else {
     return array();
   }
+}
+
+function enable_sku($post_ID, $ad) {
+  update_post_meta((int) $post_ID, 'kleinanzeigen_id', $ad->id);
+  update_post_meta((int) $post_ID, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($ad->id));
+  update_post_meta((int) $post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
+}
+
+function disable_sku($post_ID) {
+  $product = wc_get_product($post_ID);
+  $product->set_sku('');
+  $product->save();
+  
+  delete_post_meta($post_ID, 'kleinanzeigen_id');
+  delete_post_meta($post_ID, 'kleinanzeigen_url');
+  delete_post_meta($post_ID, 'kleinanzeigen_record');
 }

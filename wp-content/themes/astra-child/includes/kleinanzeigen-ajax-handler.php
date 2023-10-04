@@ -65,12 +65,17 @@ function wbp_get_remote()
   }
 
   $response = remote_call($remoteUrl, 5);
+  $record = wbp_find_kleinanzeige($kleinanzeigen_id) ?? '';
+  $record = html_entity_decode(json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
+  update_post_meta($post_ID, 'kleinanzeigen_record', $record);
+
 
   echo json_encode(
     [
       'post_ID' => $post_ID,
       'kleinanzeigen_id' => $kleinanzeigen_id,
       'content' => $response,
+      'record' => $record,
       'screen' => $screen
     ]
   );
@@ -240,10 +245,8 @@ function wbp_ajax_disconnect()
 function wbp_ajax_import_kleinanzeigen_data()
 {
   if (isset($_REQUEST['postdata'])) {
-
     $post_ID = isset($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
     $kleinanzeigen_id = isset($_REQUEST['postdata']['kleinanzeigen_id']) ? $_REQUEST['postdata']['kleinanzeigen_id'] : null;
-
   }
 
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
@@ -255,14 +258,12 @@ function wbp_ajax_import_kleinanzeigen_data()
 
   $pageNum = $_COOKIE['kleinanzeigen-table-page'];
 
-  if (
-    ($kleinanzeigendata) &&
-    ($title = isset($kleinanzeigendata['title']) ? $kleinanzeigendata['title'] : null) &&
-    ($price = isset($kleinanzeigendata['price']) ? $kleinanzeigendata['price'] : null) &&
-    ($content = isset($kleinanzeigendata['description']) ? $kleinanzeigendata['description'] : null) &&
-    ($excerpt = isset($kleinanzeigendata['excerpt']) ? $kleinanzeigendata['excerpt'] : null) &&
-    ($tags = isset($kleinanzeigendata['tags']) ? $kleinanzeigendata['tags'] : [])
-  ) {
+  if (!empty($kleinanzeigendata)) {
+    ($title = isset($kleinanzeigendata['title']) ? $kleinanzeigendata['title'] : null);
+    ($price = isset($kleinanzeigendata['price']) ? $kleinanzeigendata['price'] : null);
+    ($content = isset($kleinanzeigendata['content']) ? $kleinanzeigendata['content'] : null);
+    ($excerpt = isset($kleinanzeigendata['excerpt']) ? $kleinanzeigendata['excerpt'] : null);
+    ($tags = isset($kleinanzeigendata['tags']) ? $kleinanzeigendata['tags'] : []);
 
     if (!$post_ID) {
       $product = new WC_Product();
@@ -319,7 +320,6 @@ function wbp_ajax_import_kleinanzeigen_data()
         $product->set_sku($kleinanzeigen_id);
       } catch (Exception $e) {
       }
-
       $product->save();
     }
 
@@ -332,7 +332,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       'post_type' => 'product',
       'post_status' => 'draft',
       'post_content' => $content,
-      'post_excerpt' => $excerpt //wbp_sanitize_excerpt($content, 300)
+      'post_excerpt' => $excerpt // wbp_sanitize_excerpt($content, 300)
     ), true);
   }
 
@@ -351,7 +351,6 @@ function wbp_ajax_import_kleinanzeigen_data()
       $ids = array_column($ads, 'id');
       $record_key = array_search($kleinanzeigen_id, $ids);
       $wp_list_table->render_row($ads[$record_key], $columns, $hidden);
-
       break;
   }
   $row = ob_get_clean();

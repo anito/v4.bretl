@@ -7,6 +7,14 @@ jQuery(document).ready(function ($) {
     edit_link,
   } = ajax_object;
 
+  // hide controls if sku is not available
+  const sku = document.getElementById("kleinanzeigen_id");
+  
+  if(sku?.getAttribute('value')) {
+    const sku_metabox = document.getElementById('kleinanzeigen_id')?.closest('.postbox');
+    sku_metabox?.classList.add('sku')
+  };
+
   // Set Status
   $("#change-post-status").on("click", function () {
     let post_ID = $(this).attr("id");
@@ -120,7 +128,7 @@ jQuery(document).ready(function ($) {
         action: "_ajax_connect",
         post_ID,
         kleinanzeigen_id,
-        screen
+        screen,
       },
       beforeSend: () => {
         $(el).html("Verknüpfe...");
@@ -172,7 +180,7 @@ jQuery(document).ready(function ($) {
         action: "_ajax_disconnect",
         post_ID,
         kleinanzeigen_id,
-        screen
+        screen,
       },
       beforeSend: () => {
         $(el).html("Verknüpfung lösen...");
@@ -542,31 +550,35 @@ jQuery(document).ready(function ($) {
   }
 
   function processDataImport(json, el, callback = () => {}) {
-    const { title, price: raw_price, tags: raw_tags, excerpt } = $(el).data();
+    const record = JSON.parse(json.record);
+    const { title, price: raw_price, tags, description: excerpt } = record;
     // const title = raw_title?.replace(/\s*/, "");
-    const tags = raw_tags?.split(",");
     const price = raw_price?.replace(/[\s\.€]*/g, "");
-    const { post_ID, kleinanzeigen_id, post_status, content, screen } = json;
+    const {
+      post_ID,
+      kleinanzeigen_id,
+      post_status,
+      content: description,
+      screen,
+    } = json;
     const postdata = { post_ID, kleinanzeigen_id, post_status };
 
-    let doc, description;
+    let doc, content;
     try {
       const parser = new DOMParser();
-      doc = parser.parseFromString(content.body, "text/html");
-      description = doc.getElementById(
-        "viewad-description-text"
-      )?.outerHTML;
+      doc = parser.parseFromString(description.body, "text/html");
+      content = doc.getElementById("viewad-description-text")?.outerHTML;
     } catch (err) {
-      description = `Document parse error: ${err}`;
+      content = `Document parse error: ${err}`;
     }
 
     // const raw_title = doc.getElementById("viewad-title")?.innerText;
     // const raw_price = doc.getElementById("viewad-price")?.innerText;
-    
+
     const kleinanzeigendata = {
       title,
       price,
-      description,
+      content,
       excerpt,
       tags,
     };

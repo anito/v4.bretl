@@ -62,3 +62,9 @@
   font-size: 1.3em;
   vertical-align: bottom;
 }
+.show-if-sku {
+  display: none;
+}
+.postbox.sku .show-if-sku {
+  display: unset;
+}
