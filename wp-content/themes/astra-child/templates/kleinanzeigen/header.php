@@ -23,7 +23,7 @@
           <?php } ?>
         </div>
 
-        <?php $title = "Verberge alle mit Kleinanzeigen verlinkten Produkte im Shop, die verkauft oder deaktiviert wurden." ?>
+        <?php $title = "Verberge alle Produkte im Shop, die auf Kleinanzeigen gelöscht oder deaktiviert wurden." ?>
         <div class="scan-pages" style="display: flex; margin: 15px 0px 5px; font-size: 12px;">
           <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
           <div class="">
