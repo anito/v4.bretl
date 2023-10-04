@@ -86,12 +86,12 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           <div class="sync-column-content">
             <div id="import-kleinanzeigen-data-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
-              <a id="import-kleinanzeigen-data-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-data" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-data button button-primary button-small">Daten importieren</a>
+              <a id="import-kleinanzeigen-data-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-data" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-data button button-primary button-small"><?php echo __('Import Data', 'astra-child') ?></a>
             </div>
             <div id="import-kleinanzeigen-images-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
               <span class="spinner"></span>
               <span class="kleinanzeigen-images-wrapper" style="display: flex;">
-                <a id="import-kleinanzeigen-images-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-images button button-primary button-small"><?php echo __('Fotos importieren') ?></a>
+                <a id="import-kleinanzeigen-images-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-images button button-primary button-small"><?php echo __('Import Images', 'astra-child') ?></a>
                 <a id="delete-kleinanzeigen-images-<?php echo $post_id ?>" name="delete-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-kleinanzeigen-images button button-primary button-small">
                   <i class="dashicons dashicons-trash" style="font-size: 1.3em; vertical-align: middle"></i>
                 </a>
@@ -99,7 +99,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
             </div>
             <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
               <span class="spinner"></span>
-              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Trennen') ?></a>
+              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Disconnect', 'astra-child') ?></a>
             </div>
             <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="publish-column-content">
               <span class="spinner"></span>
