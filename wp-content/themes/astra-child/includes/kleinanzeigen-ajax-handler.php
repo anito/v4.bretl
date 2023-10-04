@@ -282,6 +282,7 @@ function wbp_ajax_import_kleinanzeigen_data()
           'fn' => 'sale',
         ),
         'allrad' => array('term_name' => 'Allrad', 'match_type' => 'like'),
+        'vorführ' => array('term_name' => 'Vorführmaschine', 'match_type' => 'like'),
         'neu' => 'Neu',
         'aktion' => 'Aktion',
         'aktionsmodell' => 'Aktion',
