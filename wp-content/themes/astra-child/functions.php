@@ -27,7 +27,7 @@ add_filter('allowed_http_origins', 'add_allowed_origins');
 /**
  * Define Constants
  */
-define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.0.4');
+define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.3.0');
 
 /**
  * App asset names (e.g. *.js. *.css files) changing per app distribution
