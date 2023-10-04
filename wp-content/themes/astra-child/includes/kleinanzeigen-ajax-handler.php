@@ -283,6 +283,8 @@ function wbp_ajax_import_kleinanzeigen_data()
         ),
         'allrad' => array('term_name' => 'Allrad', 'match_type' => 'like'),
         'vorführ' => array('term_name' => 'Vorführmaschine', 'match_type' => 'like'),
+        'topzustand' => array('term_name' => 'Top'),
+        'topausstattung' => array('term_name' => 'Top'),
         'neu' => 'Neu',
         'aktion' => 'Aktion',
         'aktionsmodell' => 'Aktion',
