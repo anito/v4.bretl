@@ -116,7 +116,7 @@ function wbp_text_contains($needle, $haystack, $searchtype = 'default')
     return true;
   }
   return false;
-} 
+}
 
 // Callable product title functions
 function wbp_handle_product_title_sale($args)
