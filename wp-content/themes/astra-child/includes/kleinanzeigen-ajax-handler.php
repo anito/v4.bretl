@@ -300,7 +300,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       // handle title sensitive product labels
       foreach ($parts as $key => $val) {
 
-        if (wbp_text_contains($key, $title . ' ' . $content, isset($val['match_type']) ? $val['match_type'] : null)) {
+        if (wbp_text_contains($key, $title . ' ' . $excerpt, isset($val['match_type']) ? $val['match_type'] : null)) {
 
           $fn = isset($val['fn']) ? $val['fn'] : 'default';
           if (is_callable('wbp_handle_product_title_' . $fn, false, $callable_name)) {
