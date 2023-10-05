@@ -102,21 +102,21 @@ function wbp_has_price_diff($record, $product)
 }
 
 
-function wbp_title_contains($string, $title, $searchtype = 'default')
+function wbp_text_contains($needle, $haystack, $searchtype = 'default')
 {
   switch ($searchtype) {
     case 'like':
-      preg_match('/' . strtolower($string) . '/', strtolower($title), $matches);
+      preg_match('/' . strtolower($needle) . '/', strtolower($haystack), $matches);
       break;
     default:
-      preg_match('/\b' . strtolower($string) . '\b/', strtolower($title), $matches);
+      preg_match('/\b' . strtolower($needle) . '\b/', strtolower($haystack), $matches);
   }
 
   if (!empty($matches[0])) {
     return true;
   }
   return false;
-}
+} 
 
 // Callable product title functions
 function wbp_handle_product_title_sale($args)

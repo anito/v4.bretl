@@ -276,7 +276,7 @@ function wbp_ajax_import_kleinanzeigen_data()
 
     if ($product) {
       $product->set_regular_price($price);
-      $title_parts = array(
+      $parts = array(
         'aktionspreis' => array(
           'term_name' => 'Aktionspreis',
           'fn' => 'sale',
@@ -292,14 +292,15 @@ function wbp_ajax_import_kleinanzeigen_data()
         'mietmaschine' => 'Mieten',
         'klima' => 'Klima',
         'am lager' => 'Am Lager',
+        'lagermaschine' => 'Am Lager',
         'neues modell' => 'Neues Modell',
         'leicht gebraucht' => 'Leicht Gebraucht',
       );
 
       // handle title sensitive product labels
-      foreach ($title_parts as $key => $val) {
+      foreach ($parts as $key => $val) {
 
-        if (wbp_title_contains($key, $title, isset($val['match_type']) ? $val['match_type'] : null)) {
+        if (wbp_text_contains($key, $title . ' ' . $content, isset($val['match_type']) ? $val['match_type'] : null)) {
 
           $fn = isset($val['fn']) ? $val['fn'] : 'default';
           if (is_callable('wbp_handle_product_title_' . $fn, false, $callable_name)) {
