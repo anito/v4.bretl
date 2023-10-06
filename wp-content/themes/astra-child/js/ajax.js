@@ -551,9 +551,6 @@ jQuery(document).ready(function ($) {
 
   function processDataImport(json, el, callback = () => {}) {
     const record = JSON.parse(json.record);
-    const { title, price: raw_price, tags, description: excerpt, url } = record;
-    // const title = raw_title?.replace(/\s*/, "");
-    const price = raw_price?.replace(/[\s\.€]*/g, "");
     const {
       post_ID,
       kleinanzeigen_id,
@@ -576,12 +573,8 @@ jQuery(document).ready(function ($) {
     // const raw_price = doc.getElementById("viewad-price")?.innerText;
 
     const kleinanzeigendata = {
-      title,
-      price,
       content,
-      excerpt,
-      tags,
-      url
+      record
     };
 
     $.post({

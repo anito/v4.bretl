@@ -78,7 +78,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     $columns['product_cat'] = $cat;
     $columns['sku'] = 'KA';
     $columns['sync'] = 'KA Aktionen';
-    
+
     return $columns;
   }
 
@@ -105,7 +105,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           break;
         }
       case 'sku': {
-          echo '<a href="' . esc_html(wbp_get_kleinanzeigen_url($sku)) . '" target="_blank"</a>';
+          echo '<a href="' . esc_html(wbp_get_kleinanzeigen_search_url($sku)) . '" target="_blank"</a>';
           break;
         }
       case 'sync': {

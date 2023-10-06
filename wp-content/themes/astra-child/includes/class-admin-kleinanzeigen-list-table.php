@@ -405,7 +405,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "image": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><a href="<?php echo KLEINANZEIGEN_URL . stripslashes($record->url) ?>" target="_blank"><img src="<?php echo stripslashes($record->image) ?>" width="128" /></a></div>
+                <div class="column-content"><a href="<?php echo wbp_get_kleinanzeigen_url($record->url) ?>" target="_blank"><img src="<?php echo stripslashes($record->image) ?>" width="128" /></a></div>
               </td>
             <?php
               break;
@@ -421,7 +421,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "title": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><a href="<?php echo KLEINANZEIGEN_URL . stripslashes($record->url) ?>" target="_blank"><?php echo $record->title ?></a></div>
+                <div class="column-content"><a href="<?php echo wbp_get_kleinanzeigen_url($record->url) ?>" target="_blank"><?php echo $record->title ?></a></div>
               </td>
             <?php
               break;

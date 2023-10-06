@@ -27,7 +27,7 @@ add_filter('allowed_http_origins', 'add_allowed_origins');
 /**
  * Define Constants
  */
-define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.3.1');
+define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.4.0');
 
 /**
  * App asset names (e.g. *.js. *.css files) changing per app distribution
@@ -168,7 +168,12 @@ function wbp_quick_edit_product_save($post)
   };
 }
 
-function wbp_get_kleinanzeigen_url($id)
+function wbp_get_kleinanzeigen_url($url)
+{
+  return KLEINANZEIGEN_URL . $url;
+}
+
+function wbp_get_kleinanzeigen_search_url($id)
 {
   return KLEINANZEIGEN_URL . ($id ? '/s-' . $id . '/k0' : '/');
 }
@@ -678,15 +683,6 @@ function wbp_product_custom_fields()
   );
   echo '</div>';
 }
-
-function wbp_product_custom_fields_save($post_id)
-{
-  // Custom Product Text Field
-  if (isset($_POST['kleinanzeigen_url']))
-    update_post_meta($post_id, 'kleinanzeigen_url', esc_attr($_POST['kleinanzeigen_url']));
-}
-// add_action('woocommerce_product_options_general_product_data', 'wbp_product_custom_fields');
-// add_action('woocommerce_process_product_meta', 'wbp_product_custom_fields_save');
 
 /**
  * Replace default Elementor image placeholdder
