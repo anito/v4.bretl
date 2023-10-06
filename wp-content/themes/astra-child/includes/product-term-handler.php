@@ -261,7 +261,8 @@ function __get_the_terms($post_id, $taxonomy)
 
 function enable_sku($post_ID, $ad) {
   update_post_meta((int) $post_ID, 'kleinanzeigen_id', $ad->id);
-  update_post_meta((int) $post_ID, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($ad->id));
+  update_post_meta((int) $post_ID, 'kleinanzeigen_url', $ad->url);
+  update_post_meta((int) $post_ID, 'kleinanzeigen_search_url', wbp_get_kleinanzeigen_url($ad->id));
   update_post_meta((int) $post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
 }
 
@@ -272,5 +273,6 @@ function disable_sku($post_ID) {
   
   delete_post_meta($post_ID, 'kleinanzeigen_id');
   delete_post_meta($post_ID, 'kleinanzeigen_url');
+  delete_post_meta($post_ID, 'kleinanzeigen_search_url');
   delete_post_meta($post_ID, 'kleinanzeigen_record');
 }
