@@ -27,7 +27,7 @@ add_filter('allowed_http_origins', 'add_allowed_origins');
 /**
  * Define Constants
  */
-define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.3.0');
+define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.3.1');
 
 /**
  * App asset names (e.g. *.js. *.css files) changing per app distribution
@@ -287,7 +287,7 @@ add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
 function wbp_add_admin_ajax_scripts()
 {
-  wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js');
+  wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION);
 
   // kleinanzeigen doesn't accept a wc_remote_get from referrers w/o valid certificates
   $valid_cert = !!check_cert();

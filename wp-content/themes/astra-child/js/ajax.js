@@ -552,7 +552,6 @@ jQuery(document).ready(function ($) {
   function processDataImport(json, el, callback = () => {}) {
     const record = JSON.parse(json.record);
     const { title, price: raw_price, tags, description: excerpt, url } = record;
-    console.log(record)
     // const title = raw_title?.replace(/\s*/, "");
     const price = raw_price?.replace(/[\s\.€]*/g, "");
     const {
