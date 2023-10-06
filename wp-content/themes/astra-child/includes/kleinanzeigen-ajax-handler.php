@@ -302,6 +302,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'klima' => 'Klima',
         'am lager' => 'Am Lager',
         'lagermaschine' => 'Am Lager',
+        'sofort verfügbar' => 'Am Lager',
         'neues modell' => 'Neues Modell',
         'leicht gebraucht' => 'Leicht Gebraucht',
       );
