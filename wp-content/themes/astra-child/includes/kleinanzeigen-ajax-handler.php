@@ -259,11 +259,12 @@ function wbp_ajax_import_kleinanzeigen_data()
   $pageNum = $_COOKIE['kleinanzeigen-table-page'];
 
   if (!empty($kleinanzeigendata)) {
-    ($title = isset($kleinanzeigendata['title']) ? $kleinanzeigendata['title'] : null);
-    ($price = isset($kleinanzeigendata['price']) ? $kleinanzeigendata['price'] : null);
-    ($content = isset($kleinanzeigendata['content']) ? $kleinanzeigendata['content'] : null);
-    ($excerpt = isset($kleinanzeigendata['excerpt']) ? $kleinanzeigendata['excerpt'] : null);
+    ($title = isset($kleinanzeigendata['title']) ? $kleinanzeigendata['title'] : '');
+    ($price = isset($kleinanzeigendata['price']) ? $kleinanzeigendata['price'] : '');
+    ($content = isset($kleinanzeigendata['content']) ? $kleinanzeigendata['content'] : '');
+    ($excerpt = isset($kleinanzeigendata['excerpt']) ? $kleinanzeigendata['excerpt'] : '');
     ($tags = isset($kleinanzeigendata['tags']) ? $kleinanzeigendata['tags'] : []);
+    ($url = isset($kleinanzeigendata['url']) ? $kleinanzeigendata['url'] : '');
 
     if (!$post_ID) {
       $product = new WC_Product();
@@ -327,8 +328,9 @@ function wbp_ajax_import_kleinanzeigen_data()
       $product->save();
     }
 
+    update_post_meta((int) $post_ID, 'kleinanzeigen_url', !empty($url) ? KLEINANZEIGEN_URL . $url : '');
     update_post_meta((int) $post_ID, 'kleinanzeigen_id', $kleinanzeigen_id);
-    update_post_meta((int) $post_ID, 'kleinanzeigen_url', KLEINANZEIGEN_URL . '/s-' . $kleinanzeigen_id . '/k0');
+    update_post_meta((int) $post_ID, 'kleinanzeigen_search_url', KLEINANZEIGEN_URL . '/s-' . $kleinanzeigen_id . '/k0');
 
     wp_insert_post(array(
       'ID' => $post_ID,
