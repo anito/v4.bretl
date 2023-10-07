@@ -295,6 +295,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'topzustand' => array('term_name' => 'Top'),
         'topausstattung' => array('term_name' => 'Top'),
         'neu' => 'Neu',
+        'neuwertig' => array('term_name' =>'Neuwertig', 'match_type' => 'like'),
         'aktion' => 'Aktion',
         'aktionsmodell' => 'Aktion',
         'neumaschine' => 'Neu',
