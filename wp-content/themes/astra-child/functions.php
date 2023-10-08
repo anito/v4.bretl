@@ -425,9 +425,13 @@ function _ajax_get_brands()
   wbp_ajax_get_brand_images();
 }
 
+function wbp_get_product_terms($post, $type)
+{
+  return get_the_terms($post, 'product_' . $type);
+}
 function wbp_get_product_brands($post)
 {
-  return get_the_terms($post, 'brands');
+  return get_the_terms($post, 'product_brands');
 }
 
 function wbp_get_product_cats($post)

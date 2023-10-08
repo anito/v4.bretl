@@ -308,7 +308,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'leicht gebraucht' => 'Leicht Gebraucht',
       );
 
-      // handle title sensitive product labels
+      // handle labels
       foreach ($parts as $key => $val) {
 
         if (wbp_text_contains($key, $title . ' ' . $excerpt, isset($val['match_type']) ? $val['match_type'] : null)) {
@@ -326,7 +326,20 @@ function wbp_ajax_import_kleinanzeigen_data()
         }
       }
 
-      // set product attributes
+      // handle brands
+      $brands = get_terms([
+        'taxonomy' => 'product_brands',
+        'hide_empty' => false,
+      ]);
+
+      foreach($brands as $brand) {
+        if(wbp_text_contains($brand->name, $title)) {
+          $ids = wbp_set_product_term($product, $brand->term_id, 'brands', true);
+        }
+      }
+      
+
+      // handle product attributes
       foreach ($tags as $key => $tag) {
         wbp_set_pa_term($product, $tag, true);
       }

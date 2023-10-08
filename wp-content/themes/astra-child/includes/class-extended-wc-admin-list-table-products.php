@@ -13,7 +13,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   {
     $this->list_table_type = 'product';
 
-    if(is_ajax()) {
+    if (is_ajax()) {
       if (isset($_POST['ID'])) {
         $this->is_quickedit = true;
       } else {
@@ -27,7 +27,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'));
     add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 11);
     // add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
-    
+
     if (($this->is_fetch)) {
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
@@ -36,7 +36,6 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     if ($this->is_pageload || $this->is_quickedit) {
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
     }
-
   }
 
   function render_row($id)
@@ -61,11 +60,11 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     unset($columns['product_tag']);
 
     $columns['price'] = $price;
-    $columns['product_label'] = 'Labels';
     $columns['featured'] = $featured;
-    $columns['date'] = $date;
-    $columns['product_tag'] = $tag;
+    $columns['product_label'] = 'Labels';
+    $columns['product_brands'] = 'Hersteller';
     $columns['product_cat'] = $cat;
+    $columns['date'] = $date;
     $columns['ka_sku'] = 'KA';
     $columns['sync'] = 'KA Aktionen';
 
@@ -81,12 +80,8 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_ID);
       $sku = is_numeric($sku) ? $sku : false;
-
-      $product_label_terms = get_the_terms($post_ID, 'product_label');
-      $product_labels = array_map(function ($item) {
-        return $item->name;
-      }, !is_wp_error($product_label_terms) ? ($product_label_terms ? $product_label_terms : []) : []);
-
+      $brands = wp_list_pluck(wbp_get_product_terms($post_ID, 'brands'), 'name');
+      $product_labels = wp_list_pluck(wbp_get_product_terms($post_ID, 'label'), 'name');
     } else return 0;
 
     switch ($column_name) {
@@ -96,6 +91,10 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
         }
       case 'ka_sku': {
           echo '<a href="' . esc_html(get_post_meta($post_ID, 'kleinanzeigen_url', true)) . '" target="_blank">' . $sku . '</a>';
+          break;
+        }
+      case 'product_brands': {
+          echo implode(', ', $brands);
           break;
         }
       case 'sync': {

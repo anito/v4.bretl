@@ -10,6 +10,9 @@
 .edit-php .column-product_label {
   width: 10%;
 }
+.edit-php .column-product_brands {
+  width: 10%;
+}
 .edit-php .column-sync {
   width: 13%;
 }

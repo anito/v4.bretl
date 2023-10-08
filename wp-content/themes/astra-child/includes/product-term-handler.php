@@ -139,7 +139,7 @@ function wbp_process_kleinanzeigen($post_ID, $post)
     // $results = $wpdb->get_results($prepare);
     // $title_exists = count($results) >= 2;
 
-    if($sku_error) {
+    if ($sku_error) {
       $title = wp_strip_all_tags(wbp_sanitize_title($ad_title . " [ DUPLIKAT " . 0 . " ID " . $kleinanzeigen_id . " ]"));
       $content = '<b style="color: red;">' . __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child') . '</b>';
     }
@@ -177,16 +177,23 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
       $terms = get_the_terms($product_id, 'product_label');
       $term_ids =
         array_map(
-          function ($item) {
-            return $item->term_id;
+          function ($term) {
+            return $term->term_id;
           },
           !is_wp_error($terms) ? ($terms ? $terms : []) : []
         );
+      break;
+    case 'brands':
+      $term_ids = get_the_terms($product_id, 'product_' . $type);
+      if (false === $term_ids) {
+        $term_ids = array();
+      }
+      break;
   }
   $term_ids = array_unique(array_map('intval', $term_ids));
   $term_ids = wbp_toggle_array_item($term_ids, $term_id, $bool);
 
-  wp_set_object_terms($product_id, $term_ids, 'product_' . $type);
+  return wp_set_object_terms($product_id, $term_ids, 'product_' . $type);
 }
 
 /**
@@ -235,7 +242,7 @@ function wbp_get_product_term($name, $type)
 
 function wbp_toggle_array_item($ids, $id, $bool)
 {
-  if(!isset($bool)) {
+  if (!isset($bool)) {
     $bool = in_array($id, $ids);
   }
   if (!$bool) {
@@ -259,18 +266,20 @@ function __get_the_terms($post_id, $taxonomy)
   }
 }
 
-function enable_sku($post_ID, $ad) {
+function enable_sku($post_ID, $ad)
+{
   update_post_meta((int) $post_ID, 'kleinanzeigen_id', $ad->id);
   update_post_meta((int) $post_ID, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($ad->url));
   update_post_meta((int) $post_ID, 'kleinanzeigen_search_url', wbp_get_kleinanzeigen_search_url($ad->id));
   update_post_meta((int) $post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
 }
 
-function disable_sku($post_ID) {
+function disable_sku($post_ID)
+{
   $product = wc_get_product($post_ID);
   $product->set_sku('');
   $product->save();
-  
+
   delete_post_meta($post_ID, 'kleinanzeigen_id');
   delete_post_meta($post_ID, 'kleinanzeigen_url');
   delete_post_meta($post_ID, 'kleinanzeigen_search_url');
