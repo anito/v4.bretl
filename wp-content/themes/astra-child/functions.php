@@ -161,7 +161,10 @@ function wbp_filter_exclusive_label_terms($terms)
     define(
       'MUTUALLY_EXCLUSIVE_LABEL_NAMES',
       array(
-        array('neu', 'neuwertig'),
+        array(
+          'neuwertig',
+          'neu'
+        ),
       )
     );
   }
