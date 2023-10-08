@@ -96,7 +96,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
         }
       case 'product_brands': {
           echo implode(', ', array_map(function($term) use($column_name) {
-            return '<a href="' . home_url() . '/' . $column_name . '/' . $term->slug . '">' . $term->name . '</a>';
+            return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '">' . $term->name . '</a>';
           }, $brands !== false ? $brands : []));
           break;
         }

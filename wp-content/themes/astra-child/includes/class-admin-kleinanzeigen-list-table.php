@@ -302,11 +302,9 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       }, !is_wp_error($product_label_terms) ? ($product_label_terms ? $product_label_terms : []) : []);
 
       $price = wp_kses_post($product->get_price_html());
-
     } else {
 
       $price = '<span class="na">&ndash;</span>';
-
     }
 
 ?>
@@ -327,8 +325,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $permalink = get_permalink($post_id);
           $classes = "";
           $post_status = $product->get_status();
-          $brands = wp_list_pluck(wbp_get_product_brands($post_id), 'name');
-          $cats = wp_list_pluck(wbp_get_product_cats($post_id), 'name');
+          $brands = wbp_get_product_brands($post_id);
+          $cats = wbp_get_product_cats($post_id);
           switch ($post_status) {
             case 'draft':
               $status_name = __("Draft");
@@ -453,7 +451,9 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "shop-categories": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo implode(', ', $cats) ?></div>
+                <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
+                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '">' . $term->name . '</a>';
+                                            }, $cats !== false ? $cats : [])); ?></div>
               </td>
             <?php
               break;
@@ -461,7 +461,9 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "shop-brands": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo implode(', ', $brands) ?></div>
+                <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
+                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '">' . $term->name . '</a>';
+                                            }, $brands !== false ? $brands : [])); ?></div>
               </td>
             <?php
               break;
