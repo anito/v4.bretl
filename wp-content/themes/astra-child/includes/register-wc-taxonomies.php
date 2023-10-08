@@ -9,7 +9,7 @@ function wbp_create_terms()
     foreach (WC_TERMS as $slug => $name) {
 
       if (!in_array($slug, $tag_slugs)) {
-        wbp_add_product_term($slug, 'tag');
+        wbp_add_the_product_term($slug, 'tag');
       }
     }
   }
@@ -52,7 +52,7 @@ function wbp_create_taxonomy_product_labels()
     foreach (WC_PRODUCT_LABELS as $name) {
 
       if (!in_array($name, $term_names)) {
-        wbp_add_product_term($name, 'label');
+        wbp_add_the_product_term($name, 'label');
       }
     }
   }
@@ -72,17 +72,17 @@ function wbp_get_wc_taxonomies()
     foreach (WC_COMMON_TAXONOMIES as $name) {
 
       if (!in_array($name, $cat_names)) {
-        wbp_add_product_term($name, 'cat');
+        wbp_add_the_product_term($name, 'cat');
       }
       if (!in_array($name, $tag_names)) {
-        wbp_add_product_term($name, 'tag');
+        wbp_add_the_product_term($name, 'tag');
       }
     }
   }
 }
 add_action('admin_init', 'wbp_get_wc_taxonomies');
 
-function wbp_add_product_term($name, $type)
+function wbp_add_the_product_term($name, $type)
 {
   $term = wp_insert_term(
     $name,

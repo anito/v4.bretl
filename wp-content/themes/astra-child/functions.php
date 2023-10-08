@@ -119,7 +119,7 @@ function wbp_text_contains($needle, $haystack, $searchtype = 'default')
 }
 
 // Callable product title functions
-function wbp_handle_product_title_sale($args)
+function wbp_handle_product_contents_sale($args)
 {
   $product = $args['product'];
   $price = $args['price'];
@@ -130,7 +130,7 @@ function wbp_handle_product_title_sale($args)
   return wbp_handle_product_term($args['term_name'], $product);;
 }
 
-function wbp_handle_product_title_default($args)
+function wbp_handle_product_contents_default($args)
 {
   $product = $args['product'];
   return wbp_handle_product_term($args['term_name'], $product);
@@ -138,12 +138,49 @@ function wbp_handle_product_title_default($args)
 
 function wbp_handle_product_term($name, $product)
 {
-  $term_id = wbp_add_product_term($name, 'label');
+  $term_id = wbp_add_the_product_term($name, 'label');
   if ($term_id) {
     require_once __DIR__ . '/includes/product-term-handler.php';
     wbp_set_product_term($product, $term_id, 'label', true);
   }
   return $product;
+}
+
+function wbp_label_filter($terms, $post_ID, $taxonomy)
+{
+  if ('product_label' === $taxonomy) {
+    $terms = wbp_filter_exclusive_label_terms($terms);
+  }
+  return $terms;
+}
+add_filter('get_the_terms', 'wbp_label_filter', 10, 3);
+
+function wbp_filter_exclusive_label_terms($terms)
+{
+  if (!defined('MUTUALLY_EXCLUSIVE_LABEL_NAMES')) {
+    define(
+      'MUTUALLY_EXCLUSIVE_LABEL_NAMES',
+      array(
+        array('neu', 'neuwertig'),
+      )
+    );
+  }
+
+  foreach (MUTUALLY_EXCLUSIVE_LABEL_NAMES as $group) {
+    $term_slugs = array_map(function ($term) {
+      return $term->slug;
+    }, $terms);
+    $intersection = array_intersect($term_slugs, $group);
+    if (count($intersection) > 1) {
+      $exclusive_term = get_term_by('slug', $group[0], 'product_label');
+      $diff_term_slugs = array_diff($term_slugs, $group);
+      $diff_terms = array_map(function ($slug) {
+        return get_term_by('slug', $slug, 'product_label');
+      }, $diff_term_slugs);
+      $terms = array_merge(array($exclusive_term), $diff_terms);
+    }
+  }
+  return $terms;
 }
 
 function wbp_publish_guard($data)
@@ -479,7 +516,8 @@ function kleinanzeigen_meta_box()
 }
 // add_action('add_meta_boxes', 'kleinanzeigen_meta_box');
 
-function kleinanzeigen_metabox_callback($post) {
+function kleinanzeigen_metabox_callback($post)
+{
 
   wp_nonce_field('kleinanzeigen_nonce', 'kleinanzeigen_nonce');
 

@@ -290,12 +290,12 @@ function wbp_ajax_import_kleinanzeigen_data()
           'term_name' => 'Aktionspreis',
           'fn' => 'sale',
         ),
-        'allrad' => array('term_name' => 'Allrad', 'match_type' => 'like'),
-        'vorführ' => array('term_name' => 'Vorführmaschine', 'match_type' => 'like'),
-        'topzustand' => array('term_name' => 'Top'),
-        'topausstattung' => array('term_name' => 'Top'),
+        'allrad' => array('Allrad', 'match_type' => 'like'),
+        'vorführ' => array('Vorführmaschine', 'match_type' => 'like'),
+        'topzustand' => 'Top',
+        'topausstattung' => 'Top',
         'neu' => 'Neu',
-        'neuwertig' => array('term_name' =>'Neuwertig', 'match_type' => 'like'),
+        'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
         'aktion' => 'Aktion',
         'aktionsmodell' => 'Aktion',
         'neumaschine' => 'Neu',
@@ -314,14 +314,14 @@ function wbp_ajax_import_kleinanzeigen_data()
         if (wbp_text_contains($key, $title . ' ' . $excerpt, isset($val['match_type']) ? $val['match_type'] : null)) {
 
           $fn = isset($val['fn']) ? $val['fn'] : 'default';
-          if (is_callable('wbp_handle_product_title_' . $fn, false, $callable_name)) {
+          if (is_callable('wbp_handle_product_contents_' . $fn, false, $callable_name)) {
 
             if (!is_array($val)) {
               $term_name = $val;
-            } else {
-              $term_name = isset($val['term_name']) ? $val['term_name'] : $key;
+            } elseif (isset($val[0])) {
+              $term_name = $val[0];
             }
-            $product = call_user_func('wbp_handle_product_title_' . $fn, compact('product', 'price', 'title', 'content', 'term_name'));
+            $product = call_user_func('wbp_handle_product_contents_' . $fn, compact('product', 'price', 'title', 'content', 'term_name'));
           }
         }
       }
