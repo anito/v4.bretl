@@ -23,27 +23,17 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $this->is_pageload = true;
     }
 
-    // if (is_ajax()) {
-    //   $render_wc = true;
-    // } elseif (!function_exists('get_current_screen')) {
-    //   $render_wc = false;
-    // }
-
-    // No screen ID on full page load (render build in woo rows)
-    // if (!function_exists('get_current_screen')) {
-    //   $render_wc = false;
-    // }
-
     add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 10, 2);
     add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_columns'));
     add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 11);
-
+    // add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
+    
     if (($this->is_fetch)) {
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
     }
 
-    if ($this->is_pageload | $this->is_quickedit) {
+    if ($this->is_pageload || $this->is_quickedit) {
       add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
     }
 
@@ -76,23 +66,23 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     $columns['date'] = $date;
     $columns['product_tag'] = $tag;
     $columns['product_cat'] = $cat;
-    $columns['sku'] = 'KA';
+    $columns['ka_sku'] = 'KA';
     $columns['sync'] = 'KA Aktionen';
 
     return $columns;
   }
 
-  function render_custom_columns($column_name, $post_id)
+  function render_custom_columns($column_name, $post_ID)
   {
-    $post = get_post($post_id);
-    $product = wc_get_product($post_id);
+    $post = get_post($post_ID);
+    $product = wc_get_product($post_ID);
     if ($product) {
 
       $post_status = $post->post_status;
-      $sku = $product->get_sku($post_id);
+      $sku = $product->get_sku($post_ID);
       $sku = is_numeric($sku) ? $sku : false;
 
-      $product_label_terms = get_the_terms($post_id, 'product_label');
+      $product_label_terms = get_the_terms($post_ID, 'product_label');
       $product_labels = array_map(function ($item) {
         return $item->name;
       }, !is_wp_error($product_label_terms) ? ($product_label_terms ? $product_label_terms : []) : []);
@@ -104,33 +94,33 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           echo implode(', ', $product_labels);
           break;
         }
-      case 'sku': {
-          echo '<a href="' . esc_html(wbp_get_kleinanzeigen_search_url($sku)) . '" target="_blank"</a>';
+      case 'ka_sku': {
+          echo '<a href="' . esc_html(get_post_meta($post_ID, 'kleinanzeigen_url', true)) . '" target="_blank">' . $sku . '</a>';
           break;
         }
       case 'sync': {
 ?>
           <div class="sync-column-content">
-            <div id="import-kleinanzeigen-data-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
+            <div id="import-kleinanzeigen-data-wbp-action-<?php echo $post_ID ?>" style="flex: 1;">
               <span class="spinner"></span>
-              <a id="import-kleinanzeigen-data-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-data" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-data button button-primary button-small"><?php echo __('Import Data', 'astra-child') ?></a>
+              <a id="import-kleinanzeigen-data-<?php echo $post_ID ?>" disabled name="import-kleinanzeigen-data" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_ID ?>" class="import-kleinanzeigen-data button button-primary button-small"><?php echo __('Import Data', 'astra-child') ?></a>
             </div>
-            <div id="import-kleinanzeigen-images-wbp-action-<?php echo $post_id ?>" style="flex: 1;">
+            <div id="import-kleinanzeigen-images-wbp-action-<?php echo $post_ID ?>" style="flex: 1;">
               <span class="spinner"></span>
               <span class="kleinanzeigen-images-wrapper" style="display: flex;">
-                <a id="import-kleinanzeigen-images-<?php echo $post_id ?>" disabled name="import-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="import-kleinanzeigen-images button button-primary button-small"><?php echo __('Import Images', 'astra-child') ?></a>
-                <a id="delete-kleinanzeigen-images-<?php echo $post_id ?>" name="delete-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_id ?>" class="delete-kleinanzeigen-images button button-primary button-small">
+                <a id="import-kleinanzeigen-images-<?php echo $post_ID ?>" disabled name="import-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_ID ?>" class="import-kleinanzeigen-images button button-primary button-small"><?php echo __('Import Images', 'astra-child') ?></a>
+                <a id="delete-kleinanzeigen-images-<?php echo $post_ID ?>" name="delete-kleinanzeigen-images" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_ID ?>" class="delete-kleinanzeigen-images button button-primary button-small">
                   <i class="dashicons dashicons-trash" style="font-size: 1.3em; vertical-align: middle"></i>
                 </a>
               </span>
             </div>
             <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
               <span class="spinner"></span>
-              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_id ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Disconnect', 'astra-child') ?></a>
+              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Disconnect', 'astra-child') ?></a>
             </div>
-            <div id="publish-post-wbp-action-<?php echo $post_id ?>" class="publish-column-content">
+            <div id="publish-post-wbp-action-<?php echo $post_ID ?>" class="publish-column-content">
               <span class="spinner"></span>
-              <a id="publish-post-<?php echo $post_id ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_id ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Hide', 'astra-child') : __('Publish') ?></a>
+              <a id="publish-post-<?php echo $post_ID ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_ID ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Hide', 'astra-child') : __('Publish') ?></a>
             </div>
           </div>
           <script>
@@ -146,11 +136,11 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
               const sku = '<?php echo $sku; ?>';
               const post_status = '<?php echo $post_status ?>';
 
-              const tr = document.getElementById('post-<?php echo $post_id ?>');
-              const publishButton = tr?.querySelector('#publish-post-<?php echo $post_id ?>');
-              const importDataButton = tr?.querySelector('#import-kleinanzeigen-data-<?php echo $post_id ?>');
-              const importImagesButton = tr?.querySelector('#import-kleinanzeigen-images-<?php echo $post_id ?>');
-              const deleteImagesButton = tr?.querySelector('#delete-kleinanzeigen-images-<?php echo $post_id ?>');
+              const tr = document.getElementById('post-<?php echo $post_ID ?>');
+              const publishButton = tr?.querySelector('#publish-post-<?php echo $post_ID ?>');
+              const importDataButton = tr?.querySelector('#import-kleinanzeigen-data-<?php echo $post_ID ?>');
+              const importImagesButton = tr?.querySelector('#import-kleinanzeigen-images-<?php echo $post_ID ?>');
+              const deleteImagesButton = tr?.querySelector('#delete-kleinanzeigen-images-<?php echo $post_ID ?>');
               const disconnectButton = tr?.querySelector('#disconnect-kleinanzeigen-<?php echo $sku ?>');
 
               setTimeout(() => {

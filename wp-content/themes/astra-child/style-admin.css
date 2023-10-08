@@ -13,6 +13,9 @@
 .edit-php .column-sync {
   width: 13%;
 }
+.edit-php .column-ka_sku {
+  width: 10%;
+}
 .edit-php .sync-column-content {
   display: flex;
   flex-direction: column;

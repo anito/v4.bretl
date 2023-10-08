@@ -82,6 +82,7 @@ function _ajax_sts_scan()
 
   $ids = wp_list_pluck($all_ads, 'id');
 
+  $deactivated = [];
   foreach ($published as $product) {
     $id = $product->get_sku();
 
@@ -93,13 +94,14 @@ function _ajax_sts_scan()
         ),
         true
       );
+      $deactivated[] = $product->get_title();
     }
   }
 
 
   die(json_encode(array(
 
-    "data" => $all_ads,
+    "data" => array('all_ads' => $all_ads, 'deactivated' => $deactivated),
     "pageNum" => $_COOKIE['kleinanzeigen-table-page']
 
   )));
@@ -247,6 +249,8 @@ function fetch_ts_script()
 
           $('.scan-pages a.start-scan').on('click', function(e) {
             e.preventDefault();
+            const el = e.target;
+            const parent = $(el).parents('.scan-pages')
 
             $.ajax({
 
@@ -256,12 +260,30 @@ function fetch_ts_script()
                 _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
                 action: '_ajax_sts_scan'
               },
+              beforeSend: function(data) {
+                $('a', parent).html("Einen Moment...");
+              },
               success: function(response) {
                 console.log(response)
-                const data = {
+                const {
+                  data
+                } = response;
+                const count = data.deactivated.length;
+                if (count > 0) {
+                  let titles = "";
+                  const hr = '-----------------\n';
+                  for (const title of data.deactivated) {
+                    titles = titles.concat(title, '\n');
+                    titles = titles.concat(hr);
+                  }
+                  alert(`${count} Artikel wurden deaktiviert:\n${hr}${titles}`);
+                } else {
+                  alert('Es brauchten keine Artikel deaktiviert werden');
+                }
+
+                list.update({
                   pageNum: response.pageNum || '1',
-                };
-                list.update(data);
+                });
               },
               error: function(response) {
                 console.log(response)
