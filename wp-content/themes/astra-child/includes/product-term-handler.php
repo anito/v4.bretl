@@ -174,20 +174,10 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
     case 'tag':
       $term_ids = $product->get_tag_ids();
     case 'label':
-      $terms = get_the_terms($product_id, 'product_label');
-      $term_ids =
-        array_map(
-          function ($term) {
-            return $term->term_id;
-          },
-          !is_wp_error($terms) ? ($terms ? $terms : []) : []
-        );
+      $term_ids = wp_list_pluck(get_the_terms($product_id, 'product_label'), 'term_id');
       break;
     case 'brands':
-      $term_ids = get_the_terms($product_id, 'product_' . $type);
-      if (false === $term_ids) {
-        $term_ids = array();
-      }
+      $term_ids = wp_list_pluck(get_the_terms($product_id, 'product_' . $type), 'term_id');
       break;
   }
   $term_ids = array_unique(array_map('intval', $term_ids));

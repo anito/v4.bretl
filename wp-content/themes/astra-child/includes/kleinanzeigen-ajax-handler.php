@@ -157,7 +157,7 @@ function wbp_ajax_connect()
     $product->save();
   }
 
-  if($success) {
+  if ($success) {
     enable_sku($post_ID, $ad);
   } else {
     disable_sku($post_ID);
@@ -266,7 +266,7 @@ function wbp_ajax_import_kleinanzeigen_data()
     ($record = isset($kleinanzeigendata['record']) ? $kleinanzeigendata['record'] : null);
     $record = (object) $record;
 
-    if($record) {
+    if ($record) {
       $title = $record->title;
       $price = preg_replace('/[\s.,a-zA-Z€]*/', '', $record->price);
       $excerpt = $record->description;
@@ -329,15 +329,15 @@ function wbp_ajax_import_kleinanzeigen_data()
       // handle brands
       $brands = get_terms([
         'taxonomy' => 'product_brands',
-        'hide_empty' => false,
+        'hide_empty' => false
       ]);
 
-      foreach($brands as $brand) {
-        if(wbp_text_contains($brand->name, $title)) {
+      foreach ($brands as $brand) {
+        if (wbp_text_contains($brand->name, $title)) {
           $ids = wbp_set_product_term($product, $brand->term_id, 'brands', true);
         }
       }
-      
+
 
       // handle product attributes
       foreach ($tags as $key => $tag) {
@@ -351,7 +351,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       $product->save();
     }
 
-    if($record) {
+    if ($record) {
       enable_sku($post_ID, $record);
     }
 

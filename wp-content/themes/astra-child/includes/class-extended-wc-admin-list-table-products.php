@@ -80,7 +80,8 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_ID);
       $sku = is_numeric($sku) ? $sku : false;
-      $brands = wp_list_pluck(wbp_get_product_terms($post_ID, 'brands'), 'name');
+      $brands = wbp_get_product_terms($post_ID, 'brands');
+      // $brands = wp_list_pluck(wbp_get_product_terms($post_ID, 'brands'), 'name');
       $product_labels = wp_list_pluck(wbp_get_product_terms($post_ID, 'label'), 'name');
     } else return 0;
 
@@ -94,7 +95,9 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           break;
         }
       case 'product_brands': {
-          echo implode(', ', $brands);
+          echo implode(', ', array_map(function($term) use($column_name) {
+            return '<a href="' . home_url() . '/' . $column_name . '/' . $term->slug . '">' . $term->name . '</a>';
+          }, $brands !== false ? $brands : []));
           break;
         }
       case 'sync': {
