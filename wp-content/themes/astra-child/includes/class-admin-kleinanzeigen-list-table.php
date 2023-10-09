@@ -452,7 +452,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
-                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '">' . $term->name . '</a>';
+                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
                                             }, $cats !== false ? $cats : [])); ?></div>
               </td>
             <?php
@@ -462,7 +462,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
-                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '">' . $term->name . '</a>';
+                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
                                             }, $brands !== false ? $brands : [])); ?></div>
               </td>
             <?php

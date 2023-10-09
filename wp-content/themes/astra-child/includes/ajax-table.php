@@ -278,7 +278,7 @@ function fetch_ts_script()
                   }
                   alert(`${count} Artikel wurden deaktiviert:\n${hr}${titles}`);
                 } else {
-                  alert('Es brauchten keine Artikel deaktiviert werden');
+                  alert('Keine Deaktivierungen notwendig');
                 }
 
                 list.update({

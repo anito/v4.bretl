@@ -260,11 +260,12 @@ function wbp_ajax_import_kleinanzeigen_data()
   }
 
   $pageNum = $_COOKIE['kleinanzeigen-table-page'];
-
+  
   if (!empty($kleinanzeigendata)) {
     ($content = isset($kleinanzeigendata['content']) ? $kleinanzeigendata['content'] : null);
     ($record = isset($kleinanzeigendata['record']) ? $kleinanzeigendata['record'] : null);
     $record = (object) $record;
+    $contents = '';
 
     if ($record) {
       $title = $record->title;
@@ -272,6 +273,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       $excerpt = $record->description;
       $tags = !empty($record->tags) ? $record->tags : [];
       $url = $record->url;
+      $contents = $title . ' ' . $excerpt;
     }
 
     if (!$post_ID) {
@@ -311,7 +313,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       // handle labels
       foreach ($parts as $key => $val) {
 
-        if (wbp_text_contains($key, $title . ' ' . $excerpt, isset($val['match_type']) ? $val['match_type'] : null)) {
+        if (wbp_text_contains($key, $contents, isset($val['match_type']) ? $val['match_type'] : null)) {
 
           $fn = isset($val['fn']) ? $val['fn'] : 'default';
           if (is_callable('wbp_handle_product_contents_' . $fn, false, $callable_name)) {
@@ -333,7 +335,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       ]);
 
       foreach ($brands as $brand) {
-        if (wbp_text_contains($brand->name, $title)) {
+        if (wbp_text_contains($brand->name, $contents)) {
           $ids = wbp_set_product_term($product, $brand->term_id, 'brands', true);
         }
       }
