@@ -266,8 +266,14 @@ function fetch_ts_script()
               success: function(response) {
                 console.log(response)
                 const {
-                  data
+                  data,
+                  pageNum
                 } = response;
+
+                list.update({
+                  pageNum: pageNum || '1',
+                })
+
                 const count = data.deactivated.length;
                 if (count > 0) {
                   let titles = "";
@@ -280,10 +286,6 @@ function fetch_ts_script()
                 } else {
                   alert('Keine Deaktivierungen notwendig');
                 }
-
-                list.update({
-                  pageNum: response.pageNum || '1',
-                });
               },
               error: function(response) {
                 console.log(response)
