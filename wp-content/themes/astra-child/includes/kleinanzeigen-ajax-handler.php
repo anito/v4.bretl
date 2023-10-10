@@ -39,7 +39,9 @@ function wbp_sanitize_excerpt($content, $count)
 
 function remote_call($url, $tries = 3, $retry = 1)
 {
-  $response = wp_remote_get($url);
+  $response = wp_remote_get(esc_url_raw($url), array(
+    'timeout' => 10
+  ));
 
   if (!is_wp_error($response) && ($response['response']['code'] === 200)) {
     return $response;
@@ -307,6 +309,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'mietmaschine' => 'Mieten',
         'neu' => 'Neu',
         'neues modell' => 'Neues Modell',
+        'top modell' => 'Top Modell',
         'neumaschine' => 'Neu',
         'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
         'sofort verfügbar' => 'Am Lager',

@@ -39,7 +39,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
   protected const INVISIBLE = 'Nicht sichtbar';
   protected const PRICE_DIFF = 'Preisdifferenz';
-  protected const WRONG_CAT = 'Kategorie';
+  protected const CONTAINS_DEFAULT_CAT = 'enthält Standard-Kategorie';
+  protected const NO_CAT = 'keine gültige Kategorie';
 
   /**
    * @Build Head
@@ -87,10 +88,16 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           default:
             $products['other'][] = $product;
         }
-        $cats = get_the_terms($product->get_id(), 'product_cat');
-        $slugs = wp_list_pluck($cats, 'slug');
-        if (in_array(DEFAULT_CAT_SLUG, $slugs)) {
-          $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::WRONG_CAT . ' (' . implode(', ', wp_list_pluck($cats, 'name')) . ')');
+        $default_cat_id = get_option('default_product_cat');
+        $cat_terms = get_the_terms($product->get_id(), 'product_cat');
+        $ids = wp_list_pluck($cat_terms, 'term_id');
+        if (in_array($default_cat_id, $ids)) {
+          $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
+          if( 1 === count($ids)) {
+            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::NO_CAT);
+          } else {
+            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
+          }
         }
       } else {
         $products['unknown'][] = $item->id;
@@ -287,7 +294,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     $diff_classes = array();
     $brands = array();
-    $cats = array();
+    $cat_terms = array();
     $product_labels = array();
 
     if ($product) {
@@ -326,7 +333,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $classes = "";
           $post_status = $product->get_status();
           $brands = wbp_get_product_brands($post_id);
-          $cats = wbp_get_product_cats($post_id);
+          $cat_terms = wbp_get_product_cats($post_id);
           switch ($post_status) {
             case 'draft':
               $status_name = __("Draft");
@@ -453,7 +460,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
               <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
                                               return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
-                                            }, $cats !== false ? $cats : [])); ?></div>
+                                            }, $cat_terms !== false ? $cat_terms : [])); ?></div>
               </td>
             <?php
               break;
