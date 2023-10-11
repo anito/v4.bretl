@@ -347,7 +347,7 @@ function wbp_ajax_import_kleinanzeigen_data()
 
       foreach ($brands as $brand) {
         $exists = false;
-        if (wbp_text_contains('\^(?:motorenhersteller?:?\s*(' . esc_html($brand->name). '))\$', esc_html($content), 'raw')) {
+        if (wbp_text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
           $exists = true;
         }
         if(wbp_text_contains(esc_html($brand->name), esc_html($contents))) {
