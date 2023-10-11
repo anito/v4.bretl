@@ -166,20 +166,7 @@ function wbp_process_kleinanzeigen($post_ID, $post)
 function wbp_set_product_term($product, $term_id, $type, $bool)
 {
   $product_id = $product->get_id();
-
-  switch ($type) {
-    case 'cat':
-      $term_ids = $product->get_category_ids();
-      break;
-    case 'tag':
-      $term_ids = $product->get_tag_ids();
-    case 'label':
-      $term_ids = wp_list_pluck(get_the_terms($product_id, 'product_label'), 'term_id');
-      break;
-    case 'brands':
-      $term_ids = wp_list_pluck(get_the_terms($product_id, 'product_' . $type), 'term_id');
-      break;
-  }
+  $term_ids = wp_list_pluck(get_the_terms($product_id, 'product_' . $type), 'term_id');
   $term_ids = array_unique(array_map('intval', $term_ids));
   $term_ids = wbp_toggle_array_item($term_ids, $term_id, $bool);
 
@@ -230,17 +217,14 @@ function wbp_get_product_term($name, $type)
   $term_id = get_term_by('name', 'product_' . $type);
 }
 
-function wbp_toggle_array_item($ids, $id, $bool)
+function wbp_toggle_array_item($ids, $id, $bool = null)
 {
   if (!isset($bool)) {
     $bool = in_array($id, $ids);
   }
-  if (!$bool) {
-    # remove id
-    $ids = array_diff($ids, array($id));
-  } else {
-    # add id
-    $ids = array_diff($ids, array($id));
+  # remove id
+  $ids = array_diff($ids, array($id));
+  if (true === $bool) {
     $ids[] = $id;
   }
   return $ids;
