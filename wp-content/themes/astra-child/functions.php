@@ -101,10 +101,12 @@ function wbp_has_price_diff($record, $product)
   return $kleinanzeigen_price !== $woo_price;
 }
 
-
 function wbp_text_contains($needle, $haystack, $searchtype = 'default')
 {
   switch ($searchtype) {
+    case 'raw':
+      preg_match('/' . $needle . '/', $haystack, $matches);
+      break;
     case 'like':
       preg_match('/' . strtolower($needle) . '/', strtolower($haystack), $matches);
       break;
@@ -118,7 +120,7 @@ function wbp_text_contains($needle, $haystack, $searchtype = 'default')
   return false;
 }
 
-// Callable product title functions
+// Callable product contents functions
 function wbp_handle_product_contents_sale($args)
 {
   $product = $args['product'];
@@ -127,16 +129,29 @@ function wbp_handle_product_contents_sale($args)
   $regular_price = (int) $price + (int) $price * 10 / 100;
   $product->set_regular_price($regular_price);
   $product->set_sale_price($price);
-  return wbp_handle_product_term($args['term_name'], $product);;
+  return wbp_handle_product_label($args['term_name'], $product);;
+}
+
+function wbp_handle_product_contents_aktion($args)
+{
+  $product = $args['product'];
+
+  $term = get_term_by('name', isset(WC_COMMON_TAXONOMIES['aktion']) ? WC_COMMON_TAXONOMIES['aktion'] : '', 'product_cat');
+
+  if ($term) {
+    require_once __DIR__ . '/includes/product-term-handler.php';
+    wbp_set_product_term($product, $term->term_id, 'cat', true);
+  }
+  return $product;
 }
 
 function wbp_handle_product_contents_default($args)
 {
   $product = $args['product'];
-  return wbp_handle_product_term($args['term_name'], $product);
+  return wbp_handle_product_label($args['term_name'], $product);
 }
 
-function wbp_handle_product_term($name, $product)
+function wbp_handle_product_label($name, $product)
 {
   $term_id = wbp_add_the_product_term($name, 'label');
   if ($term_id) {

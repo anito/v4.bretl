@@ -262,7 +262,7 @@ function wbp_ajax_import_kleinanzeigen_data()
   }
 
   $pageNum = $_COOKIE['kleinanzeigen-table-page'];
-  
+
   if (!empty($kleinanzeigendata)) {
     ($content = isset($kleinanzeigendata['content']) ? $kleinanzeigendata['content'] : null);
     ($record = isset($kleinanzeigendata['record']) ? $kleinanzeigendata['record'] : null);
@@ -291,14 +291,15 @@ function wbp_ajax_import_kleinanzeigen_data()
       $product->set_regular_price($price);
       $parts = array(
         'aktionspreis' => array(
-          'term_name' => 'Aktionspreis',
+          'Aktionspreis',
+          'match_type' => 'like',
           'fn' => 'sale',
         ),
         'allrad' => array('Allrad', 'match_type' => 'like'),
         'vorführ' => array('Vorführmaschine', 'match_type' => 'like'),
         'topzustand' => 'Top',
         'topausstattung' => 'Top',
-        'aktion' => 'Aktion',
+        'aktion' => array('Aktion', 'fn' => array('aktion', 'default')),
         'aktionsmodell' => 'Aktion',
         'am lager' => 'Am Lager',
         'klima' => 'Klima',
@@ -313,22 +314,27 @@ function wbp_ajax_import_kleinanzeigen_data()
         'neumaschine' => 'Neu',
         'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
         'sofort verfügbar' => 'Am Lager',
+        'sofort lieferbar' => 'Am Lager',
       );
 
-      // handle labels
+      // handle contents
       foreach ($parts as $key => $val) {
 
         if (wbp_text_contains($key, $contents, isset($val['match_type']) ? $val['match_type'] : null)) {
 
-          $fn = isset($val['fn']) ? $val['fn'] : 'default';
-          if (is_callable('wbp_handle_product_contents_' . $fn, false, $callable_name)) {
+          $fns = isset($val['fn']) ? $val['fn'] : 'default';
+          $fns = !is_array($fns) ? array($fns) : $fns;
 
-            if (!is_array($val)) {
-              $term_name = $val;
-            } elseif (isset($val[0])) {
-              $term_name = $val[0];
+          foreach ($fns as $fn) {
+            if (is_callable('wbp_handle_product_contents_' . $fn, false, $callable_name)) {
+
+              if (!is_array($val)) {
+                $term_name = $val;
+              } elseif (isset($val[0])) {
+                $term_name = $val[0];
+              }
+              $product = call_user_func('wbp_handle_product_contents_' . $fn, compact('product', 'price', 'title', 'content', 'term_name'));
             }
-            $product = call_user_func('wbp_handle_product_contents_' . $fn, compact('product', 'price', 'title', 'content', 'term_name'));
           }
         }
       }
@@ -340,8 +346,15 @@ function wbp_ajax_import_kleinanzeigen_data()
       ]);
 
       foreach ($brands as $brand) {
-        if (wbp_text_contains($brand->name, $contents)) {
-          $ids = wbp_set_product_term($product, $brand->term_id, 'brands', true);
+        $exists = false;
+        if (wbp_text_contains('\^(?:motorenhersteller?:?\s*(' . esc_html($brand->name). '))\$', esc_html($content), 'raw')) {
+          $exists = true;
+        }
+        if(wbp_text_contains(esc_html($brand->name), esc_html($contents))) {
+          $exists = true;
+        }
+        if(true === $exists) {
+          wbp_set_product_term($product, $brand->term_id, 'brands', true);
         }
       }
 
