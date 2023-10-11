@@ -282,7 +282,7 @@ function fetch_ts_script()
                     titles = titles.concat(title, '\n');
                     titles = titles.concat(hr);
                   }
-                  alert(`${count} Artikel wurde${1 !== count & 'n'} deaktiviert:\n${hr}${titles}`);
+                  alert(`${count} Artikel wurde${1 !== count ? 'n' : ''} deaktiviert:\n${hr}${titles}`);
                 } else {
                   alert('Keine Deaktivierungen vorgenommen');
                 }
