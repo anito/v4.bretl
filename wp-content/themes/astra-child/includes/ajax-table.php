@@ -284,7 +284,7 @@ function fetch_ts_script()
                   }
                   alert(`${count} Artikel wurde${1 !== count ? 'n' : ''} deaktiviert:\n${hr}${titles}`);
                 } else {
-                  alert('Keine Deaktivierungen vorgenommen');
+                  alert('Es gab keine Deaktivierungen');
                 }
               },
               error: function(response) {
