@@ -54,11 +54,12 @@ add_action('wp_ajax_nopriv__ajax_sts_display', '_ajax_sts_display');
 
 function _ajax_sts_scan()
 {
+  // Keep in mind wbp_get_json_data will alter the page number cookie, so save it and reset it later
   $current_page = $_COOKIE['kleinanzeigen-table-page'];
+  $scan_type = isset($_REQUEST['scan_type']) ? $_REQUEST['scan_type'] : null;
 
   $all_ads = array();
   for ($pageNum = 1; $pageNum <= KLEINANZEIGEN_TOTAL_PAGES; $pageNum++) {
-    // Keep in mind wbp_get_json_data will alter page number and should be resetted later
     $page_data  = wbp_get_json_data($pageNum);
 
     if (is_wp_error($page_data)) {
@@ -80,27 +81,54 @@ function _ajax_sts_scan()
   $ad_ids = wp_list_pluck($all_ads, 'id');
 
   $deactivated = [];
-  $_published = [];
+  $price_diffs = [];
   foreach ($published_products as $product) {
-    $sku = $product->get_sku();
+    $id = $product->get_id();
+    $sku = (int) $product->get_sku();
+    $image = wp_get_attachment_image_url($product->get_image_id());
+    $shop_price = wp_kses_post($product->get_price_html());
+    $shop_price_raw = $product->get_price();
+    $price = '-';
+    $title = $product->get_title();
 
-    if (!empty($sku) && !in_array($sku, $ad_ids)) {
-      $id = $product->get_id();
-      $image = wp_get_attachment_image_url($product->get_image_id());
-      $title = $product->get_title();
-      $deactivated[] = compact('id', 'sku', 'image', 'title');
+    // invalid ads
+    if (!empty($sku)) {
+      if (!in_array($sku, $ad_ids)) {
+        $deactivated[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price');
+      } else {
+        $records = array_filter($all_ads, function ($ad) use ($sku) {
+          return $ad->id === $sku;
+        });
+        if (!empty($records)) {
+          $key = array_key_first($records);
+          $record = $records[$key];
+          if (wbp_has_price_diff($record, $product)) {
+            $price = wbp_sanitize_kleinanzeigen_price($record->price);
+            $ad_price = $record->price;
+            $price_diffs[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price', 'ad_price');
+          }
+        }
+      }
     }
   }
 
   // Reset page number
   setcookie('kleinanzeigen-table-page', $current_page);
   $response = array(
-    "data" => compact('all_ads', 'deactivated'),
-    "pageNum" => $current_page
+    "data" => compact('all_ads', 'deactivated', 'price_diffs')
   );
 
-  $content = wbp_include_kleinanzeigen_template('/dashboard/scan-results.php', true, $response);
+  ob_start();
+  switch($scan_type) {
+    case 'invalid-ad':
+      wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-results.php', false, $response);
+      break;
+    case 'invalid-price':
+      wbp_include_kleinanzeigen_template('/dashboard/invalid-price-results.php', false, $response);
+      break;
+  }
 
+  $content = ob_get_clean();
   die(json_encode($content));
 }
 add_action('wp_ajax__ajax_sts_scan', '_ajax_sts_scan');
@@ -247,7 +275,8 @@ function fetch_ts_script()
           $('.scan-pages a.start-scan').on('click', function(e) {
             e.preventDefault();
             const el = e.target;
-            const parent = $(el).parents('.scan-pages')
+            const parent = $(el).parents('.scan-pages');
+            const scan_type = $(el).data('scan-type');
 
             $.ajax({
 
@@ -255,7 +284,8 @@ function fetch_ts_script()
               dataType: 'json',
               data: {
                 _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
-                action: '_ajax_sts_scan'
+                action: '_ajax_sts_scan',
+                scan_type
               },
               beforeSend: function(data) {},
               success: function(response) {

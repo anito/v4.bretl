@@ -23,17 +23,36 @@
           <?php } ?>
         </div>
 
-        <?php $title = "Verberge alle Produkte im Shop, die auf Kleinanzeigen gelöscht oder deaktiviert wurden." ?>
-        <div class="scan-pages" style="display: flex; margin: 15px 0px 5px; font-size: 12px;">
-          <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
+        <div class="">
           <div class="">
-            <span><b>Wurden Artikel verkauft oder deaktiviert?</b></span>
-            <div>
-              <span>Shop jetzt nach Produkten </span>
-              <a href="" type="button" class="start-scan info" title="<?php echo $title ?>">durchsuchen</a>
-              <span>die auf ungültigen Anzeigen basieren</span>
+            <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de inzwischen gelöscht oder deaktiviert wurden." ?>
+            <div class="scan-pages" style="display: flex; margin: 15px 0px 5px; font-size: 12px;">
+              <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
+              <div class="">
+                <span><b>Wurden Artikel verkauft oder deaktiviert?</b></span>
+                <div>
+                  <span>Shop jetzt auf </span>
+                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-ad" title="<?php echo $title ?>">Produkte überprüfen</a>
+                  <span>die auf ungültigen Anzeigen basieren.</span>
+                </div>
+              </div>
             </div>
           </div>
+          <div class="">
+            <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
+            <div class="scan-pages" style="display: flex; margin: 15px 0px 5px; font-size: 12px;">
+              <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
+              <div class="">
+                <span><b>Wurden Artikelpreise geändert?</b></span>
+                <div>
+                  <span>Shop jetzt auf </span>
+                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-price" title="<?php echo $title ?>">Produkte überprüfen</a>
+                  <span>deren Preise nicht mehr mit den Anzeigen übereinstimmen.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

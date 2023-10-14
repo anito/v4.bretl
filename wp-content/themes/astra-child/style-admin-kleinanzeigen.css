@@ -235,6 +235,9 @@ section .summary {
 section .summary .count:nth-child(2) {
   margin-left: 10px;
 }
+.wp-list-table .column-shop-price .woocommerce-price-suffix {
+    display: none;
+}
 .wp-list-table.wp-list-kleinanzeigen-ads .manage-column[class*="status"],
 .column[class*="column-status"] {
   width: 5px;
@@ -278,9 +281,6 @@ section .summary .count:nth-child(2) {
 }
 .wp-list-table.wp-list-kleinanzeigen-ads .column-shop-brands {
   width: auto;
-}
-.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-price .woocommerce-price-suffix {
-    display: none;
 }
 .wp-list-table.wp-list-kleinanzeigen-ads .column-content {
   position: relative;

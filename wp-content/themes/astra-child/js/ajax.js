@@ -31,6 +31,9 @@ jQuery(document).ready(function ($) {
   window.addEventListener("disconnect:item", function (e) {
     disconnect(e.detail.e);
   });
+  window.addEventListener("fixprice:item", function (e) {
+    fixPrice(e.detail.e);
+  });
   window.addEventListener("deactivate:all", async function (e) {
     const { deactivated } = e.detail.data;
 
@@ -446,6 +449,43 @@ jQuery(document).ready(function ($) {
         action: "_ajax_toggle_publish_post",
         post_ID,
         kleinanzeigen_id,
+        screen: el.dataset.screen || screen,
+      },
+      beforeSend: () => {
+        $(el).parents("td").addClass("busy");
+        $(el).html("Einen Moment...");
+      },
+      success: (data) => {
+        $(el).html("Fertig");
+
+        setTimeout(() => {
+          parseResponse(data, el);
+        }, 500);
+      },
+      error: (error) => console.log(error),
+    });
+  }
+
+  function fixPrice(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    start();
+
+    const el = e.target;
+    const post_ID = el.dataset.postId;
+    const kleinanzeigen_id = el.dataset.kleinanzeigenId;
+    const price = el.dataset.price;
+
+    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    spinner?.classList.add("is-active");
+
+    $.post({
+      url: admin_ajax_local,
+      data: {
+        action: "_ajax_fix_price",
+        post_ID,
+        kleinanzeigen_id,
+        price,
         screen: el.dataset.screen || screen,
       },
       beforeSend: () => {

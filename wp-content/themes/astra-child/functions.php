@@ -6,7 +6,7 @@ require_once __DIR__ . '/includes/class-extended-wc-admin-list-table-products.ph
 
 function wbp_product_table_list_loader()
 {
-  if (!is_ajax()) {
+  if (!wp_doing_ajax()) {
     new Extended_WC_Admin_List_Table_Products();
   }
 }
@@ -91,12 +91,16 @@ function wbp_wc_screen_styles($hook)
   }
 }
 
+function wbp_sanitize_kleinanzeigen_price($text) {
+  $regex = '/^([\d.]+)/';
+  preg_match($regex, $text, $matches);
+  return !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+}
+
 function wbp_has_price_diff($record, $product)
 {
-  $regex = '/^([\d.]+)/';
-  preg_match($regex, $record->price, $matches);
-  $kleinanzeigen_price = !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
-  $woo_price = $product->get_price();
+  $kleinanzeigen_price = wbp_sanitize_kleinanzeigen_price($record->price);
+  $woo_price = $product->get_price($record);
 
   return $kleinanzeigen_price !== $woo_price;
 }
@@ -217,7 +221,7 @@ function wbp_quick_edit_product_save($post)
   if (!class_exists('WooCommerce', false)) return 0;
 
   // Check for a quick editsave action
-  if (is_ajax() && isset($_POST['ID'])) {
+  if (wp_doing_ajax() && isset($_POST['ID'])) {
     // Render custom columns
     new Extended_WC_Admin_List_Table_Products();
   };
@@ -255,7 +259,7 @@ function wbp_save_post($post_ID, $post)
 
   require_once __DIR__ . '/includes/product-term-handler.php';
   wbp_process_sale($post_ID, $post);
-  if (!is_ajax()) {
+  if (!wp_doing_ajax()) {
     wbp_process_kleinanzeigen($post_ID, $post);
   }
 }
@@ -405,6 +409,11 @@ function _ajax_disconnect()
   wbp_ajax_disconnect();
 }
 
+function _ajax_fix_price()
+{
+  wbp_ajax_fix_price();
+}
+
 function _ajax_toggle_publish_post()
 {
   wbp_ajax_toggle_publish_post();
@@ -484,6 +493,7 @@ if (is_admin()) {
   require_once __DIR__ . '/includes/product-term-handler.php';
 
   add_action('wp_ajax__ajax_connect', '_ajax_connect');
+  add_action('wp_ajax__ajax_fix_price', '_ajax_fix_price');
   add_action('wp_ajax__ajax_disconnect', '_ajax_disconnect');
   add_action('wp_ajax__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax__ajax_get_brands', '_ajax_get_brands');
@@ -495,6 +505,7 @@ if (is_admin()) {
   add_action('wp_ajax__ajax_get_product_categories', '_ajax_get_product_categories');
 
   add_action('wp_ajax_nopriv__ajax_connect', '_ajax_connect');
+  add_action('wp_ajax_nopriv__ajax_fix_price', '_ajax_fix_price');
   add_action('wp_ajax_nopriv__ajax_disconnect', '_ajax_disconnect');
   add_action('wp_ajax_nopriv__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax_nopriv__ajax_get_brands', '_ajax_get_brands');

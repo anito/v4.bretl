@@ -19,6 +19,9 @@
     <div class="list-modal-background close">
       <div class="list-modal-body">
         <div id="list-modal-content" class="list-modal-inner"></div>
+        <div class="button-wrap right">
+          <a href="#" type="button" class="button button-primary close"><?php echo __('Close', 'astra-child') ?></a>
+        </div>
       </div>
     </div>
   </div>
@@ -26,7 +29,15 @@
 </div>
 
 <script>
-  jQuery(document).ready(($) => {})
+  jQuery(document).ready(($) => {
+
+    $('.list-modal .close').on('click', function(e) {
+      if (e.target === e.currentTarget) {
+        $('body').removeClass('show-modal');
+      }
+    })
+
+  })
 </script>
 
 <style>
@@ -61,8 +72,8 @@
   }
 
   .list-modal-body {
-    width: 60%;
-    height: 500px;
+    width: 80%;
+    height: 600px;
     background-color: white;
     border-radius: 8px;
     padding: 20px;
@@ -71,5 +82,108 @@
 
   body.show-modal .list-modal {
     display: block;
+  }
+
+  /**
+   * Styles for imported templates
+   */
+  #table-scan-list .column-image {
+    width: 90px;
+  }
+
+  #table-scan-list .column-title {
+    width: auto;
+  }
+
+  #table-scan-list .column-shop-price {
+    width: 20%;
+  }
+
+  #table-scan-list .column-actions {
+    width: 30%;
+    text-align: center;
+  }
+
+  .list-outer {
+    position: relative;
+  }
+
+  .list-wrap {
+    height: auto;
+    overflow-y: auto;
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+  }
+
+  .list-header {
+    display: flex;
+    justify-content: center;
+  }
+
+  .list-header h5 {
+    font-size: 1.5em;
+  }
+
+  #table-scan-list {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    height: 440px;
+    display: inline-block;
+    overflow: auto;
+  }
+
+  #table-scan-list.empty {
+    display: table;
+  }
+
+  #table-scan-list thead td,
+  #table-scan-list thead th {
+    background-color: #fff;
+    outline: 1px solid #c3c4c7;
+    position: sticky;
+    top: 0;
+    height: 30px;
+    padding: 5px;
+  }
+
+  #table-scan-list tbody td {
+    padding: 3px;
+  }
+
+  #table-scan-list.striped>tbody> :nth-child(odd) {
+    background-color: #f6f7f7;
+  }
+
+  #table-scan-list tbody {
+    overflow: auto;
+  }
+
+  #table-scan-list tbody,
+  #table-scan-list thead {
+    display: inline-table;
+    width: 100%;
+  }
+
+  .button-wrap {
+    position: absolute;
+    bottom: 20px;
+  }
+
+  .button-wrap.right {
+    right: 20px;
+  }
+
+  .button-wrap.left {
+    left: 20px;
+  }
+
+  #table-scan-list tbody td .action-button {
+    width: 110px;
+    margin: 5px;
+  }
+
+  #table-scan-list tbody td .action-button.disabled {
+    pointer-events: none;
   }
 </style>

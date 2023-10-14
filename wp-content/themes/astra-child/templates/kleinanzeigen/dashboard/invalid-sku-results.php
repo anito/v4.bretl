@@ -9,17 +9,17 @@
     </div>
   </div>
   <div class="list-wrap">
-    <table id="table-scan-list" class="table-scan-list striped">
+    <table id="table-scan-list" class="table-scan-list wp-list-table striped <?php echo empty($data['deactivated']) ? 'empty' : '' ?>">
       <thead>
         <th id="scan-result-image" class="column-image">Bild</th>
         <th id="scan-result-title" class="column-title">Titel</th>
-        <th id="scan-result-price" class="column-title">Preis</th>
+        <th id="scan-result-price" class="column-shop-price">Preis</th>
         <th id="scan-result-actions" class="column-actions">Aktionen</th>
       </thead>
       <tbody>
-        <?php if (!count($data['deactivated'])) : ?>
+        <?php if (empty($data['deactivated'])) : ?>
           <tr id="<?php echo $published['id'] ?>">
-            <td colspan="3" class="" style="height: 60px; text-align: center;">
+            <td colspan="4" class="" style="height: 60px; text-align: center;">
               <?php echo __('No invalid ads found', 'astra-child') ?>
             </td>
           </tr>
@@ -28,7 +28,10 @@
             <tr id="<?php echo $published['id'] ?>">
               <td class="column-image"><img width="80" src="<?php echo $published['image']; ?>" alt=""></td>
               <td class="column-title"><?php echo $published['title'] ?></td>
-              <td class="column-price"><?php echo $published['price'] ?></td>
+              <td class="column-shop-price">
+                <div class="shop-price"><?php echo $published['shop_price'] ?></div>
+                <div class="ad-price"><?php echo $published['price'] ?></div>
+              </td>
               <td class="column-actions">
                 <a href="#" type="button" class="button button-primary button-small action-button hide" data-success-label="<?php echo __('Hidden', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-screen="modal"><?php echo __('Hide', 'astra-child') ?></a>
                 <a href="#" type="button" class="button button-primary button-small action-button disconnect" data-success-label="<?php echo __('Disconnected', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-screen="modal"><?php echo __('Disconnect', 'astra-child') ?></a>
@@ -39,14 +42,11 @@
       </tbody>
     </table>
   </div>
-  <div class="button-wrap">
-    <div class="button-group">
-      <a href="#" type="button" class="button button-primary hide-all <?php echo !count($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Hide all', 'astra-child') ?></a>
-      <a href="#" type="button" class="button button-primary disconnect-all <?php echo !count($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Disconnect all', 'astra-child') ?></a>
-    </div>
-    <div>
-      <a href="#" type="button" class="button button-primary close"><?php echo __('Close', 'astra-child') ?></a>
-    </div>
+</div>
+<div class="button-wrap left">
+  <div class="button-group">
+    <a href="#" type="button" class="button button-primary hide-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Hide all', 'astra-child') ?></a>
+    <a href="#" type="button" class="button button-primary disconnect-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Disconnect all', 'astra-child') ?></a>
   </div>
 </div>
 
@@ -96,93 +96,7 @@
       );
     })
 
-    $('.list-modal .close').on('click', function(e) {
-      if (e.target === e.currentTarget) {
-        $('body').removeClass('show-modal');
-      }
-    }, )
-
     const data = <?php echo json_encode($data) ?>;
 
   })
 </script>
-
-<style>
-  .column-image {
-    width: 90px;
-  }
-
-  .column-title {
-    width: auto;
-  }
-
-  .column-actions {
-    width: 30%;
-    text-align: center;
-  }
-
-  .list-outer {
-    position: relative;
-  }
-
-  .list-wrap {
-    height: 420px;
-    overflow-y: auto;
-    border: 1px solid #c3c4c7;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
-  }
-
-  .list-header {
-    display: flex;
-    justify-content: center;
-  }
-
-  .list-header h5 {
-    font-size: 1.5em;
-  }
-
-  #table-scan-list {
-    table-layout: fixed;
-    border-collapse: collapse;
-    width: 100%;
-    height: 350px;
-  }
-
-  #table-scan-list thead td,
-  #table-scan-list thead th {
-    background-color: #fff;
-    outline: 1px solid #c3c4c7;
-    position: sticky;
-    top: 0;
-    height: 30px;
-    padding: 5px;
-  }
-
-  #table-scan-list tbody td {
-    padding: 3px;
-  }
-
-  #table-scan-list.striped>tbody> :nth-child(odd) {
-    background-color: #f6f7f7;
-  }
-
-  tbody {
-    overflow: auto;
-  }
-
-  .button-wrap {
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    bottom: -44px;
-    width: 100%;
-  }
-
-  .action-button {
-    width: 110px;
-  }
-
-  .action-button.disabled {
-    pointer-events: none;
-  }
-</style>

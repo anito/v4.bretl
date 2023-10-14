@@ -13,7 +13,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   {
     $this->list_table_type = 'product';
 
-    if (is_ajax()) {
+    if (wp_doing_ajax()) {
       if (isset($_POST['ID'])) {
         $this->is_quickedit = true;
       } else {
