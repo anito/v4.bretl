@@ -47,21 +47,18 @@ function _ajax_sts_display()
   $wp_list_table->render_head();
   $head = ob_get_clean();
 
-  die(json_encode(array(
-
-    "head" => $head,
-    "display" => $display
-
-  )));
+  die(json_encode(compact('head', 'display')));
 }
 add_action('wp_ajax__ajax_sts_display', '_ajax_sts_display');
 add_action('wp_ajax_nopriv__ajax_sts_display', '_ajax_sts_display');
 
 function _ajax_sts_scan()
 {
+  $current_page = $_COOKIE['kleinanzeigen-table-page'];
 
   $all_ads = array();
   for ($pageNum = 1; $pageNum <= KLEINANZEIGEN_TOTAL_PAGES; $pageNum++) {
+    // Keep in mind wbp_get_json_data will alter page number and should be resetted later
     $page_data  = wbp_get_json_data($pageNum);
 
     if (is_wp_error($page_data)) {
@@ -78,33 +75,33 @@ function _ajax_sts_scan()
     'status' => 'publish',
     'limit' => -1
   );
-  $published = wc_get_products($args);
+  $published_products = wc_get_products($args);
 
-  $ids = wp_list_pluck($all_ads, 'id');
+  $ad_ids = wp_list_pluck($all_ads, 'id');
 
   $deactivated = [];
-  foreach ($published as $product) {
-    $id = $product->get_sku();
+  $_published = [];
+  foreach ($published_products as $product) {
+    $sku = $product->get_sku();
 
-    if (!empty($id) && !in_array($id, $ids)) {
-      wp_update_post(
-        array(
-          'ID' => $product->get_id(),
-          'post_status' => 'draft'
-        ),
-        true
-      );
-      $deactivated[] = $product->get_title();
+    if (!empty($sku) && !in_array($sku, $ad_ids)) {
+      $id = $product->get_id();
+      $image = wp_get_attachment_image_url($product->get_image_id());
+      $title = $product->get_title();
+      $deactivated[] = compact('id', 'sku', 'image', 'title');
     }
   }
 
+  // Reset page number
+  setcookie('kleinanzeigen-table-page', $current_page);
+  $response = array(
+    "data" => compact('all_ads', 'deactivated'),
+    "pageNum" => $current_page
+  );
 
-  die(json_encode(array(
+  $content = wbp_include_kleinanzeigen_template('/dashboard/scan-results.php', true, $response);
 
-    "data" => array('all_ads' => $all_ads, 'deactivated' => $deactivated),
-    "pageNum" => $_COOKIE['kleinanzeigen-table-page']
-
-  )));
+  die(json_encode($content));
 }
 add_action('wp_ajax__ajax_sts_scan', '_ajax_sts_scan');
 add_action('wp_ajax_nopriv__ajax_sts_scan', '_ajax_sts_scan');
@@ -123,14 +120,15 @@ function fetch_ts_script()
 
 ?>
 
-  <script type="text/javascript">
+  <script>
     console.log("<?php echo $screen->id; ?>")
   </script>
 
   <?php
 
-  if ($screen->id != "toplevel_page_kleinanzeigen")
+  if ("toplevel_page_kleinanzeigen" != $screen->id) {
     return;
+  }
 
   ?>
 
@@ -139,8 +137,9 @@ function fetch_ts_script()
 
       list = {
 
-        /** added method display
-         * for getting first sets of data
+        /**
+         * method display:
+         * get first sets of data
          **/
 
         display: function() {
@@ -159,9 +158,9 @@ function fetch_ts_script()
 
               $('.wp-list-table').removeClass('loading');
 
-              $("#ts-history-table").html(response.display);
-
               $("#head-wrap").html(response.head);
+
+              $("#kleinanzeigen-table").html(response.display);
 
               $("tbody").on("click", ".toggle-row", function(e) {
                 e.preventDefault();
@@ -234,8 +233,6 @@ function fetch_ts_script()
 
         init_head: function() {
 
-          console.log('init_head')
-
           $('.pagination a').on('click', function(e) {
             e.preventDefault();
 
@@ -260,32 +257,10 @@ function fetch_ts_script()
                 _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
                 action: '_ajax_sts_scan'
               },
-              beforeSend: function(data) {
-                $('a', parent).html("Einen Moment...");
-              },
+              beforeSend: function(data) {},
               success: function(response) {
-                console.log(response)
-                const {
-                  data,
-                  pageNum
-                } = response;
-
-                list.update({
-                  pageNum: pageNum || '1',
-                })
-
-                const count = data.deactivated.length;
-                if (count > 0) {
-                  let titles = "";
-                  const hr = '-----------------\n';
-                  for (const title of data.deactivated) {
-                    titles = titles.concat(title, '\n');
-                    titles = titles.concat(hr);
-                  }
-                  alert(`${count} Artikel wurde${1 !== count ? 'n' : ''} deaktiviert:\n${hr}${titles}`);
-                } else {
-                  alert('Es gab keine Deaktivierungen');
-                }
+                $('#list-modal-content').html(response);
+                $('body').addClass('show-modal');
               },
               error: function(response) {
                 console.log(response)
@@ -324,16 +299,16 @@ function fetch_ts_script()
                 $('#the-list').html(response.rows);
               if (response.column_headers.length)
                 $('thead tr, tfoot tr').html(response.column_headers);
-              if (response.pagination.bottom.length)
-                $('.tablenav.top .tablenav-pages').html($(response.pagination.top).html());
               if (response.pagination.top.length)
+                $('.tablenav.top .tablenav-pages').html($(response.pagination.top).html());
+              if (response.pagination.bottom.length)
                 $('.tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
               if (response.row)
                 $('#the-list tr').html($(response.pagination.bottom).html());
 
               $('.wp-list-table').removeClass('loading');
 
-              list.init();
+              setTimeout(list.init, 100);
             }
           });
         },

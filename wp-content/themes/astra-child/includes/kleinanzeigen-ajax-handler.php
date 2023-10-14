@@ -109,6 +109,7 @@ function wbp_ajax_toggle_publish_post()
 
       break;
     case 'toplevel_page_kleinanzeigen':
+    case 'modal':
 
       $wp_list_table = new Kleinanzeigen_List_Table();
       $data = wbp_get_json_data($pageNum);
@@ -126,6 +127,7 @@ function wbp_ajax_toggle_publish_post()
   ob_start();
   switch ($screen) {
     case 'toplevel_page_kleinanzeigen':
+    case 'modal':
       $wp_list_table->render_head($pageNum);
       break;
   }
@@ -350,10 +352,10 @@ function wbp_ajax_import_kleinanzeigen_data()
         if (wbp_text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
           $exists = true;
         }
-        if(wbp_text_contains(esc_html($brand->name), esc_html($contents))) {
+        if (wbp_text_contains(esc_html($brand->name), esc_html($contents))) {
           $exists = true;
         }
-        if(true === $exists) {
+        if (true === $exists) {
           wbp_set_product_term($product, $brand->term_id, 'brands', true);
         }
       }

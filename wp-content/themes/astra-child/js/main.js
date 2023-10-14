@@ -63,6 +63,7 @@ jQuery.noConflict();
       targetEls.forEach((el) => {
         let targetEl = el.querySelector(".wishlist-widget");
         if (!targetEl) {
+          el.style.display = 'inline-block';
           targetEl = document.createElement("span");
           targetEl.classList.add("wishlist-widget");
           el.append(targetEl);
@@ -156,7 +157,7 @@ jQuery.noConflict();
 
   // add_fb_div();
   // add_image_disclaimer();
-  add_jet_engine_wishlist_hook(".wishlist-target [class*=title]", "wishlist");
+  add_jet_engine_wishlist_hook("header .wishlist-target", "wishlist");
   add_toggle_sidebar();
   // add_solis_script();
 })(jQuery);

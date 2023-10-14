@@ -325,7 +325,7 @@ function wbp_detectTrident($current_theme)
     $browser['version'] = $match;
     add_action('wp_footer', 'unsupported_browsers_template', 100);
 
-    wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', ['jquery'], '0.1', true);
+    wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), '0.1', true);
     wp_localize_script('browser_sniffer', '__browser', array('name' => $browser['name'], 'version' => $browser['version'], 'platform' => $browser['platform']));
     wp_enqueue_script('browser_sniffer');
   }
@@ -405,7 +405,7 @@ function _ajax_disconnect()
   wbp_ajax_disconnect();
 }
 
-function _ajax_publish_post()
+function _ajax_toggle_publish_post()
 {
   wbp_ajax_toggle_publish_post();
 }
@@ -488,7 +488,7 @@ if (is_admin()) {
   add_action('wp_ajax__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax__ajax_get_brands', '_ajax_get_brands');
   add_action('wp_ajax__ajax_delete_post', '_ajax_delete_post');
-  add_action('wp_ajax__ajax_publish_post', '_ajax_publish_post');
+  add_action('wp_ajax__ajax_toggle_publish_post', '_ajax_toggle_publish_post');
   add_action('wp_ajax__ajax_delete_images', '_ajax_delete_images');
   add_action('wp_ajax__ajax_import_kleinanzeigen_data', '_ajax_import_kleinanzeigen_data');
   add_action('wp_ajax__ajax_import_kleinanzeigen_images', '_ajax_import_kleinanzeigen_images');
@@ -499,7 +499,7 @@ if (is_admin()) {
   add_action('wp_ajax_nopriv__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax_nopriv__ajax_get_brands', '_ajax_get_brands');
   add_action('wp_ajax_nopriv__ajax_delete_post', '_ajax_delete_post');
-  add_action('wp_ajax_nopriv__ajax_publish_post', '_ajax_publish_post');
+  add_action('wp_ajax_nopriv__ajax_toggle_publish_post', '_ajax_toggle_publish_post');
   add_action('wp_ajax_nopriv__ajax_delete_images', '_ajax_delete_images');
   add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_data', '_ajax_import_kleinanzeigen_data');
   add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_images', '_ajax_import_kleinanzeigen_images');
@@ -755,19 +755,26 @@ add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeh
 
 function wbp_add_kleinanzeigen_admin_menu_page()
 {
-  $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJ1dWlkLWNmNTA5MjcyLTAwZTItNGIyZS1iZmVlLTU2ZWYwOWQ4YTA0ZiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTE0Ljk4IDEzMC45OCI+PGcgaWQ9InV1aWQtZGFkMmZmYTQtODM3Ny00ODc2LTg5NjQtZDc4MTJhYTQ0ZTkxIj48cGF0aCBkPSJtODQuOTksMTMwLjk4Yy0xNy41NiwwLTI2LjE1LTEyLjI1LTI3Ljg5LTE0Ljc5LTUuMTgsNS4xLTEzLjAxLDE0Ljc5LTI3LjEsMTQuNzktMTYuMjcsMC0yOS45OS0xMi4zLTI5Ljk5LTMyLjI0VjMyLjI0QzAsMTIuMjUsMTMuNzQsMCwyOS45OSwwczI5Ljk5LDEzLjAyLDI5Ljk5LDMxLjk0YzMuMTctMS4xMyw2LjU0LTEuNzEsMTAtMS43MSwxNi43NCwwLDI5Ljk5LDEzLjczLDI5Ljk5LDMwLjIzLDAsNC42My0uODcsOC43NC0yLjc5LDEyLjY4LDEwLjYyLDQuNzYsMTcuNzgsMTUuNDYsMTcuNzgsMjcuNjMsMCwxNi42Ny0xMy40NiwzMC4yMy0yOS45OSwzMC4yM1ptLTIwLjY0LTIyLjA5YzQuMzEsNy41NSwxMS41NywxMi4wMiwyMC42NCwxMi4wMiwxMS4wMiwwLDIwLTkuMDQsMjAtMjAuMTUsMC04Ljc5LTUuNjEtMTYuNDQtMTMuNjctMTkuMTNsLTI2Ljk3LDI3LjI2aDBaTTMwLDEwLjA4Yy05Ljk1LDAtMjAsNi44NS0yMCwyMi4xN3Y2Ni41YzAsMTUuMzEsMTAuMDQsMjIuMTcsMjAsMjIuMTcsNy45LDAsMTIuMjctNC4wMiwxOS4zMS0xMS4xMmwzLjEyLTMuMTRjLTEuNjEtNC44My0yLjQ0LTEwLjItMi40NC0xNS45N3YtNTguNDRjMC0xNS4zMS0xMC4wNC0yMi4xNy0yMC0yMi4xN2gwWm0yOS45OSwzMi45MnY0Ny42OWMwLDIuNy4yMyw1LjI3LjY1LDcuNjlsMjEuNzMtMjEuOWM2LjMxLTYuMzYsNy42MS0xMSw3LjYxLTE2LjAxLDAtMTAuNy04LjU0LTIwLjE1LTIwLTIwLjE1LTMuNTcsMC02Ljk4LjkyLTEwLDIuNjloMFoiIGZpbGw9IiMxZDRiMDAiLz48L2c+PC9zdmc+';
+  load_textdomain('astra-child', get_stylesheet_directory() . '/languages/de_DE.mo');
+  $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI3LjkuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9InV1aWQtY2Y1MDkyNzItMDBlMi00YjJlLWJmZWUtNTZlZjA5ZDhhMDRmIgoJIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTE1IDEzMSIKCSBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMTUgMTMxOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0E3QUFBRDt9Cjwvc3R5bGU+CjxnIGlkPSJ1dWlkLWRhZDJmZmE0LTgzNzctNDg3Ni04OTY0LWQ3ODEyYWE0NGU5MSI+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNODAuOCwxMjFjLTE0LjksMC0yMi4yLTEwLjQtMjMuNi0xMi41Yy00LjQsNC4zLTExLDEyLjUtMjMsMTIuNWMtMTMuOCwwLTI1LjQtMTAuNC0yNS40LTI3LjNWMzcuMwoJCUM4LjgsMjAuNCwyMC40LDEwLDM0LjIsMTBzMjUuNCwxMSwyNS40LDI3LjFjMi43LTEsNS41LTEuNCw4LjUtMS40YzE0LjIsMCwyNS40LDExLjYsMjUuNCwyNS42YzAsMy45LTAuNyw3LjQtMi40LDEwLjcKCQljOSw0LDE1LjEsMTMuMSwxNS4xLDIzLjRDMTA2LjIsMTA5LjUsOTQuOCwxMjEsODAuOCwxMjFMODAuOCwxMjF6IE02My4zLDEwMi4zYzMuNyw2LjQsOS44LDEwLjIsMTcuNSwxMC4yCgkJYzkuMywwLDE2LjktNy43LDE2LjktMTcuMWMwLTcuNC00LjgtMTMuOS0xMS42LTE2LjJMNjMuMywxMDIuM0M2My4zLDEwMi4zLDYzLjMsMTAyLjMsNjMuMywxMDIuM3ogTTM0LjIsMTguNQoJCWMtOC40LDAtMTYuOSw1LjgtMTYuOSwxOC44djU2LjNjMCwxMyw4LjUsMTguOCwxNi45LDE4LjhjNi43LDAsMTAuNC0zLjQsMTYuNC05LjRsMi42LTIuN2MtMS40LTQuMS0yLjEtOC42LTIuMS0xMy41VjM3LjMKCQlDNTEuMSwyNC40LDQyLjYsMTguNSwzNC4yLDE4LjVMMzQuMiwxOC41TDM0LjIsMTguNXogTTU5LjYsNDYuNHY0MC40YzAsMi4zLDAuMiw0LjUsMC42LDYuNWwxOC40LTE4LjZjNS4zLTUuNCw2LjQtOS4zLDYuNC0xMy42CgkJYzAtOS4xLTcuMi0xNy4xLTE2LjktMTcuMUM2NSw0NC4yLDYyLjIsNDQuOSw1OS42LDQ2LjRMNTkuNiw0Ni40TDU5LjYsNDYuNHoiLz4KPC9nPgo8L3N2Zz4K';
+  
+  add_menu_page(__('Kleinanzeigen', 'astra-child'), __('Kleinanzeigen', 'astra-child'), 'edit_posts', 'kleinanzeigen', 'wbp_display_kleinanzeigen_list', $icon_svg, 10);
+  
+  $submenu_items = wbp_kleinanzeigen_get_submenu_items();
+  foreach ($submenu_items as $key => $item) {
+    add_submenu_page('kleinanzeigen', $item['page_title'], $item['menu_title'], 'edit_posts', $item['menu_slug'], $item['callback'], $item['order']);
+  }
 
-  add_menu_page('kleinanzeigen', 'kleinanzeigen', 'edit_posts', 'kleinanzeigen', 'wbp_display_kleinanzeigen_list', $icon_svg, 10);
   if (!empty($_GET['page']) && 'kleinanzeigen' == $_GET['page']) {
 
     if (!defined('KLEINANZEIGEN_TEMPLATE_PATH')) {
       define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/kleinanzeigen/');
     }
     require_once __DIR__ . '/includes/ajax-table.php';
-
-    wbp_kleinanzeigen_register_scripts();
-    register_admin_content();
   }
+  wbp_register_admin_content();
+  wbp_kleinanzeigen_register_scripts();
+
 }
 add_action('admin_menu', 'wbp_add_kleinanzeigen_admin_menu_page');
 
@@ -776,29 +783,47 @@ function wbp_display_kleinanzeigen_list()
 
   echo '<div id="wbp-kleinanzeigen-wrap">';
 
-  wbp_include_kleinanzeigen_template('page-header.php');
-
-  do_action('wbp_kleinanzeigen_admin_after_header');
+  do_action('wbp_kleinanzeigen_admin_header', array('title' => __('Overview', 'astra-child')));
 
   echo '<div id="pages-results"></div>';
 
-  $pages = wbp_kleinanzeigen_get_submenu_items();
-
-  foreach ($pages as $page) {
-    if (isset($page['menu_slug'])) {
-      wbp_kleinanzeigen_display_admin_page($page['menu_slug']);
-    }
-  }
+  $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : '';
+  wbp_kleinanzeigen_display_admin_page($page);
 
   do_action('wbp_kleinanzeigen_admin_before_closing_wrap');
 
-  // closes main plugin wrapper div. #wp-optimize-wrap
+  // closes main plugin wrapper div
   echo '</div><!-- END #wbp-kleinanzeigen-wrap -->';
 }
 
-function register_admin_content()
+function wbp_display_kleinanzeigen_settings()
 {
-  add_action('wbp_kleinanzeigen_admin_page_wbp_kleinanzeigen_dashboard', 'output_dashboard_tab', 20);
+
+  echo '<div id="wbp-kleinanzeigen-settings-wrap">';
+
+  do_action('wbp_kleinanzeigen_admin_header', array('title' => __('Settings', 'astra-child')));
+
+  echo '<div id="page-settings"></div>';
+
+  $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : '';
+  wbp_kleinanzeigen_display_admin_page($page);
+
+  do_action('wbp_kleinanzeigen_admin_before_closing_wrap');
+
+  // closes main plugin wrapper div
+  echo '</div><!-- END #wbp-kleinanzeigen-wrap -->';
+}
+
+function wbp_register_admin_content()
+{
+  add_action('wbp_kleinanzeigen_admin_header', 'output_header', 20);
+  
+  add_action('wbp_kleinanzeigen_admin_before_closing_wrap', 'output_before_closing_wrap', 20);
+  add_action('wbp_kleinanzeigen_admin_after_page_kleinanzeigen', 'output_after_page', 20);
+  add_action('wbp_kleinanzeigen_admin_after_page_kleinanzeigen-settings', 'output_after_page', 20);
+
+  add_action('wbp_kleinanzeigen_admin_page_kleinanzeigen', 'output_dashboard_tab', 20);
+  add_action('wbp_kleinanzeigen_admin_page_kleinanzeigen-settings', 'output_settings_tab', 20);
 }
 
 function wbp_kleinanzeigen_register_scripts()
@@ -833,46 +858,74 @@ function wbp_kleinanzeigen_get_submenu_items()
 {
   $sub_menu_items = array(
     array(
-      'page_title' => __('Dashborad', 'wbp'),
-      'menu_title' => __('Dashboard', 'wbp'),
-      'menu_slug' => 'wbp_kleinanzeigen_dashboard',
-      'function' => 'display_admin',
+      'page_title' => esc_html__('Overview', 'astra-child'),
+      'menu_title' => esc_html__('Overview', 'astra-child'),
+      'menu_slug' => 'kleinanzeigen',
+      'callback' => 'wbp_display_kleinanzeigen_list',
       'icon' => 'admin-settings',
       'create_submenu' => true,
-      'order' => 60,
+      'order' => 0,
+    ),
+    array(
+      'page_title' => esc_html__('Settings', 'astra-child'),
+      'menu_title' => esc_html__('Settings', 'astra-child'),
+      'menu_slug' => 'kleinanzeigen-settings',
+      'callback' => 'wbp_display_kleinanzeigen_settings',
+      'icon' => 'admin-settings',
+      'create_submenu' => true,
+      'order' => 1,
     )
   );
 
   return $sub_menu_items;
 }
 
-function wbp_kleinanzeigen_display_admin_page($page)
+function wbp_kleinanzeigen_display_admin_page($slug)
 {
 
   $active_page = !empty($_REQUEST['page']) ? $_REQUEST['page'] : '';
 
-  echo '<div class="wbp-kleinanzeigen-page' . ($active_page == $page ? ' active' : '') . '" data-whichpage="' . $page . '">';
+  echo '<div class="wbp-kleinanzeigen-page' . ($active_page == $slug ? ' active' : '') . '" data-whichpage="' . $slug . '">';
 
   echo '<div class="wbp-kleinanzeigen-main">';
 
 
-  // if no tabs defined for $page then use $page as $active_tab for load template, doing related actions e t.c.
-  $active_tab = $page;
+  // if no tabs defined for $page then use $slug as $active_tab for load template, doing related actions e t.c.
+  $active_tab = $slug;
 
-  do_action('wbp_kleinanzeigen_admin_page_' . $page, $active_tab);
+  do_action('wbp_kleinanzeigen_admin_page_' . $slug, $slug);
 
   echo '</div><!-- END .wbp-kleinanzeigen-main -->';
 
-  do_action('wbp_kleinanzeigen_admin_after_page_' . $page, $active_tab);
+  do_action('wbp_kleinanzeigen_admin_after_page_' . $slug, $slug);
 
   echo '</div><!-- END .wbp-kleinanzeigen-page -->';
 }
 
 function output_dashboard_tab()
 {
-  wbp_include_kleinanzeigen_template('dashboard/dashboard.php', false, array('pages' => 5, 'load_data' => false));
+  wbp_include_kleinanzeigen_template('dashboard/dashboard.php', false, array());
 }
 
+function output_settings_tab()
+{
+  wbp_include_kleinanzeigen_template('dashboard/settings.php', false, array());
+}
+
+function output_header($args)
+{
+  wbp_include_kleinanzeigen_template('page-header.php', false, $args);
+}
+
+function output_before_closing_wrap()
+{
+  echo '<div class="sub-content"></div>';
+}
+
+function output_after_page()
+{
+  echo '<div class="after-page"></div>';
+}
 
 function wbp_get_json_data($page)
 {

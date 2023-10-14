@@ -27,10 +27,11 @@
         <div class="scan-pages" style="display: flex; margin: 15px 0px 5px; font-size: 12px;">
           <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
           <div class="">
-            <span><b>Verkaufte/deaktivierte Artikel:</b></span>
+            <span><b>Wurden Artikel verkauft oder deaktiviert?</b></span>
             <div>
-              <span>Alle auf Kleinanzeigen.de <i>verkaufte/deaktivierte</i> Artikel </span>
-              <a href="" type="button" class="start-scan info" title="<?php echo $title ?>">im Shop ausblenden</a>
+              <span>Shop jetzt nach Produkten </span>
+              <a href="" type="button" class="start-scan info" title="<?php echo $title ?>">durchsuchen</a>
+              <span>die auf ungültigen Anzeigen basieren</span>
             </div>
           </div>
         </div>

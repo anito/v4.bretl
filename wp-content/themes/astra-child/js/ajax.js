@@ -9,11 +9,57 @@ jQuery(document).ready(function ($) {
 
   // hide controls if sku is not available
   const sku = document.getElementById("kleinanzeigen_id");
-  
-  if(sku?.getAttribute('value')) {
-    const sku_metabox = document.getElementById('kleinanzeigen_id')?.closest('.postbox');
-    sku_metabox?.classList.add('sku')
-  };
+
+  if (sku?.getAttribute("value")) {
+    const sku_metabox = document
+      .getElementById("kleinanzeigen_id")
+      ?.closest(".postbox");
+    sku_metabox?.classList.add("sku");
+  }
+
+  const delay = (fn, ms) =>
+    new Promise((resolve) =>
+      setTimeout(() => {
+        fn();
+        return resolve;
+      }, ms)
+    );
+
+  window.addEventListener("deactivate:item", function (e) {
+    publishPost(e.detail.e);
+  });
+  window.addEventListener("disconnect:item", function (e) {
+    disconnect(e.detail.e);
+  });
+  window.addEventListener("deactivate:all", async function (e) {
+    const { deactivated } = e.detail.data;
+
+    await deactivated.reduce(async (a, item) => {
+      await a;
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          const el = $(`tr#${item.id} .hide`)
+          $(el).click();
+          resolve();
+        }, 2000);
+      });
+    }, Promise.resolve());
+
+  });
+  window.addEventListener("disconnect:all", async function (e) {
+    const { deactivated } = e.detail.data;
+
+    await deactivated.reduce(async (a, item) => {
+      await a;
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          const el = $(`tr#${item.id} .disconnect`)
+          $(el).click();
+          resolve();
+        }, 2000);
+      });
+    }, Promise.resolve());
+  });
 
   // Set Status
   $("#change-post-status").on("click", function () {
@@ -160,9 +206,8 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
 
     const el = e.target;
-    const action = el.dataset.action;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
-    const post_ID = action.replace("disconnect-", "");
+    const post_ID = el.dataset.postId;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     const addSpinner = () => {
@@ -398,16 +443,22 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax_local,
       data: {
-        action: "_ajax_publish_post",
+        action: "_ajax_toggle_publish_post",
         post_ID,
         kleinanzeigen_id,
-        screen,
+        screen: el.dataset.screen || screen,
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
         $(el).html("Einen Moment...");
       },
-      success: (data) => parseResponse(data, el),
+      success: (data) => {
+        $(el).html("Fertig");
+
+        setTimeout(() => {
+          parseResponse(data, el);
+        }, 500);
+      },
       error: (error) => console.log(error),
     });
   }
@@ -434,8 +485,9 @@ jQuery(document).ready(function ($) {
       data: { row, head, post_ID, kleinanzeigen_id },
     } = JSON.parse(data);
 
+    const _screen = el.dataset.screen || screen;
     let rowEl;
-    switch (screen) {
+    switch (_screen) {
       case "product":
         location = `${edit_link}${post_ID}`;
         break;
@@ -446,8 +498,11 @@ jQuery(document).ready(function ($) {
         break;
 
       case "toplevel_page_kleinanzeigen":
-        rowEl = el.closest(`tr#ad-id-${kleinanzeigen_id}`);
-        if (head) $("#head-wrap").html(head);
+      case "modal":
+        rowEl = $(`tr#ad-id-${kleinanzeigen_id}`, ".wp-list-table");
+        if (head) {
+          $("#head-wrap").html(head);
+        }
         el.dispatchEvent(
           new CustomEvent("data:action", {
             detail: { data: $(el).data() },
@@ -466,6 +521,9 @@ jQuery(document).ready(function ($) {
             );
           }, 200);
         }
+      case "modal":
+        const newLabel = $(el).data("success-label") || "Fertig";
+        $(el).html(newLabel).addClass("disabled");
         break;
     }
     callback?.();
@@ -574,7 +632,7 @@ jQuery(document).ready(function ($) {
 
     const kleinanzeigendata = {
       content,
-      record
+      record,
     };
 
     $.post({
@@ -629,9 +687,11 @@ jQuery(document).ready(function ($) {
     const kleinanzeigendata = { images };
 
     if (images.length) {
-      msg = `${images.length} Fotos wurden importiert.`;
+      msg = `${images.length} Foto${1 === images.length ? "" : "s"} wurde${
+        1 === images.length ? "" : "n"
+      } importiert.`;
     } else {
-      msg = "Es wurden keine Fotos importiert.";
+      msg = "Es konnten keine Fotos gefunden werden.";
     }
 
     $.post({
