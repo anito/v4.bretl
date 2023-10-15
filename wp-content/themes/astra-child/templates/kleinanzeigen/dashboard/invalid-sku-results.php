@@ -43,17 +43,16 @@
     </table>
   </div>
 </div>
-<div class="button-wrap left">
+<div class="button-wrap button-controls left">
   <div class="button-group">
-    <a href="#" type="button" class="button button-primary hide-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Hide all', 'astra-child') ?></a>
-    <a href="#" type="button" class="button button-primary disconnect-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Disconnect all', 'astra-child') ?></a>
+    <a href="#" type="button" class="button action-button button-primary hide-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Hide all', 'astra-child') ?></a>
+    <a href="#" type="button" class="button action-button button-primary disconnect-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Disconnect all', 'astra-child') ?></a>
   </div>
 </div>
 
 <script>
   jQuery(document).ready(($) => {
 
-    const outerEl = $('#table-scan-list-outer');
     const table = $('#table-scan-list');
 
     $('.hide', table).on('click', function(e) {
@@ -76,7 +75,7 @@
       );
     })
 
-    $('.hide-all', outerEl).on('click', function() {
+    $('.hide-all').on('click', function() {
       window.dispatchEvent(
         new CustomEvent("deactivate:all", {
           detail: {
@@ -86,7 +85,7 @@
       );
     })
 
-    $('.disconnect-all', outerEl).on('click', function() {
+    $('.disconnect-all').on('click', function() {
       window.dispatchEvent(
         new CustomEvent("disconnect:all", {
           detail: {

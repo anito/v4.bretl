@@ -29,17 +29,17 @@
               <td class="column-image"><img width="80" src="<?php echo $published['image']; ?>" alt=""></td>
               <td class="column-title"><?php echo $published['title'] ?></td>
               <td class="column-shop-price">
-                <div class="shop-price price">
-                  <span><?php echo __('Shop price', 'astra-child') ?>:</span>
-                  <span><?php echo $published['shop_price'] ?></span>
-                </div>
                 <div class="ad-price price">
                   <span><?php echo __('KA price', 'astra-child') ?>:</span>
                   <span><?php echo $published['ad_price'] ?></span>
                 </div>
+                <div class="shop-price price">
+                  <span><?php echo __('Shop price', 'astra-child') ?>:</span>
+                  <span><?php echo $published['shop_price'] ?></span>
+                </div>
               </td>
               <td class="column-actions">
-                <a href="#" type="button" class="button button-primary button-small action-button fix" data-success-label="<?php echo __('Fixed', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-price="<?php echo $published['price'] ?>" data-ka-price="<?php echo $published['ad_price'] ?>" data-screen=" modal"><?php echo __('Fix price', 'astra-child') ?></a>
+                <a href="#" type="button" class="button button-primary button-small action-button fix-price" data-success-label="<?php echo __('Fixed', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-price="<?php echo $published['price'] ?>" data-ka-price="<?php echo $published['ad_price'] ?>" data-screen="modal"><?php echo __('Fix price', 'astra-child') ?></a>
               </td>
             </tr>
           <?php endforeach ?>
@@ -49,16 +49,15 @@
   </div>
 </div>
 <div class="button-wrap left">
-  <a href="#" type="button" class="button button-primary fix-all <?php echo empty($data['price_diffs']) ? 'disabled' : '' ?>"><?php echo __('Fix all prices', 'astra-child') ?></a>
+  <a href="#" type="button" class="button action-button button-primary fix-price-all <?php echo empty($data['price_diffs']) ? 'disabled' : '' ?>"><?php echo __('Fix all prices', 'astra-child') ?></a>
 </div>
 
 <script>
   jQuery(document).ready(($) => {
 
-    const outerEl = $('#table-scan-list-outer');
     const table = $('#table-scan-list');
 
-    $('.fix', table).on('click', function(e) {
+    $('.fix-price', table).on('click', function(e) {
       window.dispatchEvent(
         new CustomEvent("fixprice:item", {
           detail: {
@@ -68,7 +67,7 @@
       );
     })
 
-    $('.fix-all', outerEl).on('click', function() {
+    $('.fix-price-all').on('click', function() {
       window.dispatchEvent(
         new CustomEvent("fixprice:all", {
           detail: {

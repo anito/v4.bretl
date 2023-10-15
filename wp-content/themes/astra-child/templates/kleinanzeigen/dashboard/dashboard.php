@@ -183,7 +183,7 @@
     margin: 5px;
   }
 
-  #table-scan-list tbody td .action-button.disabled {
+  .action-button.disabled {
     pointer-events: none;
   }
 </style>
