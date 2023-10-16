@@ -15,11 +15,11 @@
     </div>
 
   </form>
-  <div class="list-modal">
-    <div class="list-modal-background close">
-      <div class="list-modal-body">
-        <div id="list-modal-content" class="list-modal-inner"></div>
-        <div class="button-wrap right">
+  <div class="ka-list-modal">
+    <div class="ka-list-modal-background close">
+      <div class="ka-list-modal-body">
+        <div id="ka-list-modal-content" class="ka-list-modal-inner"></div>
+        <div class="button-controls right">
           <a href="#" type="button" class="button button-primary close"><?php echo __('Close', 'astra-child') ?></a>
         </div>
       </div>
@@ -31,7 +31,7 @@
 <script>
   jQuery(document).ready(($) => {
 
-    $('.list-modal .close').on('click', function(e) {
+    $('.ka-list-modal .close').on('click', function(e) {
       if (e.target === e.currentTarget) {
         $('body').removeClass('show-modal');
       }
@@ -54,16 +54,17 @@
     overflow: hidden;
   }
 
-  .list-modal {
+  .ka-list-modal {
     position: absolute;
     top: 0;
     left: -20px;
     display: none;
   }
 
-  .list-modal-background {
+  .ka-list-modal-background {
     background-color: #00000050;
     position: fixed;
+    z-index: 99;
     display: flex;
     height: calc(100vh - var(--admin-topbar));
     width: calc(100vw - var(--admin-sidebar));
@@ -71,7 +72,7 @@
     align-items: center;
   }
 
-  .list-modal-body {
+  .ka-list-modal-body {
     width: 80%;
     height: 600px;
     background-color: white;
@@ -80,7 +81,7 @@
     position: relative;
   }
 
-  body.show-modal .list-modal {
+  body.show-modal .ka-list-modal {
     display: block;
   }
 
@@ -104,23 +105,19 @@
     text-align: center;
   }
 
-  .list-outer {
-    position: relative;
-  }
-
-  .list-wrap {
+  .ka-list-content {
     height: auto;
     overflow-y: auto;
     border: 1px solid #c3c4c7;
     box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
   }
 
-  .list-header {
+  .ka-list-header {
     display: flex;
     justify-content: center;
   }
 
-  .list-header h5 {
+  .ka-list-header h5 {
     font-size: 1.5em;
   }
 
@@ -165,22 +162,25 @@
     width: 100%;
   }
 
-  .button-wrap {
+  .ka-list-modal .button-controls {
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
   }
 
-  .button-wrap.right {
+  .ka-list-modal .button-controls.right {
     right: 20px;
   }
 
-  .button-wrap.left {
+  .ka-list-modal .button-controls.left {
     left: 20px;
   }
 
   #table-scan-list tbody td .action-button {
     width: 110px;
     margin: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .action-button.disabled {

@@ -91,18 +91,25 @@ function wbp_wc_screen_styles($hook)
   }
 }
 
-function wbp_sanitize_kleinanzeigen_price($text) {
-  $regex = '/^([\d.]+)/';
-  preg_match($regex, $text, $matches);
-  return !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+function wbp_extract_kleinanzeigen_price($text) {
+  // $regex = '/^([\d.]+)/';
+  // preg_match($regex, $text, $matches);
+  // return !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
+  return preg_replace('/[\s.,a-zA-Z€\$]*/', '', $text);
 }
 
 function wbp_has_price_diff($record, $product)
 {
-  $kleinanzeigen_price = wbp_sanitize_kleinanzeigen_price($record->price);
+  $kleinanzeigen_price = wbp_extract_kleinanzeigen_price($record->price);
   $woo_price = $product->get_price($record);
 
   return $kleinanzeigen_price !== $woo_price;
+}
+
+function wbp_set_pseudo_sale_price($product, $price, $percent = 10) {
+  $regular_price = (int) $price + (int) $price * $percent / 100;
+  $product->set_regular_price($regular_price);
+  $product->set_sale_price($price);
 }
 
 function wbp_text_contains($needle, $haystack, $searchtype = 'default')
@@ -130,9 +137,7 @@ function wbp_handle_product_contents_sale($args)
   $product = $args['product'];
   $price = $args['price'];
 
-  $regular_price = (int) $price + (int) $price * 10 / 100;
-  $product->set_regular_price($regular_price);
-  $product->set_sale_price($price);
+  wbp_set_pseudo_sale_price($product, $price);
   return wbp_handle_product_label($args['term_name'], $product);;
 }
 

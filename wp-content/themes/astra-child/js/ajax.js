@@ -17,6 +17,19 @@ jQuery(document).ready(function ($) {
     sku_metabox?.classList.add("sku");
   }
 
+  const delayed_item_click = async (arr, selector) => {
+    await arr.reduce(async (a, item) => {
+      await a;
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          const el = $(`tr#${item.id} ${selector}`);
+          $(el).click();
+          resolve();
+        }, 1000);
+      });
+    }, Promise.resolve());
+  };
+
   window.addEventListener("deactivate:item", function (e) {
     publishPost(e.detail.e);
   });
@@ -28,46 +41,15 @@ jQuery(document).ready(function ($) {
   });
   window.addEventListener("deactivate:all", async function (e) {
     const { deactivated } = e.detail.data;
-
-    await deactivated.reduce(async (a, item) => {
-      await a;
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          const el = $(`tr#${item.id} .hide`)
-          $(el).click();
-          resolve();
-        }, 2000);
-      });
-    }, Promise.resolve());
-
+    delayed_item_click(deactivated, ".deactivate");
   });
   window.addEventListener("disconnect:all", async function (e) {
     const { deactivated } = e.detail.data;
-
-    await deactivated.reduce(async (a, item) => {
-      await a;
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          const el = $(`tr#${item.id} .disconnect`)
-          $(el).click();
-          resolve();
-        }, 2000);
-      });
-    }, Promise.resolve());
+    delayed_item_click(deactivated, ".disconnect");
   });
   window.addEventListener("fixprice:all", async function (e) {
     const { price_diffs } = e.detail.data;
-
-    await price_diffs.reduce(async (a, item) => {
-      await a;
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          const el = $(`tr#${item.id} .fix-price`);
-          $(el).click();
-          resolve();
-        }, 2000);
-      });
-    }, Promise.resolve());
+    delayed_item_click(price_diffs, ".fix-price");
   });
 
   // Set Status
@@ -445,6 +427,7 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
+    const disconnect = el.dataset.disconnect;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
@@ -455,6 +438,7 @@ jQuery(document).ready(function ($) {
         action: "_ajax_toggle_publish_post",
         post_ID,
         kleinanzeigen_id,
+        disconnect,
         screen: el.dataset.screen || screen,
       },
       beforeSend: () => {

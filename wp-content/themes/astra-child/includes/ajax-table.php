@@ -54,7 +54,7 @@ add_action('wp_ajax_nopriv__ajax_sts_display', '_ajax_sts_display');
 
 function _ajax_sts_scan()
 {
-  // Keep in mind wbp_get_json_data will alter the page number cookie, so save it and reset it later
+  // Keep in mind wbp_get_json_data will alter the page_number cookie, so save it and reset it later if required
   $current_page = $_COOKIE['kleinanzeigen-table-page'];
   $scan_type = isset($_REQUEST['scan_type']) ? $_REQUEST['scan_type'] : null;
 
@@ -93,8 +93,8 @@ function _ajax_sts_scan()
 
     // invalid ads
     if (!empty($sku)) {
+      $deactivated[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price');
       if (!in_array($sku, $ad_ids)) {
-        $deactivated[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price');
       } else {
         $records = array_filter($all_ads, function ($ad) use ($sku) {
           return $ad->id === $sku;
@@ -103,7 +103,7 @@ function _ajax_sts_scan()
           $key = array_key_first($records);
           $record = $records[$key];
           if (wbp_has_price_diff($record, $product)) {
-            $price = wbp_sanitize_kleinanzeigen_price($record->price);
+            $price = wbp_extract_kleinanzeigen_price($record->price);
             $ad_price = $record->price;
             $price_diffs[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price', 'ad_price');
           }
@@ -120,10 +120,10 @@ function _ajax_sts_scan()
 
   ob_start();
   switch($scan_type) {
-    case 'invalid-ad':
+    case 'invalid-ads':
       wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-results.php', false, $response);
       break;
-    case 'invalid-price':
+    case 'invalid-prices':
       wbp_include_kleinanzeigen_template('/dashboard/invalid-price-results.php', false, $response);
       break;
   }
@@ -289,7 +289,7 @@ function fetch_ts_script()
               },
               beforeSend: function(data) {},
               success: function(response) {
-                $('#list-modal-content').html(response);
+                $('#ka-list-modal-content').html(response);
                 $('body').addClass('show-modal');
               },
               error: function(response) {

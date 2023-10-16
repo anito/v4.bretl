@@ -1,14 +1,14 @@
 <div id="table-scan-list-outer" class="list-outer">
-  <div class="list-header" style="display: flex; flex-direction: column;">
+  <div class="ka-list-header" style="display: flex; flex-direction: column;">
     <div style="display: flex; justify-content: center;">
       <i class="dashicons dashicons-admin-generic" style="align-self: center; margin-right: 10px;"></i>
       <h5><?php echo __('Evaluation Results', 'astra-child') ?></h5>
     </div>
     <div style="display: flex; justify-content: center;">
-      <p style="margin-top: -20px; margin-bottom: 20px;"><?php echo __('Products based on invalid ads', 'astra-child') ?></p>
+      <p style="margin-top: -20px; margin-bottom: 20px;"><?php echo __('Products with price differences', 'astra-child') ?></p>
     </div>
   </div>
-  <div class="list-wrap">
+  <div class="ka-list-content">
     <table id="table-scan-list" class="table-scan-list wp-list-table striped <?php echo empty($data['price_diffs']) ? 'empty' : '' ?>">
       <thead>
         <th id="scan-result-image" class="column-image">Bild</th>
@@ -20,7 +20,7 @@
         <?php if (empty($data['price_diffs'])) : ?>
           <tr id="<?php echo $published['id'] ?>">
             <td colspan="4" class="" style="height: 60px; text-align: center;">
-              <?php echo __('No invalid ads found', 'astra-child') ?>
+              <?php echo __('No products found', 'astra-child') ?>
             </td>
           </tr>
         <?php else : ?>
@@ -48,7 +48,7 @@
     </table>
   </div>
 </div>
-<div class="button-wrap left">
+<div class="button-controls left">
   <a href="#" type="button" class="button action-button button-primary fix-price-all <?php echo empty($data['price_diffs']) ? 'disabled' : '' ?>"><?php echo __('Fix all prices', 'astra-child') ?></a>
 </div>
 

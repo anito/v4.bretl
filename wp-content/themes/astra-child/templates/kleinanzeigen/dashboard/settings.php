@@ -15,29 +15,10 @@
     </div>
 
   </form>
-  <div class="list-modal">
-    <div class="modal-background">
-      <div class="modal-body">
-        <div class="modal-inner">
-          Test
-        </div>
-      </div>
-    </div>
-  </div>
 
 </div>
 
 <style>
-  .list-modal {
-    position: absolute;
-    top: 0;
-    left: -160px;
-    bottom: 0;
-    height: 100vh;
-    width: 100vw;
-    display: none;
-    background-color: #ff000050;
-  }
 </style>
 <script>
 </script>

@@ -1,5 +1,5 @@
 <div id="table-scan-list-outer" class="list-outer">
-  <div class="list-header" style="display: flex; flex-direction: column;">
+  <div class="ka-list-header" style="display: flex; flex-direction: column;">
     <div style="display: flex; justify-content: center;">
       <i class="dashicons dashicons-admin-generic" style="align-self: center; margin-right: 10px;"></i>
       <h5><?php echo __('Evaluation Results', 'astra-child') ?></h5>
@@ -8,19 +8,18 @@
       <p style="margin-top: -20px; margin-bottom: 20px;"><?php echo __('Products based on invalid ads', 'astra-child') ?></p>
     </div>
   </div>
-  <div class="list-wrap">
+  <div class="ka-list-content">
     <table id="table-scan-list" class="table-scan-list wp-list-table striped <?php echo empty($data['deactivated']) ? 'empty' : '' ?>">
       <thead>
         <th id="scan-result-image" class="column-image">Bild</th>
         <th id="scan-result-title" class="column-title">Titel</th>
-        <th id="scan-result-price" class="column-shop-price">Preis</th>
         <th id="scan-result-actions" class="column-actions">Aktionen</th>
       </thead>
       <tbody>
         <?php if (empty($data['deactivated'])) : ?>
           <tr id="<?php echo $published['id'] ?>">
-            <td colspan="4" class="" style="height: 60px; text-align: center;">
-              <?php echo __('No invalid ads found', 'astra-child') ?>
+            <td colspan="3" class="" style="height: 60px; text-align: center;">
+              <?php echo __('No invalid products found', 'astra-child') ?>
             </td>
           </tr>
         <?php else : ?>
@@ -28,13 +27,9 @@
             <tr id="<?php echo $published['id'] ?>">
               <td class="column-image"><img width="80" src="<?php echo $published['image']; ?>" alt=""></td>
               <td class="column-title"><?php echo $published['title'] ?></td>
-              <td class="column-shop-price">
-                <div class="shop-price"><?php echo $published['shop_price'] ?></div>
-                <div class="ad-price"><?php echo $published['price'] ?></div>
-              </td>
               <td class="column-actions">
-                <a href="#" type="button" class="button button-primary button-small action-button hide" data-success-label="<?php echo __('Hidden', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-screen="modal"><?php echo __('Hide', 'astra-child') ?></a>
-                <a href="#" type="button" class="button button-primary button-small action-button disconnect" data-success-label="<?php echo __('Disconnected', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-screen="modal"><?php echo __('Disconnect', 'astra-child') ?></a>
+                <a href="#" type="button" class="button button-primary button-small action-button deactivate" data-success-label="<?php echo __('Deactivated', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-disconnect="disconnect" data-screen="modal"><?php echo __('Deactivate', 'astra-child') ?></a>
+                <a href="#" type="button" class="button button-primary button-small action-button disconnect" data-success-label="<?php echo __('Disconnected', 'astra-child') ?>" data-post-id="<?php echo $published['id'] ?>" data-kleinanzeigen-id="<?php echo $published['sku'] ?>" data-screen="modal"><?php echo __('Just disconnect', 'astra-child') ?></a>
               </td>
             </tr>
           <?php endforeach ?>
@@ -43,10 +38,10 @@
     </table>
   </div>
 </div>
-<div class="button-wrap button-controls left">
+<div class="button-controls left">
   <div class="button-group">
-    <a href="#" type="button" class="button action-button button-primary hide-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Hide all', 'astra-child') ?></a>
-    <a href="#" type="button" class="button action-button button-primary disconnect-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Disconnect all', 'astra-child') ?></a>
+    <a href="#" type="button" class="button action-button button-primary deactivate-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Deactivate all', 'astra-child') ?></a>
+    <a href="#" type="button" class="button action-button button-primary disconnect-all <?php echo empty($data['deactivated']) ? 'disabled' : '' ?>"><?php echo __('Just disconnect all', 'astra-child') ?></a>
   </div>
 </div>
 
@@ -55,7 +50,7 @@
 
     const table = $('#table-scan-list');
 
-    $('.hide', table).on('click', function(e) {
+    $('.deactivate', table).on('click', function(e) {
       window.dispatchEvent(
         new CustomEvent("deactivate:item", {
           detail: {
@@ -75,7 +70,7 @@
       );
     })
 
-    $('.hide-all').on('click', function() {
+    $('.deactivate-all').on('click', function() {
       window.dispatchEvent(
         new CustomEvent("deactivate:all", {
           detail: {

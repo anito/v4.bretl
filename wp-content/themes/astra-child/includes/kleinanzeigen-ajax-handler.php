@@ -96,7 +96,11 @@ function wbp_ajax_fix_price()
   if ($post_ID) {
     $product = wc_get_product($post_ID);
     if ($product) {
-      $product->set_regular_price($price);
+      if ($product->is_on_sale()) {
+        wbp_set_pseudo_sale_price($product, $price, 10);
+      } else {
+        $product->set_regular_price($price);
+      }
       $product->save();
     }
   }
@@ -140,6 +144,8 @@ function wbp_ajax_toggle_publish_post()
   $post_ID = isset($_REQUEST['post_ID']) ? (int) $_REQUEST['post_ID'] : null;
   $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : null;
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+  $disconnect = isset($_REQUEST['disconnect']) ? $_REQUEST['disconnect'] : null;
+  $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : null;
 
   $pageNum = $_COOKIE['kleinanzeigen-table-page'];
 
@@ -147,8 +153,22 @@ function wbp_ajax_toggle_publish_post()
   if ($post_ID) {
     wp_update_post(array(
       'ID' => $post_ID,
-      'post_status' => $curr_status === 'draft' ? 'publish' : 'draft',
+      'post_status' => $status ?? ($curr_status === 'draft' ? 'publish' : 'draft'),
     ));
+
+    // Maybe disconnect product
+    if (isset($disconnect) && 'disconnect' === $disconnect) {
+      $product = wc_get_product($post_ID);
+      if ($product) {
+        try {
+          $product->set_sku('');
+        } catch (Exception $e) {
+        }
+        $product->save();
+      }
+
+      disable_sku($post_ID);
+    }
   }
 
   ob_start();
@@ -324,7 +344,7 @@ function wbp_ajax_import_kleinanzeigen_data()
 
     if ($record) {
       $title = $record->title;
-      $price = preg_replace('/[\s.,a-zA-Z€]*/', '', $record->price);
+      $price = wbp_extract_kleinanzeigen_price($record->price);
       $excerpt = $record->description;
       $tags = !empty($record->tags) ? $record->tags : [];
       $url = $record->url;
