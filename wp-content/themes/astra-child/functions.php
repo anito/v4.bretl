@@ -257,11 +257,6 @@ function wbp_get_kleinanzeigen_search_url($id)
   return KLEINANZEIGEN_URL . ($id ? '/s-' . $id . '/k0' : '/');
 }
 
-function wbp_get_kleinanzeigen_json_url($page)
-{
-  return KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $page ?? 1;
-}
-
 function wbp_save_post($post_ID, $post)
 {
   if (!class_exists('WooCommerce', false)) return 0;
@@ -959,22 +954,23 @@ function output_after_page()
   echo '<div class="after-page"></div>';
 }
 
-function wbp_get_json_data($page)
+function wbp_get_json_data($args = array())
 {
-  setcookie('kleinanzeigen-table-page', $page);
-  $remoteUrl = wbp_get_kleinanzeigen_json_url($page);
-  $response = get_remote($remoteUrl);
+  $defaults = array(
+    'pageSize' => 25,
+    'pageNum' => 1
+  );
+  $options = wp_parse_args($args, $defaults);
+
+  setcookie('kleinanzeigen-table-page', $options['pageNum']);
+  $remoteUrl = KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $options['pageNum'] . '&pageSize=' . $options['pageSize'];
+  $response = wp_remote_get($remoteUrl);
   // $response = file_get_contents(__DIR__ . '/sample' . $page . '.json');
   if (!is_wp_error($response)) {
     return json_decode($response['body']);
   } else {
     return $response;
   }
-}
-
-function get_remote($url)
-{
-  return wp_remote_get($url);
 }
 
 function wbp_get_product_by_sku_($sku)

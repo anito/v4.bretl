@@ -87,7 +87,7 @@ function wbp_find_kleinanzeige(int $id): stdClass | null
 {
   $pageNum = 1;
   while ($pageNum <= KLEINANZEIGEN_TOTAL_PAGES) {
-    $data = wbp_get_json_data($pageNum);
+    $data = wbp_get_json_data(array('pageNum' => $pageNum));
     $ads = $data->ads;
     foreach ($ads as $val) {
       if ($val->id == (int) $id) {

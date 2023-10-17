@@ -27,7 +27,7 @@ function _ajax_sts_display()
   $wp_list_table = new Kleinanzeigen_List_Table();
 
   $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
-  $data = wbp_get_json_data($pageNum);
+  $data = wbp_get_json_data(array('pageNum' => $pageNum));
 
   if (is_wp_error($data)) {
     die(json_encode(array(
@@ -36,6 +36,8 @@ function _ajax_sts_display()
 
     )));
   }
+  $categories = $data->categoriesSearchData;
+  $totalAds = array_column($categories, 'totalAds');
 
   $wp_list_table->setData($data);
 
@@ -60,7 +62,7 @@ function _ajax_sts_scan()
 
   $all_ads = array();
   for ($pageNum = 1; $pageNum <= KLEINANZEIGEN_TOTAL_PAGES; $pageNum++) {
-    $page_data  = wbp_get_json_data($pageNum);
+    $page_data  = wbp_get_json_data(array('pageNum' => $pageNum));
 
     if (is_wp_error($page_data)) {
       die(json_encode(array(
@@ -119,7 +121,7 @@ function _ajax_sts_scan()
   );
 
   ob_start();
-  switch($scan_type) {
+  switch ($scan_type) {
     case 'invalid-ads':
       wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-results.php', false, $response);
       break;
@@ -129,7 +131,7 @@ function _ajax_sts_scan()
   }
 
   $content = ob_get_clean();
-  die(json_encode($content));
+  die($content);
 }
 add_action('wp_ajax__ajax_sts_scan', '_ajax_sts_scan');
 add_action('wp_ajax_nopriv__ajax_sts_scan', '_ajax_sts_scan');
@@ -277,20 +279,24 @@ function fetch_ts_script()
             const el = e.target;
             const parent = $(el).parents('.scan-pages');
             const scan_type = $(el).data('scan-type');
+            const restored_text = $(el).html();
 
             $.ajax({
 
               url: ajaxurl,
-              dataType: 'json',
+              dataType: 'text',
               data: {
                 _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
                 action: '_ajax_sts_scan',
                 scan_type
               },
-              beforeSend: function(data) {},
+              beforeSend: function(data) {
+                $(el).html('Einen Moment...');
+              },
               success: function(response) {
                 $('#ka-list-modal-content').html(response);
                 $('body').addClass('show-modal');
+                $(el).html(restored_text);
               },
               error: function(response) {
                 console.log(response)

@@ -117,7 +117,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     check_ajax_referer('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
 
     $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
-    $data = wbp_get_json_data($pageNum);
+    $data = wbp_get_json_data(array('pageNum' => $pageNum));
     $this->setData($data);
 
     extract($this->_args);

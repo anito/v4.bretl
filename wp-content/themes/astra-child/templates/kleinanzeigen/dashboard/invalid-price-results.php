@@ -18,7 +18,7 @@
       </thead>
       <tbody>
         <?php if (empty($data['price_diffs'])) : ?>
-          <tr id="<?php echo $published['id'] ?>">
+          <tr>
             <td colspan="4" class="" style="height: 60px; text-align: center;">
               <?php echo __('No products found', 'astra-child') ?>
             </td>

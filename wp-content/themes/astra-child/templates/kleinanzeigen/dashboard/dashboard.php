@@ -144,8 +144,9 @@
     padding: 5px;
   }
 
-  #table-scan-list tbody td {
-    padding: 3px;
+  #table-scan-list tbody td,
+  #table-scan-list thead th {
+    padding: 8px;
   }
 
   #table-scan-list.striped>tbody> :nth-child(odd) {

@@ -111,7 +111,7 @@ function wbp_ajax_fix_price()
     case 'modal':
 
       $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data($pageNum);
+      $data = wbp_get_json_data(array('pageNum' => $pageNum));
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
       $ads = $data->ads;
@@ -183,7 +183,7 @@ function wbp_ajax_toggle_publish_post()
     case 'modal':
 
       $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data($pageNum);
+      $data = wbp_get_json_data(array('pageNum' => $pageNum));
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
       $ads = $data->ads;
@@ -242,7 +242,7 @@ function wbp_ajax_connect()
 
   ob_start();
   $wp_list_table = new Kleinanzeigen_List_Table();
-  $data = wbp_get_json_data($pageNum);
+  $data = wbp_get_json_data(array('pageNum' => $pageNum));
   $wp_list_table->setData($data);
   list($columns, $hidden) = $wp_list_table->get_column_info();
   $ads = $data->ads;
@@ -296,7 +296,7 @@ function wbp_ajax_disconnect()
       break;
     case 'toplevel_page_kleinanzeigen':
       $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data($pageNum);
+      $data = wbp_get_json_data(array('pageNum' => $pageNum));
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
       $ads = $data->ads;
@@ -466,7 +466,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       break;
     case 'toplevel_page_kleinanzeigen':
       $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data($pageNum);
+      $data = wbp_get_json_data(array('pageNum' => $pageNum));
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
       $ads = $data->ads;
@@ -536,7 +536,7 @@ function wbp_ajax_import_kleinanzeigen_images()
       break;
     case 'toplevel_page_kleinanzeigen':
       $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data($pageNum);
+      $data = wbp_get_json_data(array('pageNum' => $pageNum));
       $wp_list_table->setData($data);
       list($columns, $hidden) = $wp_list_table->get_column_info();
       $ads = $data->ads;
@@ -590,7 +590,7 @@ function wbp_ajax_delete_post()
 
   ob_start();
   $wp_list_table = new Kleinanzeigen_List_Table();
-  $data = wbp_get_json_data($pageNum);
+  $data = wbp_get_json_data(array('pageNum' => $pageNum));
   $wp_list_table->setData($data);
   list($columns, $hidden) = $wp_list_table->get_column_info();
   $ads = $data->ads;
