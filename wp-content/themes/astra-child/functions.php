@@ -992,8 +992,6 @@ function wbp_get_product_by_sku($sku)
   if (!empty($p)) {
     return $p[0];
   }
-
-  return false;
 }
 
 function wbp_get_product_by_title($title)

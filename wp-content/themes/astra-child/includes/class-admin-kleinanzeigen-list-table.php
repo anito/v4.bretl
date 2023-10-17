@@ -290,7 +290,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     if (!$product_by_sku) {
       $product_by_title = wbp_get_product_by_title($record->title);
     }
-    $product = $product_by_sku ? $product_by_sku : ($product_by_title ? $product_by_title : false);
+    $product = $product_by_sku ?? $product_by_title ?? null;
 
     $diff_classes = array();
     $brands = array();
@@ -391,11 +391,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         } else {
 
           $status = 'invalid';
-          $label = __('Anlegen');
           $action = 'create';
           $icon = 'plus';
           $type = 'button';
-          $kleinanzeigen_actions = wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-toggle-link-control.php', true, compact('record', 'label', 'action', 'icon', 'type'));
+          $kleinanzeigen_actions = wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-create-control.php', true, compact('record', 'action', 'icon', 'type'));
           $shop_actions = '';
         }
 
