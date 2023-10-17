@@ -19,7 +19,7 @@
         <?php if (empty($data['deactivated'])) : ?>
           <tr id="<?php echo $published['id'] ?>">
             <td colspan="3" class="" style="height: 60px; text-align: center;">
-              <?php echo __('No invalid products found', 'astra-child') ?>
+              <?php echo __('No products found', 'astra-child') ?>
             </td>
           </tr>
         <?php else : ?>
