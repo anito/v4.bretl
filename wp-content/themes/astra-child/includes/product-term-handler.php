@@ -1,8 +1,8 @@
 <?php
-function wbp_process_sale($post_id, $post)
+function wbp_process_sale($post_ID, $post)
 {
 
-  $product = wc_get_product($post_id);
+  $product = wc_get_product($post_ID);
 
   if (!$product) {
     return;
@@ -230,9 +230,9 @@ function wbp_toggle_array_item($ids, $id, $bool = null)
   return $ids;
 }
 
-function __get_the_terms($post_id, $taxonomy)
+function __get_the_terms($post_ID, $taxonomy)
 {
-  $terms = get_the_terms($post_id, $taxonomy);
+  $terms = get_the_terms($post_ID, $taxonomy);
   if ($terms) {
     return $terms;
   } else {

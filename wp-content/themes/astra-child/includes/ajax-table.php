@@ -93,8 +93,8 @@ function _ajax_sts_scan()
 
     // invalid ads
     if (!empty($sku)) {
+      $deactivated[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price');
       if (!in_array($sku, $ad_ids)) {
-        $deactivated[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price');
       } else {
         $records = array_filter($all_ads, function ($ad) use ($sku) {
           return $ad->id === $sku;

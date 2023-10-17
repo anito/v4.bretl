@@ -5,7 +5,7 @@
       <h5><?php echo __('Evaluation Results', 'astra-child') ?></h5>
     </div>
     <div style="display: flex; justify-content: center;">
-      <p style="margin-top: -20px; margin-bottom: 20px;"><?php echo __('Products based on invalid ads', 'astra-child') ?></p>
+      <p style="margin-top: -20px; margin-bottom: 20px;"><?php echo __('Products based on deactivated or deleted ads', 'astra-child') ?></p>
     </div>
   </div>
   <div class="ka-list-content">

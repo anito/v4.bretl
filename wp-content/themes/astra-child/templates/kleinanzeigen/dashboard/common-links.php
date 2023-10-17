@@ -8,5 +8,5 @@
   <a data-action="edit-post" href="<?php echo $editlink ?>" target="_blank" class="<?php echo $classes ?>"><?php echo __('Edit') ?></a>
 </div>
 <div>
-  <a data-action="delete-post" href="<?php echo $deletelink ?>" target="_blank" data-kleinanzeigen-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_id ?>"><?php echo __('Delete') ?></a>
+  <a data-action="delete-post" href="<?php echo $deletelink ?>" target="_blank" data-kleinanzeigen-id="<?php echo $record->id ?>" data-post-id="<?php echo $post_ID ?>"><?php echo __('Delete') ?></a>
 </div>

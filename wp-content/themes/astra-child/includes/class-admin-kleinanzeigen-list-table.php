@@ -326,14 +326,14 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
         // Setup Kleinanzeigen actions
         if ($product) {
-          $post_id = $product->get_id();
-          $editlink  = admin_url('post.php?action=edit&post=' . $post_id);
-          $deletelink  = get_delete_post_link($post_id);
-          $permalink = get_permalink($post_id);
+          $post_ID = $product->get_id();
+          $editlink  = admin_url('post.php?action=edit&post=' . $post_ID);
+          $deletelink  = get_delete_post_link($post_ID);
+          $permalink = get_permalink($post_ID);
           $classes = "";
           $post_status = $product->get_status();
-          $brands = wbp_get_product_brands($post_id);
-          $cat_terms = wbp_get_product_cats($post_id);
+          $brands = wbp_get_product_brands($post_ID);
+          $cat_terms = wbp_get_product_cats($post_ID);
           switch ($post_status) {
             case 'draft':
               $status_name = __("Draft");
@@ -352,19 +352,19 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
           if (!$product_by_sku) {
             $label = __('Connect', 'astra-child');
-            $action = 'connect-' . $post_id;
+            $action = 'connect-' . $post_ID;
             $icon = 'admin-links';
             $type = 'button';
           } else {
             $label = __('Disconnect', 'astra-child');
-            $action = 'disconnect-' . $post_id;
+            $action = 'disconnect-' . $post_ID;
             $icon = 'editor-unlink';
             $type = 'button';
           }
           $kleinanzeigen_actions =
             '<div>' .
-            wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_id', 'record', 'post_status', 'classes'), array('connected' => $product_by_sku))) .
-            wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-activate-control.php', true, compact('post_id', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
+            wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_ID', 'record', 'post_status', 'classes'), array('connected' => $product_by_sku))) .
+            wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-toggle-link-control.php', true, compact('post_ID', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
             '</div>';
         }
 
@@ -374,19 +374,19 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $status = $post_status === 'publish' ? 'connected-publish' : ($post_status === 'draft' ? 'connected-draft' : 'connected-unknown');
           $shop_actions =
             '<div>' .
-            wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
-            wbp_include_kleinanzeigen_template('dashboard/toggle-publish-link.php', true, compact('post_status', 'post_id', 'record')) .
+            wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_ID', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_kleinanzeigen_template('dashboard/toggle-publish-link.php', true, compact('post_status', 'post_ID', 'record')) .
             '</div>';
         } elseif ($product) {
 
           $status = $post_status === 'publish' ? 'disconnected-publish' : ($post_status === 'draft' ? 'disconnected-draft' : 'disconnected-unknown');
           $label = __('Verknüpfen');
-          $action = 'connect-' . $post_id;
+          $action = 'connect-' . $post_ID;
           $icon = 'admin-links';
           $shop_actions =
             '<div>' .
-            wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_id', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
-            wbp_include_kleinanzeigen_template('dashboard/toggle-publish-link.php', true, compact('post_status', 'post_id', 'record')) .
+            wbp_include_kleinanzeigen_template('dashboard/common-links.php', true, compact('status_name', 'post_status', 'post_ID', 'record', 'classes', 'deletelink', 'editlink', 'permalink')) .
+            wbp_include_kleinanzeigen_template('dashboard/toggle-publish-link.php', true, compact('post_status', 'post_ID', 'record')) .
             '</div>';
         } else {
 
@@ -519,11 +519,11 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             publishPost
           } = ajax_object;
 
-          const post_id = "<?php echo $product ? $post_id : '' ?>";
+          const post_ID = "<?php echo $product ? $post_ID : '' ?>";
           const record = <?php echo json_encode($record) ?>;
           const kleinanzeigen_id = record.id;
 
-          const publishEl = $(`#ad-id-${kleinanzeigen_id} #publish-post-${post_id}`);
+          const publishEl = $(`#ad-id-${kleinanzeigen_id} #publish-post-${post_ID}`);
           $(publishEl).on('click', function(e) {
             e.preventDefault();
 

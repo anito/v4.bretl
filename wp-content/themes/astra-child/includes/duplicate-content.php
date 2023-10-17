@@ -16,13 +16,13 @@ function wbp_duplicate_post_as_draft()
     return;
 
   /*
-   * get the original post id
+   * get the original post_ID
    */
-  $post_id = (isset($_GET['post']) ? absint($_GET['post']) : absint($_POST['post']));
+  $post_ID = (isset($_GET['post']) ? absint($_GET['post']) : absint($_POST['post']));
   /*
    * and all the original post data then
    */
-  $post = get_post($post_id);
+  $post = get_post($post_ID);
 
   /*
    * if you don't want current user to be the new post author,
@@ -65,14 +65,14 @@ function wbp_duplicate_post_as_draft()
      */
     $taxonomies = get_object_taxonomies($post->post_type); // returns array of taxonomy names for post type, ex array("category", "post_tag");
     foreach ($taxonomies as $taxonomy) {
-      $post_terms = wp_get_object_terms($post_id, $taxonomy, array('fields' => 'slugs'));
+      $post_terms = wp_get_object_terms($post_ID, $taxonomy, array('fields' => 'slugs'));
       wp_set_object_terms($new_post_id, $post_terms, $taxonomy, false);
     }
 
     /*
      * duplicate all post meta just in two SQL queries
      */
-    $post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$post_id");
+    $post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$post_ID");
     if (count($post_meta_infos) != 0) {
       $sql_query = "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) ";
       foreach ($post_meta_infos as $meta_info) {
@@ -92,7 +92,7 @@ function wbp_duplicate_post_as_draft()
     wp_redirect(admin_url('post.php?action=edit&post=' . $new_post_id));
     exit;
   } else {
-    wp_die('Post creation failed, could not find original post: ' . $post_id);
+    wp_die('Post creation failed, could not find original post: ' . $post_ID);
   }
 }
 add_action('admin_action_wbp_duplicate_post_as_draft', 'wbp_duplicate_post_as_draft');

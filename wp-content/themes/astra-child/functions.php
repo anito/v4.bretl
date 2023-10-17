@@ -468,7 +468,7 @@ function wbp_get_product_cats($post)
   return get_the_terms($post, 'product_cat');
 }
 
-function wbp_product_set_attributes($post_id, $attributes)
+function wbp_product_set_attributes($post_ID, $attributes)
 {
   $i = 0;
   // Loop through the attributes array
@@ -486,7 +486,7 @@ function wbp_product_set_attributes($post_id, $attributes)
   }
 
   // Now update the post with its new attributes
-  update_post_meta($post_id, '_product_attributes', $product_attributes);
+  update_post_meta($post_ID, '_product_attributes', $product_attributes);
 }
 
 if (is_admin()) {
@@ -563,7 +563,7 @@ function kleinanzeigen_metabox_callback($post)
   wbp_include_kleinanzeigen_template('metaboxes/kleinanzeigen-import.php', false, array('id' => $id));
 }
 
-function save_kleinanzeigen_meta_box_data($post_id)
+function save_kleinanzeigen_meta_box_data($post_ID)
 {
 
   // Check if our nonce is set.
@@ -584,7 +584,7 @@ function save_kleinanzeigen_meta_box_data($post_id)
   // Check the user's permissions.
   if (isset($_POST['post_type']) && 'product' == $_POST['post_type']) {
 
-    if (!current_user_can('edit_post', $post_id)) {
+    if (!current_user_can('edit_post', $post_ID)) {
       return;
     }
   }
@@ -595,7 +595,7 @@ function save_kleinanzeigen_meta_box_data($post_id)
 
   $id = sanitize_text_field($_POST['kleinanzeigen_id']);
 
-  update_post_meta($post_id, 'kleinanzeigen_id', $id);
+  update_post_meta($post_ID, 'kleinanzeigen_id', $id);
 }
 // add_action('save_post', 'save_kleinanzeigen_meta_box_data');
 
@@ -964,7 +964,7 @@ function get_remote($url)
 function wbp_get_product_by_sku_($sku)
 {
   global $wpdb;
-  $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku));
+  $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku));
 
   if (isset($post_ID)) {
     return wc_get_product($post_ID);
