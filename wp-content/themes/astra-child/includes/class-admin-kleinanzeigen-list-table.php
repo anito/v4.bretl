@@ -238,7 +238,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $sortable = $this->get_sortable_columns();
     $this->_column_headers = array($columns, $hidden, $sortable);
 
-    $data = $this->items;
+    $data = $this->has_items() ? $this->items : array();
 
     function usort_reorder($a, $b)
     {
@@ -395,7 +395,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $action = 'create';
           $icon = 'plus';
           $type = 'button';
-          $kleinanzeigen_actions = wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-activate-control.php', true, compact('record', 'label', 'action', 'icon', 'type'));
+          $kleinanzeigen_actions = wbp_include_kleinanzeigen_template('dashboard/kleinanzeigen-toggle-link-control.php', true, compact('record', 'label', 'action', 'icon', 'type'));
           $shop_actions = '';
         }
 

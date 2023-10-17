@@ -1,4 +1,18 @@
 <?php
+
+// Remove default category if necessary
+function wbp_maybe_remove_default_cat($post_ID)
+{
+  $default_cat_id = get_option('default_product_cat');
+  $cat_terms = get_the_terms($post_ID, 'product_cat');
+  $ids = wp_list_pluck($cat_terms, 'term_id');
+
+  $count = count($ids);
+  if (in_array($default_cat_id, $ids) && 2 <= $count) {
+    wbp_set_product_term($post_ID, $default_cat_id, 'cat', false);
+  }
+}
+
 function wbp_process_sale($post_ID, $post)
 {
 
@@ -118,8 +132,6 @@ function wbp_process_kleinanzeigen($post_ID, $post)
     $ad_title = $ad->title;
     $sku_error = false;
 
-    remove_action('save_post', 'wbp_save_post', 99);
-
     if (empty($title)) {
       $title = $ad_title;
       $content = __('Ready to import ad. Click "Import ad" to start.', 'astra-child');
@@ -144,6 +156,7 @@ function wbp_process_kleinanzeigen($post_ID, $post)
       $content = '<b style="color: red;">' . __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child') . '</b>';
     }
 
+    remove_action('save_post', 'wbp_save_post', 99);
     wp_insert_post([
       'ID' => $post_ID,
       'post_type' => 'product',
@@ -165,7 +178,11 @@ function wbp_process_kleinanzeigen($post_ID, $post)
 
 function wbp_set_product_term($product, $term_id, $type, $bool)
 {
-  $product_id = $product->get_id();
+  if ($product instanceof WC_Product) {
+    $product_id = $product->get_id();;
+  } else {
+    $product_id = $product;
+  }
   $term_ids = wp_list_pluck(get_the_terms($product_id, 'product_' . $type), 'term_id');
   $term_ids = array_unique(array_map('intval', $term_ids));
   $term_ids = wbp_toggle_array_item($term_ids, $term_id, $bool);

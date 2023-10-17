@@ -382,8 +382,9 @@ section .box-wrapper.summary-status .outer {
   transition: all 0.3s;
 }
 section .box-wrapper.summary-status .trigger.active ~ .outer {
-  height: auto;
+  height: calc(100vh - 400px);
   width: 300px;
+  overflow: auto;
 }
 section .box-wrapper.summary-status .status-wrapper {
   display: flex;

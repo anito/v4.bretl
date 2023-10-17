@@ -4,13 +4,33 @@ require_once __DIR__ . '/includes/duplicate-content.php';
 require_once __DIR__ . '/includes/register-wc-taxonomies.php';
 require_once __DIR__ . '/includes/class-extended-wc-admin-list-table-products.php';
 
-function wbp_product_table_list_loader()
+function wbp_init()
 {
   if (!wp_doing_ajax()) {
-    new Extended_WC_Admin_List_Table_Products();
+    $theme = wp_get_theme();
+    /**
+     * Define Constants
+     */
+    define('CHILD_THEME_ASTRA_CHILD_VERSION', $theme->__get('version'));
   }
 }
-add_filter('init', 'wbp_product_table_list_loader');
+add_filter('init', 'wbp_init');
+
+function wbp_admin_init() {
+  if (!wp_doing_ajax()) {
+    add_action('current_screen', 'wbp_on_current_screen');
+  }
+}
+add_filter('admin_init', 'wbp_admin_init');
+
+function wbp_on_current_screen($screen)
+{
+  switch($screen->id) {
+    case 'edit-product':
+      new Extended_WC_Admin_List_Table_Products();
+      break;
+  }
+}
 
 /**
  * CSRF allowed domains
@@ -23,11 +43,6 @@ function add_allowed_origins($origins)
   ]);
 }
 add_filter('allowed_http_origins', 'add_allowed_origins');
-
-/**
- * Define Constants
- */
-define('CHILD_THEME_ASTRA_CHILD_VERSION', '1.4.0');
 
 /**
  * App asset names (e.g. *.js. *.css files) changing per app distribution
@@ -264,6 +279,7 @@ function wbp_save_post($post_ID, $post)
 
   require_once __DIR__ . '/includes/product-term-handler.php';
   wbp_process_sale($post_ID, $post);
+  wbp_maybe_remove_default_cat($post_ID);
   if (!wp_doing_ajax()) {
     wbp_process_kleinanzeigen($post_ID, $post);
   }
@@ -850,7 +866,7 @@ function wbp_kleinanzeigen_register_scripts()
 
 function wbp_kleinanzeigen_admin_enqueue_styles()
 {
-  wp_enqueue_style('ajax-kleinanzeigen-json', get_stylesheet_directory_uri() . '/style-admin-kleinanzeigen.css');
+  wp_enqueue_style('ajax-kleinanzeigen-json', get_stylesheet_directory_uri() . '/style-admin-kleinanzeigen.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION);
 }
 
 function wbp_include_kleinanzeigen_template($path, $return_instead_of_echo = false, $extract_these = array())
