@@ -31,9 +31,8 @@
               <div class="">
                 <span><b>Bei Verkauf bzw. Deaktivierung</b></span>
                 <div>
-                  <span>Shop jetzt auf veröffentlichte </span>
-                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-ads" title="<?php echo $title ?>">Produkte überprüfen</a>
-                  <span>die auf ungültigen Anzeigen basieren.</span>
+                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-ads" title="<?php echo $title ?>">Produkte anzeigen</a>
+                  <span> deren Anzeigen ID nicht mehr gültig ist.</span>
                 </div>
               </div>
             </div>
@@ -45,9 +44,8 @@
               <div class="">
                 <span><b>Bei Preisanpassung</b></span>
                 <div>
-                  <span>Shop jetzt auf veröffentlichte </span>
-                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-prices" title="<?php echo $title ?>">Produkte überprüfen</a>
-                  <span>deren Preise sich von denen in der Anzeige unterscheiden.</span>
+                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-prices" title="<?php echo $title ?>">Produkte anzeigen</a>
+                  <span> deren Preis nicht mehr mit dem Anzeigenpreis übereinstimmt.</span>
                 </div>
               </div>
             </div>
