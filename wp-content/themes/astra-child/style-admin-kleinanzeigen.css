@@ -66,6 +66,9 @@ section#color-definitions {
   display: flex;
   padding: 20px;
 }
+#head-wrap .left-sections section:first-child {
+  width: 460px;
+}
 #head-wrap .left-sections section:not(:first-child) {
   padding-left: 0px;
 }

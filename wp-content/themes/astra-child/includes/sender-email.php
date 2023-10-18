@@ -8,7 +8,7 @@ function wpb_sender_email($original_email_address)
     $url = home_url();
     $pattern = '/(https?):\/\/(.*)/';
     preg_match($pattern, $url, $matches);
-    return 'bretschneider@' . $matches[2];
+    return 'info@' . $matches[2];
 }
 add_filter('wp_mail_from', 'wpb_sender_email');
 

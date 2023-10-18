@@ -32,7 +32,7 @@
                 <span><b>Bei Verkauf bzw. Deaktivierung</b></span>
                 <div>
                   <a href="#" type="button" class="start-scan info" data-scan-type="invalid-ads" title="<?php echo $title ?>">Produkte anzeigen</a>
-                  <span> deren Anzeigen ID nicht mehr gültig ist.</span>
+                  <span> deren Anzeige nicht mehr erreichbar ist</span>
                 </div>
               </div>
             </div>
@@ -45,7 +45,7 @@
                 <span><b>Bei Preisanpassung</b></span>
                 <div>
                   <a href="#" type="button" class="start-scan info" data-scan-type="invalid-prices" title="<?php echo $title ?>">Produkte anzeigen</a>
-                  <span> deren Preis nicht mehr mit dem Anzeigenpreis übereinstimmt.</span>
+                  <span> deren Preis vom Anzeigenpreis abweicht</span>
                 </div>
               </div>
             </div>

@@ -29,9 +29,9 @@ jQuery.noConflict();
   };
 
   //add disclaimer to gallery image
-  var disclaimer =
+  const disclaimer =
     "Abbildung kann ähnlich sein. Änderungen und Irrtümer vorbehalten. Mögliches Zubehör auf Bildern ist nicht Teil des Angebots.";
-  var add_image_disclaimer = function () {
+  const add_image_disclaimer = function () {
     $(".woocommerce-product-gallery").before(
       '<div class="product-gallery-disclaimer">' + disclaimer + "</div>"
     );
@@ -57,13 +57,12 @@ jQuery.noConflict();
 
   // Copy and observe an elements wishlist count
   var add_jet_engine_wishlist_hook = (targetSelector, storeName) => {
-
     function copyToTarget(count) {
       const targetEls = document.querySelectorAll(targetSelector);
       targetEls.forEach((el) => {
         let targetEl = el.querySelector(".wishlist-widget");
         if (!targetEl) {
-          el.style.display = 'inline-block';
+          el.style.display = "inline-block";
           targetEl = document.createElement("span");
           targetEl.classList.add("wishlist-widget");
           el.append(targetEl);
@@ -102,62 +101,91 @@ jQuery.noConflict();
   };
 
   function add_solis_script() {
-    const el = document.getElementById('iframe-solis');
+    const el = document.getElementById("iframe-solis");
 
-    if(!el) return;
+    if (!el) return;
 
     const src = "https://solis-traktor.de/";
-    if(undefined !== IntersectionObserver) {
-        const onenter = (o) => o.forEach((entry) => {
-            if(entry.isIntersecting) entry.target.src=src;
-            else entry.target.src="";
+    if (undefined !== IntersectionObserver) {
+      const onenter = (o) =>
+        o.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.src = src;
+          else entry.target.src = "";
         });
-        const observer = new IntersectionObserver(onenter, {threshold: 0.5});
-        observer.observe(el, onenter);
+      const observer = new IntersectionObserver(onenter, { threshold: 0.5 });
+      observer.observe(el, onenter);
     } else {
-        el.src=src;
+      el.src = src;
     }
   }
 
   function add_toggle_sidebar() {
     const toggleEl = document.getElementById("sidebar-toggle");
-	  
-    if(!toggleEl) return;
-	
-    const svgEl = toggleEl.querySelector('svg');
-    const polygonEl = svgEl.querySelector('polygon');
-    const root = document.querySelector('body');
+
+    if (!toggleEl) return;
+
+    const svgEl = toggleEl.querySelector("svg");
+    const polygonEl = svgEl.querySelector("polygon");
+    const root = document.querySelector("body");
 
     const points = {
       arrow: "8.39 0 7.61 0 7.61 7.64 0 7.64 0 8.4 8.39 8.4 8.39 0",
       plus: "8.39 7.64 8.39 0 7.61 0 7.61 7.64 0 7.64 0 8.4 7.61 8.4 7.61 16 8.39 16 8.39 8.4 16 8.4 16 7.64 8.39 7.64",
-    }
+    };
 
     const opened = () => {
       polygonEl.setAttribute("points", points.plus);
-      toggleEl.style.display = 'unset';
-    }
-    
+      toggleEl.style.display = "unset";
+    };
+
     const closed = () => {
       polygonEl.setAttribute("points", points.arrow);
-      toggleEl.style.display = 'unset';
-    }
+      toggleEl.style.display = "unset";
+    };
 
     const clickHandler = () => {
-      root.classList.toggle("sidebar-open")
-        ? opened()
-        : closed();
-    }
+      root.classList.toggle("sidebar-open") ? opened() : closed();
+    };
 
-    toggleEl.addEventListener('click', clickHandler);
+    toggleEl.addEventListener("click", clickHandler);
 
     clickHandler();
-    
   }
 
+  function add_show_quote_request() {
+    $(".description_tab a").on("click", function (e) {
+      e.preventDefault();
+      $("#quote-request-form").addClass("hidden");
+    });
+
+    $("#show-quote-request").on("click", function (e) {
+      e.preventDefault();
+      $("#quote-request-form").toggleClass("hidden");
+    });
+  }
+
+  function add_iubenda_script() {
+    (function (w, d) {
+      var loader = function () {
+        var s = d.createElement("script"),
+          tag = d.getElementsByTagName("script")[0];
+        s.src = "https://cdn.iubenda.com/iubenda.js";
+        tag.parentNode.insertBefore(s, tag);
+      };
+      if (w.addEventListener) {
+        w.addEventListener("load", loader, false);
+      } else if (w.attachEvent) {
+        w.attachEvent("onload", loader);
+      } else {
+        w.onload = loader;
+      }
+    })(window, document);
+  }
   // add_fb_div();
   // add_image_disclaimer();
+  add_iubenda_script();
   add_jet_engine_wishlist_hook("header .wishlist-target", "wishlist");
   add_toggle_sidebar();
+  add_show_quote_request();
   // add_solis_script();
 })(jQuery);

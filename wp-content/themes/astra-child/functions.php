@@ -635,10 +635,10 @@ function wbp_woo_custom_tabs($tabs)
     );
   }
 
-  $tabs['request_form'] = array(
-    'title'   => __('Anfrage', 'astra-child'),
+  $tabs['quote_request_form'] = array(
+    'title'   => __('Quote Request', 'astra-child'),
     'priority'   => 30,
-    'callback'   => 'wbp_woo_tab_request_form'
+    'callback'   => 'wbp_woo_tab_quote_request'
   );
 
   unset($tabs['reviews']);
@@ -656,7 +656,7 @@ function wbp_woo_tab_content($tab_name, $tab)
   echo '<h6 style="font-weight:600; opacity: 0.5; margin-bottom: 10px;">Highlights</h6><h5 style="margin-bottom: 30px;">' . $title . '</h5>' . do_shortcode($content); // keep possible shortcode
 }
 
-function wbp_woo_tab_request_form()
+function wbp_woo_tab_quote_request()
 {
   if (REQUEST_FORM_SHORTCODE_ID) {
     echo  do_shortcode('[elementor-template id="' . REQUEST_FORM_SHORTCODE_ID . '"]');
