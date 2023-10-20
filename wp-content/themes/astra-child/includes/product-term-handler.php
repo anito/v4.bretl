@@ -259,15 +259,25 @@ function __get_the_terms($post_ID, $taxonomy)
 
 function enable_sku($post_ID, $ad)
 {
-  update_post_meta((int) $post_ID, 'kleinanzeigen_id', $ad->id);
-  update_post_meta((int) $post_ID, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($ad->url));
-  update_post_meta((int) $post_ID, 'kleinanzeigen_search_url', wbp_get_kleinanzeigen_search_url($ad->id));
-  update_post_meta((int) $post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
+  $product = wc_get_product($post_ID);
+  if ($product) {
+    try {
+      $product->set_sku($ad->id);
+      $product->save();
+
+      update_post_meta((int) $post_ID, 'kleinanzeigen_id', $ad->id);
+      update_post_meta((int) $post_ID, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($ad->url));
+      update_post_meta((int) $post_ID, 'kleinanzeigen_search_url', wbp_get_kleinanzeigen_search_url($ad->id));
+      update_post_meta((int) $post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
+    } catch (Exception $e) {
+    }
+  }
 }
 
 function disable_sku($post_ID)
 {
   $product = wc_get_product($post_ID);
+
   $product->set_sku('');
   $product->save();
 

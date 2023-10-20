@@ -239,7 +239,7 @@ section .summary .count:nth-child(2) {
   margin-left: 10px;
 }
 .wp-list-table .column-shop-price .woocommerce-price-suffix {
-    display: none;
+  display: none;
 }
 .wp-list-table.wp-list-kleinanzeigen-ads .manage-column[class*="status"],
 .column[class*="column-status"] {
@@ -297,7 +297,9 @@ section .summary .count:nth-child(2) {
 .wp-list-table.wp-list-kleinanzeigen-ads tr[class*="diff"] {
   background-color: #ff00001e;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .diff.price-diff .column[class*="-price"] {
+.wp-list-table.wp-list-kleinanzeigen-ads
+  .diff.price-diff
+  .column[class*="-price"] {
   text-decoration: underline;
   text-decoration-style: wavy;
   text-decoration-thickness: 0.06em;
@@ -341,6 +343,7 @@ section .summary .count:nth-child(2) {
 .wp-list-table.wp-list-kleinanzeigen-ads .column-content .button {
   cursor: pointer;
 }
+
 .divider-bottom {
   margin-bottom: 10px;
   padding-bottom: 10px;
@@ -417,4 +420,78 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 .todo .reason {
   flex-basis: 30%;
   padding-left: 30px;
+}
+
+/**
+   * Styles for imported templates
+   */
+.wp-list-scan-kleinanzeigen-ads .column-image {
+  width: 10%;
+}
+
+.wp-list-scan-kleinanzeigen-ads .column-title {
+  width: 30%;
+}
+.wp-list-scan-kleinanzeigen-ads .column-ka-price {
+  width: 10%;
+}
+
+.wp-list-scan-kleinanzeigen-ads .column-shop-price {
+  width: 10%;
+}
+
+.wp-list-scan-kleinanzeigen-ads .column-actions {
+  width: 33%;
+  text-align: center;
+}
+
+.wp-list-scan-kleinanzeigen-ads {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.wp-list-scan-kleinanzeigen-ads.empty {
+  display: table;
+}
+
+.wp-list-scan-kleinanzeigen-ads thead td,
+.wp-list-scan-kleinanzeigen-ads thead th,
+.wp-list-scan-kleinanzeigen-ads tfoot td,
+.wp-list-scan-kleinanzeigen-ads tfoot th {
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  height: 30px;
+  padding: 5px;
+}
+
+.wp-list-scan-kleinanzeigen-ads thead th,
+.wp-list-scan-kleinanzeigen-ads tbody td,
+.wp-list-scan-kleinanzeigen-ads tfoot th {
+  padding: 8px;
+  vertical-align: middle;
+}
+
+.wp-list-scan-kleinanzeigen-ads.striped > tbody > :nth-child(odd) {
+  background-color: #f6f7f7;
+}
+
+.wp-list-scan-kleinanzeigen-ads tbody {
+  overflow: auto;
+  height: 266px;
+  display: block;
+}
+
+.wp-list-scan-kleinanzeigen-ads thead tr,
+.wp-list-scan-kleinanzeigen-ads tfoot tr {
+  display: inline-table;
+  width: 100%;
+}
+
+.wp-list-scan-kleinanzeigen-ads tbody td .action-button {
+  width: 110px;
+  margin: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -985,12 +985,14 @@ function wbp_get_product_by_sku_($sku)
 
 function wbp_get_product_by_sku($sku)
 {
-  $p = wc_get_products(array(
-    'sku' => $sku
-  ));
-
-  if (!empty($p)) {
-    return $p[0];
+  if($sku) {
+    $p = wc_get_products(array(
+      'sku' => $sku
+    ));
+  
+    if (!empty($p)) {
+      return $p[0];
+    }
   }
 }
 

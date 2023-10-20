@@ -5,6 +5,15 @@ if (!class_exists('WP_List_Table')) {
 
 class Kleinanzeigen_List_Table extends WP_List_Table
 {
+  private $hidden_columns = array(
+    'id'
+  );
+  private $data;
+
+  private static $INVISIBLE;
+  private static $PRICE_DIFF;
+  private static $CONTAINS_DEFAULT_CAT;
+  private static $NO_CAT;
 
   function __construct()
   {
@@ -13,6 +22,11 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       'plural' => 'wp-list-kleinanzeigen-ads',
       'ajax' => true
     ));
+
+    self::$INVISIBLE = __('Nicht sichtbar', 'astra-child');
+    self::$PRICE_DIFF = __('Preisdifferenz', 'astra-child');
+    self::$CONTAINS_DEFAULT_CAT = __('enthält Standard-Kategorie', 'astra-child');
+    self::$NO_CAT = __('keine gültige Kategorie', 'astra-child');
   }
 
   /**
@@ -36,11 +50,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     parent::display();
   }
-
-  protected const INVISIBLE = 'Nicht sichtbar';
-  protected const PRICE_DIFF = 'Preisdifferenz';
-  protected const CONTAINS_DEFAULT_CAT = 'enthält Standard-Kategorie';
-  protected const NO_CAT = 'keine gültige Kategorie';
 
   /**
    * @Build Head
@@ -74,7 +83,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       }
       $product = $product_by_sku ? $product_by_sku : ($product_by_title ? $product_by_title : false);
       $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null;
-      $product ? (wbp_has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::PRICE_DIFF) : null) : null;
+      $product ? (wbp_has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$PRICE_DIFF) : null) : null;
 
       if ($product) {
         switch ($product->get_status()) {
@@ -83,7 +92,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             break;
           case 'draft':
             $products['draft'][] = $product;
-            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::INVISIBLE);
+            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
             break;
           default:
             $products['other'][] = $product;
@@ -93,15 +102,15 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $ids = wp_list_pluck($cat_terms, 'term_id');
         if (in_array($default_cat_id, $ids)) {
           $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
-          if( 1 === count($ids)) {
-            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::NO_CAT);
+          if (1 === count($ids)) {
+            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$NO_CAT);
           } else {
-            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
+            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
           }
         }
       } else {
         $products['unknown'][] = $item->id;
-        $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::INVISIBLE);
+        $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
       }
     }
     wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => KLEINANZEIGEN_TOTAL_PAGES, 'categories' => $categories, 'total' => $total, 'published' => $published, 'products' => $products, 'todos' => $products['todos']));
@@ -150,7 +159,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $response['pagination']['top'] = $pagination_top;
     $response['pagination']['bottom'] = $pagination_bottom;
     $response['column_headers'] = $headers;
-    $response['head'] = $head;
 
     if (isset($total_items))
       $response['total_items_i18n'] = sprintf(_n('1 item', '%s items', $total_items), number_format_i18n($total_items));
@@ -201,20 +209,19 @@ class Kleinanzeigen_List_Table extends WP_List_Table
    */
   function display_rows()
   {
-
-    list($columns, $hidden) = $this->get_column_info();
-
     $records = $this->items;
     foreach ($records as $record) {
-      $this->render_row($record, $columns, $hidden);
+      $this->render_row($record);
     }
   }
 
-  private $hidden_columns = array(
-    'id'
-  );
+  function setData($data)
+  {
+    $this->data = $data;
+    $this->items = $data->ads;
 
-  private $data = array();
+    $this->prepare_items();
+  }
 
   /**
    * Prepare the table with different parameters, pagination, columns and table elements
@@ -276,16 +283,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     );
   }
 
-  function setData($data)
+  function render_row($record)
   {
-    $this->data = $data;
-    $this->items = $data->ads;
+    list($columns, $hidden) = $this->get_column_info();
 
-    $this->prepare_items();
-  }
-
-  function render_row($record, $columns, $hidden)
-  {
     $product_by_sku = wbp_get_product_by_sku($record->id);
     if (!$product_by_sku) {
       $product_by_title = wbp_get_product_by_title($record->title);
@@ -575,12 +576,11 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           })
 
           const trEl = $(`#ad-id-${kleinanzeigen_id}`);
-          trEl.get()[0].addEventListener('data:action', (e) => {
+          trEl.on('data:parsed', (e) => {
 
             if ('create' === e.detail?.action) {
-              $(impImagesEl).get()[0]?.addEventListener('data:action', function(e) {
+              $(impImagesEl).on('data:parsed', function(e) {
 
-                $('a[data-action=edit-post]', trEl)
                 const href = $('a[data-action=edit-post]', trEl).attr('href');
                 const {
                   data: {

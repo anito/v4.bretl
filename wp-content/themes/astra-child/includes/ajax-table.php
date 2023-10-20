@@ -1,5 +1,6 @@
 <?php
 require_once get_stylesheet_directory() . '/includes/class-admin-kleinanzeigen-list-table.php';
+require_once get_stylesheet_directory() . '/includes/class-admin-kleinanzeigen-scan-list-table.php';
 define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/kleinanzeigen/');
 
 /**
@@ -78,60 +79,74 @@ function _ajax_sts_scan()
     'status' => 'publish',
     'limit' => -1
   );
+
   $published_products = wc_get_products($args);
 
   $ad_ids = wp_list_pluck($all_ads, 'id');
+  $items = [];
+  $subheader = '';
 
-  $deactivated = [];
-  $price_diffs = [];
+  switch ($scan_type) {
+    case 'invalid-ad':
+      $subheader = 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist.';
+      break;
+      case 'invalid-price':
+        $subheader = 'Auflistung von Produkten mit Preisdifferenz zwischen Shop und Kleinanzeige.';
+      break;
+  }
+
   foreach ($published_products as $product) {
-    $id = $product->get_id();
+    $post_ID = $product->get_id();
     $sku = (int) $product->get_sku();
     $image = wp_get_attachment_image_url($product->get_image_id());
     $shop_price = wp_kses_post($product->get_price_html());
     $shop_price_raw = $product->get_price();
-    $price = '-';
+    $ka_price = '-';
     $title = $product->get_title();
+    $permalink = get_permalink($post_ID);
 
-    // invalid ads
     if (!empty($sku)) {
-      if (!in_array($sku, $ad_ids)) {
-        $deactivated[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price');
-      } else {
-        $records = array_filter($all_ads, function ($ad) use ($sku) {
-          return $ad->id === $sku;
-        });
-        if (!empty($records)) {
-          $key = array_key_first($records);
-          $record = $records[$key];
-          if (wbp_has_price_diff($record, $product)) {
-            $price = wbp_extract_kleinanzeigen_price($record->price);
-            $ad_price = $record->price;
-            $price_diffs[] = compact('id', 'sku', 'image', 'title', 'shop_price', 'price', 'ad_price');
+      switch ($scan_type) {
+        case 'invalid-ad':
+          if (!in_array($sku, $ad_ids)) {
+            $record = null;
+            $items[] = compact('product', 'scan_type', 'record');
           }
-        }
+          break;
+        case 'invalid-price':
+          if (in_array($sku, $ad_ids)) {
+            $records = array_filter($all_ads, function ($ad) use ($sku) {
+              return $ad->id === $sku;
+            });
+            if (!empty($records)) {
+              $key = array_key_first($records);
+              $record = $records[$key];
+              if (wbp_has_price_diff($record, $product)) {
+                $ka_price = $record->price;
+                $items[] = compact('product', 'scan_type', 'record');
+              }
+            }
+          }
+          break;
       }
     }
   }
 
   // Reset page number
   setcookie('kleinanzeigen-table-page', $current_page);
-  $response = array(
-    "data" => compact('all_ads', 'deactivated', 'price_diffs')
-  );
+  $wp_list_table = new Kleinanzeigen_Scan_List_Table();
 
   ob_start();
-  switch ($scan_type) {
-    case 'invalid-ads':
-      wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-results.php', false, $response);
-      break;
-    case 'invalid-prices':
-      wbp_include_kleinanzeigen_template('/dashboard/invalid-price-results.php', false, $response);
-      break;
-  }
+  $wp_list_table->setData($items);
+  $wp_list_table->display();
+  $body = ob_get_clean();
 
-  $content = ob_get_clean();
-  die($content);
+  ob_start();
+  $wp_list_table->render_header(array('subheader' => $subheader));
+  $header = ob_get_clean();
+
+
+  die(json_encode(compact('header', 'body')));
 }
 add_action('wp_ajax__ajax_sts_scan', '_ajax_sts_scan');
 add_action('wp_ajax_nopriv__ajax_sts_scan', '_ajax_sts_scan');
@@ -284,7 +299,7 @@ function fetch_ts_script()
             $.ajax({
 
               url: ajaxurl,
-              dataType: 'text',
+              dataType: 'json',
               data: {
                 _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
                 action: '_ajax_sts_scan',
@@ -294,7 +309,8 @@ function fetch_ts_script()
                 $(el).html('Einen Moment...');
               },
               success: function(response) {
-                $('#ka-list-modal-content').html(response);
+                $('#ka-list-modal-content .header').html(response['header']);
+                $('#ka-list-modal-content .body').html(response['body']);
                 $('body').addClass('show-modal');
                 $(el).html(restored_text);
               },

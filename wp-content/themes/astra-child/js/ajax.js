@@ -17,17 +17,21 @@ jQuery(document).ready(function ($) {
     sku_metabox?.classList.add("sku");
   }
 
-  const delayed_item_click = async (arr, selector) => {
-    await arr.reduce(async (a, item) => {
-      await a;
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          const el = $(`tr#${item.id} ${selector}`);
+  const delayed_item_click = async (arr, selector, eventType) => {
+    await arr
+      .reduce(async (a, item) => {
+        await a;
+        await new Promise((resolve) => {
+          const el = $(`tr#${item.post_ID} ${selector}`);
+          $(el).on("data:parsed", function (e) {
+            return resolve(e.detail);
+          });
           $(el).click();
-          resolve();
-        }, 1000);
+        });
+      }, Promise.resolve())
+      .then(() => {
+        window.dispatchEvent(new CustomEvent(eventType));
       });
-    }, Promise.resolve());
   };
 
   window.addEventListener("deactivate:item", function (e) {
@@ -40,16 +44,16 @@ jQuery(document).ready(function ($) {
     fixPrice(e.detail.e);
   });
   window.addEventListener("deactivate:all", async function (e) {
-    const { deactivated } = e.detail.data;
-    delayed_item_click(deactivated, ".deactivate");
+    const { products } = e.detail.data;
+    delayed_item_click(products, ".deactivate", "deactivated:all");
   });
   window.addEventListener("disconnect:all", async function (e) {
-    const { deactivated } = e.detail.data;
-    delayed_item_click(deactivated, ".disconnect");
+    const { products } = e.detail.data;
+    delayed_item_click(products, ".disconnect", "disconnected:all");
   });
   window.addEventListener("fixprice:all", async function (e) {
-    const { price_diffs } = e.detail.data;
-    delayed_item_click(price_diffs, ".fix-price");
+    const { products } = e.detail.data;
+    delayed_item_click(products, ".fix-price", "fixed-price:all");
   });
 
   // Set Status
@@ -199,6 +203,8 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const post_ID = el.dataset.postId;
+    const scan_type = el.dataset.scanType;
+    const _screen = el.dataset.screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     const addSpinner = () => {
@@ -216,7 +222,8 @@ jQuery(document).ready(function ($) {
         action: "_ajax_disconnect",
         post_ID,
         kleinanzeigen_id,
-        screen,
+        scan_type,
+        screen: _screen || screen,
       },
       beforeSend: () => {
         $(el).html("Verknüpfung lösen...");
@@ -428,6 +435,8 @@ jQuery(document).ready(function ($) {
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const disconnect = el.dataset.disconnect;
+    const scan_type = el.dataset.scanType;
+    const _screen = el.dataset.screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
@@ -439,7 +448,8 @@ jQuery(document).ready(function ($) {
         post_ID,
         kleinanzeigen_id,
         disconnect,
-        screen: el.dataset.screen || screen,
+        scan_type,
+        screen: _screen || screen,
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
@@ -464,6 +474,7 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
+    const scan_type = el.dataset.scanType;
     const price = el.dataset.price;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
@@ -476,6 +487,7 @@ jQuery(document).ready(function ($) {
         post_ID,
         kleinanzeigen_id,
         price,
+        scan_type,
         screen: el.dataset.screen || screen,
       },
       beforeSend: () => {
@@ -512,12 +524,13 @@ jQuery(document).ready(function ($) {
 
   function parseResponse(data, el, callback) {
     const {
-      data: { row, head, post_ID, kleinanzeigen_id },
+      data: { row, modal_row, head, post_ID, kleinanzeigen_id },
     } = JSON.parse(data);
 
-    const _screen = el.dataset.screen || screen;
+    const the_screen = el.dataset.screen || screen;
     let rowEl;
-    switch (_screen) {
+    let modalRowEl;
+    switch (the_screen) {
       case "product":
         location = `${edit_link}${post_ID}`;
         break;
@@ -529,32 +542,38 @@ jQuery(document).ready(function ($) {
 
       case "toplevel_page_kleinanzeigen":
       case "modal":
-        rowEl = $(`.wp-list-table tr#ad-id-${kleinanzeigen_id}`);
         if (head) {
           $("#head-wrap").html(head);
         }
+
+        if(row) {
+          rowEl = $(`.wp-list-kleinanzeigen-ads tr#ad-id-${kleinanzeigen_id}`);
+          $(rowEl)?.replaceWith(row);
+        }
+        
+        if(modal_row) {
+          modalRowEl = $(`.wp-list-scan-kleinanzeigen-ads tr#${post_ID}`);
+          $(modalRowEl)?.replaceWith(modal_row);
+        }
+
+        const data = $(el).data();
         el.dispatchEvent(
-          new CustomEvent("data:action", {
-            detail: { data: $(el).data() },
+          new CustomEvent("data:parsed", {
+            detail: data,
           })
         );
-        $(rowEl)?.replaceWith(row);
 
         if ("create" === el.dataset.action) {
           rowEl = document.querySelector(`tr#ad-id-${kleinanzeigen_id}`);
 
           setTimeout(() => {
             rowEl.dispatchEvent(
-              new CustomEvent("data:action", {
+              new CustomEvent("data:parsed", {
                 detail: { action: el.dataset.action },
               })
             );
           }, 200);
         }
-      case "modal":
-        const newLabel = $(el).data("success-label") || "Fertig";
-        $(el).html(newLabel).addClass("disabled");
-        break;
     }
     callback?.();
     finish();
