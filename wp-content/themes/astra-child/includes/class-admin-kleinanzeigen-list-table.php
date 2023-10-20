@@ -190,7 +190,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       'shop-labels' => __('Labels'),
       'shop-actions' => __('Aktionen'),
       'shop-actions-import' => __('Import'),
-      'shop-status-end' => __('')
     );
   }
 

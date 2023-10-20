@@ -132,20 +132,8 @@ section#color-definitions {
 .wp-list-table.loading::after {
   opacity: 0.3;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column.status.connected-publish,
-.color-box.connected-publish {
-  background-color: var(--publish);
-}
 .color-box.status {
   align-self: center;
-}
-.wp-list-table.wp-list-kleinanzeigen-ads .column.status.disconnected-publish {
-  background-color: var(--publish);
-  background-image: repeating-linear-gradient(
-    -45deg,
-    white 0 5px,
-    var(--publish) 5px 10px
-  );
 }
 .color-box.disconnected {
   background-color: rgb(56, 56, 56);
@@ -155,11 +143,23 @@ section#color-definitions {
     rgb(185 185 185) 4px 8px
   );
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column.status.connected-draft,
+.wp-list-table .column.status.connected-publish,
+.color-box.connected-publish {
+  background-color: var(--publish);
+}
+.wp-list-table .column.status.connected-draft,
 .color-box.connected-draft {
   background-color: var(--draft);
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column.status.disconnected-draft,
+.wp-list-table .column.status.disconnected-publish {
+  background-color: var(--publish);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    white 0 5px,
+    var(--publish) 5px 10px
+  );
+}
+.wp-list-table .column.status.disconnected-draft,
 .color-box.disconnected-draft {
   background-color: var(--draft);
   background-image: repeating-linear-gradient(
@@ -168,11 +168,11 @@ section#color-definitions {
     var(--draft) 5px 10px
   );
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column.status.invalid,
+.wp-list-table .column.status.invalid,
 section .color-box.invalid {
   background-color: var(--unknown);
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column.status.connected-unknown,
+.wp-list-table .column.status.connected-unknown,
 .color-box.unknown {
   background-color: rgb(71, 71, 71);
 }
@@ -425,6 +425,13 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 /**
    * Styles for imported templates
    */
+.wp-list-scan-kleinanzeigen-ads .status {
+  width: 4px;
+  height: 90px;
+  display: block;
+  overflow: auto;
+}
+
 .wp-list-scan-kleinanzeigen-ads .column-image {
   width: 10%;
 }

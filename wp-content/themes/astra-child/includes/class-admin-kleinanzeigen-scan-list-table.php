@@ -39,8 +39,9 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
 
     parent::display();
   }
-  
-  function render_header($args = array('subheader' => '')) {
+
+  function render_header($args = array('subheader' => ''))
+  {
     wbp_include_kleinanzeigen_template('/dashboard/modal_header.php', false, $args);
   }
 
@@ -105,6 +106,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
   {
     return array(
       'id' => 'ID',
+      'status-start' => '',
       'image' => __('Bild'),
       'title' => __('Titel'),
       'ka-price' => __('KA Preis'),
@@ -200,7 +202,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
   {
     // Extracts $products | $scan_type | $record
     extract($item);
-    
+
     list($columns, $hidden) = $this->get_column_info();
 
     $post_ID = $product->get_id();
@@ -246,13 +248,22 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
             break;
           default:
         }
+        switch ($post_status) {
+          case 'publish':
+            $status = $sku ? 'connected-publish' : 'disconnected-publish';
+            break;
+          case 'draft':
+            $status = $sku ? 'connected-draft' : 'disconnected-draft';
+            break;
+          default:
+            $status = $sku ? 'connected-unknown' : 'disconnected-unknown';
+            break;
+        }
 
         switch ($column_name) {
-          case "id": {
+          case "status-start": {
       ?>
-              <td class="<?php echo $class ?>">
-                <div class="column-content center"><?php echo $post_ID ?></div>
-              </td>
+              <td class="status <?php echo $status . ' ' . $class ?>"></td>
             <?php
               break;
             }
@@ -293,6 +304,12 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
               <td class="<?php echo $class ?>" style="vertical-align: middle;">
                 <div class="column-content"><?php echo $actions ?></div>
               </td>
+            <?php
+              break;
+            }
+          case "shop-status-end": {
+            ?>
+              <td class="status <?php echo $status . ' ' . $class ?>"></td>
       <?php
               break;
             }
