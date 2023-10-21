@@ -28,7 +28,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
     /**
      * Adds a nonce field
      */
-    wp_nonce_field('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
+    wp_nonce_field('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce');
 
     /**
      * Adds field order and orderby
@@ -40,9 +40,23 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
     parent::display();
   }
 
-  function render_header($args = array('subheader' => ''))
+  function render_header($args = array())
   {
-    wbp_include_kleinanzeigen_template('/dashboard/modal_header.php', false, $args);
+    $defaults = array(
+      'template' => '__blank__',
+      'subheader' => '__SUBHEADER__'
+    );
+    $options = wp_parse_args($args, $defaults);
+    wbp_include_kleinanzeigen_template('/dashboard/' . $options['template'] . '.php', false, $options);
+  }
+
+  function render_footer($args = array())
+  {
+    $defaults = array(
+      'template' => '__blank__'
+    );
+    $options = wp_parse_args($args, $defaults);
+    wbp_include_kleinanzeigen_template('/dashboard/' . $options['template'] . '.php', false, $options);
   }
 
   /**
@@ -52,7 +66,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
   function ajax_response()
   {
 
-    check_ajax_referer('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
+    check_ajax_referer('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce');
 
     $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
     $data = wbp_get_json_data(array('pageNum' => $pageNum));
@@ -231,13 +245,14 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
 
         switch ($scan_type) {
           case 'invalid-ad':
-            $disabled = !$sku;
             $published = 'publish' === $product->get_status();
-            $labels = array(
-              'deactivate' => ($published || $sku) ? __('Deactivate', 'astra-child') : __('Deactivated', 'astra-child'),
+            $disabled['deactivate'] = !$sku && !$published;
+            $disabled['disconnect'] = !$sku;
+            $label = array(
+              'deactivate' => (!$disabled['deactivate']) ? __('Deactivate', 'astra-child') : __('Deactivated', 'astra-child'),
               'disconnect' => $product->get_sku() ? __('Just disconnect', 'astra-child') : __('Disconnected', 'astra-child')
             );
-            $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'labels', 'scan_type', 'disabled'));
+            $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'scan_type', 'disabled'));
             break;
           case 'invalid-price':
             $price = wbp_extract_kleinanzeigen_price($ka_price);
@@ -366,8 +381,6 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
             $(el).addClass('disabled')
               .off('data:parsed', handleLabel);
           }
-
-          const data = <?php echo json_encode($data) ?>;
         })
       </script>
     </tr>

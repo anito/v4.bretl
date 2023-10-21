@@ -6,7 +6,7 @@
 .wbp-kleinanzeigen-main-header {
   margin: 40px 0 10px;
 }
-#head-wrap {
+#kleinanzeigen-head-wrap {
   margin-right: 20px;
   padding: 20px;
   display: flex;
@@ -46,44 +46,44 @@ section#color-definitions {
   justify-content: space-between;
   flex: 1 0 100%;
 }
-#head-wrap section .dashicons {
+#kleinanzeigen-head-wrap section .dashicons {
   margin-right: 10px;
 }
-#head-wrap .left-sections .section-inner {
+#kleinanzeigen-head-wrap .left-sections .section-inner {
   display: flex;
   flex: 1;
   flex-direction: column;
   justify-content: space-between;
   padding: 20px;
 }
-#head-wrap .section-inner .warning {
+#kleinanzeigen-head-wrap .section-inner .warning {
   color: red;
 }
-#head-wrap .left-sections section:not(:last-child) .section-inner {
+#kleinanzeigen-head-wrap .left-sections section:not(:last-child) .section-inner {
   border-right: 1px solid #eee;
 }
-#head-wrap .left-sections section {
+#kleinanzeigen-head-wrap .left-sections section {
   display: flex;
   padding: 20px;
 }
-#head-wrap .left-sections section:first-child {
+#kleinanzeigen-head-wrap .left-sections section:first-child {
   width: 460px;
 }
-#head-wrap .left-sections section:not(:first-child) {
+#kleinanzeigen-head-wrap .left-sections section:not(:first-child) {
   padding-left: 0px;
 }
-#head-wrap .left-sections section:not(:first-child) .section-inner {
+#kleinanzeigen-head-wrap .left-sections section:not(:first-child) .section-inner {
   padding-left: 10px;
   padding-right: 30px;
 }
-#head-wrap .left-sections .wbp-shop-section {
+#kleinanzeigen-head-wrap .left-sections .wbp-shop-section {
   max-width: 220px;
 }
-#head-wrap .left-sections .info {
+#kleinanzeigen-head-wrap .left-sections .info {
   display: inline-block;
   max-width: 300px;
 }
-#head-wrap .info-box li .dashicons {
+#kleinanzeigen-head-wrap .info-box li .dashicons {
   margin-right: 0.2em;
   display: inline;
   font-size: 1em;
@@ -94,13 +94,13 @@ section#color-definitions {
   font-weight: 100;
   font-size: 0.8em;
 }
-#head-wrap .left-sections section h2 {
+#kleinanzeigen-head-wrap .left-sections section h2 {
   margin: 5px 0 20px;
 }
-#head-wrap .left-sections section h2:first-child {
+#kleinanzeigen-head-wrap .left-sections section h2:first-child {
   margin-bottom: 20px;
 }
-#head-wrap .left-sections section h2 {
+#kleinanzeigen-head-wrap .left-sections section h2 {
   margin-bottom: 10px;
 }
 .wbp-kleinanzeigen-section .pagination {
@@ -423,8 +423,13 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 }
 
 /**
-   * Styles for imported templates
-   */
+* Styles for imported templates
+*/
+table tbody tr.no-items {
+  display: flex;
+  justify-content: center;
+}
+
 .wp-list-scan-kleinanzeigen-ads .status {
   width: 4px;
   height: 90px;

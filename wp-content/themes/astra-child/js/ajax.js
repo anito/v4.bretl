@@ -543,7 +543,7 @@ jQuery(document).ready(function ($) {
       case "toplevel_page_kleinanzeigen":
       case "modal":
         if (head) {
-          $("#head-wrap").html(head);
+          $("#kleinanzeigen-head-wrap").html(head);
         }
 
         if(row) {

@@ -1,6 +1,6 @@
 <div class="wbp-section wbp-dashboard-section">
 
-  <header id="head-wrap"></header>
+  <header id="kleinanzeigen-head-wrap"></header>
 
   <form name="kleinanzeigen-list" id="kleinanzeigen-list" method="get">
 
@@ -21,6 +21,7 @@
         <div id="ka-list-modal-content" class="ka-list-modal-inner">
           <div class="header"></div>
           <div class="body"></div>
+          <div class="footer"></div>
         </div>
         <div class="button-controls right">
           <a href="#" type="button" class="button button-primary close"><?php echo __('Close', 'astra-child') ?></a>

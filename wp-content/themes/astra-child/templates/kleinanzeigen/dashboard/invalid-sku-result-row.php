@@ -1,6 +1,6 @@
 <div class="actions" data-id="<?php echo $post_ID ?>">
-  <a href="#" type="button" class="button button-primary button-small action-button deactivate" <?php echo $disabled ? 'disabled' : '' ?> data-scan-type="<?php echo $scan_type ?>" data-action="deactivate" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal" data-disconnect="__disconnect__"><?php echo $labels['deactivate'] ?></a>
-  <a href="#" type="button" class="button button-primary button-small action-button disconnect" <?php echo $disabled ? 'disabled' : '' ?> data-scan-type="<?php echo $scan_type ?>" data-action="disconnect" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal"><?php echo $labels['disconnect'] ?></a>
+  <a href="#" type="button" class="button button-primary button-small action-button deactivate <?php echo $disabled['deactivate'] ? 'disabled' : '' ?>" data-scan-type="<?php echo $scan_type ?>" data-action="deactivate" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal" data-disconnect="__disconnect__"><?php echo $label['deactivate'] ?></a>
+  <a href="#" type="button" class="button button-primary button-small action-button disconnect <?php echo $disabled['disconnect'] ? 'disabled' : '' ?>" data-scan-type="<?php echo $scan_type ?>" data-action="disconnect" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal"><?php echo $label['disconnect'] ?></a>
 </div>
 
 <script>

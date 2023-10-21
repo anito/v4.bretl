@@ -1,6 +1,6 @@
 <div class="wpo_section wpo_group">
 
-  <header id="head-wrap"></header>
+  <header id="kleinanzeigen-settings-head-wrap"></header>
 
   <form name="kleinanzeigen-list" id="kleinanzeigen-list" method="get">
 

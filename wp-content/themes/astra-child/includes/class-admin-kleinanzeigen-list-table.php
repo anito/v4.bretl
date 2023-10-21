@@ -155,10 +155,11 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $this->pagination('bottom');
     $pagination_bottom = ob_get_clean();
 
-    $response = array('rows' => $rows);
+    $response['rows'] = $rows;
     $response['pagination']['top'] = $pagination_top;
     $response['pagination']['bottom'] = $pagination_bottom;
     $response['column_headers'] = $headers;
+    $response['head'] = $head;
 
     if (isset($total_items))
       $response['total_items_i18n'] = sprintf(_n('1 item', '%s items', $total_items), number_format_i18n($total_items));

@@ -60,6 +60,7 @@ function _ajax_sts_scan()
   // Keep in mind wbp_get_json_data will alter the page_number cookie, so save it and reset it later if required
   $current_page = $_COOKIE['kleinanzeigen-table-page'];
   $scan_type = isset($_REQUEST['scan_type']) ? $_REQUEST['scan_type'] : null;
+  $wp_list_table = new Kleinanzeigen_Scan_List_Table();
 
   $all_ads = array();
   for ($pageNum = 1; $pageNum <= KLEINANZEIGEN_TOTAL_PAGES; $pageNum++) {
@@ -89,9 +90,12 @@ function _ajax_sts_scan()
   switch ($scan_type) {
     case 'invalid-ad':
       $subheader = 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist.';
+      $footer_template = 'footer-invalid-ad';
       break;
-      case 'invalid-price':
-        $subheader = 'Auflistung von Produkten mit Preisdifferenz zwischen Shop und Kleinanzeige.';
+    case 'invalid-price':
+      $subheader = 'Auflistung von Produkten mit Preisdifferenz zwischen Shop und Kleinanzeige.';
+      $footer_template = 'blank';
+      $footer = '';
       break;
   }
 
@@ -134,7 +138,7 @@ function _ajax_sts_scan()
 
   // Reset page number
   setcookie('kleinanzeigen-table-page', $current_page);
-  $wp_list_table = new Kleinanzeigen_Scan_List_Table();
+
 
   ob_start();
   $wp_list_table->setData($items);
@@ -142,11 +146,17 @@ function _ajax_sts_scan()
   $body = ob_get_clean();
 
   ob_start();
-  $wp_list_table->render_header(array('subheader' => $subheader));
+  $wp_list_table->render_header(array(
+    'template' => 'modal-header',
+    'subheader' => $subheader,
+  ));
   $header = ob_get_clean();
 
+  ob_start();
+  $wp_list_table->render_footer(array('template' => $footer_template));
+  $footer = ob_get_clean();
 
-  die(json_encode(compact('header', 'body')));
+  die(json_encode(compact('header', 'body', 'footer')));
 }
 add_action('wp_ajax__ajax_sts_scan', '_ajax_sts_scan');
 add_action('wp_ajax_nopriv__ajax_sts_scan', '_ajax_sts_scan');
@@ -203,7 +213,7 @@ function fetch_ts_script()
 
               $('.wp-list-table').removeClass('loading');
 
-              $("#head-wrap").html(response.head);
+              $("#kleinanzeigen-head-wrap").html(response.head);
 
               $("#kleinanzeigen-table").html(response.display);
 
@@ -226,7 +236,7 @@ function fetch_ts_script()
               list.init();
             },
             error: function(ajax, error, message) {
-              $("#head-wrap").html(message);
+              $("#kleinanzeigen-head-wrap").html(message);
             }
           });
 
@@ -311,6 +321,7 @@ function fetch_ts_script()
               success: function(response) {
                 $('#ka-list-modal-content .header').html(response['header']);
                 $('#ka-list-modal-content .body').html(response['body']);
+                $('#ka-list-modal-content .footer').html(response['footer']);
                 $('body').addClass('show-modal');
                 $(el).html(restored_text);
               },
@@ -346,17 +357,17 @@ function fetch_ts_script()
               response = $.parseJSON(response);
 
               if (response.head)
-                $("#head-wrap").html(response.head);
+                $("#kleinanzeigen-head-wrap").html(response.head);
               if (response.rows.length)
-                $('#the-list').html(response.rows);
+                $('#kleinanzeigen-table-list-wrap tbody').html(response.rows);
               if (response.column_headers.length)
-                $('thead tr, tfoot tr').html(response.column_headers);
+                $('#kleinanzeigen-table-list-wrap thead tr, tfoot tr').html(response.column_headers);
               if (response.pagination.top.length)
-                $('.tablenav.top .tablenav-pages').html($(response.pagination.top).html());
+                $('#kleinanzeigen-table-list-wrap .tablenav.top .tablenav-pages').html($(response.pagination.top).html());
               if (response.pagination.bottom.length)
-                $('.tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
+                $('#kleinanzeigen-table-list-wrap .tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
               if (response.row)
-                $('#the-list tr').html($(response.pagination.bottom).html());
+                $('#kleinanzeigen-table-list-wrap #the-list tr').html($(response.pagination.bottom).html());
 
               $('.wp-list-table').removeClass('loading');
 

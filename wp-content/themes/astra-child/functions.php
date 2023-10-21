@@ -16,22 +16,6 @@ function wbp_init()
 }
 add_filter('init', 'wbp_init');
 
-function wbp_admin_init() {
-  if (!wp_doing_ajax()) {
-    add_action('current_screen', 'wbp_on_current_screen');
-  }
-}
-add_filter('admin_init', 'wbp_admin_init');
-
-function wbp_on_current_screen($screen)
-{
-  switch($screen->id) {
-    case 'edit-product':
-      new Extended_WC_Admin_List_Table_Products();
-      break;
-  }
-}
-
 /**
  * CSRF allowed domains
  */
@@ -106,7 +90,8 @@ function wbp_wc_screen_styles($hook)
   }
 }
 
-function wbp_extract_kleinanzeigen_price($text) {
+function wbp_extract_kleinanzeigen_price($text)
+{
   // $regex = '/^([\d.]+)/';
   // preg_match($regex, $text, $matches);
   // return !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
@@ -121,7 +106,8 @@ function wbp_has_price_diff($record, $product)
   return $kleinanzeigen_price !== $woo_price;
 }
 
-function wbp_set_pseudo_sale_price($product, $price, $percent = 10) {
+function wbp_set_pseudo_sale_price($product, $price, $percent = 10)
+{
   $regular_price = (int) $price + (int) $price * $percent / 100;
   $product->set_regular_price($regular_price);
   $product->set_sale_price($price);
@@ -500,7 +486,21 @@ function wbp_product_set_attributes($post_ID, $attributes)
   update_post_meta($post_ID, '_product_attributes', $product_attributes);
 }
 
-if (is_admin()) {
+function wbp_on_current_screen($screen)
+{
+  switch ($screen->id) {
+    case 'edit-product':
+      new Extended_WC_Admin_List_Table_Products();
+      break;
+  }
+}
+
+function wbp_admin_init()
+{
+  if (!wp_doing_ajax()) {
+    add_action('current_screen', 'wbp_on_current_screen');
+  }
+
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 10);
   add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');
 
@@ -532,6 +532,7 @@ if (is_admin()) {
   add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_images', '_ajax_import_kleinanzeigen_images');
   add_action('wp_ajax_nopriv__ajax_get_product_categories', '_ajax_get_product_categories');
 }
+add_action('admin_init', 'wbp_admin_init');
 
 /**
  * Replace Elementors with Woos Placeholder Image (can be defined in woo product settings)
@@ -784,9 +785,9 @@ function wbp_add_kleinanzeigen_admin_menu_page()
 {
   load_textdomain('astra-child', get_stylesheet_directory() . '/languages/de_DE.mo');
   $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI3LjkuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9InV1aWQtY2Y1MDkyNzItMDBlMi00YjJlLWJmZWUtNTZlZjA5ZDhhMDRmIgoJIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTE1IDEzMSIKCSBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMTUgMTMxOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0E3QUFBRDt9Cjwvc3R5bGU+CjxnIGlkPSJ1dWlkLWRhZDJmZmE0LTgzNzctNDg3Ni04OTY0LWQ3ODEyYWE0NGU5MSI+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNODAuOCwxMjFjLTE0LjksMC0yMi4yLTEwLjQtMjMuNi0xMi41Yy00LjQsNC4zLTExLDEyLjUtMjMsMTIuNWMtMTMuOCwwLTI1LjQtMTAuNC0yNS40LTI3LjNWMzcuMwoJCUM4LjgsMjAuNCwyMC40LDEwLDM0LjIsMTBzMjUuNCwxMSwyNS40LDI3LjFjMi43LTEsNS41LTEuNCw4LjUtMS40YzE0LjIsMCwyNS40LDExLjYsMjUuNCwyNS42YzAsMy45LTAuNyw3LjQtMi40LDEwLjcKCQljOSw0LDE1LjEsMTMuMSwxNS4xLDIzLjRDMTA2LjIsMTA5LjUsOTQuOCwxMjEsODAuOCwxMjFMODAuOCwxMjF6IE02My4zLDEwMi4zYzMuNyw2LjQsOS44LDEwLjIsMTcuNSwxMC4yCgkJYzkuMywwLDE2LjktNy43LDE2LjktMTcuMWMwLTcuNC00LjgtMTMuOS0xMS42LTE2LjJMNjMuMywxMDIuM0M2My4zLDEwMi4zLDYzLjMsMTAyLjMsNjMuMywxMDIuM3ogTTM0LjIsMTguNQoJCWMtOC40LDAtMTYuOSw1LjgtMTYuOSwxOC44djU2LjNjMCwxMyw4LjUsMTguOCwxNi45LDE4LjhjNi43LDAsMTAuNC0zLjQsMTYuNC05LjRsMi42LTIuN2MtMS40LTQuMS0yLjEtOC42LTIuMS0xMy41VjM3LjMKCQlDNTEuMSwyNC40LDQyLjYsMTguNSwzNC4yLDE4LjVMMzQuMiwxOC41TDM0LjIsMTguNXogTTU5LjYsNDYuNHY0MC40YzAsMi4zLDAuMiw0LjUsMC42LDYuNWwxOC40LTE4LjZjNS4zLTUuNCw2LjQtOS4zLDYuNC0xMy42CgkJYzAtOS4xLTcuMi0xNy4xLTE2LjktMTcuMUM2NSw0NC4yLDYyLjIsNDQuOSw1OS42LDQ2LjRMNTkuNiw0Ni40TDU5LjYsNDYuNHoiLz4KPC9nPgo8L3N2Zz4K';
-  
+
   add_menu_page(__('Kleinanzeigen', 'astra-child'), __('Kleinanzeigen', 'astra-child'), 'edit_posts', 'kleinanzeigen', 'wbp_display_kleinanzeigen_list', $icon_svg, 10);
-  
+
   $submenu_items = wbp_kleinanzeigen_get_submenu_items();
   foreach ($submenu_items as $key => $item) {
     add_submenu_page('kleinanzeigen', $item['page_title'], $item['menu_title'], 'edit_posts', $item['menu_slug'], $item['callback'], $item['order']);
@@ -801,14 +802,13 @@ function wbp_add_kleinanzeigen_admin_menu_page()
   }
   wbp_register_admin_content();
   wbp_kleinanzeigen_register_scripts();
-
 }
 add_action('admin_menu', 'wbp_add_kleinanzeigen_admin_menu_page');
 
 function wbp_display_kleinanzeigen_list()
 {
 
-  echo '<div id="wbp-kleinanzeigen-wrap">';
+  echo '<div id="kleinanzeigen-table-list-wrap">';
 
   do_action('wbp_kleinanzeigen_admin_header', array('title' => __('Overview', 'astra-child')));
 
@@ -820,13 +820,13 @@ function wbp_display_kleinanzeigen_list()
   do_action('wbp_kleinanzeigen_admin_before_closing_wrap');
 
   // closes main plugin wrapper div
-  echo '</div><!-- END #wbp-kleinanzeigen-wrap -->';
+  echo '</div><!-- END #kleinanzeigen-table-list-wrap -->';
 }
 
 function wbp_display_kleinanzeigen_settings()
 {
 
-  echo '<div id="wbp-kleinanzeigen-settings-wrap">';
+  echo '<div id="kleinanzeigen-settings-wrap">';
 
   do_action('wbp_kleinanzeigen_admin_header', array('title' => __('Settings', 'astra-child')));
 
@@ -838,13 +838,13 @@ function wbp_display_kleinanzeigen_settings()
   do_action('wbp_kleinanzeigen_admin_before_closing_wrap');
 
   // closes main plugin wrapper div
-  echo '</div><!-- END #wbp-kleinanzeigen-wrap -->';
+  echo '</div><!-- END #kleinanzeigen-settings-wrap -->';
 }
 
 function wbp_register_admin_content()
 {
   add_action('wbp_kleinanzeigen_admin_header', 'output_header', 20);
-  
+
   add_action('wbp_kleinanzeigen_admin_before_closing_wrap', 'output_before_closing_wrap', 20);
   add_action('wbp_kleinanzeigen_admin_after_page_kleinanzeigen', 'output_after_page', 20);
   add_action('wbp_kleinanzeigen_admin_after_page_kleinanzeigen-settings', 'output_after_page', 20);
@@ -985,11 +985,11 @@ function wbp_get_product_by_sku_($sku)
 
 function wbp_get_product_by_sku($sku)
 {
-  if($sku) {
+  if ($sku) {
     $p = wc_get_products(array(
       'sku' => $sku
     ));
-  
+
     if (!empty($p)) {
       return $p[0];
     }
