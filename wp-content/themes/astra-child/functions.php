@@ -356,9 +356,9 @@ function wbp_add_admin_ajax_scripts()
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION);
 
   // kleinanzeigen doesn't accept a wc_remote_get from referrers w/o valid certificates
-  $valid_cert = !!check_cert();
+  $is_valid_cert = !!check_cert();
   $admin_ajax_local = admin_url('admin-ajax.php');
-  if ($valid_cert) {
+  if ($is_valid_cert) {
     $admin_ajax_remote = $admin_ajax_local;
   } else {
     // fallback to https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php

@@ -88,14 +88,16 @@ function wbp_find_kleinanzeige(int $id): stdClass | null
   $paged = 1;
   while ($paged <= KLEINANZEIGEN_TOTAL_PAGES) {
     $data = wbp_get_json_data(array('paged' => $paged));
-    $ads = $data->ads;
-    foreach ($ads as $val) {
-      if ($val->id == (int) $id) {
-        $ad = $val;
-        $paged = KLEINANZEIGEN_TOTAL_PAGES;
-        break;
-      }
-    };
+    if(!is_wp_error($data)) {
+      $ads = $data->ads;
+      foreach ($ads as $val) {
+        if ($val->id == (int) $id) {
+          $ad = $val;
+          $paged = KLEINANZEIGEN_TOTAL_PAGES;
+          break;
+        }
+      };
+    }
     $paged++;
   }
   return $ad ?? null;

@@ -43,6 +43,10 @@ function remote_call($url, $tries = 3, $retry = 1)
     'timeout' => 10
   ));
 
+  if(is_callable('write_log')) {
+    write_log($response);
+  }
+
   if (!is_wp_error($response) && ($response['response']['code'] === 200)) {
     return $response;
   } elseif ($retry++ < $tries) {
@@ -71,8 +75,7 @@ function wbp_get_remote()
   $record = html_entity_decode(json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
   update_post_meta($post_ID, 'kleinanzeigen_record', $record);
 
-
-  echo json_encode(
+  die(json_encode(
     [
       'post_ID' => $post_ID,
       'kleinanzeigen_id' => $kleinanzeigen_id,
@@ -80,8 +83,7 @@ function wbp_get_remote()
       'record' => $record,
       'screen' => $screen
     ]
-  );
-  wp_die();
+  ));
 }
 
 function wbp_ajax_fix_price()
