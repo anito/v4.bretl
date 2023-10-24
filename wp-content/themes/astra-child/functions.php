@@ -173,7 +173,7 @@ function wbp_handle_product_label($name, $product)
 
 function wbp_label_filter($terms, $post_ID, $taxonomy)
 {
-  if ('product_label' === $taxonomy) {
+  if (!is_wp_error($terms) && 'product_label' === $taxonomy) {
     $terms = wbp_filter_exclusive_label_terms($terms);
   }
   return $terms;
