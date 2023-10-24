@@ -67,7 +67,7 @@ section#color-definitions {
   padding: 20px;
 }
 #kleinanzeigen-head-wrap .left-sections section:first-child {
-  width: 460px;
+  width: 490px;
 }
 #kleinanzeigen-head-wrap .left-sections section:not(:first-child) {
   padding-left: 0px;
@@ -490,7 +490,7 @@ table tbody tr.no-items {
 
 .wp-list-scan-kleinanzeigen-ads tbody {
   overflow: auto;
-  height: 266px;
+  height: 320px;
   display: block;
 }
 

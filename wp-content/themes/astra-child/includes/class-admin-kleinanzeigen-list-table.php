@@ -55,9 +55,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
    * @Build Head
    */
 
-  function render_head($page = 1)
+  function render_head()
   {
-    $data = $this->data;
+    $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
+    $data = wbp_get_json_data();
 
     if (isset($data)) {
       $categories = $data->categoriesSearchData;
@@ -113,7 +114,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
       }
     }
-    wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'page' => $page, 'pages' => KLEINANZEIGEN_TOTAL_PAGES, 'categories' => $categories, 'total' => $total, 'published' => $published, 'products' => $products, 'todos' => $products['todos']));
+    wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'paged' => $paged, 'pages' => KLEINANZEIGEN_TOTAL_PAGES, 'categories' => $categories, 'total' => $total, 'published' => $published, 'products' => $products, 'todos' => $products['todos']));
   }
 
   /**
@@ -125,15 +126,15 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     check_ajax_referer('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
 
-    $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
-    $data = wbp_get_json_data(array('pageNum' => $pageNum));
+    $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
+    $data = wbp_get_json_data(array('paged' => $paged));
     $this->setData($data);
 
     extract($this->_args);
     extract($this->_pagination_args, EXTR_SKIP);
 
     ob_start();
-    $this->render_head($pageNum);
+    $this->render_head();
     $head = ob_get_clean();
 
     ob_start();
@@ -219,6 +220,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   {
     $this->data = $data;
     $this->items = $data->ads;
+    // $this->items = $data;
 
     $this->prepare_items();
   }
@@ -264,7 +266,13 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     $total_items = count($data);
 
-    $data = array_slice($data, (($current_page - 1) * $per_page), $per_page);
+    /**
+     * We must check this in case we deal with faked page numbers (query ?paged)
+     * 
+     */
+    if($current_page <= ceil($total_items / $per_page)) {
+      $data = array_slice($data, (($current_page - 1) * $per_page), $per_page);
+    }
 
     $this->items = $data;
 

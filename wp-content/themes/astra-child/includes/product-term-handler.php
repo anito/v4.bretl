@@ -85,18 +85,18 @@ function wbp_process_featured($product)
 
 function wbp_find_kleinanzeige(int $id): stdClass | null
 {
-  $pageNum = 1;
-  while ($pageNum <= KLEINANZEIGEN_TOTAL_PAGES) {
-    $data = wbp_get_json_data(array('pageNum' => $pageNum));
+  $paged = 1;
+  while ($paged <= KLEINANZEIGEN_TOTAL_PAGES) {
+    $data = wbp_get_json_data(array('paged' => $paged));
     $ads = $data->ads;
     foreach ($ads as $val) {
       if ($val->id == (int) $id) {
         $ad = $val;
-        $pageNum = KLEINANZEIGEN_TOTAL_PAGES;
+        $paged = KLEINANZEIGEN_TOTAL_PAGES;
         break;
       }
     };
-    $pageNum++;
+    $paged++;
   }
   return $ad ?? null;
 }

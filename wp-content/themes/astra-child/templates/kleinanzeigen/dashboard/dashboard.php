@@ -8,7 +8,7 @@
     <input type="hidden" name="order" value="<?php echo isset($_REQUEST['order']) ? $_REQUEST['order'] : ''; ?>" />
     <input type="hidden" name="orderby" value="<?php echo isset($_REQUEST['orderby']) ? $_REQUEST['orderby'] : ''; ?>" />
 
-    <div id="kleinanzeigen-table">
+    <div id="kleinanzeigen-list-display">
       <?php
       wp_nonce_field('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
       ?>
@@ -20,8 +20,14 @@
       <div class="ka-list-modal-body">
         <div id="ka-list-modal-content" class="ka-list-modal-inner">
           <div class="header"></div>
-          <div class="body"></div>
+          <form action="" name="kleinanzeigen-scan-list" id="kleinanzeigen-scan-list" method="get">
+            <?php
+            wp_nonce_field('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce');
+            ?>
+            <div class="body" id="kleinanzeigen-scan-list-display"></div>
+          </form>
           <div class="footer"></div>
+          <div class="script"></div>
         </div>
         <div class="button-controls right">
           <a href="#" type="button" class="button button-primary close"><?php echo __('Close', 'astra-child') ?></a>
@@ -60,9 +66,19 @@
 
   .ka-list-modal {
     position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
     top: 0;
     left: -20px;
-    display: none;
+    transition: opacity .3s ease-in;
+  }
+
+  body.show-modal .ka-list-modal {
+    pointer-events: all;
+    transition: opacity .3s ease-in;
+    z-index: 99;
+    opacity: 1;
   }
 
   .ka-list-modal-background {
@@ -85,10 +101,6 @@
     position: relative;
   }
 
-  body.show-modal .ka-list-modal {
-    display: block;
-  }
-
   .ka-list-header {
     display: flex;
     flex-direction: column;
@@ -100,8 +112,12 @@
     justify-content: center;
   }
 
-  .ka-list-header h5 {
+  .ka-list-header h2 {
     font-size: 1.5em;
+  }
+
+  .ka-list-header h5 {
+    font-size: 1em;
   }
 
   .ka-list-modal .button-controls {

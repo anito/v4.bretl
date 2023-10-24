@@ -5,7 +5,7 @@
 
         <div class="">
 
-          <h2><?php echo sprintf(__('Page: %s', 'astra-child'), $page) ?></h2>
+          <h2><?php echo sprintf(__('Page: %s', 'astra-child'), $paged) ?></h2>
           <h2><small><?php echo sprintf(__('Ads: %s', 'astra-child'), count($data->ads)); ?><span class="<?php echo $total != count($published) ? 'warning' : '' ?>" style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Total: %d / %s)', 'astra-child'), $total, count($published)); ?></span></small></h2>
           <h4><small>
               <?php foreach ($categories as $category) { ?>
@@ -19,7 +19,7 @@
         <div class="pagination">
           <?php for ($i = 1; $i <= $pages; $i++) {
           ?>
-            <a href="<?php echo KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $i ?>" type="button" class="button <?php echo ($i == (int) $page ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
+            <a href="<?php echo KLEINANZEIGEN_CUSTOMER_URL . '?paged=' . $i ?>" type="button" class="button <?php echo ($i == (int) $paged ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
           <?php } ?>
         </div>
 
@@ -29,9 +29,9 @@
             <div class="scan-pages">
               <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
               <div class="">
-                <span><b>Bei Verkauf bzw. Deaktivierung</b></span>
+                <span><b>Bei Reservierung / Verkauf / Deaktivierung</b></span>
                 <div>
-                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-ad" title="<?php echo $title ?>">Produkte anzeigen</a>
+                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-ad" title="<?php echo $title ?>">Produkte des Shops anzeigen</a>
                   <span> deren Anzeige nicht mehr erreichbar ist</span>
                 </div>
               </div>
@@ -44,7 +44,7 @@
               <div class="">
                 <span><b>Bei Preisanpassung</b></span>
                 <div>
-                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-price" title="<?php echo $title ?>">Produkte anzeigen</a>
+                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-price" title="<?php echo $title ?>">Produkte des Shops anzeigen</a>
                   <span> deren Preis vom Anzeigenpreis abweicht</span>
                 </div>
               </div>

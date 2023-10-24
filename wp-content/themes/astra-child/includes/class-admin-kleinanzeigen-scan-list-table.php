@@ -67,9 +67,15 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
   {
 
     check_ajax_referer('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce');
+    $scan_type = isset($_GET['scan_type']) ? $_GET['scan_type'] : '';
 
-    $pageNum = !empty($_REQUEST['pageNum']) ? $_REQUEST['pageNum'] : 1;
-    $data = wbp_get_json_data(array('pageNum' => $pageNum));
+    $ads = wbp_get_all_ads();
+    $args = array(
+      'status' => 'publish',
+      'limit' => -1
+    );
+    $products = wc_get_products($args);
+    $data = wbp_get_scan_data($products, $ads, $scan_type);
     $this->setData($data);
 
     extract($this->_args);
@@ -98,7 +104,6 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
     $response['pagination']['top'] = $pagination_top;
     $response['pagination']['bottom'] = $pagination_bottom;
     $response['column_headers'] = $headers;
-    $response['head'] = $head;
 
     if (isset($total_items))
       $response['total_items_i18n'] = sprintf(_n('1 item', '%s items', $total_items), number_format_i18n($total_items));

@@ -1,5 +1,5 @@
 <div class="actions" data-id="<?php echo $post_ID ?>">
-  <a href="#" type="button" class="button button-primary button-small action-button fix-price <?php echo $disabled ? 'disabled' : '' ?>" data-scan-type="<?php echo $scan_type ?>" data-action="fix-price" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-price="<?php echo $price ?>" data-ka-price="<?php echo $ka_price ?>" data-screen="modal"><?php echo $label ?></a>
+  <a href="#" type="button" class="button button-primary button-small action-button fix-price <?php echo $disabled ? 'disabled' : '' ?>" data-scan-type="<?php echo $scan_type ?>" data-action="fix-price" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-price="<?php echo $price ?>" data-screen="modal"><?php echo $label ?></a>
 </div>
 
 <script>

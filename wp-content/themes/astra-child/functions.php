@@ -213,7 +213,7 @@ function wbp_filter_exclusive_label_terms($terms)
 
 function wbp_publish_guard($data)
 {
-  require_once __DIR__ . '/includes/kleinanzeigen-ajax-handler.php';
+  require_once __DIR__ . '/includes/kleinanzeigen-ajax-action-handler.php';
   if (!is_valid_title($data['post_title']) && $data['post_status'] == 'publish') {
     $data['post_status'] = 'draft';
     // prevent adding duplicate DUPLIKAT info to title
@@ -490,7 +490,11 @@ function wbp_on_current_screen($screen)
 {
   switch ($screen->id) {
     case 'edit-product':
+      require_once __DIR__ . '/includes/kleinanzeigen-ajax-action-handler.php';
       new Extended_WC_Admin_List_Table_Products();
+      break;
+    case 'toplevel_page_kleinanzeigen':
+      // setcookie('ka-paged', 1);
       break;
   }
 }
@@ -504,8 +508,9 @@ function wbp_admin_init()
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 10);
   add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');
 
-  require_once __DIR__ . '/includes/kleinanzeigen-ajax-handler.php';
-  require_once __DIR__ . '/includes/ajax-table.php';
+  require_once __DIR__ . '/includes/kleinanzeigen-ajax-table.php';
+  require_once __DIR__ . '/includes/kleinanzeigen-ajax-table-modal.php';
+  require_once __DIR__ . '/includes/kleinanzeigen-ajax-action-handler.php';
   require_once __DIR__ . '/includes/product-term-handler.php';
 
   add_action('wp_ajax__ajax_connect', '_ajax_connect');
@@ -781,6 +786,51 @@ function custom_elementor_placeholder_image()
 }
 add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');
 
+/**
+ * Kleinanzeigen.de
+ */
+function wbp_get_scan_data($products, $ads, $scan_type) {
+  $ad_ids = wp_list_pluck($ads, 'id');
+  $items = [];
+  foreach ($products as $product) {
+    $post_ID = $product->get_id();
+    $sku = (int) $product->get_sku();
+    $image = wp_get_attachment_image_url($product->get_image_id());
+    $shop_price = wp_kses_post($product->get_price_html());
+    $shop_price_raw = $product->get_price();
+    $ka_price = '-';
+    $title = $product->get_title();
+    $permalink = get_permalink($post_ID);
+
+    if (!empty($sku)) {
+      switch ($scan_type) {
+        case 'invalid-ad':
+          $record = null;
+          if (!in_array($sku, $ad_ids)) {
+            $items[] = compact('product', 'scan_type', 'record');
+          }
+          break;
+        case 'invalid-price':
+          if (in_array($sku, $ad_ids)) {
+            $records = array_filter($ads, function ($ad) use ($sku) {
+              return $ad->id === $sku;
+            });
+            if (!empty($records)) {
+              $key = array_key_first($records);
+              $record = $records[$key];
+              if (wbp_has_price_diff($record, $product)) {
+                $ka_price = $record->price;
+                $items[] = compact('product', 'scan_type', 'record');
+              }
+            }
+          }
+          break;
+      }
+    }
+  }
+  return $items;
+}
+
 function wbp_add_kleinanzeigen_admin_menu_page()
 {
   load_textdomain('astra-child', get_stylesheet_directory() . '/languages/de_DE.mo');
@@ -796,9 +846,9 @@ function wbp_add_kleinanzeigen_admin_menu_page()
   if (!empty($_GET['page']) && 'kleinanzeigen' == $_GET['page']) {
 
     if (!defined('KLEINANZEIGEN_TEMPLATE_PATH')) {
-      define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/kleinanzeigen/');
+      // define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/kleinanzeigen/');
     }
-    require_once __DIR__ . '/includes/ajax-table.php';
+    // require_once __DIR__ . '/includes/kleinanzeigen-ajax-table.php';
   }
   wbp_register_admin_content();
   wbp_kleinanzeigen_register_scripts();
@@ -958,12 +1008,11 @@ function wbp_get_json_data($args = array())
 {
   $defaults = array(
     'pageSize' => 25,
-    'pageNum' => 1
+    'paged' => 1
   );
   $options = wp_parse_args($args, $defaults);
 
-  setcookie('kleinanzeigen-table-page', $options['pageNum']);
-  $remoteUrl = KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $options['pageNum'] . '&pageSize=' . $options['pageSize'];
+  $remoteUrl = KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $options['paged'] . '&pageSize=' . $options['pageSize'];
   $response = wp_remote_get($remoteUrl);
   // $response = file_get_contents(__DIR__ . '/sample' . $page . '.json');
   if (!is_wp_error($response)) {
@@ -971,6 +1020,24 @@ function wbp_get_json_data($args = array())
   } else {
     return $response;
   }
+}
+
+function wbp_get_all_ads()
+{
+  $ads = [];
+  for ($paged = 1; $paged <= KLEINANZEIGEN_TOTAL_PAGES; $paged++) {
+    $page_data  = wbp_get_json_data(array('paged' => $paged));
+
+    if (is_wp_error($page_data)) {
+      die(json_encode(array(
+
+        "head" => wbp_include_kleinanzeigen_template('error-message.php', true, array('message' => $page_data->get_error_message()))
+
+      )));
+    }
+    $ads = array_merge($ads, $page_data->ads);
+  }
+  return $ads;
 }
 
 function wbp_get_product_by_sku_($sku)
