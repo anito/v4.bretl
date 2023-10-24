@@ -4,7 +4,7 @@
 function wbp_maybe_remove_default_cat($post_ID)
 {
   $default_cat_id = get_option('default_product_cat');
-  $cat_terms = get_the_terms($post_ID, 'product_cat');
+  $cat_terms = wbp_get_product_cats($post_ID);
   $ids = wp_list_pluck($cat_terms, 'term_id');
 
   $count = count($ids);
@@ -55,8 +55,8 @@ function wbp_process_sale($post_ID, $post)
 function wbp_process_featured($product)
 {
   $product_id = $product->get_id();
-  $cats = __get_the_terms($product_id, 'product_cat');
-  $tags = __get_the_terms($product_id, 'product_tag');
+  $cats = wbp_get_product_cats($product_id);
+  $tags = wbp_get_product_tags($product_id);
 
   if (isset($_GET['action']) && $_GET['action'] !== 'woocommerce_feature_product') {
     $is_terms_featured = in_array(WC_COMMON_TAXONOMIES['featured'], array_unique(wp_list_pluck(array_merge($cats, $tags), 'name')));
@@ -185,7 +185,8 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
   } else {
     $product_id = $product;
   }
-  $term_ids = wp_list_pluck(get_the_terms($product_id, 'product_' . $type), 'term_id');
+  $terms = get_the_terms($product_id, 'product_' . $type);
+  $term_ids = wp_list_pluck($terms, 'term_id');
   $term_ids = array_unique(array_map('intval', $term_ids));
   $term_ids = wbp_toggle_array_item($term_ids, $term_id, $bool);
 
@@ -231,11 +232,6 @@ function wbp_set_pa_term($product, $term_name, $bool, $attr = 'specials')
   update_post_meta($product_id, '_product_attributes', $attributes);
 }
 
-function wbp_get_product_term($name, $type)
-{
-  $term_id = get_term_by('name', 'product_' . $type);
-}
-
 function wbp_toggle_array_item($ids, $id, $bool = null)
 {
   if (!isset($bool)) {
@@ -247,16 +243,6 @@ function wbp_toggle_array_item($ids, $id, $bool = null)
     $ids[] = $id;
   }
   return $ids;
-}
-
-function __get_the_terms($post_ID, $taxonomy)
-{
-  $terms = get_the_terms($post_ID, $taxonomy);
-  if ($terms) {
-    return $terms;
-  } else {
-    return array();
-  }
 }
 
 function enable_sku($post_ID, $ad)

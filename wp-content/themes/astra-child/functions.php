@@ -171,6 +171,22 @@ function wbp_handle_product_label($name, $product)
   return $product;
 }
 
+function wbp_get_the_terms($terms, $post_ID, $taxonomy)
+{
+  if (is_wp_error($terms)) {
+    return array();
+  }
+  return $terms;
+}
+add_filter('get_the_terms', 'wbp_get_the_terms', 10, 3);
+
+// function wbp_label_filter($terms, $post_ID, $taxonomy)
+// {
+//   $terms = wbp_get_product_labels($post_ID);
+//   return wbp_filter_exclusive_label_terms($terms);
+// }
+// add_filter('get_the_terms', 'wbp_label_filter', 20, 3);
+
 function wbp_label_filter($terms, $post_ID, $taxonomy)
 {
   if (!is_wp_error($terms) && 'product_label' === $taxonomy) {
@@ -178,7 +194,7 @@ function wbp_label_filter($terms, $post_ID, $taxonomy)
   }
   return $terms;
 }
-add_filter('get_the_terms', 'wbp_label_filter', 10, 3);
+add_filter('get_the_terms', 'wbp_label_filter', 20, 3);
 
 function wbp_filter_exclusive_label_terms($terms)
 {
@@ -457,12 +473,19 @@ function wbp_get_product_terms($post, $type)
 }
 function wbp_get_product_brands($post)
 {
-  return get_the_terms($post, 'product_brands');
+  return wbp_get_product_terms($post, 'brands');
 }
-
 function wbp_get_product_cats($post)
 {
-  return get_the_terms($post, 'product_cat');
+  return wbp_get_product_terms($post, 'cat');
+}
+function wbp_get_product_tags($post)
+{
+  return wbp_get_product_terms($post, 'tag');
+}
+function wbp_get_product_labels($post)
+{
+  return wbp_get_product_terms($post, 'label');
 }
 
 function wbp_product_set_attributes($post_ID, $attributes)
@@ -789,7 +812,8 @@ add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeh
 /**
  * Kleinanzeigen.de
  */
-function wbp_get_scan_data($products, $ads, $scan_type) {
+function wbp_get_scan_data($products, $ads, $scan_type)
+{
   $ad_ids = wp_list_pluck($ads, 'id');
   $items = [];
   foreach ($products as $product) {

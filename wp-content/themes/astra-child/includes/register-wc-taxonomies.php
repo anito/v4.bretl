@@ -22,21 +22,17 @@ function wbp_create_attribute_taxonomies()
     return;
   }
 
-  $attributes_taxonomies = [];
+  $taxonomies = wc_get_attribute_taxonomies();
   if (defined('WC_CUSTOM_PRODUCT_ATTRIBUTES')) {
-    foreach (WC_CUSTOM_PRODUCT_ATTRIBUTES as $attribute) {
-      $attributes_taxonomies[] = $attribute;
-    }
-  }
-
-  foreach ($attributes_taxonomies as $tax) {
-    $attributes = wc_get_attribute_taxonomies();
-    $attribute = wp_list_pluck($attributes, 'attribute_name');
-    if (empty($attribute[$tax])) {
-      wc_create_attribute([
-        'name' => $tax,
-        'has_archives' => 1
-      ]);
+    foreach (WC_CUSTOM_PRODUCT_ATTRIBUTES as $name) {
+      $labels = wp_list_pluck($taxonomies, 'attribute_label');
+      $labels = array_flip($labels);
+      if (empty($labels[$name])) {
+        wc_create_attribute([
+          'name' => $name,
+          'has_archives' => 1
+        ]);
+      }
     }
   }
 }

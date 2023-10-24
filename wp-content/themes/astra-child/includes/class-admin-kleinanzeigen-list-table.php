@@ -99,7 +99,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             $products['other'][] = $product;
         }
         $default_cat_id = get_option('default_product_cat');
-        $cat_terms = get_the_terms($product->get_id(), 'product_cat');
+        $cat_terms = wbp_get_product_cats($product->get_id());
         $ids = wp_list_pluck($cat_terms, 'term_id');
         if (in_array($default_cat_id, $ids)) {
           $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
@@ -302,20 +302,21 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $product = $product_by_sku ?? $product_by_title ?? null;
 
     $diff_classes = array();
-    $brands = array();
-    $cat_terms = array();
     $product_labels = array();
 
     if ($product) {
 
+      $post_ID = $product->get_id();
       if (wbp_has_price_diff($record, $product)) {
         $diff_classes[] = 'diff price-diff';
       }
 
-      $product_label_terms = get_the_terms($product->get_id(), 'product_label');
-      $product_labels = array_map(function ($item) {
-        return $item->name;
-      }, !is_wp_error($product_label_terms) ? ($product_label_terms ? $product_label_terms : []) : []);
+      $label_terms = wbp_get_product_labels($post_ID);
+      if($label_terms) {
+        $product_labels = wp_list_pluck($label_terms, 'name');
+      }
+      $brand_terms = wbp_get_product_brands($post_ID);
+      $cat_terms = wbp_get_product_cats($post_ID);
 
       $price = wp_kses_post($product->get_price_html());
     } else {
@@ -341,8 +342,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $permalink = get_permalink($post_ID);
           $classes = "";
           $post_status = $product->get_status();
-          $brands = wbp_get_product_brands($post_ID);
-          $cat_terms = wbp_get_product_cats($post_ID);
           switch ($post_status) {
             case 'draft':
               $status_name = __("Draft");
@@ -478,7 +477,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
               <td class="<?php echo $class ?>">
                 <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
                                               return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
-                                            }, $brands !== false ? $brands : [])); ?></div>
+                                            }, $brand_terms !== false ? $brand_terms : [])); ?></div>
               </td>
             <?php
               break;

@@ -44,7 +44,7 @@ function remote_call($url, $tries = 3, $retry = 1)
   ));
 
   if(is_callable('write_log')) {
-    write_log($response);
+    // write_log($response);
   }
 
   if (!is_wp_error($response) && ($response['response']['code'] === 200)) {
