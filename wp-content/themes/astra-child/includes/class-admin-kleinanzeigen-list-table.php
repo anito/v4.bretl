@@ -303,6 +303,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     $diff_classes = array();
     $product_labels = array();
+    $cat_terms = array();
+    $brand_terms = array();
 
     if ($product) {
 
