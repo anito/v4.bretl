@@ -562,7 +562,7 @@ jQuery(document).ready(function ($) {
             detail: data,
           })
         );
-
+        
         if ("create" === el.dataset.action) {
           rowEl = document.querySelector(`tr#ad-id-${kleinanzeigen_id}`);
 
@@ -753,11 +753,7 @@ jQuery(document).ready(function ($) {
       },
       success: (data) => {
         $(el).html("Fertig");
-        if (!$(el).data("bulk-action")) {
-          alert(msg);
-        } else {
-          $(el).data("image-count", images.length);
-        }
+        alert(msg);
         setTimeout(() => parseResponse(data, el, callback), 2000);
       },
       error: (error) => {

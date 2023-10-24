@@ -270,7 +270,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
      * We must check this in case we deal with faked page numbers (query ?paged)
      * 
      */
-    if($current_page <= ceil($total_items / $per_page)) {
+    if ($current_page <= ceil($total_items / $per_page)) {
       $data = array_slice($data, (($current_page - 1) * $per_page), $per_page);
     }
 
@@ -587,21 +587,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           trEl.on('data:parsed', (e) => {
 
             if ('create' === e.detail?.action) {
-              $(impImagesEl).on('data:parsed', function(e) {
-
-                const href = $('a[data-action=edit-post]', trEl).attr('href');
-                const {
-                  data: {
-                    imageCount
-                  }
-                } = e.detail;
-                if (confirm(`Das Produkt "${record.title}" inklusive ${imageCount} Produktfotos wurde angelegt.\n\nJetzt zum Produkt gehen um Eigenschaften wie Produkt-Kategorie, Hersteller etc. hinzuzufügen?`)) {
-                  const tab = window.open(href, 'edit-tab');
-                  tab.focus();
-                }
-
-              });
-              impImagesEl.data('bulk-action', 'create');
               impImagesEl.click();
             }
 

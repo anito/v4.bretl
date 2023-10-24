@@ -115,7 +115,7 @@ function wbp_ajax_fix_price()
       $ads = $data->ads;
       $ids = array_column($ads, 'id');
       $record_key = array_search($kleinanzeigen_id, $ids);
-      if ($record_key) {
+      if (isset($record_key)) {
         $record = $ads[$record_key];
         $wp_list_table->render_row($record);
       }
@@ -180,7 +180,7 @@ function wbp_ajax_toggle_publish_post()
       $ads = $data->ads;
       $ids = array_column($ads, 'id');
       $record_key = array_search($kleinanzeigen_id, $ids);
-      if ($record_key) {
+      if (isset($record_key)) {
         $record = $ads[$record_key];
         $wp_list_table->render_row($record);
       }
@@ -229,7 +229,7 @@ function wbp_ajax_connect()
   $ads = $data->ads;
   $ids = array_column($ads, 'id');
   $record_key = array_search($kleinanzeigen_id, $ids);
-  if ($record_key) {
+  if (isset($record_key)) {
     $record = $ads[$record_key];
     $wp_list_table->render_row($record);
   }
@@ -269,7 +269,7 @@ function wbp_ajax_disconnect()
       $ads = $data->ads;
       $ids = array_column($ads, 'id');
       $record_key = array_search($kleinanzeigen_id, $ids);
-      if ($record_key) {
+      if (isset($record_key)) {
         $record = $ads[$record_key];
         $wp_list_table->render_row($record);
       }
@@ -448,7 +448,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       $ads = $data->ads;
       $ids = array_column($ads, 'id');
       $record_key = array_search($kleinanzeigen_id, $ids);
-      if ($record_key) {
+      if (isset($record_key)) {
         $record = $ads[$record_key];
         $wp_list_table->render_row($record);
       }
@@ -521,7 +521,7 @@ function wbp_ajax_import_kleinanzeigen_images()
       $ads = $data->ads;
       $ids = array_column($ads, 'id');
       $record_key = array_search($kleinanzeigen_id, $ids);
-      if ($record_key) {
+      if (isset($record_key)) {
         $record = $ads[$record_key];
         $wp_list_table->render_row($record);
       }
@@ -579,7 +579,7 @@ function wbp_ajax_delete_post()
   $ads = $data->ads;
   $ids = array_column($ads, 'id');
   $record_key = array_search($kleinanzeigen_id, $ids);
-  if ($record_key) {
+  if (isset($record_key)) {
     $record = $ads[$record_key];
     $wp_list_table->render_row($record);
   }
