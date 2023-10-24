@@ -81,7 +81,6 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $sku = $product->get_sku($post_ID);
       $sku = is_numeric($sku) ? $sku : false;
       $brands = wbp_get_product_terms($post_ID, 'brands');
-      // $brands = wp_list_pluck(wbp_get_product_terms($post_ID, 'brands'), 'name');
       $product_labels = wp_list_pluck(wbp_get_product_terms($post_ID, 'label'), 'name');
     } else return 0;
 

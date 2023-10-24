@@ -241,63 +241,63 @@ section .summary .count:nth-child(2) {
 .wp-list-table .column-shop-price .woocommerce-price-suffix {
   display: none;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .manage-column[class*="status"],
+.wp-list-kleinanzeigen-ads .manage-column[class*="status"],
 .column[class*="column-status"] {
   width: 5px;
   min-width: 5px;
   padding: 0;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-image {
+.wp-list-kleinanzeigen-ads .column-image {
   width: 120px;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-id {
+.wp-list-kleinanzeigen-ads .column-id {
   width: 10%;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-title {
+.wp-list-kleinanzeigen-ads .column-title {
   width: auto;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-actions {
+.wp-list-kleinanzeigen-ads .column-shop-actions {
   width: 140px;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-actions-import {
+.wp-list-kleinanzeigen-ads .column-shop-actions-import {
   width: 130px;
   padding-left: 30px;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-empty {
+.wp-list-kleinanzeigen-ads .column-empty {
   width: auto;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-date {
+.wp-list-kleinanzeigen-ads .column-date {
   width: auto;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-price,
-.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-price {
+.wp-list-kleinanzeigen-ads .column-price,
+.wp-list-kleinanzeigen-ads .column-shop-price {
   width: 90px;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-description {
+.wp-list-kleinanzeigen-ads .column-description {
   width: auto;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-categories {
+.wp-list-kleinanzeigen-ads .column-shop-categories {
   width: auto;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-labels {
+.wp-list-kleinanzeigen-ads .column-shop-labels {
   width: 90px;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-shop-brands {
+.wp-list-kleinanzeigen-ads .column-shop-brands {
   width: auto;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content {
+.wp-list-kleinanzeigen-ads .column-content {
   position: relative;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads [class*="column-shop-"] {
+.wp-list-kleinanzeigen-ads [class*="column-shop-"] {
   background-color: rgb(193 227 250 / 12%);
 }
-.wp-list-table.wp-list-kleinanzeigen-ads [id*="-wbp-action"] {
+.wp-list-kleinanzeigen-ads [id*="-wbp-action"] {
   position: relative;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads tr[class*="diff"] {
+.wp-list-kleinanzeigen-ads tr[class*="diff"] {
   background-color: #ff00001e;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads
+.wp-list-kleinanzeigen-ads
   .diff.price-diff
   .column[class*="-price"] {
   text-decoration: underline;
@@ -305,13 +305,13 @@ section .summary .count:nth-child(2) {
   text-decoration-thickness: 0.06em;
   text-decoration-color: red;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content .spinner {
+.wp-list-kleinanzeigen-ads .column-content .spinner {
   position: absolute;
   left: -25px;
   top: 3px;
   margin: 0;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content a.button {
+.wp-list-kleinanzeigen-ads .column-content a.button {
   text-align: center;
   margin-bottom: 5px;
   text-overflow: ellipsis;
@@ -319,7 +319,7 @@ section .summary .count:nth-child(2) {
   white-space: nowrap;
   width: 130px;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content .dashicons {
+.wp-list-kleinanzeigen-ads .column-content .dashicons {
   font-size: 1em;
   display: inline-block;
   line-height: 1em;
@@ -327,20 +327,20 @@ section .summary .count:nth-child(2) {
   vertical-align: baseline;
   pointer-events: none;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content .button .dashicons {
+.wp-list-kleinanzeigen-ads .column-content .button .dashicons {
   font-size: 1.3em;
   line-height: 1.3em;
   vertical-align: sub;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content a[disabled],
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content .button[disabled],
-.wp-list-table.wp-list-kleinanzeigen-ads td.busy a,
-.wp-list-table.wp-list-kleinanzeigen-ads td.busy .button {
+.wp-list-kleinanzeigen-ads .column-content a[disabled],
+.wp-list-kleinanzeigen-ads .column-content .button[disabled],
+.wp-list-kleinanzeigen-ads td.busy a,
+.wp-list-kleinanzeigen-ads td.busy .button {
   pointer-events: none;
   cursor: auto;
 }
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content a,
-.wp-list-table.wp-list-kleinanzeigen-ads .column-content .button {
+.wp-list-kleinanzeigen-ads .column-content a,
+.wp-list-kleinanzeigen-ads .column-content .button {
   cursor: pointer;
 }
 
@@ -425,7 +425,8 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 /**
 * Styles for imported templates
 */
-table tbody tr.no-items {
+.wp-list-kleinanzeigen-ads tbody tr.no-items,
+.wp-list-scan-kleinanzeigen-ads tbody tr.no-items {
   display: flex;
   justify-content: center;
 }
