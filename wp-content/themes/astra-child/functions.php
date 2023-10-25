@@ -115,6 +115,7 @@ function wbp_set_pseudo_sale_price($product, $price, $percent = 10)
 
 function wbp_text_contains($needle, $haystack, $searchtype = 'default')
 {
+  $needle = preg_quote($needle);
   switch ($searchtype) {
     case 'raw':
       preg_match('/' . $needle . '/', $haystack, $matches);
