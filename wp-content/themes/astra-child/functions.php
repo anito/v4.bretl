@@ -52,21 +52,21 @@ function add_scripts()
   $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
 
   // Theme styles
-  wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'));
+  wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'), array(), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
   wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
 
   // Homepage hero
   $js_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.js');
   $css_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.css');
 
-  // wp_enqueue_script('app-hero', $js_uri, false, '0.0.1', 'all');
-  // wp_enqueue_style('app-hero', $css_uri, false, '0.0.1', 'all');
+  // wp_enqueue_script('app-hero', $js_uri, false, CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
+  // wp_enqueue_style('app-hero', $css_uri, false, CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
   // wp_localize_script('app-hero', 'app_hero', array(
   //   'app_url' => get_stylesheet_directory_uri() . '/js/hero/dist/',
   //   'stylesheet_url' => get_stylesheet_directory_uri()
   // ));
 
-  wp_register_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), '1.0', true);
+  wp_register_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
   wp_enqueue_script('main');
 
   if (!IS_DEV_MODE) {
@@ -316,7 +316,7 @@ function wbp_custom_default_orderby($sortby)
 
   // categories sorting table
   $orderby = array(
-    'sale' => 'date',
+    'aktionspreise' => 'date',
   );
 
   $cat = $wp_query->get_queried_object();
@@ -347,7 +347,7 @@ function wbp_detectTrident($current_theme)
     $browser['version'] = $match;
     add_action('wp_footer', 'unsupported_browsers_template', 100);
 
-    wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), '0.1', true);
+    wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
     wp_localize_script('browser_sniffer', '__browser', array('name' => $browser['name'], 'version' => $browser['version'], 'platform' => $browser['platform']));
     wp_enqueue_script('browser_sniffer');
   }
@@ -377,8 +377,9 @@ function wbp_add_admin_ajax_scripts()
   if ($is_valid_cert) {
     $admin_ajax_remote = $admin_ajax_local;
   } else {
-    // fallback to https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php
-    $admin_ajax_remote = 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
+    // fallback admin-ajax.php
+    // $admin_ajax_remote = 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
+    $admin_ajax_remote = $admin_ajax_local;
   }
 
   $screen_id = get_current_screen()->id;
