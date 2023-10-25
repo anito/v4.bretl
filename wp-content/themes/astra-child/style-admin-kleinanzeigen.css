@@ -387,7 +387,8 @@ section .box-wrapper.summary-status .outer {
   transition: all 0.3s;
 }
 section .box-wrapper.summary-status .trigger.active ~ .outer {
-  height: calc(100vh - 400px);
+  height: auto;
+  max-height: calc(100vh - 400px);
   width: 300px;
   overflow: auto;
 }
