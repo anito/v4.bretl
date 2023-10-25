@@ -1,7 +1,6 @@
 jQuery(document).ready(function ($) {
   const {
-    admin_ajax_local,
-    admin_ajax_remote,
+    admin_ajax,
     relocate_url,
     screen,
     edit_link,
@@ -63,7 +62,7 @@ jQuery(document).ready(function ($) {
     let that = this;
     $.ajax({
       method: "POST",
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_update_post",
         post_ID,
@@ -85,7 +84,7 @@ jQuery(document).ready(function ($) {
     let that = this;
     $.ajax({
       type: "POST",
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_get_post",
         post_ID,
@@ -131,7 +130,7 @@ jQuery(document).ready(function ($) {
     addSpinner();
 
     $.post({
-      url: admin_ajax_remote,
+      url: admin_ajax,
       data: {
         action: "_ajax_get_remote",
         formdata,
@@ -164,7 +163,7 @@ jQuery(document).ready(function ($) {
     addSpinner();
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_connect",
         post_ID,
@@ -217,7 +216,7 @@ jQuery(document).ready(function ($) {
     addSpinner();
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_disconnect",
         post_ID,
@@ -286,7 +285,7 @@ jQuery(document).ready(function ($) {
     addSpinner();
 
     $.post({
-      url: admin_ajax_remote,
+      url: admin_ajax,
       data: {
         action: "_ajax_get_remote",
         formdata,
@@ -356,7 +355,7 @@ jQuery(document).ready(function ($) {
     addSpinner();
 
     $.post({
-      url: admin_ajax_remote,
+      url: admin_ajax,
       data: {
         action: "_ajax_get_remote",
         formdata,
@@ -416,7 +415,7 @@ jQuery(document).ready(function ($) {
     };
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_delete_images",
         post_ID,
@@ -442,7 +441,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_toggle_publish_post",
         post_ID,
@@ -481,7 +480,7 @@ jQuery(document).ready(function ($) {
     spinner?.classList.add("is-active");
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_fix_price",
         post_ID,
@@ -511,7 +510,7 @@ jQuery(document).ready(function ($) {
     const post_ID = el.dataset.postId;
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_delete_post",
         post_ID,
@@ -685,7 +684,7 @@ jQuery(document).ready(function ($) {
     };
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_import_kleinanzeigen_data",
         postdata,
@@ -744,7 +743,7 @@ jQuery(document).ready(function ($) {
     }
 
     $.post({
-      url: admin_ajax_local,
+      url: admin_ajax,
       data: {
         action: "_ajax_import_kleinanzeigen_images",
         postdata,

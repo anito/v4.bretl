@@ -371,22 +371,10 @@ function wbp_add_admin_ajax_scripts()
 {
   wp_enqueue_script('ajax-callback', get_stylesheet_directory_uri() . '/js/ajax.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION);
 
-  // kleinanzeigen doesn't accept a wc_remote_get from referrers w/o valid certificates
-  $is_valid_cert = !!check_cert();
-  $admin_ajax_local = admin_url('admin-ajax.php');
-  if ($is_valid_cert) {
-    $admin_ajax_remote = $admin_ajax_local;
-  } else {
-    // fallback admin-ajax.php
-    // $admin_ajax_remote = 'https://dev.bretl.webpremiere.de/wp-admin/admin-ajax.php';
-    $admin_ajax_remote = $admin_ajax_local;
-  }
-
   $screen_id = get_current_screen()->id;
   $request_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
   wp_localize_script('ajax-callback', 'ajax_object', array(
-    'admin_ajax_remote' => $admin_ajax_remote,
-    'admin_ajax_local' => $admin_ajax_local,
+    'admin_ajax' => admin_url('admin-ajax.php'),
     'home_url' => home_url(),
     'screen' => $screen_id,
     'edit_link' => admin_url('post.php?action=edit&post='),
