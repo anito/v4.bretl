@@ -244,7 +244,6 @@ section .summary .count:nth-child(2) {
 .wp-list-kleinanzeigen-ads .manage-column[class*="status"],
 .column[class*="column-status"] {
   width: 5px;
-  min-width: 5px;
   padding: 0;
 }
 .wp-list-kleinanzeigen-ads .column-image {
@@ -431,11 +430,9 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
   justify-content: center;
 }
 
-.wp-list-scan-kleinanzeigen-ads .status {
-  width: 4px;
-  height: 90px;
-  display: block;
-  overflow: auto;
+.wp-list-scan-kleinanzeigen-ads .column-status-start {
+  width: 0.4%;
+  padding: 0;
 }
 
 .wp-list-scan-kleinanzeigen-ads .column-image {
@@ -496,6 +493,7 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 }
 
 .wp-list-scan-kleinanzeigen-ads thead tr,
+.wp-list-scan-kleinanzeigen-ads tbody tr,
 .wp-list-scan-kleinanzeigen-ads tfoot tr {
   display: inline-table;
   width: 100%;

@@ -283,7 +283,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
         switch ($column_name) {
           case "status-start": {
       ?>
-              <td class="status <?php echo $status . ' ' . $class ?>"></td>
+              <td class="status <?php echo $class . ' ' . $status ?>"></td>
             <?php
               break;
             }
