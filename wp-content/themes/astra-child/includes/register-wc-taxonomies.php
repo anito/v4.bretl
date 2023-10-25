@@ -1,4 +1,36 @@
 <?php
+function wbp_copy_brand_terms()
+{
+
+  $terms = get_terms('product_brands', array('hide_empty' => false));
+
+  foreach ($terms as $term) {
+    wp_insert_term($term->name, 'product_brand', array(
+      'alias_of'    => '',
+      'description' => $term->description,
+      'parent'      => 0,
+      'slug'        => $term->slug,
+    ));
+  }
+
+  $products = wc_get_products(array(
+    'status' => array('draft', 'pending', 'private', 'publish'),
+    'limit' => -1
+  ));
+
+  foreach ($products as $product) {
+    $post_ID = $product->get_id();
+    $terms = wbp_get_product_terms($post_ID, 'brands');
+    if($terms) {
+      $term_slugs = wp_list_pluck($terms, 'slug');
+      foreach($terms as $term) {
+        $result = wp_set_object_terms($post_ID, $term_slugs, 'product_brand', true);
+      }
+    }
+  }
+}
+// add_action('admin_init', 'wbp_copy_brand_terms');
+
 function wbp_create_terms()
 {
   if (defined('WC_TERMS')) {

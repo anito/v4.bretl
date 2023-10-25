@@ -383,7 +383,7 @@ function wbp_add_admin_ajax_scripts()
   ));
 }
 
-function check_cert()
+function get_certificate()
 {
   $g = stream_context_create(array("ssl" => array("capture_peer_cert" => true)));
   $r = stream_socket_client(
@@ -462,7 +462,7 @@ function wbp_get_product_terms($post, $type)
 }
 function wbp_get_product_brands($post)
 {
-  return wbp_get_product_terms($post, 'brands');
+  return wbp_get_product_terms($post, 'brand');
 }
 function wbp_get_product_cats($post)
 {
@@ -477,7 +477,7 @@ function wbp_get_product_labels($post)
   return wbp_get_product_terms($post, 'label');
 }
 
-function wbp_product_set_attributes($post_ID, $attributes)
+function wbp_set_product_attributes($post_ID, $attributes)
 {
   $i = 0;
   // Loop through the attributes array

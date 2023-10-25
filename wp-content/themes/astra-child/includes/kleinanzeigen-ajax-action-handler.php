@@ -392,7 +392,7 @@ function wbp_ajax_import_kleinanzeigen_data()
 
       // handle brands
       $brands = get_terms([
-        'taxonomy' => 'product_brands',
+        'taxonomy' => 'product_brand',
         'hide_empty' => false
       ]);
 
@@ -405,7 +405,7 @@ function wbp_ajax_import_kleinanzeigen_data()
           $exists = true;
         }
         if (true === $exists) {
-          wbp_set_product_term($product, $brand->term_id, 'brands', true);
+          wbp_set_product_term($product, $brand->term_id, 'brand', true);
         }
       }
 
@@ -615,7 +615,7 @@ function wbp_ajax_get_product_categories()
 function wbp_ajax_get_brand_images()
 {
   $brands = array();
-  foreach (get_terms(['taxonomy' => 'brands']) as $key => $term) {
+  foreach (get_terms(['taxonomy' => 'product_brand']) as $key => $term) {
     $image_ids = get_metadata('term', $term->term_id, 'image');
     if (!empty($image_ids)) {
       $image_url = wp_get_attachment_image_url($image_ids[0]);

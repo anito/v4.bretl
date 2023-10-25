@@ -62,7 +62,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     $columns['price'] = $price;
     $columns['featured'] = $featured;
     $columns['product_label'] = 'Labels';
-    $columns['product_brands'] = 'Hersteller';
+    $columns['product_brand'] = 'Hersteller';
     $columns['product_cat'] = $cat;
     $columns['date'] = $date;
     $columns['ka_sku'] = 'KA';
@@ -80,7 +80,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_ID);
       $sku = is_numeric($sku) ? $sku : false;
-      $brands = wbp_get_product_terms($post_ID, 'brands');
+      $brands = wbp_get_product_terms($post_ID, 'brand');
       $product_labels = wp_list_pluck(wbp_get_product_terms($post_ID, 'label'), 'name');
     } else return 0;
 
@@ -93,7 +93,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           echo '<a href="' . esc_html(get_post_meta($post_ID, 'kleinanzeigen_url', true)) . '" target="_blank">' . $sku . '</a>';
           break;
         }
-      case 'product_brands': {
+      case 'product_brand': {
           echo implode(', ', array_map(function ($term) use ($column_name) {
             return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
           }, $brands !== false ? $brands : []));
