@@ -94,7 +94,6 @@
 
   .ka-list-modal-body {
     width: 80%;
-    height: 600px;
     background-color: white;
     border-radius: 8px;
     padding: 20px;

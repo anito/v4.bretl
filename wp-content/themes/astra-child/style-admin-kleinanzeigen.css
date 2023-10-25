@@ -508,3 +508,7 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+#kleinanzeigen-scan-list .tablenav.bottom {
+  margin-bottom: 30px;
+}
