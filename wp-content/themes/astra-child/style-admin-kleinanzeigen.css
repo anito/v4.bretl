@@ -501,7 +501,7 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 }
 
 .wp-list-scan-kleinanzeigen-ads tbody td .action-button {
-  width: 110px;
+  width: 130px;
   margin: 5px;
   overflow: hidden;
   text-overflow: ellipsis;

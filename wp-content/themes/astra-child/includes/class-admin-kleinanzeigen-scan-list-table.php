@@ -254,8 +254,8 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
             $disabled['deactivate'] = !$sku && !$published;
             $disabled['disconnect'] = !$sku;
             $label = array(
-              'deactivate' => (!$disabled['deactivate']) ? __('Disconnect & hide', 'astra-child') : __('Deactivated', 'astra-child'),
-              'disconnect' => $product->get_sku() ? __('Disconnect', 'astra-child') : __('Disconnected', 'astra-child')
+              'deactivate' => (!$disabled['deactivate']) ? __('Hide', 'astra-child') : __('Disconnected', 'astra-child'),
+              'disconnect' => $product->get_sku() ? __('Don\'t hide', 'astra-child') : __('Disconnected', 'astra-child')
             );
             $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'scan_type', 'disabled'));
             break;
@@ -263,7 +263,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
             $price = wbp_extract_kleinanzeigen_price($ka_price);
             $shop_price = $product->get_price();
             $disabled = $price === $shop_price;
-            $label = $price !== $shop_price ? __('Fix', 'astra-child') : __('Fixed', 'astra-child');
+            $label = $price !== $shop_price ? __('Accept price', 'astra-child') : __('Price accepted', 'astra-child');
             $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'scan_type', 'disabled'));
             break;
           default:

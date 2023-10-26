@@ -23,30 +23,28 @@
           <?php } ?>
         </div>
 
-        <div class="">
-          <div class="">
-            <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de inzwischen gelöscht oder deaktiviert wurden." ?>
-            <div class="scan-pages">
-              <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
-              <div class="">
-                <span><b>Bei Reservierung / Verkauf / Deaktivierung</b></span>
-                <div>
-                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-ad" title="<?php echo $title ?>">Produkte des Shops anzeigen</a>
-                  <span> deren Anzeige nicht mehr erreichbar ist</span>
-                </div>
+        <div class="scan-pages">
+          <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
+          <div class="scan-page">
+            <div class="general-action">
+              <div class="action-header">
+                <i class="dashicons dashicons-editor-help align-center" title="<?php echo $title ?>"></i>
+                <span><b>Nach Reservierung / Verkauf / Deaktivierung</b></span>
+              </div>
+              <div class="action-buttons">
+                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-ad" title="<?php echo $title ?>">Betroffene Produkte anzeigen</a>
               </div>
             </div>
           </div>
-          <div class="">
-            <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
-            <div class="scan-pages">
-              <i class="dashicons dashicons-editor-help" title="<?php echo $title ?>"></i>
-              <div class="">
-                <span><b>Bei Preisanpassung</b></span>
-                <div>
-                  <a href="#" type="button" class="start-scan info" data-scan-type="invalid-price" title="<?php echo $title ?>">Produkte des Shops anzeigen</a>
-                  <span> deren Preis vom Anzeigenpreis abweicht</span>
-                </div>
+          <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
+          <div class="scan-page">
+            <div class="general-action">
+              <div class="action-header">
+                <i class="dashicons dashicons-editor-help align-center" title="<?php echo $title ?>"></i>
+                <span><b>Nach Preisanpassung</b></span>
+              </div>
+              <div class="action-buttons">
+                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-price" title="<?php echo $title ?>">Betroffene Produkte anzeigen</a>
               </div>
             </div>
           </div>
@@ -182,8 +180,42 @@
 
 <style>
   .scan-pages {
-    display: flex;
-    margin: 15px 0px 5px;
+    padding: 10px;
+    background-color: #f8fbff;
+    border: 1px solid #eee;
+  }
+
+  .scan-pages .scan-page {
+    margin: 10px 0px 30px;
     font-size: 12px;
+  }
+
+  .scan-pages .scan-page:last-child {
+    margin-bottom: 10px;
+  }
+
+  .scan-page .explanation {
+    padding: 5px;
+    background-color: aqua;
+    font-size: .8em;
+    font-weight: 100;
+  }
+
+  .scan-pages .scan-page .general-action .action-header {
+    margin-bottom: 10px;
+  }
+
+  .scan-pages .scan-page .general-action .action-buttons {
+    margin-left: 30px;
+  }
+
+  .scan-pages .scan-page .general-action .action-buttons .button {
+    min-width: 200px;
+    text-align: center;
+  }
+
+  .scan-page .dashicons.align-center {
+    margin-right: 10px;
+    align-self: center;
   }
 </style>

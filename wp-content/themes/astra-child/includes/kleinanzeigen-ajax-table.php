@@ -238,10 +238,9 @@ function fetch_ka_script()
             list.update(data);
           })
 
-          $('.scan-pages a.start-scan').on('click', function(e) {
+          $('.scan-page a.start-scan').on('click', function(e) {
             e.preventDefault();
             const el = e.target;
-            const parent = $(el).parents('.scan-pages');
             const scan_type = $(el).data('scan-type');
             const restored_text = $(el).html();
 
