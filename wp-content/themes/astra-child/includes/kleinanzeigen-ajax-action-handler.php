@@ -352,9 +352,11 @@ function wbp_ajax_import_kleinanzeigen_data()
         'topausstattung' => 'Top',
         'aktion' => array('Aktion', 'fn' => array('aktion', 'default')),
         'aktionsmodell' => 'Aktion',
-        'am lager' => 'Am Lager',
         'klima' => 'Klima',
-        'lagermaschine' => 'Am Lager',
+        'am lager' => 'Sofort lieferbar',
+        'sofort verfügbar' => 'Sofort lieferbar',
+        'sofort lieferbar' => 'Sofort lieferbar',
+        'lagermaschine' => 'Sofort lieferbar',
         'leicht gebraucht' => 'Leicht Gebraucht',
         'limited edition' => 'Limited Edition',
         'lim. edition' => 'Limited Edition',
@@ -364,8 +366,6 @@ function wbp_ajax_import_kleinanzeigen_data()
         'top modell' => 'Top Modell',
         'neumaschine' => 'Neu',
         'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
-        'sofort verfügbar' => 'Am Lager',
-        'sofort lieferbar' => 'Am Lager',
       );
 
       // handle contents
