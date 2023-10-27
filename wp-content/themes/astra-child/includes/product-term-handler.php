@@ -129,10 +129,11 @@ function wbp_process_kleinanzeigen($post_ID, $post)
   $content = $product->get_description();
 
   if (!empty($kleinanzeigen_id)) {
-
     $ad = wbp_find_kleinanzeige($kleinanzeigen_id);
-    $ad_title = $ad->title;
+  }
+  if($ad) {
     $sku_error = false;
+    $ad_title = $ad->title;
 
     if (empty($title)) {
       $title = $ad_title;
@@ -141,6 +142,7 @@ function wbp_process_kleinanzeigen($post_ID, $post)
 
     $sku = $product->get_sku();
     if ($sku !== $kleinanzeigen_id) {
+      // Throws error if sku already exists
       try {
         $product->set_sku($kleinanzeigen_id);
         $product->save();
@@ -158,6 +160,7 @@ function wbp_process_kleinanzeigen($post_ID, $post)
       $content = '<b style="color: red;">' . __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child') . '</b>';
     }
 
+    // Avoid recursion
     remove_action('save_post', 'wbp_save_post', 99);
     wp_insert_post([
       'ID' => $post_ID,
@@ -173,8 +176,6 @@ function wbp_process_kleinanzeigen($post_ID, $post)
     } else {
       enable_sku($post_ID, $ad);
     }
-  } else {
-    disable_sku($post_ID);
   }
 }
 

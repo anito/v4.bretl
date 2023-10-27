@@ -32,7 +32,7 @@
                 <span><b>Nach Reservierung / Verkauf / Deaktivierung</b></span>
               </div>
               <div class="action-buttons">
-                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Find affected products') ?></a>
+                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Find affected products', 'astra-child') ?></a>
               </div>
             </div>
           </div>
@@ -44,7 +44,7 @@
                 <span><b>Nach Preisanpassung</b></span>
               </div>
               <div class="action-buttons">
-                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Find affected products') ?></a>
+                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Find affected products', 'astra-child') ?></a>
               </div>
             </div>
           </div>

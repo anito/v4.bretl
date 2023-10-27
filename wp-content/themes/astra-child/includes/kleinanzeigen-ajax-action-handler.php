@@ -43,7 +43,7 @@ function remote_call($url, $tries = 3, $retry = 1)
     'timeout' => 10
   ));
 
-  if(is_callable('write_log')) {
+  if (is_callable('write_log')) {
     // write_log($response);
   }
 
@@ -72,8 +72,11 @@ function wbp_get_remote()
 
   $response = remote_call($remoteUrl, 5);
   $record = wbp_find_kleinanzeige($kleinanzeigen_id) ?? '';
-  $record = html_entity_decode(json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
-  update_post_meta($post_ID, 'kleinanzeigen_record', $record);
+
+  if ($record) {
+    $record = html_entity_decode(json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
+    update_post_meta($post_ID, 'kleinanzeigen_record', $record);
+  }
 
   die(json_encode(
     [
@@ -308,25 +311,28 @@ function wbp_ajax_import_kleinanzeigen_data()
 
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-  $kleinanzeigendata = isset($_REQUEST['kleinanzeigendata']) ? $_REQUEST['kleinanzeigendata'] : null;
+  $kleinanzeigendata = isset($_REQUEST['kleinanzeigendata']) ? (object) $_REQUEST['kleinanzeigendata'] : null;
 
   if ($kleinanzeigen_id) {
     $kleinanzeigen_id = parse_kleinanzeigen_id($kleinanzeigen_id);
   }
 
-  if (!empty($kleinanzeigendata)) {
-    ($content = isset($kleinanzeigendata['content']) ? $kleinanzeigendata['content'] : null);
-    ($record = isset($kleinanzeigendata['record']) ? $kleinanzeigendata['record'] : null);
-    $record = (object) $record;
-    $contents = '';
+  if ($kleinanzeigendata) {
+    $content = isset($kleinanzeigendata->content) ? $kleinanzeigendata->content : null;
+    $record = isset($kleinanzeigendata->record) ? (object) $kleinanzeigendata->record : null;
+    $searchable_content = '';
 
     if ($record) {
+      // Ad is publicly available
       $title = $record->title;
       $price = wbp_extract_kleinanzeigen_price($record->price);
       $excerpt = $record->description;
       $tags = !empty($record->tags) ? $record->tags : [];
       $url = $record->url;
-      $contents = $title . ' ' . $excerpt;
+      $searchable_content = $title . ' ' . $excerpt;
+    } else {
+      // Ad is reserved or deleted, don't do anything, keep existing content
+      die();
     }
 
     if (!$post_ID) {
@@ -371,7 +377,7 @@ function wbp_ajax_import_kleinanzeigen_data()
       // handle contents
       foreach ($parts as $key => $val) {
 
-        if (wbp_text_contains($key, $contents, isset($val['match_type']) ? $val['match_type'] : null)) {
+        if (wbp_text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
 
           $fns = isset($val['fn']) ? $val['fn'] : 'default';
           $fns = !is_array($fns) ? array($fns) : $fns;
@@ -401,7 +407,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         if (wbp_text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
           $exists = true;
         }
-        if (wbp_text_contains(esc_html($brand->name), esc_html($contents))) {
+        if (wbp_text_contains(esc_html($brand->name), esc_html($searchable_content))) {
           $exists = true;
         }
         if (true === $exists) {
@@ -466,11 +472,9 @@ function wbp_ajax_import_kleinanzeigen_data()
   }
   $head = ob_get_clean();
 
-  echo json_encode([
+  die(json_encode([
     'data' => compact(['row', 'head', 'post_ID', 'kleinanzeigen_id'])
-  ]);
-
-  wp_die();
+  ]));
 }
 
 function wbp_ajax_import_kleinanzeigen_images()

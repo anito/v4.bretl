@@ -672,7 +672,7 @@ jQuery(document).ready(function ($) {
       doc = parser.parseFromString(description.body, "text/html");
       content = doc.getElementById("viewad-description-text")?.outerHTML;
     } catch (err) {
-      content = `Document parse error: ${err}`;
+      content = null;
     }
 
     // const raw_title = doc.getElementById("viewad-title")?.innerText;
