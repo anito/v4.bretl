@@ -255,7 +255,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
             $disabled['disconnect'] = !$sku;
             $label = array(
               'deactivate' => (!$disabled['deactivate']) ? __('Hide', 'astra-child') : __('Disconnected', 'astra-child'),
-              'disconnect' => $product->get_sku() ? __('Don\'t hide', 'astra-child') : __('Disconnected', 'astra-child')
+              'disconnect' => $product->get_sku() ? __('Keep visible', 'astra-child') : __('Disconnected', 'astra-child')
             );
             $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'scan_type', 'disabled'));
             break;
