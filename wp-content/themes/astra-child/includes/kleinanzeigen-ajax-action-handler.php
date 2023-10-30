@@ -16,16 +16,16 @@ function is_valid_title($val)
   return true;
 }
 
-function wbp_increment($matches)
+function wbp_reg_increment($matches)
 {
   return $matches[1] . ++$matches[2] . $matches[3];
 }
 
 function wbp_sanitize_title($title, $appendix = "")
 {
-  preg_match('/((?!DUPLIKAT \d+ ID).)*(\[ DUPLIKAT \d+ ID \d{8,} \])/', $title . $appendix, $matches);
+  preg_match('/((?!DUPLIKAT \d+).)*(\[ DUPLIKAT \d+ \])/', $title . $appendix, $matches);
   if (isset($matches[0])) {
-    return preg_replace_callback('/(.*\[ DUPLIKAT )(\d+)( ID \d{8,} \])/', "wbp_increment", $matches[0]);
+    return preg_replace_callback('/(.*\[ DUPLIKAT )(\d+)( \])/', "wbp_reg_increment", $matches[0]);
   }
   return $title;
 }

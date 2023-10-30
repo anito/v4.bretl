@@ -88,7 +88,7 @@ function wbp_find_kleinanzeige(int $id): stdClass | null
   $paged = 1;
   while ($paged <= KLEINANZEIGEN_TOTAL_PAGES) {
     $data = wbp_get_json_data(array('paged' => $paged));
-    if(!is_wp_error($data)) {
+    if (!is_wp_error($data)) {
       $ads = $data->ads;
       foreach ($ads as $val) {
         if ($val->id == (int) $id) {
@@ -118,26 +118,27 @@ function wbp_process_kleinanzeigen($post_ID, $post)
     }
   }
 
-  if (!isset($_POST['kleinanzeigen_id'])) {
-    return;
+  if (isset($_POST['kleinanzeigen_id'])) {
+    $kleinanzeigen_id = sanitize_text_field($_POST['kleinanzeigen_id']);
+  } else {
+    $kleinanzeigen_id = '';
   }
-
-  $kleinanzeigen_id = sanitize_text_field($_POST['kleinanzeigen_id']);
 
   $product = wc_get_product($post_ID);
   $title = $product->get_title();
+  $is_empty_title = empty($title);
   $content = $product->get_description();
+  $sku_error = false;
 
   if (!empty($kleinanzeigen_id)) {
     $ad = wbp_find_kleinanzeige($kleinanzeigen_id);
   }
-  if($ad) {
-    $sku_error = false;
+  if (isset($ad)) {
     $ad_title = $ad->title;
+    $title = $ad_title;
 
-    if (empty($title)) {
+    if ($is_empty_title) {
       $title = $ad_title;
-      $content = __('Ready to import ad. Click "Import ad" to start.', 'astra-child');
     }
 
     $sku = $product->get_sku();
@@ -147,35 +148,48 @@ function wbp_process_kleinanzeigen($post_ID, $post)
         $product->set_sku($kleinanzeigen_id);
         $product->save();
       } catch (Exception $e) {
-        $sku_error = true;
+        $sku_error = new WP_Error('invalid_sku', __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child'));
+      }
+    }
+  }
+
+  // Check for duplicate titles
+  if(!is_wp_error($sku_error)) {
+
+    global $wpdb;
+  
+    $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
+    $results = $wpdb->get_results($prepare);
+    if (count($results) >= 1) {
+      foreach($results as $result) {
+        if($result->ID != $post_ID) {
+          $sku_error = new WP_Error('invalid_sku', __('A product with the same title already exists. Enter a different title or delete this draft.', 'astra-child'));
+        }
       }
     }
 
-    // $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $ad_title);
-    // $results = $wpdb->get_results($prepare);
-    // $title_exists = count($results) >= 2;
+  }
 
-    if ($sku_error) {
-      $title = wp_strip_all_tags(wbp_sanitize_title($ad_title . " [ DUPLIKAT " . 0 . " ID " . $kleinanzeigen_id . " ]"));
-      $content = '<b style="color: red;">' . __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child') . '</b>';
-    }
+  if (is_wp_error($sku_error)) {
+    $title = wp_strip_all_tags(wbp_sanitize_title($title . " [ DUPLIKAT " . 0 . " ]"));
+    $content = '<p style="display: inline-block; border: 1px solid red; padding: 20px;"><b style="color: red;">' . $sku_error->get_error_message() . '</b></p>' . $content;
+  }
 
-    // Avoid recursion
-    remove_action('save_post', 'wbp_save_post', 99);
-    wp_insert_post([
-      'ID' => $post_ID,
-      'post_type' => 'product',
-      'post_status' => $_POST['post_status'],
-      'post_content' => $content,
-      'post_excerpt' => $product->get_short_description(),
-      'post_title' => $title
-    ]);
+  // Avoid recursion
+  remove_action('save_post', 'wbp_save_post', 99);
+  wp_insert_post([
+    'ID' => $post_ID,
+    'post_type' => 'product',
+    'post_status' => is_wp_error($sku_error) ? 'draft' : $_POST['post_status'],
+    'post_content' => $content,
+    'post_excerpt' => $product->get_short_description(),
+    'post_title' => $title
+  ]);
 
-    if ($sku_error) {
-      disable_sku($post_ID);
-    } else {
-      enable_sku($post_ID, $ad);
-    }
+  if ($sku_error) {
+    disable_sku($post_ID);
+  } else {
+    enable_sku($post_ID, $ad);
   }
 }
 
