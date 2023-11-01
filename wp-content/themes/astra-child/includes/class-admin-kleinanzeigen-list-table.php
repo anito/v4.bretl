@@ -62,18 +62,20 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     if (isset($data)) {
       $categories = $data->categoriesSearchData;
-      $total = 0;
+      $total_ads = 0;
       foreach ($categories as $category) {
-        $total += $category->totalAds;
+        $total_ads += $category->totalAds;
       }
     }
+
 
     // Total published products
     $args = array(
       'status' => 'publish',
-      'limit' => -1
+      'limit' => -1,
     );
-    $published = wc_get_products($args);
+    $published_no_sku = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
+    $published_has_sku = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
 
     $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array(), 'todos' => array());
     foreach ($this->items as $item) {
@@ -114,7 +116,9 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
       }
     }
-    wbp_include_kleinanzeigen_template('header.php', false, array('data' => $data, 'paged' => $paged, 'pages' => KLEINANZEIGEN_TOTAL_PAGES, 'categories' => $categories, 'total' => $total, 'published' => $published, 'products' => $products, 'todos' => $products['todos']));
+    $pages = KLEINANZEIGEN_TOTAL_PAGES;
+    $todos = $products['todos'];
+    wbp_include_kleinanzeigen_template('header.php', false, compact('data', 'paged', 'pages', 'todos', 'categories', 'total_ads', 'published_has_sku', 'published_no_sku', 'products', 'todos'));
   }
 
   /**

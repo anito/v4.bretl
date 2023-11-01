@@ -289,3 +289,22 @@ function disable_sku($post_ID)
   delete_post_meta($post_ID, 'kleinanzeigen_search_url');
   delete_post_meta($post_ID, 'kleinanzeigen_record');
 }
+
+/**
+ * Handle a custom 'sku_compare' query var to get products with the 'sku_compare' meta.
+ * @param array $query - Args for WP_Query.
+ * @param array $query_vars - Query vars from WC_Product_Query.
+ * @return array modified $query
+ */
+function handle_sku_compare_query($query, $query_vars)
+{
+  if (!empty($query_vars['sku_compare'])) {
+    $query['meta_query'][] = array(
+      'key' => '_sku',
+      'compare' => esc_attr($query_vars['sku_compare']),
+    );
+  }
+
+  return $query;
+}
+add_filter('woocommerce_product_data_store_cpt_get_products_query', 'handle_sku_compare_query', 10, 2);

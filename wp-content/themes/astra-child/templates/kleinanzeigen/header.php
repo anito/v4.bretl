@@ -1,19 +1,29 @@
+<?php
+ob_start();
+foreach ($categories as $category) {
+  echo sprintf(__('%s (%s)', 'astra-child'), $category->title, $category->totalAds);
+}
+$ad_cats = ob_get_clean() ?>
 <div class="section-wrapper">
   <div class="left-sections">
     <section class="wbp-kleinanzeigen-section">
       <div class="section-inner">
-
         <div class="">
-
           <h2><?php echo sprintf(__('Page: %s', 'astra-child'), $paged) ?></h2>
-          <h2><small><?php echo sprintf(__('Ads: %s', 'astra-child'), count($data->ads)); ?><span class="<?php echo $total != count($published) ? 'warning' : '' ?>" style="padding-left: 20px; font-size: 0.8em; font-weight: 300;"><?php echo sprintf(__('(Total: %d / %s)', 'astra-child'), $total, count($published)); ?></span></small></h2>
-          <h4><small>
-              <?php foreach ($categories as $category) { ?>
-                <?php echo sprintf(__('%s (%s)', 'astra-child'), $category->title, $category->totalAds) ?>
-              <?php } ?>
-            </small>
-          </h4>
-
+          <h2 class="overview-wrap"><?php echo sprintf(__('Ads: %s', 'astra-child'), count($data->ads)); ?>
+            <div class="overview-grid">
+              <div class="overview-col-key a">
+                <span><?php echo __('Total', 'astra-child'); ?></span>
+                <span style="display: inline-block; padding: 0 10px;">|</span>
+                <span><?php echo $ad_cats; ?></span>
+              </div>
+              <div class="overview-col-key b"><?php echo __('Products with Ad ID', 'astra-child'); ?></div>
+              <div class="overview-col-key c"><?php echo __('Products without Ad ID', 'astra-child'); ?></div>
+              <div class="overview-col-val a"><?php echo $total_ads; ?></div>
+              <div class="overview-col-val b"><?php echo count($published_has_sku); ?></div>
+              <div class="overview-col-val c"><?php echo count($published_no_sku); ?></div>
+            </div>
+          </h2>
         </div>
 
         <div class="pagination">

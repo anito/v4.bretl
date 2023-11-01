@@ -54,12 +54,51 @@ section#color-definitions {
   flex: 1;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px;
+  padding: 10px;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-wrap {
+  display: flex;
+  font-size: 10px;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-grid {
+  display: grid;
+  grid-column-gap: 10px;
+  grid-template-columns: 6fr 1fr;
+  grid-template-areas:
+    "key-a value-a"
+    "key-b value-b"
+    "key-c value-c";
+  font-weight: 300;
+  margin-left: 30px;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-val {
+  text-align: right;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-key.a {
+  grid-area: key-a;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-key.b {
+  grid-area: key-b;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-key.c {
+  grid-area: key-c;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-val.a {
+  grid-area: value-a;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-val.b {
+  grid-area: value-b;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-val.c {
+  grid-area: value-c;
 }
 #kleinanzeigen-head-wrap .section-inner .warning {
   color: red;
 }
-#kleinanzeigen-head-wrap .left-sections section:not(:last-child) .section-inner {
+#kleinanzeigen-head-wrap
+  .left-sections
+  section:not(:last-child)
+  .section-inner {
   border-right: 1px solid #eee;
 }
 #kleinanzeigen-head-wrap .left-sections section {
@@ -72,7 +111,10 @@ section#color-definitions {
 #kleinanzeigen-head-wrap .left-sections section:not(:first-child) {
   padding-left: 0px;
 }
-#kleinanzeigen-head-wrap .left-sections section:not(:first-child) .section-inner {
+#kleinanzeigen-head-wrap
+  .left-sections
+  section:not(:first-child)
+  .section-inner {
   padding-left: 10px;
   padding-right: 30px;
 }
@@ -296,9 +338,7 @@ section .summary .count:nth-child(2) {
 .wp-list-kleinanzeigen-ads tr[class*="diff"] {
   background-color: #ff00001e;
 }
-.wp-list-kleinanzeigen-ads
-  .diff.price-diff
-  .column[class*="-price"] {
+.wp-list-kleinanzeigen-ads .diff.price-diff .column[class*="-price"] {
   text-decoration: underline;
   text-decoration-style: wavy;
   text-decoration-thickness: 0.06em;
