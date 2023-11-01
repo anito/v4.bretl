@@ -1,8 +1,10 @@
 <?php
-ob_start();
+$cats = array();
 foreach ($categories as $category) {
-  echo sprintf(__('%s (%s)', 'astra-child'), $category->title, $category->totalAds);
+  $cats[] = sprintf(__('%s (%s)', 'astra-child'), $category->title, $category->totalAds);
 }
+ob_start();
+echo implode(', ', $cats);
 $ad_cats = ob_get_clean() ?>
 <div class="section-wrapper">
   <div class="left-sections">
@@ -14,7 +16,7 @@ $ad_cats = ob_get_clean() ?>
             <div class="overview-grid">
               <div class="overview-col-key a">
                 <span><?php echo __('Total', 'astra-child'); ?></span>
-                <span style="display: inline-block; padding: 0 10px;">|</span>
+                <span style="display: inline-block; padding: 0 10px;">>></span>
                 <span><?php echo $ad_cats; ?></span>
               </div>
               <div class="overview-col-key b"><?php echo __('Products with Ad ID', 'astra-child'); ?></div>
