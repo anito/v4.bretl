@@ -368,9 +368,10 @@ function wbp_ajax_import_kleinanzeigen_data()
         'lim. edition' => 'Limited Edition',
         'mietmaschine' => 'Mieten',
         'neu' => 'Neu',
+        'neumaschine' => 'Neu',
+        'neufahrzeug' => 'Neu',
         'neues modell' => 'Neues Modell',
         'top modell' => 'Top Modell',
-        'neumaschine' => 'Neu',
         'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
       );
 
