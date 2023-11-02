@@ -802,7 +802,7 @@ add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeh
 /**
  * Kleinanzeigen.de
  */
-function wbp_get_scan_data($products, $ads, $scan_type)
+function wbp_get_task_data($products, $ads, $task_type)
 {
   $ad_ids = wp_list_pluck($ads, 'id');
   $items = [];
@@ -817,11 +817,11 @@ function wbp_get_scan_data($products, $ads, $scan_type)
     $permalink = get_permalink($post_ID);
 
     if (!empty($sku)) {
-      switch ($scan_type) {
+      switch ($task_type) {
         case 'invalid-ad':
           $record = null;
           if (!in_array($sku, $ad_ids)) {
-            $items[] = compact('product', 'scan_type', 'record');
+            $items[] = compact('product', 'task_type', 'record');
           }
           break;
         case 'invalid-price':
@@ -834,7 +834,7 @@ function wbp_get_scan_data($products, $ads, $scan_type)
               $record = $records[$key];
               if (wbp_has_price_diff($record, $product)) {
                 $ka_price = $record->price;
-                $items[] = compact('product', 'scan_type', 'record');
+                $items[] = compact('product', 'task_type', 'record');
               }
             }
           }
@@ -1021,7 +1021,7 @@ function output_after_page()
 function wbp_get_json_data($args = array())
 {
   $defaults = array(
-    'pageSize' => 25,
+    'pageSize' => KLEINANZEIGEN_PER_PAGE,
     'paged' => 1
   );
   $options = wp_parse_args($args, $defaults);
@@ -1036,19 +1036,27 @@ function wbp_get_json_data($args = array())
   }
 }
 
+function wbp_error_check($data, $error_template) {
+  if (is_wp_error($data)) {
+    die(json_encode(array(
+
+      "head" => wbp_include_kleinanzeigen_template($error_template, true, array('message' => $data->get_error_message()))
+
+    )));
+  }
+  return $data;
+}
+
 function wbp_get_all_ads()
 {
-  $ads = [];
-  for ($paged = 1; $paged <= KLEINANZEIGEN_TOTAL_PAGES; $paged++) {
-    $page_data  = wbp_get_json_data(array('paged' => $paged));
-
-    if (is_wp_error($page_data)) {
-      die(json_encode(array(
-
-        "head" => wbp_include_kleinanzeigen_template('error-message.php', true, array('message' => $page_data->get_error_message()))
-
-      )));
-    }
+  // Get first set of data to discover page count
+  $data =  wbp_error_check(wbp_get_json_data(), 'error-message.php');
+  $ads = $data->ads;
+  $categories = $data->categoriesSearchData;
+  $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
+  $num_pages = ceil($total_ads / KLEINANZEIGEN_PER_PAGE);
+  for ($paged = 2; $paged <= $num_pages; $paged++) {
+    $page_data  = wbp_error_check(wbp_get_json_data(array('paged' => $paged)), 'error-message.php');
     $ads = array_merge($ads, $page_data->ads);
   }
   return $ads;

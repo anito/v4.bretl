@@ -202,7 +202,7 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const post_ID = el.dataset.postId;
-    const scan_type = el.dataset.scanType;
+    const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
@@ -221,7 +221,7 @@ jQuery(document).ready(function ($) {
         action: "_ajax_disconnect",
         post_ID,
         kleinanzeigen_id,
-        scan_type,
+        task_type,
         screen: _screen || screen,
       },
       beforeSend: () => {
@@ -434,7 +434,7 @@ jQuery(document).ready(function ($) {
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const disconnect = el.dataset.disconnect;
-    const scan_type = el.dataset.scanType;
+    const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
@@ -447,7 +447,7 @@ jQuery(document).ready(function ($) {
         post_ID,
         kleinanzeigen_id,
         disconnect,
-        scan_type,
+        task_type,
         screen: _screen || screen,
       },
       beforeSend: () => {
@@ -473,7 +473,7 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
-    const scan_type = el.dataset.scanType;
+    const task_type = el.dataset.taskType;
     const price = el.dataset.price;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
@@ -486,7 +486,7 @@ jQuery(document).ready(function ($) {
         post_ID,
         kleinanzeigen_id,
         price,
-        scan_type,
+        task_type,
         screen: el.dataset.screen || screen,
       },
       beforeSend: () => {
@@ -551,7 +551,7 @@ jQuery(document).ready(function ($) {
         }
         
         if(modal_row) {
-          modalRowEl = $(`.wp-list-scan-kleinanzeigen-ads tr#${post_ID}`);
+          modalRowEl = $(`.wp-list-task-kleinanzeigen-ads tr#${post_ID}`);
           $(modalRowEl)?.replaceWith(modal_row);
         }
 

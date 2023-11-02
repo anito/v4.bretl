@@ -135,7 +135,7 @@ function wbp_ajax_fix_price()
     $ids = array_column($ads, 'id');
     $record_key = array_search($kleinanzeigen_id, $ids);
     $record = $ads[$record_key];
-    $modal_row = render_scan_list_row($post_ID, array('record' => $record));
+    $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
   die(json_encode([
@@ -150,7 +150,7 @@ function wbp_ajax_toggle_publish_post()
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
   $disconnect = isset($_REQUEST['disconnect']) ? $_REQUEST['disconnect'] === '__disconnect__' : null;
   $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : null;
-  $scan_type = isset($_REQUEST['scan_type']) ? $_REQUEST['scan_type'] : null;
+  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
   // Maybe disconnect product
@@ -205,7 +205,7 @@ function wbp_ajax_toggle_publish_post()
 
   $modal_row = null;
   if ('modal' === $screen) {
-    $modal_row = render_scan_list_row($post_ID);
+    $modal_row = render_task_list_row($post_ID);
   }
 
   die(json_encode([
@@ -254,7 +254,7 @@ function wbp_ajax_disconnect()
   $post_ID = isset($_POST['post_ID']) ? $_POST['post_ID'] : null;
   $kleinanzeigen_id = isset($_POST['kleinanzeigen_id']) ? $_POST['kleinanzeigen_id'] : null;
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
-  $scan_type = isset($_REQUEST['scan_type']) ? $_REQUEST['scan_type'] : null;
+  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
   disable_sku($post_ID);
@@ -294,7 +294,7 @@ function wbp_ajax_disconnect()
 
   $modal_row = null;
   if ('modal' === $screen) {
-    $modal_row = render_scan_list_row($post_ID);
+    $modal_row = render_task_list_row($post_ID);
   }
 
   die(json_encode(array(
@@ -662,17 +662,17 @@ function wbp_upload_image($url, $post_ID)
   return $attachmentId;
 }
 
-function render_scan_list_row($post_ID, $args = array())
+function render_task_list_row($post_ID, $args = array())
 {
-  $scan_type = isset($_REQUEST['scan_type']) ? $_REQUEST['scan_type'] : null;
+  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
 
-  $wp_scan_list_table = new Kleinanzeigen_Scan_List_Table();
+  $wp_task_list_table = new Kleinanzeigen_Task_List_Table();
 
   $product = wc_get_product($post_ID);
-  $data = array_merge(array('product' => $product, 'scan_type' => $scan_type), $args);
-  $wp_scan_list_table->setData($data);
+  $data = array_merge(array('product' => $product, 'task_type' => $task_type), $args);
+  $wp_task_list_table->setData($data);
 
   ob_start();
-  $wp_scan_list_table->render_row($data);
+  $wp_task_list_table->render_row($data);
   return ob_get_clean();
 }

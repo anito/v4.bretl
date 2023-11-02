@@ -1,62 +1,65 @@
 <?php
-$cats = array();
-foreach ($categories as $category) {
-  $cats[] = sprintf(__('%s (%s)', 'astra-child'), $category->title, $category->totalAds);
-}
-ob_start();
-echo implode(', ', $cats);
-$ad_cats = ob_get_clean() ?>
+$cats = array_map(function ($category) {
+  return sprintf(__('%s (%s)', 'astra-child'), $category->title, $category->totalAds);
+}, $categories);
+$ad_cats = implode(', ', $cats);
+$total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
+$num_pages = ceil($total_ads / KLEINANZEIGEN_PER_PAGE);
+$todos = $products['todos']; ?>
 <div class="section-wrapper">
   <div class="left-sections">
     <section class="wbp-kleinanzeigen-section">
       <div class="section-inner">
-        <div class="">
-          <h2><?php echo sprintf(__('Page: %s', 'astra-child'), $paged) ?></h2>
-          <h2 class="overview-wrap"><?php echo sprintf(__('Ads: %s', 'astra-child'), count($data->ads)); ?>
-            <div class="overview-grid">
-              <div class="overview-col-key a">
-                <span><?php echo __('Total', 'astra-child'); ?></span>
-                <span style="display: inline-block; padding: 0 10px;">>></span>
-                <span><?php echo $ad_cats; ?></span>
+        <div style="display: flex; flex-direction: column;">
+          <h2 style="display: flex; justify-content: space-between;"><?php echo sprintf(__('Page: %s', 'astra-child'), $paged) ?><small style="margin-left: 20px; font-size: 12px;"><?php echo sprintf(__('Ads: %s', 'astra-child'), count($items)); ?></small></h2>
+          <div class="overview-wrap">
+            <fieldset>
+              <legend><?php echo __('Total published', 'astra-child') ?></legend>
+              <div class="overview-grid">
+                <div class="overview-col-key a">
+                  <span><?php echo __('Ads', 'astra-child'); ?></span>
+                  <span style="display: inline-block; padding: 0 10px;">>></span>
+                  <span><?php echo $ad_cats; ?></span>
+                </div>
+                <div class="overview-col-key b"><?php echo __('Products with Ad ID', 'astra-child'); ?></div>
+                <div class="overview-col-key c"><?php echo __('Products without Ad ID', 'astra-child'); ?></div>
+                <div class="overview-col-val a"><?php echo $total_ads; ?></div>
+                <div class="overview-col-val b"><?php echo count($published_has_sku); ?></div>
+                <div class="overview-col-val c"><?php echo count($published_no_sku); ?></div>
               </div>
-              <div class="overview-col-key b"><?php echo __('Products with Ad ID', 'astra-child'); ?></div>
-              <div class="overview-col-key c"><?php echo __('Products without Ad ID', 'astra-child'); ?></div>
-              <div class="overview-col-val a"><?php echo $total_ads; ?></div>
-              <div class="overview-col-val b"><?php echo count($published_has_sku); ?></div>
-              <div class="overview-col-val c"><?php echo count($published_no_sku); ?></div>
-            </div>
-          </h2>
+            </fieldset>
+          </div>
         </div>
 
         <div class="pagination">
-          <?php for ($i = 1; $i <= $pages; $i++) {
+          <?php for ($i = 1; $i <= $num_pages; $i++) {
           ?>
             <a href="<?php echo KLEINANZEIGEN_CUSTOMER_URL . '?paged=' . $i ?>" type="button" class="button <?php echo ($i == (int) $paged ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
           <?php } ?>
         </div>
 
-        <div class="scan-pages">
+        <div class="task-pages">
           <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
-          <div class="scan-page">
+          <div class="task-page">
             <div class="general-action">
               <div class="action-header">
                 <i class="dashicons dashicons-editor-help align-center" title="<?php echo $title ?>"></i>
                 <span><b>Nach Reservierung / Verkauf / Deaktivierung</b></span>
               </div>
               <div class="action-buttons">
-                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
+                <a href="#" type="button" class="start-task info button button-primary button-small" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
               </div>
             </div>
           </div>
           <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
-          <div class="scan-page">
+          <div class="task-page">
             <div class="general-action">
               <div class="action-header">
                 <i class="dashicons dashicons-editor-help align-center" title="<?php echo $title ?>"></i>
                 <span><b>Nach Preisanpassung</b></span>
               </div>
               <div class="action-buttons">
-                <a href="#" type="button" class="start-scan info button button-primary button-small" data-scan-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
+                <a href="#" type="button" class="start-task info button button-primary button-small" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
               </div>
             </div>
           </div>
@@ -191,42 +194,42 @@ $ad_cats = ob_get_clean() ?>
 </script>
 
 <style>
-  .scan-pages {
+  .task-pages {
     padding: 10px;
     background-color: #f8fbff;
     border: 1px solid #eee;
   }
 
-  .scan-pages .scan-page {
+  .task-pages .task-page {
     margin: 10px 0px 30px;
     font-size: 12px;
   }
 
-  .scan-pages .scan-page:last-child {
+  .task-pages .task-page:last-child {
     margin-bottom: 10px;
   }
 
-  .scan-page .explanation {
+  .task-page .explanation {
     padding: 5px;
     background-color: aqua;
     font-size: .8em;
     font-weight: 100;
   }
 
-  .scan-pages .scan-page .general-action .action-header {
+  .task-pages .task-page .general-action .action-header {
     margin-bottom: 10px;
   }
 
-  .scan-pages .scan-page .general-action .action-buttons {
+  .task-pages .task-page .general-action .action-buttons {
     margin-left: 30px;
   }
 
-  .scan-pages .scan-page .general-action .action-buttons .button {
+  .task-pages .task-page .general-action .action-buttons .button {
     min-width: 200px;
     text-align: center;
   }
 
-  .scan-page .dashicons.align-center {
+  .task-page .dashicons.align-center {
     margin-right: 10px;
     align-self: center;
   }

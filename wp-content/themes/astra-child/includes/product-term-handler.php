@@ -86,14 +86,20 @@ function wbp_process_featured($product)
 function wbp_find_kleinanzeige(int $id): stdClass | null
 {
   $paged = 1;
-  while ($paged <= KLEINANZEIGEN_TOTAL_PAGES) {
+  $num_pages = 1;
+  while ($paged <= $num_pages) {
     $data = wbp_get_json_data(array('paged' => $paged));
+    if(1 === $num_pages) {
+      $categories = $data->categoriesSearchData;
+      $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
+      $num_pages = ceil($total_ads / KLEINANZEIGEN_PER_PAGE);
+    }
     if (!is_wp_error($data)) {
       $ads = $data->ads;
       foreach ($ads as $val) {
         if ($val->id == (int) $id) {
           $ad = $val;
-          $paged = KLEINANZEIGEN_TOTAL_PAGES;
+          $paged = $num_pages;
           break;
         }
       };

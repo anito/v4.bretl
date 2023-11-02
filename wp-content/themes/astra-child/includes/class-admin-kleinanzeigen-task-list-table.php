@@ -3,7 +3,7 @@ if (!class_exists('WP_List_Table')) {
   require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
-class Kleinanzeigen_Scan_List_Table extends WP_List_Table
+class Kleinanzeigen_Task_List_Table extends WP_List_Table
 {
   private $hidden_columns = array(
     'id'
@@ -12,8 +12,8 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
   function __construct()
   {
     parent::__construct(array(
-      'singular' => 'wp-list-scan-kleinanzeigen-ad',
-      'plural' => 'wp-list-scan-kleinanzeigen-ads',
+      'singular' => 'wp-list-task-kleinanzeigen-ad',
+      'plural' => 'wp-list-task-kleinanzeigen-ads',
       'ajax' => true
     ));
   }
@@ -28,7 +28,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
     /**
      * Adds a nonce field
      */
-    wp_nonce_field('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce');
+    wp_nonce_field('ajax-custom-task-list-nonce', '_ajax_custom_task_list_nonce');
 
     /**
      * Adds field order and orderby
@@ -66,8 +66,8 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
   function ajax_response()
   {
 
-    check_ajax_referer('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce');
-    $scan_type = isset($_GET['scan_type']) ? $_GET['scan_type'] : '';
+    check_ajax_referer('ajax-custom-task-list-nonce', '_ajax_custom_task_list_nonce');
+    $task_type = isset($_GET['task_type']) ? $_GET['task_type'] : '';
 
     $ads = wbp_get_all_ads();
     $args = array(
@@ -75,7 +75,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
       'limit' => -1
     );
     $products = wc_get_products($args);
-    $data = wbp_get_scan_data($products, $ads, $scan_type);
+    $data = wbp_get_task_data($products, $ads, $task_type);
     $this->setData($data);
 
     extract($this->_args);
@@ -169,7 +169,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
     /**
      * How many records for page do you want to show?
      */
-    $per_page = 25;
+    $per_page = KLEINANZEIGEN_PER_PAGE;
 
     /**
      * Define of column_headers. It's an array that contains:
@@ -219,7 +219,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
 
   function render_row($item)
   {
-    // Extracts $products | $scan_type | $record
+    // Extracts $products | $task_type | $record
     extract($item);
 
     list($columns, $hidden) = $this->get_column_info();
@@ -248,7 +248,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
         $post_status = $product->get_status();
         $image = get_the_post_thumbnail_url($post_ID);
 
-        switch ($scan_type) {
+        switch ($task_type) {
           case 'invalid-ad':
             $published = 'publish' === $product->get_status();
             $disabled['deactivate'] = !$sku && !$published;
@@ -257,14 +257,14 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
               'deactivate' => (!$disabled['deactivate']) ? __('Hide', 'astra-child') : __('Disconnected', 'astra-child'),
               'disconnect' => $product->get_sku() ? __('Keep visible', 'astra-child') : __('Disconnected', 'astra-child')
             );
-            $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'scan_type', 'disabled'));
+            $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled'));
             break;
           case 'invalid-price':
             $price = wbp_extract_kleinanzeigen_price($ka_price);
             $shop_price = $product->get_price();
             $disabled = $price === $shop_price;
             $label = $price !== $shop_price ? __('Accept price', 'astra-child') : __('Price accepted', 'astra-child');
-            $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'scan_type', 'disabled'));
+            $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'task_type', 'disabled'));
             break;
           default:
         }
@@ -338,7 +338,7 @@ class Kleinanzeigen_Scan_List_Table extends WP_List_Table
       ?>
       <script>
         jQuery(document).ready(($) => {
-          const table = $('.wp-list-scan-kleinanzeigen-ads');
+          const table = $('.wp-list-task-kleinanzeigen-ads');
 
           $('.deactivate-all').on('click', function(e) {
             const el = $(e.target);

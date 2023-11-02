@@ -1,4 +1,4 @@
-<div id="table-scan-list-outer" class="list-outer">
+<div id="table-task-list-outer" class="list-outer">
   <div class="ka-list-header" style="display: flex; flex-direction: column;">
     <div style="display: flex; justify-content: center;">
       <i class="dashicons dashicons-admin-generic" style="align-self: center; margin-right: 10px;"></i>
@@ -9,12 +9,12 @@
     </div>
   </div>
   <div class="ka-list-content">
-    <table id="table-scan-list" class="table-scan-list wp-list-table striped <?php echo empty($data['products']) ? 'empty' : '' ?>">
+    <table id="table-task-list" class="table-task-list wp-list-table striped <?php echo empty($data['products']) ? 'empty' : '' ?>">
       <thead>
-        <th id="scan-result-image" class="column-image">Bild</th>
-        <th id="scan-result-title" class="column-title">Titel</th>
-        <th id="scan-result-price" class="column-shop-price">Preis</th>
-        <th id="scan-result-actions" class="column-actions">Aktionen</th>
+        <th id="task-result-image" class="column-image">Bild</th>
+        <th id="task-result-title" class="column-title">Titel</th>
+        <th id="task-result-price" class="column-shop-price">Preis</th>
+        <th id="task-result-actions" class="column-actions">Aktionen</th>
       </thead>
       <tbody>
         <?php if (empty($data['products'])) : ?>
@@ -55,7 +55,7 @@
 <script>
   jQuery(document).ready(($) => {
 
-    const table = $('#table-scan-list');
+    const table = $('#table-task-list');
 
     $('.fix-price-all', table).on('click', function() {
       window.dispatchEvent(

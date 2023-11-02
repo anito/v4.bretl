@@ -1,5 +1,5 @@
 <?php
-require_once get_stylesheet_directory() . '/includes/class-admin-kleinanzeigen-scan-list-table.php';
+require_once get_stylesheet_directory() . '/includes/class-admin-kleinanzeigen-task-list-table.php';
 if (!defined('KLEINANZEIGEN_TEMPLATE_PATH')) {
   define('KLEINANZEIGEN_TEMPLATE_PATH', get_stylesheet_directory() . '/templates/kleinanzeigen/');
 }
@@ -7,24 +7,24 @@ if (!defined('KLEINANZEIGEN_TEMPLATE_PATH')) {
 /**
  * Action wp_ajax for fetching ajax_response
  */
-function _ajax_fetch_kleinanzeigen_scan_history()
+function _ajax_fetch_kleinanzeigen_task_history()
 {
-  $wp_list_table = new Kleinanzeigen_Scan_List_Table();
+  $wp_list_table = new Kleinanzeigen_Task_List_Table();
   $wp_list_table->ajax_response();
 }
-add_action('wp_ajax__ajax_fetch_kleinanzeigen_scan_history', '_ajax_fetch_kleinanzeigen_scan_history');
-add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_scan_history', '_ajax_fetch_kleinanzeigen_scan_history');
+add_action('wp_ajax__ajax_fetch_kleinanzeigen_task_history', '_ajax_fetch_kleinanzeigen_task_history');
+add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_task_history', '_ajax_fetch_kleinanzeigen_task_history');
 
 /**
  * Action wp_ajax for fetching the first time table structure
  */
-function _ajax_fetch_kleinanzeigen_scan_display()
+function _ajax_fetch_kleinanzeigen_task_display()
 {
 
-  check_ajax_referer('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce', true);
-  $scan_type = isset($_COOKIE['kleinanzeigen-scan-type']) ? $_COOKIE['kleinanzeigen-scan-type'] : '';
+  check_ajax_referer('ajax-custom-task-list-nonce', '_ajax_custom_task_list_nonce', true);
+  $task_type = isset($_COOKIE['kleinanzeigen-task-type']) ? $_COOKIE['kleinanzeigen-task-type'] : '';
 
-  $wp_list_table = new Kleinanzeigen_Scan_List_Table();
+  $wp_list_table = new Kleinanzeigen_Task_List_Table();
 
   $ads = wbp_get_all_ads();
   $args = array(
@@ -32,7 +32,7 @@ function _ajax_fetch_kleinanzeigen_scan_display()
     'limit' => -1
   );
   $products = wc_get_products($args);
-  $data = wbp_get_scan_data($products, $ads, $scan_type);
+  $data = wbp_get_task_data($products, $ads, $task_type);
   $wp_list_table->setData($data);
 
   ob_start();
@@ -45,8 +45,8 @@ function _ajax_fetch_kleinanzeigen_scan_display()
 
   die(json_encode(compact('head', 'display')));
 }
-add_action('wp_ajax__ajax_fetch_kleinanzeigen_scan_display', '_ajax_fetch_kleinanzeigen_scan_display');
-add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_scan_display', '_ajax_fetch_kleinanzeigen_scan_display');
+add_action('wp_ajax__ajax_fetch_kleinanzeigen_task_display', '_ajax_fetch_kleinanzeigen_task_display');
+add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_task_display', '_ajax_fetch_kleinanzeigen_task_display');
 
 /**
  * fetch_ka_modal_script function based from Charlie's original function
@@ -68,23 +68,23 @@ function fetch_ka_modal_script()
 
         display: function() {
 
-          $('.wp-list-scan-kleinanzeigen-ads').addClass('loading');
+          $('.wp-list-task-kleinanzeigen-ads').addClass('loading');
 
           $.ajax({
 
             url: ajaxurl,
             dataType: 'json',
             data: {
-              _ajax_custom_scan_list_nonce: $('#_ajax_custom_scan_list_nonce').val(),
-              action: '_ajax_fetch_kleinanzeigen_scan_display'
+              _ajax_custom_task_list_nonce: $('#_ajax_custom_task_list_nonce').val(),
+              action: '_ajax_fetch_kleinanzeigen_task_display'
             },
             success: function(response) {
 
-              $('.wp-list-scan-kleinanzeigen-ads').removeClass('loading');
+              $('.wp-list-task-kleinanzeigen-ads').removeClass('loading');
 
-              $("#kleinanzeigen-scan-list-display").html(response.display);
+              $("#kleinanzeigen-task-list-display").html(response.display);
 
-              $(".wp-list-scan-kleinanzeigen-ads tbody").on("click", ".toggle-row", function(e) {
+              $(".wp-list-task-kleinanzeigen-ads tbody").on("click", ".toggle-row", function(e) {
                 e.preventDefault();
                 $(this).closest("tr").toggleClass("is-expanded")
               });
@@ -103,7 +103,7 @@ function fetch_ka_modal_script()
           let timeoutId;
           const delay = 500;
 
-          $('#kleinanzeigen-scan-list-display .tablenav-pages a, #kleinanzeigen-scan-list-display .manage-column.sortable a, #kleinanzeigen-scan-list-display .manage-column.sorted a').on('click', function(e) {
+          $('#kleinanzeigen-task-list-display .tablenav-pages a, #kleinanzeigen-task-list-display .manage-column.sortable a, #kleinanzeigen-task-list-display .manage-column.sorted a').on('click', function(e) {
             e.preventDefault();
             const query = this.search.substring(1);
 
@@ -111,20 +111,20 @@ function fetch_ka_modal_script()
               paged: list.__query(query, 'paged') || '1',
               order: list.__query(query, 'order') || 'asc',
               orderby: list.__query(query, 'orderby') || 'title',
-              scan_type: list.__query(query, 'scan_type') || '',
+              task_type: list.__query(query, 'task_type') || '',
             };
             list.update(data);
           });
 
-          $('#kleinanzeigen-scan-list-display input[name=paged]').on('keyup', function(e) {
+          $('#kleinanzeigen-task-list-display input[name=paged]').on('keyup', function(e) {
 
             if (13 == e.which)
               e.preventDefault();
 
             const data = {
-              paged: parseInt($('#kleinanzeigen-scan-list-display input[name=paged]').val()) || '1',
-              order: $('#kleinanzeigen-scan-list-display input[name=order]').val() || 'asc',
-              orderby: $('#kleinanzeigen-scan-list-display input[name=orderby]').val() || 'title'
+              paged: parseInt($('#kleinanzeigen-task-list-display input[name=paged]').val()) || '1',
+              order: $('#kleinanzeigen-task-list-display input[name=order]').val() || 'asc',
+              orderby: $('#kleinanzeigen-task-list-display input[name=orderby]').val() || 'title'
             };
 
             window.clearTimeout(timeoutId);
@@ -133,13 +133,13 @@ function fetch_ka_modal_script()
             }, delay);
           });
 
-          $('#kleinanzeigen-scan-list').on('submit', function(e) {
+          $('#kleinanzeigen-task-list').on('submit', function(e) {
 
             e.preventDefault();
 
           });
 
-          $('.wp-list-scan-kleinanzeigen-ads').removeClass('loading');
+          $('.wp-list-task-kleinanzeigen-ads').removeClass('loading');
 
         },
 
@@ -151,14 +151,14 @@ function fetch_ka_modal_script()
          */
         update: function(data) {
 
-          $('.wp-list-scan-kleinanzeigen-ads').addClass('loading');
+          $('.wp-list-task-kleinanzeigen-ads').addClass('loading');
 
           $.ajax({
 
             url: ajaxurl,
             data: $.extend({
-                _ajax_custom_scan_list_nonce: $('#_ajax_custom_scan_list_nonce').val(),
-                action: '_ajax_fetch_kleinanzeigen_scan_history',
+                _ajax_custom_task_list_nonce: $('#_ajax_custom_task_list_nonce').val(),
+                action: '_ajax_fetch_kleinanzeigen_task_history',
               },
               data
             ),
@@ -167,15 +167,15 @@ function fetch_ka_modal_script()
               response = $.parseJSON(response);
 
               if (response.rows.length)
-                $('.wp-list-scan-kleinanzeigen-ads tbody').html(response.rows);
+                $('.wp-list-task-kleinanzeigen-ads tbody').html(response.rows);
               if (response.column_headers.length)
-                $('.wp-list-scan-kleinanzeigen-ads thead tr, .wp-list-kleinanzeigen-ads tfoot tr').html(response.column_headers);
+                $('.wp-list-task-kleinanzeigen-ads thead tr, .wp-list-kleinanzeigen-ads tfoot tr').html(response.column_headers);
               if (response.pagination.top.length)
-                $('#kleinanzeigen-scan-list-display .tablenav.top .tablenav-pages').html($(response.pagination.top).html());
+                $('#kleinanzeigen-task-list-display .tablenav.top .tablenav-pages').html($(response.pagination.top).html());
               if (response.pagination.bottom.length)
-                $('#kleinanzeigen-scan-list-display .tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
+                $('#kleinanzeigen-task-list-display .tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
 
-              $('.wp-list-scan-kleinanzeigen-ads').removeClass('loading');
+              $('.wp-list-task-kleinanzeigen-ads').removeClass('loading');
 
               setTimeout(list.init, 100);
             }

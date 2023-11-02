@@ -59,17 +59,17 @@ function _ajax_fetch_kleinanzeigen_display()
 add_action('wp_ajax__ajax_fetch_kleinanzeigen_display', '_ajax_fetch_kleinanzeigen_display');
 add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_display', '_ajax_fetch_kleinanzeigen_display');
 
-function _ajax_kleinanzeigen_scan()
+function _ajax_kleinanzeigen_task()
 {
   // require_once get_stylesheet_directory() . '/includes/kleinanzeigen-ajax-table-modal.php';
 
   // Keep in mind wbp_get_json_data will alter the page_number cookie, so save it and reset it later if required
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-  $scan_type = isset($_REQUEST['scan_type']) ? $_REQUEST['scan_type'] : null;
-  $wp_list_table = new Kleinanzeigen_Scan_List_Table();
+  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
+  $wp_list_table = new Kleinanzeigen_Task_List_Table();
 
   $subheader = '';
-  switch ($scan_type) {
+  switch ($task_type) {
     case 'invalid-ad':
       $subheader = 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist.';
       $footer_template = 'footer-invalid-ad';
@@ -88,9 +88,9 @@ function _ajax_kleinanzeigen_scan()
     'limit' => -1
   );
   $products = wc_get_products($args);
-  $items = wbp_get_scan_data($products, $ads, $scan_type);
+  $items = wbp_get_task_data($products, $ads, $task_type);
 
-  setcookie('kleinanzeigen-scan-type', $scan_type);
+  setcookie('kleinanzeigen-task-type', $task_type);
 
   ob_start();
   $wp_list_table->setData($items);
@@ -114,8 +114,8 @@ function _ajax_kleinanzeigen_scan()
 
   die(json_encode(compact('header', 'body', 'footer', 'script')));
 }
-add_action('wp_ajax__ajax_kleinanzeigen_scan', '_ajax_kleinanzeigen_scan');
-add_action('wp_ajax_nopriv__ajax_kleinanzeigen_scan', '_ajax_kleinanzeigen_scan');
+add_action('wp_ajax__ajax_kleinanzeigen_task', '_ajax_kleinanzeigen_task');
+add_action('wp_ajax_nopriv__ajax_kleinanzeigen_task', '_ajax_kleinanzeigen_task');
 
 /**
  * fetch_ka_script function based from Charlie's original function
@@ -238,10 +238,10 @@ function fetch_ka_script()
             list.update(data);
           })
 
-          $('.scan-page a.start-scan').on('click', function(e) {
+          $('.task-page a.start-task').on('click', function(e) {
             e.preventDefault();
             const el = e.target;
-            const scan_type = $(el).data('scan-type');
+            const task_type = $(el).data('task-type');
             const restored_text = $(el).html();
 
             $.ajax({
@@ -250,8 +250,8 @@ function fetch_ka_script()
               dataType: 'json',
               data: {
                 _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
-                action: '_ajax_kleinanzeigen_scan',
-                scan_type
+                action: '_ajax_kleinanzeigen_task',
+                task_type
               },
               beforeSend: function(data) {
                 $(el).html('Einen Moment...');

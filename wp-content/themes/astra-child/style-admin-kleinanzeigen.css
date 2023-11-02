@@ -58,7 +58,23 @@ section#color-definitions {
 }
 #kleinanzeigen-head-wrap .left-sections .section-inner .overview-wrap {
   display: flex;
+  justify-content: space-between;
   font-size: 10px;
+}
+#kleinanzeigen-head-wrap .left-sections .section-inner .overview-wrap fieldset {
+  border: 1px solid #eee;;
+  background-color: #f8fbff;
+  padding: 10px;
+}
+#kleinanzeigen-head-wrap
+  .left-sections
+  .section-inner
+  .overview-wrap
+  fieldset
+  legend {
+  padding: 2px 5px;
+  background-color: #000000;
+  color: white;
 }
 #kleinanzeigen-head-wrap .left-sections .section-inner .overview-grid {
   display: grid;
@@ -69,7 +85,6 @@ section#color-definitions {
     "key-b value-b"
     "key-c value-c";
   font-weight: 300;
-  margin-left: 30px;
 }
 #kleinanzeigen-head-wrap .left-sections .section-inner .overview-col-val {
   text-align: right;
@@ -100,13 +115,14 @@ section#color-definitions {
   section:not(:last-child)
   .section-inner {
   border-right: 1px solid #eee;
+  padding-right: 30px;
 }
 #kleinanzeigen-head-wrap .left-sections section {
   display: flex;
   padding: 20px;
 }
 #kleinanzeigen-head-wrap .left-sections section:first-child {
-  width: 490px;
+  max-width: 490px;
 }
 #kleinanzeigen-head-wrap .left-sections section:not(:first-child) {
   padding-left: 0px;
@@ -466,49 +482,49 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 * Styles for imported templates
 */
 .wp-list-kleinanzeigen-ads tbody tr.no-items,
-.wp-list-scan-kleinanzeigen-ads tbody tr.no-items {
+.wp-list-task-kleinanzeigen-ads tbody tr.no-items {
   display: flex;
   justify-content: center;
 }
 
-.wp-list-scan-kleinanzeigen-ads .column-status-start {
+.wp-list-task-kleinanzeigen-ads .column-status-start {
   width: 0.4%;
   padding: 0;
 }
 
-.wp-list-scan-kleinanzeigen-ads .column-image {
+.wp-list-task-kleinanzeigen-ads .column-image {
   width: 10%;
 }
 
-.wp-list-scan-kleinanzeigen-ads .column-title {
+.wp-list-task-kleinanzeigen-ads .column-title {
   width: 30%;
 }
-.wp-list-scan-kleinanzeigen-ads .column-ka-price {
+.wp-list-task-kleinanzeigen-ads .column-ka-price {
   width: 10%;
 }
 
-.wp-list-scan-kleinanzeigen-ads .column-shop-price {
+.wp-list-task-kleinanzeigen-ads .column-shop-price {
   width: 10%;
 }
 
-.wp-list-scan-kleinanzeigen-ads .column-actions {
+.wp-list-task-kleinanzeigen-ads .column-actions {
   width: 33%;
   text-align: center;
 }
 
-.wp-list-scan-kleinanzeigen-ads {
+.wp-list-task-kleinanzeigen-ads {
   table-layout: fixed;
   border-collapse: collapse;
 }
 
-.wp-list-scan-kleinanzeigen-ads.empty {
+.wp-list-task-kleinanzeigen-ads.empty {
   display: table;
 }
 
-.wp-list-scan-kleinanzeigen-ads thead td,
-.wp-list-scan-kleinanzeigen-ads thead th,
-.wp-list-scan-kleinanzeigen-ads tfoot td,
-.wp-list-scan-kleinanzeigen-ads tfoot th {
+.wp-list-task-kleinanzeigen-ads thead td,
+.wp-list-task-kleinanzeigen-ads thead th,
+.wp-list-task-kleinanzeigen-ads tfoot td,
+.wp-list-task-kleinanzeigen-ads tfoot th {
   background-color: #fff;
   position: sticky;
   top: 0;
@@ -516,31 +532,31 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
   padding: 5px;
 }
 
-.wp-list-scan-kleinanzeigen-ads thead th,
-.wp-list-scan-kleinanzeigen-ads tbody td,
-.wp-list-scan-kleinanzeigen-ads tfoot th {
+.wp-list-task-kleinanzeigen-ads thead th,
+.wp-list-task-kleinanzeigen-ads tbody td,
+.wp-list-task-kleinanzeigen-ads tfoot th {
   padding: 8px;
   vertical-align: middle;
 }
 
-.wp-list-scan-kleinanzeigen-ads.striped > tbody > :nth-child(odd) {
+.wp-list-task-kleinanzeigen-ads.striped > tbody > :nth-child(odd) {
   background-color: #f6f7f7;
 }
 
-.wp-list-scan-kleinanzeigen-ads tbody {
+.wp-list-task-kleinanzeigen-ads tbody {
   overflow: auto;
   height: 320px;
   display: block;
 }
 
-.wp-list-scan-kleinanzeigen-ads thead tr,
-.wp-list-scan-kleinanzeigen-ads tbody tr,
-.wp-list-scan-kleinanzeigen-ads tfoot tr {
+.wp-list-task-kleinanzeigen-ads thead tr,
+.wp-list-task-kleinanzeigen-ads tbody tr,
+.wp-list-task-kleinanzeigen-ads tfoot tr {
   display: inline-table;
   width: 100%;
 }
 
-.wp-list-scan-kleinanzeigen-ads tbody td .action-button {
+.wp-list-task-kleinanzeigen-ads tbody td .action-button {
   width: 130px;
   margin: 5px;
   overflow: hidden;
@@ -548,6 +564,6 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
   white-space: nowrap;
 }
 
-#kleinanzeigen-scan-list .tablenav.bottom {
+#kleinanzeigen-task-list .tablenav.bottom {
   margin-bottom: 30px;
 }

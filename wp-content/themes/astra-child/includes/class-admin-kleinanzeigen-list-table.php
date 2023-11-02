@@ -62,12 +62,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     if (isset($data)) {
       $categories = $data->categoriesSearchData;
-      $total_ads = 0;
-      foreach ($categories as $category) {
-        $total_ads += $category->totalAds;
-      }
     }
-
 
     // Total published products
     $args = array(
@@ -116,9 +111,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
       }
     }
-    $pages = KLEINANZEIGEN_TOTAL_PAGES;
-    $todos = $products['todos'];
-    wbp_include_kleinanzeigen_template('header.php', false, compact('data', 'paged', 'pages', 'todos', 'categories', 'total_ads', 'published_has_sku', 'published_no_sku', 'products', 'todos'));
+    $items = $this->items;
+    wbp_include_kleinanzeigen_template('header.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku'));
   }
 
   /**
@@ -237,7 +231,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     /**
      * How many records for page do you want to show?
      */
-    $per_page = 25;
+    $per_page = KLEINANZEIGEN_PER_PAGE;
 
     /**
      * Define of column_headers. It's an array that contains:

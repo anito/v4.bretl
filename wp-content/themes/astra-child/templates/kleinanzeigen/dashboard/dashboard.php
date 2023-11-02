@@ -20,11 +20,11 @@
       <div class="ka-list-modal-body">
         <div id="ka-list-modal-content" class="ka-list-modal-inner">
           <div class="header"></div>
-          <form action="" name="kleinanzeigen-scan-list" id="kleinanzeigen-scan-list" method="get">
+          <form action="" name="kleinanzeigen-task-list" id="kleinanzeigen-task-list" method="get">
             <?php
-            wp_nonce_field('ajax-custom-scan-list-nonce', '_ajax_custom_scan_list_nonce');
+            wp_nonce_field('ajax-custom-task-list-nonce', '_ajax_custom_task_list_nonce');
             ?>
-            <div class="body" id="kleinanzeigen-scan-list-display"></div>
+            <div class="body" id="kleinanzeigen-task-list-display"></div>
           </form>
           <div class="footer"></div>
           <div class="script"></div>
