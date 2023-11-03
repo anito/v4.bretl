@@ -115,6 +115,30 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     wbp_include_kleinanzeigen_template('header.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku'));
   }
 
+  function render_tasks()
+  {
+    $tasks = array(array(
+      'name' => 'invalid-ad',
+      'product_ids' => array()
+    ), array(
+      'name' => 'invalid-price',
+      'product_ids' => array()
+    ));
+    $ads = wbp_get_all_ads();
+    $args = array(
+      'status' => 'publish',
+      'limit' => -1
+    );
+    $products = wc_get_products($args);
+    foreach ($tasks as $key => $task) {
+      $data = wbp_get_task_data($products, $ads, $task['name']);
+      foreach ($data as $item) {
+        $tasks[$key]['product_ids'][] = $item['product']->get_ID();
+      }
+    }
+    echo json_encode($tasks);
+  }
+
   /**
    * @Override ajax_response method
    */
@@ -134,6 +158,11 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     ob_start();
     $this->render_head();
     $head = ob_get_clean();
+
+    ob_start();
+    $this->render_tasks();
+    $tasks = ob_get_clean();
+    $tasks = json_decode($tasks);
 
     ob_start();
     if (!empty($_REQUEST['no_placeholder']))
@@ -159,6 +188,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $response['pagination']['bottom'] = $pagination_bottom;
     $response['column_headers'] = $headers;
     $response['head'] = $head;
+    $response['tasks'] = $tasks;
 
     if (isset($total_items))
       $response['total_items_i18n'] = sprintf(_n('1 item', '%s items', $total_items), number_format_i18n($total_items));
@@ -312,7 +342,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       }
 
       $label_terms = wbp_get_product_labels($post_ID);
-      if($label_terms) {
+      if ($label_terms) {
         $product_labels = wp_list_pluck($label_terms, 'name');
       }
       $brand_terms = wbp_get_product_brands($post_ID);

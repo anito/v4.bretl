@@ -13,7 +13,7 @@ $todos = $products['todos']; ?>
         <div style="display: flex; flex-direction: column;">
           <h2 style="display: flex; justify-content: space-between;"><?php echo sprintf(__('Page: %s', 'astra-child'), $paged) ?><small style="margin-left: 20px; font-size: 12px;"><?php echo sprintf(__('Ads: %s', 'astra-child'), count($items)); ?></small></h2>
           <div class="overview-wrap">
-            <fieldset>
+            <fieldset class="fieldset">
               <legend><?php echo __('Total published', 'astra-child') ?></legend>
               <div class="overview-grid">
                 <div class="overview-col-key a">
@@ -31,6 +31,40 @@ $todos = $products['todos']; ?>
           </div>
         </div>
 
+        <fieldset class="fieldset tasks" style="flex-direction: column;">
+          <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
+          <legend><?php echo __('Todos', 'astra-child') ?></legend>
+          <div class="task invalid-ad">
+            <div class="general-action">
+              <div class="action-header">
+                <div class="">
+                  <div class="task-count-wrapper warning">
+                    <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                    <span class="task-count">0</span>
+                  </div>
+                  <span class="action-header-title"><b><?php echo __('Invalid Ad IDs found', 'astra-child') ?></b></span>
+                </div>
+                <a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
+              </div>
+            </div>
+          </div>
+          <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
+          <div class="task invalid-price">
+            <div class="general-action">
+              <div class="action-header">
+                <div class="">
+                  <div class="task-count-wrapper warning">
+                    <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                    <span class="task-count">0</span>
+                  </div>
+                  <span class="action-header-title"><b><?php echo __('Price adjustments required', 'astra-child') ?></b></span>
+                </div>
+                <a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
         <div class="pagination">
           <?php for ($i = 1; $i <= $num_pages; $i++) {
           ?>
@@ -38,33 +72,6 @@ $todos = $products['todos']; ?>
           <?php } ?>
         </div>
 
-        <div class="task-pages">
-          <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
-          <div class="task-page">
-            <div class="general-action">
-              <div class="action-header">
-                <i class="dashicons dashicons-editor-help align-center" title="<?php echo $title ?>"></i>
-                <span><b>Nach Reservierung / Verkauf / Deaktivierung</b></span>
-              </div>
-              <div class="action-buttons">
-                <a href="#" type="button" class="start-task info button button-primary button-small" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
-              </div>
-            </div>
-          </div>
-          <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
-          <div class="task-page">
-            <div class="general-action">
-              <div class="action-header">
-                <i class="dashicons dashicons-editor-help align-center" title="<?php echo $title ?>"></i>
-                <span><b>Nach Preisanpassung</b></span>
-              </div>
-              <div class="action-buttons">
-                <a href="#" type="button" class="start-task info button button-primary button-small" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
-              </div>
-            </div>
-          </div>
-
-        </div>
       </div>
     </section>
     <section class="wbp-shop-section">
@@ -194,43 +201,84 @@ $todos = $products['todos']; ?>
 </script>
 
 <style>
-  .task-pages {
-    padding: 10px;
-    background-color: #f8fbff;
-    border: 1px solid #eee;
-  }
-
-  .task-pages .task-page {
-    margin: 10px 0px 30px;
+  .wbp-kleinanzeigen-section .tasks .task {
+    margin: 10px 0px;
     font-size: 12px;
   }
 
-  .task-pages .task-page:last-child {
+  .wbp-kleinanzeigen-section .tasks .task:last-child {
     margin-bottom: 10px;
   }
 
-  .task-page .explanation {
+  .wbp-kleinanzeigen-section .tasks .task .explanation {
     padding: 5px;
     background-color: aqua;
     font-size: .8em;
     font-weight: 100;
   }
 
-  .task-pages .task-page .general-action .action-header {
+  .wbp-kleinanzeigen-section .tasks .task .general-action .action-header {
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  .task-pages .task-page .general-action .action-buttons {
+  .wbp-kleinanzeigen-section .tasks .task .general-action .action-buttons {
+    display: flex;
+    align-items: center;
     margin-left: 30px;
   }
 
-  .task-pages .task-page .general-action .action-buttons .button {
+  .wbp-kleinanzeigen-section .tasks .task .general-action .action-buttons .dashicons {
+    font-size: 15px;
+    line-height: 18px;
+    margin-left: 10px;
+    width: 15px;
+    height: 15px;
+  }
+
+  .wbp-kleinanzeigen-section .tasks .task .general-action .action-buttons .button {
     min-width: 200px;
     text-align: center;
   }
 
-  .task-page .dashicons.align-center {
+  .wbp-kleinanzeigen-section .action-header-title {
+    display: inline-block;
     margin-right: 10px;
-    align-self: center;
+    line-height: 1em;
+  }
+
+  .wbp-kleinanzeigen-section .task-count {
+    margin-right: 5px;
+    display: inline-block;
+  }
+
+  .wbp-kleinanzeigen-section .task-count-wrapper {
+    border-radius: 99px;
+    border: 1px solid;
+    padding: 1px 4px;
+    margin-right: 8px;
+    display: inline-block;
+    text-align: center;
+    font-size: 11px;
+  }
+
+  .wbp-kleinanzeigen-section .task-count-wrapper .dashicons {
+    font-size: 14px;
+    vertical-align: middle;
+    width: 10px;
+    height: 10px;
+    line-height: 0.5em;
+  }
+
+  .wbp-kleinanzeigen-section .chip.task-count {
+    border-radius: 99px;
+    border: 1px solid;
+    padding: 3px 3px;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    text-align: center;
   }
 </style>

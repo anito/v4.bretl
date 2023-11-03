@@ -130,16 +130,20 @@ function wbp_ajax_fix_price()
   }
 
   $modal_row = null;
+  $tasks = null;
+  $wp_task_list_table = new Kleinanzeigen_Task_List_Table();
   if ('modal' === $screen) {
     $ads = wbp_get_all_ads();
     $ids = array_column($ads, 'id');
     $record_key = array_search($kleinanzeigen_id, $ids);
     $record = $ads[$record_key];
     $modal_row = render_task_list_row($post_ID, array('record' => $record));
+    $tasks = wbp_render_tasks();
+    $tasks = json_decode($tasks);
   }
 
   die(json_encode([
-    'data' => compact(array('row', 'modal_row', 'post_ID', 'kleinanzeigen_id'))
+    'data' => compact(array('row', 'modal_row', 'post_ID', 'kleinanzeigen_id', 'tasks'))
   ]));
 }
 
@@ -667,13 +671,20 @@ function render_task_list_row($post_ID, $args = array())
 {
   $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
 
-  $wp_task_list_table = new Kleinanzeigen_Task_List_Table();
+  $wp_list_table = new Kleinanzeigen_Task_List_Table();
 
   $product = wc_get_product($post_ID);
   $data = array_merge(array('product' => $product, 'task_type' => $task_type), $args);
-  $wp_task_list_table->setData($data);
+  $wp_list_table->setData($data);
 
   ob_start();
-  $wp_task_list_table->render_row($data);
+  $wp_list_table->render_row($data);
+  return ob_get_clean();
+}
+
+function wbp_render_tasks() {
+  $wp_list_table = new Kleinanzeigen_List_Table();
+  ob_start();
+  $wp_list_table->render_tasks();
   return ob_get_clean();
 }
