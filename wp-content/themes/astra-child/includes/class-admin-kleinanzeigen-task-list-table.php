@@ -263,7 +263,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             $price = wbp_extract_kleinanzeigen_price($ka_price);
             $shop_price = $product->get_price();
             $disabled = $price === $shop_price;
-            $label = $price !== $shop_price ? __('Accept price', 'astra-child') : __('Price accepted', 'astra-child');
+            $label = $price !== $shop_price ? __('Accept KA price', 'astra-child') : __('KA Price accepted', 'astra-child');
             $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'task_type', 'disabled'));
             break;
           default:

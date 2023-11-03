@@ -805,6 +805,8 @@ add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeh
 function wbp_get_task_data($products, $ads, $task_type)
 {
   $ad_ids = wp_list_pluck($ads, 'id');
+  $records = wp_list_pluck((array) $ads, 'id');
+  $records = array_flip($records);
   $items = [];
   foreach ($products as $product) {
     $post_ID = $product->get_id();
@@ -826,16 +828,9 @@ function wbp_get_task_data($products, $ads, $task_type)
           break;
         case 'invalid-price':
           if (in_array($sku, $ad_ids)) {
-            $records = array_filter($ads, function ($ad) use ($sku) {
-              return $ad->id === $sku;
-            });
-            if (!empty($records)) {
-              $key = array_key_first($records);
-              $record = $records[$key];
-              if (wbp_has_price_diff($record, $product)) {
-                $ka_price = $record->price;
-                $items[] = compact('product', 'task_type', 'record');
-              }
+            $record = $ads[$records[$sku]];
+            if (wbp_has_price_diff($record, $product)) {
+              $items[] = compact('product', 'task_type', 'record');
             }
           }
           break;
