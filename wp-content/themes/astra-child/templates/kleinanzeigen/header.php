@@ -31,37 +31,39 @@ $todos = $products['todos']; ?>
           </div>
         </div>
 
-        <fieldset class="fieldset tasks" style="flex-direction: column; background-color: #fff0f0;">
-          <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
-          <legend><?php echo __('Inconsistencies', 'astra-child') ?></legend>
-          <div class="task invalid-ad">
-            <div class="general-action">
-              <div class="action-header">
-                <div class="">
-                  <div class="task-count-wrapper warning">
-                    <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+        <div id="inconsistencies" class="hidden">
+          <fieldset class="fieldset tasks" style="flex-direction: column; background-color: #fff0f0;">
+            <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
+            <legend><?php echo __('Inconsistencies', 'astra-child') ?></legend>
+            <div class="task invalid-ad">
+              <div class="general-action">
+                <div class="action-header">
+                  <div class="">
+                    <div class="task-count-wrapper warning">
+                      <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                    </div>
+                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid Ad IDs', 'astra-child') ?></a></span>
+                    (<span class="task-count">0</span>)
                   </div>
-                  <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid Ad IDs', 'astra-child') ?></a></span>
-                  (<span class="task-count">0</span>)
                 </div>
               </div>
             </div>
-          </div>
-          <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
-          <div class="task invalid-price">
-            <div class="general-action">
-              <div class="action-header">
-                <div class="">
-                  <div class="task-count-wrapper warning">
-                    <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+            <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
+            <div class="task invalid-price">
+              <div class="general-action">
+                <div class="action-header">
+                  <div class="">
+                    <div class="task-count-wrapper warning">
+                      <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                    </div>
+                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price deviations', 'astra-child') ?></a></span>
+                    (<span class="task-count">0</span>)
                   </div>
-                  <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price deviations', 'astra-child') ?></a></span>
-                  (<span class="task-count">0</span>)
                 </div>
               </div>
             </div>
-          </div>
-        </fieldset>
+          </fieldset>
+        </div>
 
         <div class="pagination">
           <?php for ($i = 1; $i <= $num_pages; $i++) {

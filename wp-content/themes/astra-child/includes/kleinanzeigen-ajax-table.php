@@ -72,22 +72,21 @@ function _ajax_kleinanzeigen_task()
       $subheader = 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist';
       $footer_template = 'footer-invalid-ad';
       break;
-      case 'invalid-price':
-        $subheader = 'Auflistung von Produkten mit Preisdifferenz zwischen Shop und Kleinanzeige';
-        $footer_template = 'blank';
-        break;
-      case 'has-sku':
-        $subheader = 'Auflistung von Produkten mit Anzeige ID';
-        $footer_template = 'blank';
-        break;
-      case 'no-sku':
-        $subheader = 'Auflistung von Produkten ohne Anzeige ID';
-        $footer_template = 'blank';
-        break;
-      default:
-        $subheader = '';
-        $footer_template = 'blank';
-
+    case 'invalid-price':
+      $subheader = 'Auflistung von Produkten mit Preisunterschied Shop / Kleinanzeige';
+      $footer_template = 'blank';
+      break;
+    case 'has-sku':
+      $subheader = 'Auflistung von Produkten mit Anzeige ID';
+      $footer_template = 'blank';
+      break;
+    case 'no-sku':
+      $subheader = 'Auflistung von Produkten ohne Anzeige ID';
+      $footer_template = 'blank';
+      break;
+    default:
+      $subheader = '';
+      $footer_template = 'blank';
   }
 
   $ads = wbp_get_all_ads();
@@ -339,15 +338,14 @@ function fetch_ka_script()
         },
 
         render_tasks: function(tasks) {
-          const product_ids = [];
-          tasks.forEach(task => {
-            product_ids.push(...task.product_ids);
-          })
-          if (!product_ids.length) {
-            $("#kleinanzeigen-head-wrap .tasks").addClass('hidden');
+          const inconsistencies = tasks.filter(task => task.priority === 1 && task.product_ids.length);
+
+          if (!inconsistencies.length) {
+            $("#inconsistencies").addClass('hidden');
             return;
           }
 
+          $("#inconsistencies").removeClass('hidden');
           tasks.forEach(task => {
             let count = task.product_ids.length;
             if (count) {

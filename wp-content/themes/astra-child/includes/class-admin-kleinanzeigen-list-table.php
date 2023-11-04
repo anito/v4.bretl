@@ -120,15 +120,19 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   {
     $tasks = array(array(
       'name' => 'invalid-ad',
+      'priority' => 1,
       'product_ids' => array()
     ), array(
       'name' => 'invalid-price',
+      'priority' => 1,
       'product_ids' => array()
     ), array(
       'name' => 'has-sku',
+      'priority' => 0,
       'product_ids' => array()
     ), array(
       'name' => 'no-sku',
+      'priority' => 0,
       'product_ids' => array()
     ));
     $ads = wbp_get_all_ads();
