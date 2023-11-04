@@ -31,7 +31,7 @@ $todos = $products['todos']; ?>
           </div>
         </div>
 
-        <fieldset class="fieldset tasks" style="flex-direction: column;">
+        <fieldset class="fieldset tasks" style="flex-direction: column; background-color: #fff0f0;">
           <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
           <legend><?php echo __('Inconsistencies', 'astra-child') ?></legend>
           <div class="task invalid-ad">
