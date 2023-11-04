@@ -42,9 +42,8 @@ $todos = $products['todos']; ?>
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
                     <span class="task-count">0</span>
                   </div>
-                  <span class="action-header-title"><b><?php echo __('Invalid Ad IDs found', 'astra-child') ?></b></span>
+                  <span class="action-header-title"><b><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid Ad IDs found', 'astra-child') ?></a></b></span>
                 </div>
-                <a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
               </div>
             </div>
           </div>
@@ -57,9 +56,8 @@ $todos = $products['todos']; ?>
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
                     <span class="task-count">0</span>
                   </div>
-                  <span class="action-header-title"><b><?php echo __('Price adjustments required', 'astra-child') ?></b></span>
+                  <span class="action-header-title"><b><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price adjustments required', 'astra-child') ?></a></b></span>
                 </div>
-                <a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Show affected products', 'astra-child') ?></a>
               </div>
             </div>
           </div>
