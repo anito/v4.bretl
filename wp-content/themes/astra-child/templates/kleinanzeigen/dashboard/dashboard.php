@@ -74,6 +74,10 @@
     transition: opacity .3s ease-in;
   }
 
+  .ka-list-modal form {
+    margin-bottom: 50px;
+  }
+
   body.show-modal .ka-list-modal {
     pointer-events: all;
     transition: opacity .3s ease-in;
@@ -117,6 +121,7 @@
 
   .ka-list-header h5 {
     font-size: 1em;
+    margin: 0.3em 0;
   }
 
   .ka-list-modal .button-controls {

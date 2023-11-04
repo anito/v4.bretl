@@ -21,8 +21,8 @@ $todos = $products['todos']; ?>
                   <span style="display: inline-block; padding: 0 10px;">>></span>
                   <span><?php echo $ad_cats; ?></span>
                 </div>
-                <div class="overview-col-key b"><?php echo __('Products with Ad ID', 'astra-child'); ?></div>
-                <div class="overview-col-key c"><?php echo __('Products without Ad ID', 'astra-child'); ?></div>
+                <div class="overview-col-key b task has-sku"><a href="#" class="start-task" data-task-type="has-sku"><?php echo __('Products with Ad ID', 'astra-child'); ?></a></div>
+                <div class="overview-col-key c task no-sku"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Products without Ad ID', 'astra-child'); ?></a></div>
                 <div class="overview-col-val a"><?php echo $total_ads; ?></div>
                 <div class="overview-col-val b"><?php echo count($published_has_sku); ?></div>
                 <div class="overview-col-val c"><?php echo count($published_no_sku); ?></div>
@@ -33,7 +33,7 @@ $todos = $products['todos']; ?>
 
         <fieldset class="fieldset tasks" style="flex-direction: column;">
           <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
-          <legend><?php echo __('Todos', 'astra-child') ?></legend>
+          <legend><?php echo __('Issues', 'astra-child') ?></legend>
           <div class="task invalid-ad">
             <div class="general-action">
               <div class="action-header">
@@ -187,11 +187,14 @@ $todos = $products['todos']; ?>
 <script>
   jQuery(document).ready(($) => {
 
+    const tasks = <?php echo json_encode($tasks) ?>;
     const {
-      init_head
+      init_head,
+      render_tasks
     } = ajax_object;
 
     init_head();
+    render_tasks(tasks);
 
     $('.trigger').click(function() {
       $(this).toggleClass('active');

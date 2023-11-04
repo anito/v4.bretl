@@ -125,12 +125,13 @@ function wbp_ajax_fix_price()
         $wp_list_table->render_row($record);
       }
       $row = ob_get_clean();
-
+      ob_start();
+      $wp_list_table->render_head();
+      $head = ob_get_clean();
       break;
   }
 
   $modal_row = null;
-  $tasks = null;
   $wp_task_list_table = new Kleinanzeigen_Task_List_Table();
   if ('modal' === $screen) {
     $ads = wbp_get_all_ads();
@@ -138,12 +139,10 @@ function wbp_ajax_fix_price()
     $record_key = array_search($kleinanzeigen_id, $ids);
     $record = $ads[$record_key];
     $modal_row = render_task_list_row($post_ID, array('record' => $record));
-    $tasks = wbp_render_tasks();
-    $tasks = json_decode($tasks);
   }
 
   die(json_encode([
-    'data' => compact(array('row', 'modal_row', 'post_ID', 'kleinanzeigen_id', 'tasks'))
+    'data' => compact(array('row', 'modal_row', 'post_ID', 'kleinanzeigen_id', 'head'))
   ]));
 }
 

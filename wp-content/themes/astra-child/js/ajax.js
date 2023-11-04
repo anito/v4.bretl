@@ -28,6 +28,9 @@ jQuery(document).ready(function ($) {
       });
   };
 
+  window.addEventListener("hide:item", function (e) {
+    publishPost(e.detail.e);
+  });
   window.addEventListener("deactivate:item", function (e) {
     publishPost(e.detail.e);
   });
@@ -518,7 +521,7 @@ jQuery(document).ready(function ($) {
 
   function parseResponse(data, el, callback) {
     const {
-      data: { row, modal_row, head, post_ID, kleinanzeigen_id, tasks },
+      data: { row, modal_row, head, post_ID, kleinanzeigen_id },
     } = JSON.parse(data);
 
     const the_screen = el.dataset.screen || screen;
@@ -548,19 +551,6 @@ jQuery(document).ready(function ($) {
         if (modal_row) {
           modalRowEl = $(`.wp-list-task-kleinanzeigen-ads tr#${post_ID}`);
           $(modalRowEl)?.replaceWith(modal_row);
-        }
-
-        if (tasks) {
-          const product_ids = [];
-          tasks.forEach((task) => {
-            product_ids.push(...task.product_ids);
-          });
-          if (!product_ids.length) {
-            $("#kleinanzeigen-head-wrap .tasks").addClass("hidden");
-            return;
-          }
-
-          renderTasks({ tasks });
         }
 
         const data = $(el).data();
@@ -769,7 +759,4 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function renderTasks(data) {
-    ajax_object.render_tasks(data);
-  }
 });

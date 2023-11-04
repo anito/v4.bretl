@@ -53,12 +53,7 @@ function _ajax_fetch_kleinanzeigen_display()
   $wp_list_table->render_head();
   $head = ob_get_clean();
 
-  ob_start();
-  $wp_list_table->render_tasks();
-  $tasks = ob_get_clean();
-  $tasks = json_decode($tasks);
-
-  die(json_encode(compact('head', 'display', 'tasks')));
+  die(json_encode(compact('head', 'display')));
 }
 add_action('wp_ajax__ajax_fetch_kleinanzeigen_display', '_ajax_fetch_kleinanzeigen_display');
 add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_display', '_ajax_fetch_kleinanzeigen_display');
@@ -74,14 +69,25 @@ function _ajax_kleinanzeigen_task()
   $subheader = '';
   switch ($task_type) {
     case 'invalid-ad':
-      $subheader = 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist.';
+      $subheader = 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist';
       $footer_template = 'footer-invalid-ad';
       break;
-    case 'invalid-price':
-      $subheader = 'Auflistung von Produkten mit Preisdifferenz zwischen Shop und Kleinanzeige.';
-      $footer_template = 'blank';
-      $footer = '';
-      break;
+      case 'invalid-price':
+        $subheader = 'Auflistung von Produkten mit Preisdifferenz zwischen Shop und Kleinanzeige';
+        $footer_template = 'blank';
+        break;
+      case 'has-sku':
+        $subheader = 'Auflistung von Produkten mit Anzeige ID';
+        $footer_template = 'blank';
+        break;
+      case 'no-sku':
+        $subheader = 'Auflistung von Produkten ohne Anzeige ID';
+        $footer_template = 'blank';
+        break;
+      default:
+        $subheader = '';
+        $footer_template = 'blank';
+
   }
 
   $ads = wbp_get_all_ads();
@@ -157,8 +163,6 @@ function fetch_ka_script()
               $('.wp-list-kleinanzeigen-ads').removeClass('loading');
 
               $("#kleinanzeigen-head-wrap").html(response.head);
-
-              list.render_tasks(response);
 
               $("#kleinanzeigen-list-display").html(response.display);
 
@@ -304,21 +308,28 @@ function fetch_ka_script()
             ),
             success: function(response) {
 
-              response = $.parseJSON(response);
+              const {
+                head,
+                rows,
+                pagination,
+                column_headers,
+                tasks
+              } = $.parseJSON(response);
 
-              if (response.head)
-                $("#kleinanzeigen-head-wrap").html(response.head);
+              if (head)
+                $("#kleinanzeigen-head-wrap").html(head);
 
-              list.render_tasks(response);
+              if (tasks)
+                list.render_tasks(tasks);
 
-              if (response.rows.length)
-                $('.wp-list-kleinanzeigen-ads tbody').html(response.rows);
-              if (response.column_headers.length)
-                $('.wp-list-kleinanzeigen-ads thead tr, tfoot tr').html(response.column_headers);
-              if (response.pagination.top.length)
-                $('#kleinanzeigen-list-display .tablenav.top .tablenav-pages').html($(response.pagination.top).html());
-              if (response.pagination.bottom.length)
-                $('#kleinanzeigen-list-display .tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
+              if (rows.length)
+                $('.wp-list-kleinanzeigen-ads tbody').html(rows);
+              if (column_headers.length)
+                $('.wp-list-kleinanzeigen-ads thead tr, tfoot tr').html(column_headers);
+              if (pagination.top.length)
+                $('#kleinanzeigen-list-display .tablenav.top .tablenav-pages').html($(pagination.top).html());
+              if (pagination.bottom.length)
+                $('#kleinanzeigen-list-display .tablenav.bottom .tablenav-pages').html($(pagination.bottom).html());
 
               $('.wp-list-kleinanzeigen-ads').removeClass('loading');
 
@@ -327,9 +338,7 @@ function fetch_ka_script()
           });
         },
 
-        render_tasks: function({
-          tasks
-        }) {
+        render_tasks: function(tasks) {
           const product_ids = [];
           tasks.forEach(task => {
             product_ids.push(...task.product_ids);

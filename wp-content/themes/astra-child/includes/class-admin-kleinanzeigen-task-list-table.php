@@ -43,7 +43,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
   function render_header($args = array())
   {
     $defaults = array(
-      'template' => '__blank__',
+      'template' => 'blank',
       'subheader' => '__SUBHEADER__'
     );
     $options = wp_parse_args($args, $defaults);
@@ -53,7 +53,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
   function render_footer($args = array())
   {
     $defaults = array(
-      'template' => '__blank__'
+      'template' => 'blank'
     );
     $options = wp_parse_args($args, $defaults);
     wbp_include_kleinanzeigen_template('/dashboard/' . $options['template'] . '.php', false, $options);
@@ -265,6 +265,11 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             $disabled = $price === $shop_price;
             $label = $price !== $shop_price ? __('Accept KA price', 'astra-child') : __('KA Price accepted', 'astra-child');
             $actions = wbp_include_kleinanzeigen_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'task_type', 'disabled'));
+            break;
+          case 'has-sku':
+          case 'no-sku':
+            $label = $post_status === 'publish' ? __('Hide', 'astra-child') : __('Publish');
+            $actions = wbp_include_kleinanzeigen_template('/dashboard/sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
             break;
           default:
         }

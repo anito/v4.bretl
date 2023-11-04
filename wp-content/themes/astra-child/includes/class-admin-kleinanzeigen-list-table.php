@@ -112,7 +112,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       }
     }
     $items = $this->items;
-    wbp_include_kleinanzeigen_template('header.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku'));
+    $tasks = $this->render_tasks();
+    wbp_include_kleinanzeigen_template('header.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'tasks'));
   }
 
   function render_tasks()
@@ -122,6 +123,12 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       'product_ids' => array()
     ), array(
       'name' => 'invalid-price',
+      'product_ids' => array()
+    ), array(
+      'name' => 'has-sku',
+      'product_ids' => array()
+    ), array(
+      'name' => 'no-sku',
       'product_ids' => array()
     ));
     $ads = wbp_get_all_ads();
@@ -136,7 +143,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $tasks[$key]['product_ids'][] = $item['product']->get_ID();
       }
     }
-    echo json_encode($tasks);
+    return $tasks;
   }
 
   /**
@@ -158,11 +165,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     ob_start();
     $this->render_head();
     $head = ob_get_clean();
-
-    ob_start();
-    $this->render_tasks();
-    $tasks = ob_get_clean();
-    $tasks = json_decode($tasks);
 
     ob_start();
     if (!empty($_REQUEST['no_placeholder']))
@@ -188,7 +190,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $response['pagination']['bottom'] = $pagination_bottom;
     $response['column_headers'] = $headers;
     $response['head'] = $head;
-    $response['tasks'] = $tasks;
 
     if (isset($total_items))
       $response['total_items_i18n'] = sprintf(_n('1 item', '%s items', $total_items), number_format_i18n($total_items));

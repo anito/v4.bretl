@@ -808,6 +808,24 @@ function wbp_get_task_data($products, $ads, $task_type)
   $records = wp_list_pluck((array) $ads, 'id');
   $records = array_flip($records);
   $items = [];
+  if ($task_type === 'no-sku') {
+    $products_no_sku = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'NOT EXISTS'));
+    $record = null;
+    foreach ($products_no_sku as $product) {
+      $items[] = compact('product', 'task_type', 'record');
+    }
+    return $items;
+  }
+  if ($task_type === 'has-sku') {
+    $record = null;
+    $products_has_sku = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'EXISTS'));
+    foreach ($products_has_sku as $product) {
+      $sku = (int) $product->get_sku();
+      $record = $ads[$records[$sku]];
+      $items[] = compact('product', 'task_type', 'record');
+    }
+    return $items;
+  }
   foreach ($products as $product) {
     $post_ID = $product->get_id();
     $sku = (int) $product->get_sku();
@@ -1031,7 +1049,8 @@ function wbp_get_json_data($args = array())
   }
 }
 
-function wbp_error_check($data, $error_template) {
+function wbp_error_check($data, $error_template)
+{
   if (is_wp_error($data)) {
     die(json_encode(array(
 
