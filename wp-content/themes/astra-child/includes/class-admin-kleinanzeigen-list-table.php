@@ -23,10 +23,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       'ajax' => true
     ));
 
-    self::$INVISIBLE = __('Nicht sichtbar', 'astra-child');
-    self::$PRICE_DIFF = __('Preisdifferenz', 'astra-child');
-    self::$CONTAINS_DEFAULT_CAT = __('enthält Standard-Kategorie', 'astra-child');
-    self::$NO_CAT = __('keine gültige Kategorie', 'astra-child');
+    self::$INVISIBLE = __('Not visible', 'astra-child');
+    self::$PRICE_DIFF = __('Price deviation', 'astra-child');
+    self::$CONTAINS_DEFAULT_CAT = __('Contains Default Category', 'astra-child');
+    self::$NO_CAT = __('Invalid Category', 'astra-child');
   }
 
   /**
