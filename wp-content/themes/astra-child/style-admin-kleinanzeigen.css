@@ -59,7 +59,6 @@ section#color-definitions {
 #kleinanzeigen-head-wrap .left-sections .section-inner .overview-wrap {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
   margin-bottom: 20px;
 }
 #kleinanzeigen-head-wrap .fieldset {
@@ -68,6 +67,7 @@ section#color-definitions {
   border: 1px solid #eee;
   background-color: #f8fbff;
   padding: 10px;
+  font-size: 11px;
 }
 #kleinanzeigen-head-wrap .fieldset legend {
   padding: 2px 5px;
