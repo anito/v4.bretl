@@ -40,9 +40,9 @@ $todos = $products['todos']; ?>
                 <div class="">
                   <div class="task-count-wrapper warning">
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                    <span class="task-count">0</span>
                   </div>
                   <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid Ad IDs', 'astra-child') ?></a></span>
+                  (<span class="task-count">0</span>)
                 </div>
               </div>
             </div>
@@ -54,9 +54,9 @@ $todos = $products['todos']; ?>
                 <div class="">
                   <div class="task-count-wrapper warning">
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                    <span class="task-count">0</span>
                   </div>
                   <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price deviations', 'astra-child') ?></a></span>
+                  (<span class="task-count">0</span>)
                 </div>
               </div>
             </div>
@@ -241,7 +241,6 @@ $todos = $products['todos']; ?>
   }
 
   .wbp-kleinanzeigen-section .task-count {
-    margin-right: 5px;
     display: inline-block;
   }
 
