@@ -33,7 +33,7 @@ $todos = $products['todos']; ?>
 
         <fieldset class="fieldset tasks" style="flex-direction: column;">
           <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
-          <legend><?php echo __('Known issues', 'astra-child') ?></legend>
+          <legend><?php echo __('Inconsistencies', 'astra-child') ?></legend>
           <div class="task invalid-ad">
             <div class="general-action">
               <div class="action-header">
@@ -202,14 +202,6 @@ $todos = $products['todos']; ?>
 </script>
 
 <style>
-  .wbp-kleinanzeigen-section .tasks .task {
-    margin: 10px 0px;
-  }
-
-  .wbp-kleinanzeigen-section .tasks .task:last-child {
-    margin-bottom: 10px;
-  }
-
   .wbp-kleinanzeigen-section .tasks .task .explanation {
     padding: 5px;
     background-color: aqua;
@@ -218,7 +210,6 @@ $todos = $products['todos']; ?>
   }
 
   .wbp-kleinanzeigen-section .tasks .task .general-action .action-header {
-    margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -255,13 +246,16 @@ $todos = $products['todos']; ?>
   }
 
   .wbp-kleinanzeigen-section .task-count-wrapper {
-    border-radius: 99px;
-    border: 1px solid;
-    padding: 1px 4px;
     margin-right: 8px;
     display: inline-block;
     text-align: center;
     font-size: 11px;
+  }
+
+  .wbp-kleinanzeigen-section .task-count-wrapper.chip {
+    border-radius: 99px;
+    border: 1px solid;
+    padding: 1px 4px;
   }
 
   .wbp-kleinanzeigen-section .task-count-wrapper .dashicons {
