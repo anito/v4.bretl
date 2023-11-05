@@ -269,7 +269,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
           case 'has-sku':
           case 'no-sku':
             $label = $post_status === 'publish' ? __('Hide', 'astra-child') : __('Publish');
-            $actions = wbp_include_kleinanzeigen_template('/dashboard/sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
+            $actions = wbp_include_kleinanzeigen_template('/dashboard/toggle-publish-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
             break;
           default:
         }

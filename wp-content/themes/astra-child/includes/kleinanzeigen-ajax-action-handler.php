@@ -126,10 +126,7 @@ function wbp_ajax_fix_price()
 
   $modal_row = null;
   if ('modal' === $screen) {
-    $ads = wbp_get_all_ads();
-    $ids = array_column($ads, 'id');
-    $record_key = array_search($kleinanzeigen_id, $ids);
-    $record = $ads[$record_key];
+    $record = get_record($kleinanzeigen_id);
     $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
@@ -148,17 +145,19 @@ function wbp_ajax_toggle_publish_post()
   $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-  // Maybe disconnect product
-  if ($disconnect) {
+  // Maybe remove sku from product
+  if (is_null($disconnect)) {
+    $force_status = null;
+    $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
+  } else {
     disable_sku($post_ID);
-    $status = 'draft';
+    $force_status = 'draft';
   }
 
-  $curr_status = get_post_status($post_ID);
   if ($post_ID) {
     wp_update_post(array(
       'ID' => $post_ID,
-      'post_status' => $status ?? ($curr_status === 'draft' ? 'publish' : 'draft'),
+      'post_status' => $force_status ?? $post_status
     ));
   }
 
@@ -183,7 +182,8 @@ function wbp_ajax_toggle_publish_post()
 
   $modal_row = null;
   if ('modal' === $screen) {
-    $modal_row = render_task_list_row($post_ID);
+    $record = get_record($kleinanzeigen_id);
+    $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
   die(json_encode([
@@ -221,8 +221,13 @@ function wbp_ajax_save_post()
       $data = prepare_list_table($paged);
       $row = render_list_row($kleinanzeigen_id, $data);
       $head = render_head();
-      $modal_row = render_task_list_row($post_ID);
       break;
+  }
+
+  switch ($screen) {
+    case 'modal':
+      $record = get_record($kleinanzeigen_id);
+      $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
   die(json_encode([
@@ -658,4 +663,11 @@ function wbp_render_tasks()
   ob_start();
   $wp_list_table->render_tasks();
   return ob_get_clean();
+}
+
+function get_record($id) {
+  $ads = wbp_get_all_ads();
+  $ids = array_column($ads, 'id');
+  $record_key = array_search($id, $ids);
+  return $ads[$record_key];
 }

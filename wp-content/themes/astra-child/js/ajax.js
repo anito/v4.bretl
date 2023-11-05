@@ -28,7 +28,7 @@ jQuery(document).ready(function ($) {
       });
   };
 
-  window.addEventListener("hide:item", function (e) {
+  window.addEventListener("toggle-publish:item", function (e) {
     publishPost(e.detail.e);
   });
   window.addEventListener("deactivate:item", function (e) {
