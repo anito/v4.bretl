@@ -1,4 +1,10 @@
 <?php
+global $wp_list_table;
+global $wp_task_list_table;
+
+$wp_list_table = new Kleinanzeigen_List_Table();
+$wp_task_list_table = new Kleinanzeigen_Task_List_Table();
+
 function parse_kleinanzeigen_id($val)
 {
   preg_match('/(\/?)(\d{8,})/', $val, $matches);
@@ -92,7 +98,7 @@ function wbp_get_remote()
 function wbp_ajax_fix_price()
 {
   $post_ID = isset($_REQUEST['post_ID']) ? (int) $_REQUEST['post_ID'] : null;
-  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : null;
+  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
   $price = isset($_REQUEST['price']) ? $_REQUEST['price'] : null;
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : 1;
@@ -112,27 +118,13 @@ function wbp_ajax_fix_price()
   switch ($screen) {
     case 'toplevel_page_kleinanzeigen':
     case 'modal':
-
-      $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data(array('paged' => $paged));
-      $wp_list_table->setData($data);
-
-      $ads = $data->ads;
-      $ids = array_column($ads, 'id');
-      $record_key = array_search($kleinanzeigen_id, $ids);
-      if (isset($record_key)) {
-        $record = $ads[$record_key];
-        $wp_list_table->render_row($record);
-      }
-      $row = ob_get_clean();
-      ob_start();
-      $wp_list_table->render_head();
-      $head = ob_get_clean();
+      $data = prepare_list_table($paged);
+      $row = render_list_row($kleinanzeigen_id, $data);
+      $head = render_head();
       break;
   }
 
   $modal_row = null;
-  $wp_task_list_table = new Kleinanzeigen_Task_List_Table();
   if ('modal' === $screen) {
     $ads = wbp_get_all_ads();
     $ids = array_column($ads, 'id');
@@ -149,7 +141,7 @@ function wbp_ajax_fix_price()
 function wbp_ajax_toggle_publish_post()
 {
   $post_ID = isset($_REQUEST['post_ID']) ? (int) $_REQUEST['post_ID'] : null;
-  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : null;
+  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
   $disconnect = isset($_REQUEST['disconnect']) ? $_REQUEST['disconnect'] === '__disconnect__' : null;
   $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : null;
@@ -173,36 +165,19 @@ function wbp_ajax_toggle_publish_post()
   ob_start();
   switch ($screen) {
     case 'edit-product':
-
-      $wp_list_table = new Extended_WC_Admin_List_Table_Products();
-      $wp_list_table->render_row($post_ID);
-
+      $row = render_wc_admin_list_row($post_ID);
       break;
     case 'toplevel_page_kleinanzeigen':
     case 'modal':
-
-      $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data(array('paged' => $paged));
-      $wp_list_table->setData($data);
-
-      $ads = $data->ads;
-      $ids = array_column($ads, 'id');
-      $record_key = array_search($kleinanzeigen_id, $ids);
-      if (isset($record_key)) {
-        $record = $ads[$record_key];
-        $wp_list_table->render_row($record);
-      }
-
+      $data = prepare_list_table($paged);
+      $row = render_list_row($kleinanzeigen_id, $data);
       break;
   }
-  $row = ob_get_clean();
 
   switch ($screen) {
     case 'toplevel_page_kleinanzeigen':
     case 'modal':
-      ob_start();
-      $wp_list_table->render_head();
-      $head = ob_get_clean();
+      $head = render_head();
       break;
   }
 
@@ -216,10 +191,51 @@ function wbp_ajax_toggle_publish_post()
   ]));
 }
 
+// Receives data from base64_encoded json object
+function wbp_ajax_save_post()
+{
+  $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
+  $args = isset($_REQUEST['args']) ? $_REQUEST['args'] : null;
+  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
+  $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+  $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
+
+  if(!is_null($args)) {
+    $args = (array) json_decode(base64_decode($args));
+  } else {
+    $args = array();
+  }
+
+  if ($post_ID) {
+    $postarr = array_merge(array(
+      'ID' => $post_ID
+    ), $args);
+
+    $success = wp_update_post($postarr);
+  }
+
+  switch ($screen) {
+    case 'toplevel_page_kleinanzeigen':
+    case 'modal':
+      $data = prepare_list_table($paged);
+      $row = render_list_row($kleinanzeigen_id, $data);
+      $head = render_head();
+      $modal_row = render_task_list_row($post_ID);
+      break;
+  }
+
+  die(json_encode([
+    'data' => compact(['row', 'modal_row', 'head', 'post_ID', 'kleinanzeigen_id'])
+  ]));
+}
+
 function wbp_ajax_connect()
 {
-  $post_ID = isset($_POST['post_ID']) ? $_POST['post_ID'] : null;
-  $kleinanzeigen_id = isset($_POST['kleinanzeigen_id']) ? $_POST['kleinanzeigen_id'] : null;
+  global $wp_list_table;
+
+  $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : '';
   $ad = wbp_find_kleinanzeige($kleinanzeigen_id);
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
@@ -229,23 +245,9 @@ function wbp_ajax_connect()
     disable_sku($post_ID);
   }
 
-  ob_start();
-  $wp_list_table = new Kleinanzeigen_List_Table();
-  $data = wbp_get_json_data(array('paged' => $paged));
-  $wp_list_table->setData($data);
-
-  $ads = $data->ads;
-  $ids = array_column($ads, 'id');
-  $record_key = array_search($kleinanzeigen_id, $ids);
-  if (isset($record_key)) {
-    $record = $ads[$record_key];
-    $wp_list_table->render_row($record);
-  }
-  $row = ob_get_clean();
-
-  ob_start();
-  $wp_list_table->render_head();
-  $head = ob_get_clean();
+  $data = prepare_list_table($paged);
+  $row = render_list_row($kleinanzeigen_id, $data);
+  $head = render_head();
 
   die(json_encode([
     'data' => compact(array('row', 'head', 'post_ID', 'kleinanzeigen_id'))
@@ -254,44 +256,23 @@ function wbp_ajax_connect()
 
 function wbp_ajax_disconnect()
 {
-  $post_ID = isset($_POST['post_ID']) ? $_POST['post_ID'] : null;
-  $kleinanzeigen_id = isset($_POST['kleinanzeigen_id']) ? $_POST['kleinanzeigen_id'] : null;
+  $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : '';
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
   $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
   disable_sku($post_ID);
 
-  ob_start();
   switch ($screen) {
     case 'edit-product':
-      $wp_list_table = new Extended_WC_Admin_List_Table_Products();
-      $wp_list_table->render_row($post_ID);
+      $row = render_wc_admin_list_row($post_ID);
       break;
     case 'modal':
     case 'toplevel_page_kleinanzeigen':
-      $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data(array('paged' => $paged));
-      $wp_list_table->setData($data);
-
-      $ads = $data->ads;
-      $ids = array_column($ads, 'id');
-      $record_key = array_search($kleinanzeigen_id, $ids);
-      if (isset($record_key)) {
-        $record = $ads[$record_key];
-        $wp_list_table->render_row($record);
-      }
-      break;
-  }
-  $row = ob_get_clean();
-
-  switch ($screen) {
-    case 'toplevel_page_kleinanzeigen':
-    case 'modal':
-      ob_start();
-      $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : 1;
-      $wp_list_table->render_head();
-      $head = ob_get_clean();
+      $data = prepare_list_table($paged);
+      $row = render_list_row($kleinanzeigen_id, $data);
+      $head = render_head();
       break;
   }
 
@@ -446,35 +427,21 @@ function wbp_ajax_import_kleinanzeigen_data()
     ), true);
   }
 
-  ob_start();
   switch ($screen) {
     case 'edit-product':
-      $wp_list_table = new Extended_WC_Admin_List_Table_Products();
-      $wp_list_table->render_row($post_ID);
+      $row = render_wc_admin_list_row($post_ID);
       break;
     case 'toplevel_page_kleinanzeigen':
-      $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data(array('paged' => $paged));
-      $wp_list_table->setData($data);
-
-      $ads = $data->ads;
-      $ids = array_column($ads, 'id');
-      $record_key = array_search($kleinanzeigen_id, $ids);
-      if (isset($record_key)) {
-        $record = $ads[$record_key];
-        $wp_list_table->render_row($record);
-      }
+      $data = prepare_list_table($paged);
+      $row = render_list_row($kleinanzeigen_id, $data);
       break;
   }
-  $row = ob_get_clean();
 
-  ob_start();
   switch ($screen) {
     case 'toplevel_page_kleinanzeigen':
-      $wp_list_table->render_head();
+      $head = render_head();
       break;
   }
-  $head = ob_get_clean();
 
   die(json_encode([
     'data' => compact(['row', 'head', 'post_ID', 'kleinanzeigen_id'])
@@ -517,28 +484,15 @@ function wbp_ajax_import_kleinanzeigen_images()
     'post_type' => 'product',
   ));
 
-  ob_start();
   switch ($screen) {
     case 'edit-product':
-      $wp_list_table = new Extended_WC_Admin_List_Table_Products();
-      $wp_list_table->render_row($post_ID);
+      $row = render_wc_admin_list_row($post_ID);
       break;
     case 'toplevel_page_kleinanzeigen':
-      $wp_list_table = new Kleinanzeigen_List_Table();
-      $data = wbp_get_json_data(array('paged' => $paged));
-      $wp_list_table->setData($data);
-
-      $ads = $data->ads;
-      $ids = array_column($ads, 'id');
-      $record_key = array_search($kleinanzeigen_id, $ids);
-      if (isset($record_key)) {
-        $record = $ads[$record_key];
-        $wp_list_table->render_row($record);
-      }
-
+      $data = prepare_list_table($paged);
+      $row = render_list_row($kleinanzeigen_id, $data);
       break;
   }
-  $row = ob_get_clean();
 
   echo json_encode([
     'data' => compact(['row', 'post_ID', 'kleinanzeigen_id'])
@@ -552,11 +506,7 @@ function wbp_ajax_delete_images()
     $post_ID = $_REQUEST['post_ID'];
     wbp_remove_attachments($post_ID);
   }
-
-  ob_start();
-  $wp_list_table = new Extended_WC_Admin_List_Table_Products();
-  $wp_list_table->render_row($post_ID);
-  $row = ob_get_clean();
+  $row = render_wc_admin_list_row($post_ID);
 
   echo json_encode([
     'data' => compact(['row', 'post_ID'])
@@ -566,38 +516,18 @@ function wbp_ajax_delete_images()
 
 function wbp_ajax_delete_post()
 {
-  if (!empty($_REQUEST['post_ID'])) {
-    $post_ID = $_REQUEST['post_ID'];
-  }
-  if (!empty($_REQUEST['kleinanzeigen_id'])) {
-    $kleinanzeigen_id = $_REQUEST['kleinanzeigen_id'];
-  }
-
+  $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : '';
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
+  
   $product = wc_get_product($post_ID);
-
   if ($product) {
     $product->delete(true);
   }
 
-  ob_start();
-  $wp_list_table = new Kleinanzeigen_List_Table();
-
-  $data = wbp_get_json_data(array('paged' => $paged));
-  $wp_list_table->setData($data);
-
-  $ads = $data->ads;
-  $ids = array_column($ads, 'id');
-  $record_key = array_search($kleinanzeigen_id, $ids);
-  if (isset($record_key)) {
-    $record = $ads[$record_key];
-    $wp_list_table->render_row($record);
-  }
-  $row = ob_get_clean();
-
-  ob_start();
-  $wp_list_table->render_head();
-  $head = ob_get_clean();
+  $data = prepare_list_table($paged);
+  $row = render_list_row($kleinanzeigen_id, $data);
+  $head = render_head();
 
   echo json_encode([
     'data' => compact(['row', 'head', 'kleinanzeigen_id'])
@@ -666,23 +596,65 @@ function wbp_upload_image($url, $post_ID)
   return $attachmentId;
 }
 
-function render_task_list_row($post_ID, $args = array())
-{
-  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
-
-  $wp_list_table = new Kleinanzeigen_Task_List_Table();
-
-  $product = wc_get_product($post_ID);
-  $data = array_merge(array('product' => $product, 'task_type' => $task_type), $args);
-  $wp_list_table->setData($data);
+function render_wc_admin_list_row($post_ID) {
+  $wp_wc_admin_list_table = new Extended_WC_Admin_List_Table_Products();
 
   ob_start();
-  $wp_list_table->render_row($data);
+  $wp_wc_admin_list_table->render_row($post_ID);
   return ob_get_clean();
 }
 
-function wbp_render_tasks() {
-  $wp_list_table = new Kleinanzeigen_List_Table();
+function prepare_list_table($paged) {
+  global $wp_list_table;
+
+  $data = wbp_get_json_data(array('paged' => $paged));
+  $wp_list_table->setData($data);
+  return $data;
+}
+
+function render_list_row($kleinanzeigen_id, $data)
+{
+  global $wp_list_table;
+
+  ob_start();
+  $ads = $data->ads;
+  $ids = array_column($ads, 'id');
+  $record_key = array_search($kleinanzeigen_id, $ids);
+  if (isset($record_key)) {
+    $record = $ads[$record_key];
+    $wp_list_table->render_row($record);
+  }
+  return ob_get_clean();
+}
+
+function render_task_list_row($post_ID, $args = array())
+{
+  global $wp_task_list_table;
+
+  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
+
+  $product = wc_get_product($post_ID);
+  $data = array_merge(array('product' => $product, 'task_type' => $task_type), $args);
+  $wp_task_list_table->setData($data);
+
+  ob_start();
+  $wp_task_list_table->render_row($data);
+  return ob_get_clean();
+}
+
+function render_head()
+{
+  global $wp_list_table;
+
+  ob_start();
+  $wp_list_table->render_head();
+  return ob_get_clean();
+}
+
+function wbp_render_tasks()
+{
+  global $wp_list_table;
+  
   ob_start();
   $wp_list_table->render_tasks();
   return ob_get_clean();

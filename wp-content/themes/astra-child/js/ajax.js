@@ -37,6 +37,9 @@ jQuery(document).ready(function ($) {
   window.addEventListener("disconnect:item", function (e) {
     disconnect(e.detail.e);
   });
+  window.addEventListener("save:item", function (e) {
+    savePost(e.detail.e);
+  });
   window.addEventListener("fixprice:item", function (e) {
     fixPrice(e.detail.e);
   });
@@ -463,6 +466,44 @@ jQuery(document).ready(function ($) {
     });
   }
 
+  function savePost(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    start();
+
+    const el = e.target;
+    const post_ID = el.dataset.postId;
+    const args = el.dataset.args;
+    const task_type = el.dataset.taskType;
+    const _screen = el.dataset.screen;
+
+    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    spinner?.classList.add("is-active");
+
+    $.post({
+      url: admin_ajax,
+      data: {
+        action: "_ajax_save_post",
+        post_ID,
+        args,
+        task_type,
+        screen: _screen || screen,
+      },
+      beforeSend: () => {
+        $(el).parents("td").addClass("busy");
+        $(el).html("Einen Moment...");
+      },
+      success: (data) => {
+        $(el).html("Fertig");
+
+        setTimeout(() => {
+          parseResponse(data, el);
+        }, 500);
+      },
+      error: (error) => console.log(error),
+    });
+  }
+
   function fixPrice(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -590,6 +631,7 @@ jQuery(document).ready(function ($) {
         createPost,
         deletePost,
         publishPost,
+        savePost,
         importData,
         connect,
         disconnect,
@@ -758,5 +800,4 @@ jQuery(document).ready(function ($) {
       },
     });
   }
-
 });

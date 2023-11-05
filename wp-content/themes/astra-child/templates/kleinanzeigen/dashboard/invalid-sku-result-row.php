@@ -1,5 +1,5 @@
 <div class="actions" data-id="<?php echo $post_ID ?>">
-  <a href="#" type="button" class="button button-primary button-small action-button deactivate <?php echo $disabled['deactivate'] ? 'disabled' : '' ?>" data-task-type="<?php echo $task_type ?>" data-action="deactivate" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal" data-disconnect="__disconnect__"><?php echo $label['deactivate'] ?></a>
+  <a href="#" type="button" class="button button-primary button-small action-button deactivate <?php echo $disabled['deactivate'] ? 'disabled' : '' ?>" data-task-type="<?php echo $task_type ?>" data-action="deactivate" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-args=<?php echo base64_encode(json_encode(array('post_status' => 'draft'))) ?> data-screen="modal"><?php echo $label['deactivate'] ?></a>
   <a href="#" type="button" class="button button-primary button-small action-button disconnect <?php echo $disabled['disconnect'] ? 'disabled' : '' ?>" data-task-type="<?php echo $task_type ?>" data-action="disconnect" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal"><?php echo $label['disconnect'] ?></a>
 </div>
 
@@ -11,7 +11,7 @@
     // Scan Invalid Results
     $('.deactivate:not(.disabled)', parent).on('click', function(e) {
       window.dispatchEvent(
-        new CustomEvent("deactivate:item", {
+        new CustomEvent("save:item", {
           detail: {
             e
           },
@@ -23,7 +23,7 @@
 
     $('.disconnect:not(.disabled)', parent).on('click', function(e) {
       window.dispatchEvent(
-        new CustomEvent("disconnect:item", {
+        new CustomEvent("save:item", {
           detail: {
             e
           },

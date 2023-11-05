@@ -427,6 +427,11 @@ function _ajax_toggle_publish_post()
   wbp_ajax_toggle_publish_post();
 }
 
+function _ajax_save_post()
+{
+  wbp_ajax_save_post();
+}
+
 function _ajax_import_kleinanzeigen_data()
 {
   wbp_ajax_import_kleinanzeigen_data();
@@ -532,6 +537,7 @@ function wbp_admin_init()
   add_action('wp_ajax__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax__ajax_get_brands', '_ajax_get_brands');
   add_action('wp_ajax__ajax_delete_post', '_ajax_delete_post');
+  add_action('wp_ajax__ajax_save_post', '_ajax_save_post');
   add_action('wp_ajax__ajax_toggle_publish_post', '_ajax_toggle_publish_post');
   add_action('wp_ajax__ajax_delete_images', '_ajax_delete_images');
   add_action('wp_ajax__ajax_import_kleinanzeigen_data', '_ajax_import_kleinanzeigen_data');
@@ -544,6 +550,7 @@ function wbp_admin_init()
   add_action('wp_ajax_nopriv__ajax_get_remote', '_ajax_get_remote');
   add_action('wp_ajax_nopriv__ajax_get_brands', '_ajax_get_brands');
   add_action('wp_ajax_nopriv__ajax_delete_post', '_ajax_delete_post');
+  add_action('wp_ajax_nopriv__ajax_save_post', '_ajax_save_post');
   add_action('wp_ajax_nopriv__ajax_toggle_publish_post', '_ajax_toggle_publish_post');
   add_action('wp_ajax_nopriv__ajax_delete_images', '_ajax_delete_images');
   add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_data', '_ajax_import_kleinanzeigen_data');

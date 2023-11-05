@@ -52,7 +52,7 @@
 
     $('.deactivate', table).on('click', function(e) {
       window.dispatchEvent(
-        new CustomEvent("deactivate:item", {
+        new CustomEvent("save:item", {
           detail: {
             e
           },
