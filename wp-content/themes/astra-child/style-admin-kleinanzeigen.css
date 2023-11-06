@@ -339,6 +339,9 @@ section .summary .count:nth-child(2) {
 .wp-list-kleinanzeigen-ads .column-shop-labels {
   width: 90px;
 }
+.wp-list-kleinanzeigen-ads .column-shop-featured {
+  width: 30px;
+}
 .wp-list-kleinanzeigen-ads .column-shop-brands {
   width: auto;
 }

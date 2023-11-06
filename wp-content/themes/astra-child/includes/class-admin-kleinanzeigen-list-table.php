@@ -223,6 +223,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       'shop-categories' => __('Kategorien'),
       'shop-brands' => __('Hersteller'),
       'shop-labels' => __('Labels'),
+      'shop-featured' => '<i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i>',
       'shop-actions' => __('Aktionen'),
       'shop-actions-import' => __('Import'),
     );
@@ -324,6 +325,23 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     );
   }
 
+  function render_featured_column($product, $record)
+  {
+    if ($product) {
+      $product_id = $product->get_id();
+      $url = wp_nonce_url(admin_url('admin-ajax.php?action=woocommerce_feature_product&product_id=' . $product_id), 'woocommerce-feature-product');
+      echo '<a href="' . esc_url($url) . '" aria-label="' . esc_attr__('Toggle featured', 'woocommerce') . '" id="feature-post-' . $product_id . '" data-post-id="' . $product_id . '" data-kleinanzeigen-id="' . $record->id . '">';
+      if ($product->is_featured()) {
+        echo '<span class="wc-featured tips" data-tip="' . esc_attr__('Yes', 'woocommerce') . '"><i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i></span>';
+      } else {
+        echo '<span class="wc-featured not-featured tips" data-tip="' . esc_attr__('No', 'woocommerce') . '"><i class="dashicons dashicons-star-empty" style="font-size: 1.3em; vertical-align: middle"></i></span>';
+      }
+      echo '</a>';
+    } else {
+      echo '-';
+    }
+  }
+
   function render_row($record)
   {
     list($columns, $hidden) = $this->get_column_info();
@@ -377,6 +395,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $permalink = get_permalink($post_ID);
           $classes = "";
           $post_status = $product->get_status();
+          $featured = $product->is_featured();
           switch ($post_status) {
             case 'draft':
               $status_name = __("Draft");
@@ -524,6 +543,13 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             <?php
               break;
             }
+          case "shop-featured": { ?>
+              <td class="<?php echo $class ?>">
+                <div class="column-content"><?php echo $this->render_featured_column($product, $record) ?></div>
+              </td>
+            <?php
+              break;
+            }
           case "shop-actions": {
             ?>
               <td class="<?php echo $class ?>">
@@ -558,7 +584,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             importData,
             connect,
             disconnect,
-            publishPost
+            publishPost,
+            featurePost
           } = ajax_object;
 
           const post_ID = "<?php echo $product ? $post_ID : '' ?>";
@@ -570,6 +597,13 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             e.preventDefault();
 
             publishPost(e);
+          })
+
+          const featuredEl = $(`#ad-id-${kleinanzeigen_id} #feature-post-${post_ID}`);
+          $(featuredEl).on('click', function(e) {
+            e.preventDefault();
+
+            featurePost(e);
           })
 
           const connEl = $(`#ad-id-${kleinanzeigen_id} a[data-action^=connect-]`);

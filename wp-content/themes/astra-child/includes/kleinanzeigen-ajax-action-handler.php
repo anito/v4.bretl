@@ -191,6 +191,33 @@ function wbp_ajax_toggle_publish_post()
   ]));
 }
 
+function wbp_ajax_feature_post()
+{
+  $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+  $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
+  $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+  $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
+
+  if($post_ID) {
+    $product = wc_get_product($post_ID);
+    $product->set_featured(!$product->is_featured());
+    $product->save();
+  }
+
+  switch ($screen) {
+    case 'toplevel_page_kleinanzeigen':
+    case 'modal':
+      $data = prepare_list_table($paged);
+      $row = render_list_row($kleinanzeigen_id, $data);
+      $head = render_head();
+      break;
+  }
+
+  die(json_encode([
+    'data' => compact(['row', 'head', 'post_ID', 'kleinanzeigen_id'])
+  ]));
+}
+
 // Receives data from base64_encoded json object
 function wbp_ajax_save_post()
 {

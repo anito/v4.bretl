@@ -466,6 +466,31 @@ jQuery(document).ready(function ($) {
     });
   }
 
+  function featurePost(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const el = e.target.closest('a');
+    const post_ID = el.dataset.postId;
+    const kleinanzeigen_id = el.dataset.kleinanzeigenId;
+
+    $.post({
+      url: admin_ajax,
+      data: {
+        action: "_ajax_feature_post",
+        post_ID,
+        kleinanzeigen_id,
+        screen
+      },
+      success: (data) => {
+        setTimeout(() => {
+          parseResponse(data, el);
+        }, 500);
+      },
+      error: (error) => console.log(error),
+    });
+  }
+
   function savePost(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -632,6 +657,7 @@ jQuery(document).ready(function ($) {
         deletePost,
         publishPost,
         savePost,
+        featurePost,
         importData,
         connect,
         disconnect,
