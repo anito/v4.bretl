@@ -196,6 +196,7 @@ function wbp_ajax_feature_post()
   $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
   $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+  $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
   if($post_ID) {
@@ -213,8 +214,14 @@ function wbp_ajax_feature_post()
       break;
   }
 
+  switch ($screen) {
+    case 'modal':
+      $record = get_record($kleinanzeigen_id);
+      $modal_row = render_task_list_row($post_ID, array('record' => $record));
+  }
+
   die(json_encode([
-    'data' => compact(['row', 'head', 'post_ID', 'kleinanzeigen_id'])
+    'data' => compact(['row', 'modal_row', 'head', 'post_ID', 'kleinanzeigen_id'])
   ]));
 }
 

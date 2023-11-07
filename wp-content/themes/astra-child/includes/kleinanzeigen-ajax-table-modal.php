@@ -32,7 +32,7 @@ function _ajax_fetch_kleinanzeigen_task_display()
     'limit' => -1
   );
   $products = wc_get_products($args);
-  $data = wbp_get_task_data($products, $ads, $task_type);
+  $data = wbp_get_task_list_items($products, $ads, $task_type);
   $wp_list_table->setData($data);
 
   ob_start();

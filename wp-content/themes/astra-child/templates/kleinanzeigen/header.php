@@ -23,9 +23,11 @@ $todos = $products['todos']; ?>
                 </div>
                 <div class="overview-col-key b task"><a href="#" class="start-task" data-task-type="has-sku"><?php echo __('Products with Ad ID', 'astra-child'); ?></a></div>
                 <div class="overview-col-key c task"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Products without Ad ID', 'astra-child'); ?></a></div>
+                <div class="overview-col-key d task"><a href="#" class="start-task" data-task-type="featured"><?php echo __('Featured products', 'astra-child'); ?></a></div>
                 <div class="overview-col-val a"><?php echo $total_ads; ?></div>
                 <div class="overview-col-val b"><?php echo count($published_has_sku); ?></div>
                 <div class="overview-col-val c"><?php echo count($published_no_sku); ?></div>
+                <div class="overview-col-val d"><?php echo count($featured_products); ?></div>
               </div>
             </fieldset>
           </div>

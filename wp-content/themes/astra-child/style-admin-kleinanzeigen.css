@@ -511,6 +511,10 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
   width: 10%;
 }
 
+.wp-list-task-kleinanzeigen-ads .column-featured {
+  width: 30px;
+}
+
 .wp-list-task-kleinanzeigen-ads .column-actions {
   width: 33%;
   text-align: center;

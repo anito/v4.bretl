@@ -84,6 +84,10 @@ function _ajax_kleinanzeigen_task()
       $subheader = 'Auflistung von Produkten ohne Anzeige ID';
       $footer_template = 'blank';
       break;
+    case 'featured':
+      $subheader = 'Auflistung von empfohlenen Produkten';
+      $footer_template = 'blank';
+      break;
     default:
       $subheader = '';
       $footer_template = 'blank';
@@ -97,7 +101,7 @@ function _ajax_kleinanzeigen_task()
     'limit' => -1
   );
   $products = wc_get_products($args);
-  $items = wbp_get_task_data($products, $ads, $task_type);
+  $items = wbp_get_task_list_items($products, $ads, $task_type);
 
   setcookie('kleinanzeigen-task-type', $task_type);
 

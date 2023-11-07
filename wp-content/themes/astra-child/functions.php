@@ -816,7 +816,7 @@ add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeh
 /**
  * Kleinanzeigen.de
  */
-function wbp_get_task_data($products, $ads, $task_type)
+function wbp_get_task_list_items($products, $ads, $task_type)
 {
   $ad_ids = wp_list_pluck($ads, 'id');
   $records = wp_list_pluck((array) $ads, 'id');
@@ -834,6 +834,17 @@ function wbp_get_task_data($products, $ads, $task_type)
     $record = null;
     $products_has_sku = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'EXISTS'));
     foreach ($products_has_sku as $product) {
+      $sku = (int) $product->get_sku();
+      $record = $ads[$records[$sku]];
+      $items[] = compact('product', 'task_type', 'record');
+    }
+    return $items;
+  }
+  if ($task_type === 'featured') {
+    $record = null;
+    $featured_posts = wbp_get_featured_products();
+    foreach ($featured_posts as $post) {
+      $product = new WC_Product($post->ID);
       $sku = (int) $product->get_sku();
       $record = $ads[$records[$sku]];
       $items[] = compact('product', 'task_type', 'record');
@@ -1084,7 +1095,8 @@ function wbp_get_all_ads()
   $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
   $num_pages = ceil($total_ads / KLEINANZEIGEN_PER_PAGE);
   for ($paged = 2; $paged <= $num_pages; $paged++) {
-    $page_data  = wbp_error_check(wbp_get_json_data(array('paged' => $paged)), 'error-message.php');
+    $page_data = wbp_get_json_data(array('paged' => $paged));
+    $page_data  = wbp_error_check($page_data, 'error-message.php');
     $ads = array_merge($ads, $page_data->ads);
   }
   return $ads;

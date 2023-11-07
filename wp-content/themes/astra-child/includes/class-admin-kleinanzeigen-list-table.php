@@ -71,6 +71,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     );
     $published_no_sku = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
     $published_has_sku = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
+    $featured_products = wbp_get_featured_products();
 
     $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array(), 'todos' => array());
     foreach ($this->items as $item) {
@@ -113,7 +114,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     }
     $items = $this->items;
     $tasks = $this->render_tasks();
-    wbp_include_kleinanzeigen_template('header.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'tasks'));
+    wbp_include_kleinanzeigen_template('header.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'featured_products', 'tasks'));
   }
 
   function render_tasks()
@@ -134,6 +135,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       'name' => 'no-sku',
       'priority' => 0,
       'product_ids' => array()
+    ), array(
+      'name' => 'featured',
+      'priority' => 0,
+      'product_ids' => array()
     ));
     $ads = wbp_get_all_ads();
     $args = array(
@@ -142,7 +147,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     );
     $products = wc_get_products($args);
     foreach ($tasks as $key => $task) {
-      $data = wbp_get_task_data($products, $ads, $task['name']);
+      $data = wbp_get_task_list_items($products, $ads, $task['name']);
       foreach ($data as $item) {
         $tasks[$key]['product_ids'][] = $item['product']->get_ID();
       }

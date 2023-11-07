@@ -40,6 +40,23 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
     parent::display();
   }
 
+  function render_featured_column($product, $task_type)
+  {
+    if ($product) {
+      $product_id = $product->get_id();
+      $url = wp_nonce_url(admin_url('admin-ajax.php?action=woocommerce_feature_product&product_id=' . $product_id), 'woocommerce-feature-product');
+      echo '<a href="' . esc_url($url) . '" aria-label="' . esc_attr__('Toggle featured', 'woocommerce') . '" id="task-feature-post-' . $product_id . '" data-post-id="' . $product_id . '" data-screen="modal" data-task-type="' . $task_type . '">';
+      if ($product->is_featured()) {
+        echo '<span class="wc-featured tips" data-tip="' . esc_attr__('Yes', 'woocommerce') . '"><i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i></span>';
+      } else {
+        echo '<span class="wc-featured not-featured tips" data-tip="' . esc_attr__('No', 'woocommerce') . '"><i class="dashicons dashicons-star-empty" style="font-size: 1.3em; vertical-align: middle"></i></span>';
+      }
+      echo '</a>';
+    } else {
+      echo '-';
+    }
+  }
+
   function render_header($args = array())
   {
     $defaults = array(
@@ -75,7 +92,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
       'limit' => -1
     );
     $products = wc_get_products($args);
-    $data = wbp_get_task_data($products, $ads, $task_type);
+    $data = wbp_get_task_list_items($products, $ads, $task_type);
     $this->setData($data);
 
     extract($this->_args);
@@ -130,6 +147,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
       'title' => __('Titel'),
       'ka-price' => __('KA Preis'),
       'shop-price' => __('Shop Preis'),
+      'featured' => '<i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i>',
       'actions' => __('Aktionen'),
     );
   }
@@ -211,12 +229,6 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
     );
   }
 
-  function render_row_($id)
-  {
-    $wp_list_table = _get_list_table('WP_Posts_List_Table', array('screen' => 'modal'));
-    $wp_list_table->display_rows(array(get_post($id)), 0);
-  }
-
   function render_row($item)
   {
     // Extracts $products | $task_type | $record
@@ -268,6 +280,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             break;
           case 'has-sku':
           case 'no-sku':
+          case 'featured':
             $label = $post_status === 'publish' ? __('Hide', 'astra-child') : __('Publish');
             $actions = wbp_include_kleinanzeigen_template('/dashboard/toggle-publish-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
             break;
@@ -324,6 +337,14 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             <?php
               break;
             }
+          case "featured": {
+            ?>
+              <td class="<?php echo $class ?>">
+                <div class="column-content "><?php echo $this->render_featured_column($product, $task_type) ?></div>
+              </td>
+            <?php
+              break;
+            }
           case "actions": {
             ?>
               <td class="<?php echo $class ?>" style="vertical-align: middle;">
@@ -343,7 +364,12 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
       ?>
       <script>
         jQuery(document).ready(($) => {
+          const {
+            featurePost
+          } = ajax_object;
+
           const table = $('.wp-list-task-kleinanzeigen-ads');
+          const post_ID = "<?php echo $product ? $post_ID : '' ?>";
 
           $('.deactivate-all').on('click', function(e) {
             const el = $(e.target);
@@ -355,6 +381,13 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
               })
             );
             el.on('deactivated:all', handleLabel)
+          })
+
+          const featuredEl = $(`#task-feature-post-${post_ID}`);
+          $(featuredEl).on('click', function(e) {
+            e.preventDefault();
+
+            featurePost(e);
           })
 
           $('.disconnect-all').on('click', function(e) {

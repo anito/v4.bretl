@@ -204,7 +204,7 @@ jQuery(document).ready(function ($) {
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const post_ID = el.dataset.postId;
     const task_type = el.dataset.taskType;
-    const _screen = el.dataset.screen;
+    const _screen = el.dataset.screen || screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     const addSpinner = () => {
@@ -223,7 +223,7 @@ jQuery(document).ready(function ($) {
         post_ID,
         kleinanzeigen_id,
         task_type,
-        screen: _screen || screen,
+        screen: _screen,
       },
       beforeSend: () => {
         $(el).html("Verknüpfung lösen...");
@@ -436,7 +436,7 @@ jQuery(document).ready(function ($) {
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const disconnect = el.dataset.disconnect;
     const task_type = el.dataset.taskType;
-    const _screen = el.dataset.screen;
+    const _screen = el.dataset.screen || screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
@@ -449,7 +449,7 @@ jQuery(document).ready(function ($) {
         kleinanzeigen_id,
         disconnect,
         task_type,
-        screen: _screen || screen,
+        screen: _screen,
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
@@ -473,6 +473,9 @@ jQuery(document).ready(function ($) {
     const el = e.target.closest('a');
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
+    const task_type = el.dataset.taskType;
+    const _screen = el.dataset.screen || screen;
+
 
     $.post({
       url: admin_ajax,
@@ -480,7 +483,8 @@ jQuery(document).ready(function ($) {
         action: "_ajax_feature_post",
         post_ID,
         kleinanzeigen_id,
-        screen
+        task_type,
+        screen: _screen
       },
       success: (data) => {
         setTimeout(() => {
@@ -500,7 +504,7 @@ jQuery(document).ready(function ($) {
     const post_ID = el.dataset.postId;
     const args = el.dataset.args;
     const task_type = el.dataset.taskType;
-    const _screen = el.dataset.screen;
+    const _screen = el.dataset.screen || screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
@@ -512,7 +516,7 @@ jQuery(document).ready(function ($) {
         post_ID,
         args,
         task_type,
-        screen: _screen || screen,
+        screen: _screen
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
@@ -539,6 +543,7 @@ jQuery(document).ready(function ($) {
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const task_type = el.dataset.taskType;
     const price = el.dataset.price;
+    const _screen = el.dataset.screen || screen;
 
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
@@ -551,7 +556,7 @@ jQuery(document).ready(function ($) {
         kleinanzeigen_id,
         price,
         task_type,
-        screen: el.dataset.screen || screen,
+        screen: _screen
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
@@ -590,10 +595,10 @@ jQuery(document).ready(function ($) {
       data: { row, modal_row, head, post_ID, kleinanzeigen_id },
     } = JSON.parse(data);
 
-    const the_screen = el.dataset.screen || screen;
+    const _screen = el.dataset.screen || screen;
     let rowEl;
     let modalRowEl;
-    switch (the_screen) {
+    switch (_screen) {
       case "product":
         location = `${edit_link}${post_ID}`;
         break;

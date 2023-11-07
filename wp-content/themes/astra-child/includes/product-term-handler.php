@@ -89,7 +89,7 @@ function wbp_find_kleinanzeige(int $id): stdClass | null
   $num_pages = 1;
   while ($paged <= $num_pages) {
     $data = wbp_get_json_data(array('paged' => $paged));
-    if(1 === $num_pages) {
+    if (1 === $num_pages) {
       $categories = $data->categoriesSearchData;
       $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
       $num_pages = ceil($total_ads / KLEINANZEIGEN_PER_PAGE);
@@ -160,20 +160,19 @@ function wbp_process_kleinanzeigen($post_ID, $post)
   }
 
   // Check for duplicate titles
-  if(!is_wp_error($sku_error)) {
+  if (!is_wp_error($sku_error)) {
 
     global $wpdb;
-  
+
     $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
     $results = $wpdb->get_results($prepare);
     if (count($results) >= 1) {
-      foreach($results as $result) {
-        if($result->ID != $post_ID) {
+      foreach ($results as $result) {
+        if ($result->ID != $post_ID) {
           $sku_error = new WP_Error('invalid_sku', __('A product with the same title already exists. Enter a different title or delete this draft.', 'astra-child'));
         }
       }
     }
-
   }
 
   if (is_wp_error($sku_error)) {
@@ -302,7 +301,7 @@ function disable_sku($post_ID)
  * @param array $query_vars - Query vars from WC_Product_Query.
  * @return array modified $query
  */
-function handle_sku_compare_query($query, $query_vars)
+function handle_cpt_get_products_query($query, $query_vars)
 {
   if (!empty($query_vars['sku_compare'])) {
     $query['meta_query'][] = array(
@@ -310,7 +309,34 @@ function handle_sku_compare_query($query, $query_vars)
       'compare' => esc_attr($query_vars['sku_compare']),
     );
   }
+  if (!empty($query_vars['featured_products'])) {
+    $query['meta_query'][] = array(
+      'taxonomy'         => 'product_visibility',
+      'terms'            => 'featured',
+      'field'            => 'name',
+      'operator'         => 'IN',
+      'include_children' => false, // optional
+    );
+  }
 
   return $query;
 }
-add_filter('woocommerce_product_data_store_cpt_get_products_query', 'handle_sku_compare_query', 10, 2);
+add_filter('woocommerce_product_data_store_cpt_get_products_query', 'handle_cpt_get_products_query', 10, 2);
+
+function wbp_get_featured_products()
+{
+  $tax_query[] = array(
+    'taxonomy' => 'product_visibility',
+    'field'    => 'name',
+    'terms'    => 'featured',
+    'operator' => 'IN', // or 'NOT IN' to exclude feature products
+  );
+
+  $query = new WP_Query(array(
+    'post_type'           => 'product',
+    'post_status'         => 'publish',
+    'posts_per_page'      => -1,
+    'tax_query'           => $tax_query
+  ));
+  return $query->get_posts();
+}
