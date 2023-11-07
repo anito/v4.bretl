@@ -377,6 +377,22 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       $cat_terms = wbp_get_product_cats($post_ID);
 
       $price = wp_kses_post($product->get_price_html());
+      $post_status = $product->get_status();
+      switch ($post_status) {
+        case 'draft':
+          $status_name = __("Draft");
+          break;
+        case 'pending':
+          $status_name = __("Pending Review");
+          break;
+        case 'trash':
+          $status_name = __("Trash");
+          $classes = "hidden";
+          break;
+        case 'publish':
+          $status_name = __("Published");
+          break;
+      }
     } else {
 
       $price = '<span class="na">&ndash;</span>';
@@ -385,8 +401,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 ?>
     <tr id="ad-id-<?php echo $record->id ?>" <?php if (!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes) ?>" <?php } ?>>
       <?php
-
-
 
       foreach ($columns as $column_name => $column_display_name) {
         $class = $column_name . ' column column-' . $column_name;
@@ -399,23 +413,6 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $deletelink  = get_delete_post_link($post_ID);
           $permalink = get_permalink($post_ID);
           $classes = "";
-          $post_status = $product->get_status();
-          $featured = $product->is_featured();
-          switch ($post_status) {
-            case 'draft':
-              $status_name = __("Draft");
-              break;
-            case 'pending':
-              $status_name = __("Pending Review");
-              break;
-            case 'trash':
-              $status_name = __("Trash");
-              $classes = "hidden";
-              break;
-            case 'publish':
-              $status_name = __("Published");
-              break;
-          }
 
           if (!$product_by_sku) {
             $label = __('Connect', 'astra-child');

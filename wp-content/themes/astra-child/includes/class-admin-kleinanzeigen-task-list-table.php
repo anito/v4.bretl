@@ -44,8 +44,9 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
   {
     if ($product) {
       $product_id = $product->get_id();
+      $sku = $product->get_sku();
       $url = wp_nonce_url(admin_url('admin-ajax.php?action=woocommerce_feature_product&product_id=' . $product_id), 'woocommerce-feature-product');
-      echo '<a href="' . esc_url($url) . '" aria-label="' . esc_attr__('Toggle featured', 'woocommerce') . '" id="task-feature-post-' . $product_id . '" data-post-id="' . $product_id . '" data-screen="modal" data-task-type="' . $task_type . '">';
+      echo '<a href="' . esc_url($url) . '" aria-label="' . esc_attr__('Toggle featured', 'woocommerce') . '" id="task-feature-post-' . $product_id . '" data-kleinanzeigen-id="' . $sku . '" data-post-id="' . $product_id . '" data-screen="modal" data-task-type="' . $task_type . '">';
       if ($product->is_featured()) {
         echo '<span class="wc-featured tips" data-tip="' . esc_attr__('Yes', 'woocommerce') . '"><i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i></span>';
       } else {
@@ -340,7 +341,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
           case "featured": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content "><?php echo $this->render_featured_column($product, $task_type) ?></div>
+                <div class="column-content "><?php echo $this->render_featured_column($product, $sku, $task_type) ?></div>
               </td>
             <?php
               break;
