@@ -83,7 +83,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             'template' => 'modal-header',
             'args' => array(
               'header' => __('Price deviations', 'astra-child'),
-              'subheader' => 'Auflistung von Produkten mit Preisunterschied Shop / Kleinanzeige'
+              'subheader' => 'Auflistung von verknüpften Produkten die einen Preisunterschied aufweisen'
             )
           ),
           'footer-template' => array(
@@ -98,7 +98,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             'template' => 'modal-header',
             'args' => array(
               'header' => __('Linked products', 'astra-child'),
-              'subheader' => 'Auflistung von Produkten mit Anzeige ID'
+              'subheader' => 'Auflistung verknüpfter Produkte'
             )
           ),
           'footer-template' => array(
@@ -113,7 +113,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             'template' => 'modal-header',
             'args' => array(
               'header' => __('Unlinked products', 'astra-child'),
-              'subheader' => 'Auflistung von Produkten ohne Anzeige ID'
+              'subheader' => 'Auflistung von Produkten ohne Verknüpfung'
             )
           ),
           'footer-template' => array(
