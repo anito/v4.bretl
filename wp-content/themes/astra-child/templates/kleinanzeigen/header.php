@@ -44,7 +44,7 @@ $todos = $products['todos']; ?>
                     <div class="task-count-wrapper warning">
                       <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
                     </div>
-                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid Ad IDs', 'astra-child') ?></a></span>
+                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid Links', 'astra-child') ?></a></span>
                     (<span class="task-count">0</span>)
                   </div>
                 </div>
