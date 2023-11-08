@@ -65,33 +65,7 @@ function _ajax_kleinanzeigen_task()
   $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $product_ids = isset($_REQUEST['product_ids']) ? $_REQUEST['product_ids'] : array();
   $wp_list_table = new Kleinanzeigen_Task_List_Table();
-
-  $subheader = '';
-  switch ($task_type) {
-    case 'invalid-ad':
-      $subheader = 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist';
-      $footer_template = 'footer-invalid-ad';
-      break;
-    case 'invalid-price':
-      $subheader = 'Auflistung von Produkten mit Preisunterschied Shop / Kleinanzeige';
-      $footer_template = 'blank';
-      break;
-    case 'has-sku':
-      $subheader = 'Auflistung von Produkten mit Anzeige ID';
-      $footer_template = 'blank';
-      break;
-    case 'no-sku':
-      $subheader = 'Auflistung von Produkten ohne Anzeige ID';
-      $footer_template = 'blank';
-      break;
-    case 'featured':
-      $subheader = 'Auflistung von empfohlenen Produkten';
-      $footer_template = 'blank';
-      break;
-    default:
-      $subheader = '';
-      $footer_template = 'blank';
-  }
+  $wp_list_table->set_vars($task_type);
 
   $ads = wbp_get_all_ads();
 
@@ -111,14 +85,11 @@ function _ajax_kleinanzeigen_task()
   $body = ob_get_clean();
 
   ob_start();
-  $wp_list_table->render_header(array(
-    'template' => 'modal-header',
-    'subheader' => $subheader,
-  ));
+  $wp_list_table->render_header();
   $header = ob_get_clean();
 
   ob_start();
-  $wp_list_table->render_footer(array('template' => $footer_template));
+  $wp_list_table->render_footer();
   $footer = ob_get_clean();
 
   ob_start();

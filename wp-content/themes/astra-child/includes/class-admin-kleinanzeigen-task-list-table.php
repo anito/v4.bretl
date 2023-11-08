@@ -8,6 +8,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
   private $hidden_columns = array(
     'id'
   );
+  private $vars;
 
   function __construct()
   {
@@ -58,23 +59,117 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
     }
   }
 
-  function render_header($args = array())
+  function set_vars($task_type)
   {
-    $defaults = array(
-      'template' => 'blank',
-      'subheader' => '__SUBHEADER__'
-    );
-    $options = wp_parse_args($args, $defaults);
-    wbp_include_kleinanzeigen_template('/dashboard/' . $options['template'] . '.php', false, $options);
+    switch ($task_type) {
+      case 'invalid-ad':
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-header',
+            'args' => array(
+              'header' => __('Invalid ads', 'astra-child'),
+              'subheader' => 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist'
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'footer-invalid-ad',
+            'args' => array()
+          )
+        );
+        break;
+      case 'invalid-price':
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-header',
+            'args' => array(
+              'header' => __('Price deviations', 'astra-child'),
+              'subheader' => 'Auflistung von Produkten mit Preisunterschied Shop / Kleinanzeige'
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+        break;
+      case 'has-sku':
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-header',
+            'args' => array(
+              'header' => __('Linked products', 'astra-child'),
+              'subheader' => 'Auflistung von Produkten mit Anzeige ID'
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+        break;
+      case 'no-sku':
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-header',
+            'args' => array(
+              'header' => __('Unlinked products', 'astra-child'),
+              'subheader' => 'Auflistung von Produkten ohne Anzeige ID'
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+        break;
+      case 'featured':
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-header',
+            'args' => array(
+              'header' => __('Featured products', 'astra-child'),
+              'subheader' => 'Auflistung von empfohlenen Produkten'
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+        break;
+      default:
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-header',
+            'args' => array(
+              'header' => __('Title', 'astra-child'),
+              'subheader' => ''
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+    }
+    $this->vars = wp_parse_args($vars, array(
+      'header-template' => array(
+        'template' => 'blank',
+        'args' => array()),
+      'footer-template' => array(
+        'template' => 'blank',
+        'args' => array()
+      )));
+  }
+
+  function render_header()
+  {
+    wbp_include_kleinanzeigen_template('/dashboard/' . $this->vars['header-template']['template'] . '.php', false, $this->vars['header-template']['args']);
   }
 
   function render_footer($args = array())
   {
-    $defaults = array(
-      'template' => 'blank'
-    );
-    $options = wp_parse_args($args, $defaults);
-    wbp_include_kleinanzeigen_template('/dashboard/' . $options['template'] . '.php', false, $options);
+    wbp_include_kleinanzeigen_template('/dashboard/' . $this->vars['footer-template']['template'] . '.php', false, $this->vars['footer-template']['args']);
   }
 
   /**
