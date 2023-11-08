@@ -21,8 +21,8 @@ $todos = $products['todos']; ?>
                   <span style="display: inline-block; padding: 0 10px;">>></span>
                   <span><?php echo $ad_cats; ?></span>
                 </div>
-                <div class="overview-col-key b task"><a href="#" class="start-task" data-task-type="has-sku"><?php echo __('Linked Products', 'astra-child'); ?></a></div>
-                <div class="overview-col-key c task"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Unlinked Products', 'astra-child'); ?></a></div>
+                <div class="overview-col-key b task"><a href="#" class="start-task" data-task-type="has-sku"><?php echo __('Linked products', 'astra-child'); ?></a></div>
+                <div class="overview-col-key c task"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Unlinked products', 'astra-child'); ?></a></div>
                 <div class="overview-col-key d task"><a href="#" class="start-task" data-task-type="featured"><?php echo __('Featured products', 'astra-child'); ?></a></div>
                 <div class="overview-col-val a"><?php echo $total_ads; ?></div>
                 <div class="overview-col-val b"><?php echo count($published_has_sku); ?></div>
@@ -44,7 +44,7 @@ $todos = $products['todos']; ?>
                     <div class="task-count-wrapper warning">
                       <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
                     </div>
-                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid Links', 'astra-child') ?></a></span>
+                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid links', 'astra-child') ?></a></span>
                     (<span class="task-count">0</span>)
                   </div>
                 </div>
