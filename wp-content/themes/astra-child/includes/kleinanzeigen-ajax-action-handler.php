@@ -430,8 +430,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         $exists = false;
         if (wbp_text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
           $exists = true;
-        }
-        if (wbp_text_contains(esc_html($brand->name), esc_html($searchable_content))) {
+        } elseif (wbp_text_contains(esc_html($brand->name), esc_html($searchable_content))) {
           $exists = true;
         }
         if (true === $exists) {
@@ -703,5 +702,5 @@ function get_record($id) {
   $ads = wbp_get_all_ads();
   $ids = array_column($ads, 'id');
   $record_key = array_search($id, $ids);
-  return $ads[$record_key];
+  return $record_key ? $ads[$record_key] : null;
 }

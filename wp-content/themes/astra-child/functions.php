@@ -113,18 +113,18 @@ function wbp_set_pseudo_sale_price($product, $price, $percent = 10)
   $product->set_sale_price($price);
 }
 
-function wbp_text_contains($needle, $haystack, $searchtype = 'default')
+function wbp_text_contains($needle, $haystack, $searchtype = '')
 {
   $needle = preg_quote($needle);
   switch ($searchtype) {
     case 'raw':
-      preg_match('/' . $needle . '/', $haystack, $matches);
+      preg_match('/' . wp_unslash($needle) . '/', $haystack, $matches);
       break;
     case 'like':
-      preg_match('/' . strtolower($needle) . '/', strtolower($haystack), $matches);
+      preg_match('/' . strtolower(wp_unslash($needle)) . '/', strtolower($haystack), $matches);
       break;
     default:
-      preg_match('/\b' . strtolower($needle) . '\b/', strtolower($haystack), $matches);
+      preg_match('/\b' . strtolower(wp_unslash($needle)) . '\b/', strtolower($haystack), $matches);
   }
 
   if (!empty($matches[0])) {
