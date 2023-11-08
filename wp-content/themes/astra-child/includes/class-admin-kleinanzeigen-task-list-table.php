@@ -67,7 +67,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
           'header-template' => array(
             'template' => 'modal-header',
             'args' => array(
-              'header' => __('Invalid ads', 'astra-child'),
+              'header' => __('Invalid links', 'astra-child'),
               'subheader' => 'Liste von Produkten deren Anzeige nicht mehr auffindbar ist'
             )
           ),
