@@ -36,7 +36,7 @@ $todos = $products['todos']; ?>
         <div id="inconsistencies" class="hidden">
           <fieldset class="fieldset tasks" style="flex-direction: column; background-color: #fff0f0;">
             <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
-            <legend><?php echo __('Inconsistencies', 'astra-child') ?></legend>
+            <legend><?php echo __('Inconsistencies discovered', 'astra-child') ?></legend>
             <div class="task invalid-ad">
               <div class="general-action">
                 <div class="action-header">
