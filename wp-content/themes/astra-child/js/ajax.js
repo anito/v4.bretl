@@ -476,7 +476,6 @@ jQuery(document).ready(function ($) {
     const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen || screen;
 
-
     $.post({
       url: admin_ajax,
       data: {

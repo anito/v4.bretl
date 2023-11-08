@@ -341,7 +341,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
           case "featured": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content "><?php echo $this->render_featured_column($product, $sku, $task_type) ?></div>
+                <div class="column-content "><?php echo $this->render_featured_column($product, $task_type) ?></div>
               </td>
             <?php
               break;
