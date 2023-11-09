@@ -83,7 +83,7 @@ class Kleinanzeigen_Task_List_Table extends WP_List_Table
             'template' => 'modal-header',
             'args' => array(
               'header' => __('Price deviations', 'astra-child'),
-              'subheader' => 'Auflistung von verknüpften Produkten die einen Preisunterschied aufweisen'
+              'subheader' => 'Auflistung von Produkten mit Preisunterschied zur verknüpften Anzeige'
             )
           ),
           'footer-template' => array(
