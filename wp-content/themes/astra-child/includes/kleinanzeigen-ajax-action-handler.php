@@ -126,7 +126,7 @@ function wbp_ajax_fix_price()
 
   $modal_row = null;
   if ('modal' === $screen) {
-    $record = get_record($kleinanzeigen_id);
+    $record = wbp_get_record($kleinanzeigen_id);
     $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
@@ -182,7 +182,7 @@ function wbp_ajax_toggle_publish_post()
 
   $modal_row = null;
   if ('modal' === $screen) {
-    $record = get_record($kleinanzeigen_id);
+    $record = wbp_get_record($kleinanzeigen_id);
     $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
@@ -216,7 +216,7 @@ function wbp_ajax_feature_post()
 
   switch ($screen) {
     case 'modal':
-      $record = get_record($kleinanzeigen_id);
+      $record = wbp_get_record($kleinanzeigen_id);
       $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
@@ -260,7 +260,7 @@ function wbp_ajax_save_post()
 
   switch ($screen) {
     case 'modal':
-      $record = get_record($kleinanzeigen_id);
+      $record = wbp_get_record($kleinanzeigen_id);
       $modal_row = render_task_list_row($post_ID, array('record' => $record));
   }
 
@@ -698,9 +698,9 @@ function wbp_render_tasks()
   return ob_get_clean();
 }
 
-function get_record($id) {
+function wbp_get_record($id) {
   $ads = wbp_get_all_ads();
   $ids = array_column($ads, 'id');
   $record_key = array_search($id, $ids);
-  return $record_key ? $ads[$record_key] : null;
+  return is_int($record_key) ? $ads[$record_key] : null;
 }
