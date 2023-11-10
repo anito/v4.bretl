@@ -82,7 +82,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       }
       $product = $product_by_sku ? $product_by_sku : ($product_by_title ? $product_by_title : false);
       $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null;
-      $product ? (wbp_has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$PRICE_DIFF) : null) : null;
+      $product ? (wbp_has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => Kleinanzeigen_List_Table::$PRICE_DIFF) : null) : null;
 
       if ($product) {
         switch ($product->get_status()) {
@@ -91,7 +91,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             break;
           case 'draft':
             $products['draft'][] = $product;
-            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
+            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
             break;
           default:
             $products['other'][] = $product;
@@ -102,14 +102,14 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         if (in_array($default_cat_id, $ids)) {
           $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
           if (1 === count($ids)) {
-            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$NO_CAT);
+            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => Kleinanzeigen_List_Table::$NO_CAT);
           } else {
-            $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
+            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => Kleinanzeigen_List_Table::$CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
           }
         }
       } else {
         $products['unknown'][] = $item->id;
-        $products['todos'][] = array('title' => $item->title, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
+        $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => Kleinanzeigen_List_Table::$INVISIBLE);
       }
     }
     $items = $this->items;

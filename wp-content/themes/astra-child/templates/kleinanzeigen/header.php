@@ -172,7 +172,7 @@ $todos = $products['todos']; ?>
                   <ul>
                     <?php foreach ($todos as $todo) { ?>
                       <li class="todo">
-                        <span class="title"><?php echo $todo['title'] ?>:</span>
+                        <span class="title"><a href="#ad-id-<?php echo $todo['id'] ?>"><?php echo $todo['title'] ?></a>:</span>
                         <span class="reason"><?php echo $todo['reason'] ?></span>
                       </li>
                     <?php } ?>
