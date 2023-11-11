@@ -118,13 +118,13 @@ function wbp_text_contains($needle, $haystack, $searchtype = '')
   $needle = preg_quote($needle);
   switch ($searchtype) {
     case 'raw':
-      preg_match('/' . wp_unslash($needle) . '/', $haystack, $matches);
+      preg_match('/' . wp_unslash($needle) . '/i', $haystack, $matches);
       break;
     case 'like':
-      preg_match('/' . strtolower(wp_unslash($needle)) . '/', strtolower($haystack), $matches);
+      preg_match('/' . wp_unslash($needle) . '/i', $haystack, $matches);
       break;
     default:
-      preg_match('/\b' . strtolower(wp_unslash($needle)) . '\b/', strtolower($haystack), $matches);
+      preg_match('/(?:^|\b)' . $needle . '(?!\w)/i', $haystack, $matches);
   }
 
   if (!empty($matches[0])) {
