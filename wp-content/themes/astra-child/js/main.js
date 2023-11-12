@@ -147,9 +147,16 @@ jQuery.noConflict();
       root.classList.toggle("sidebar-open") ? opened() : closed();
     };
 
+    const autoclose = () => {
+      if (root.classList.contains("sidebar-open")) {
+        clickHandler();
+      }
+    }
+
     toggleEl.addEventListener("click", clickHandler);
 
     clickHandler();
+    setTimeout(autoclose, 8000);
   }
 
   function add_show_quote_request() {
