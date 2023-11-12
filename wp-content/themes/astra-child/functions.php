@@ -212,9 +212,7 @@ function wbp_filter_exclusive_label_terms($terms)
   }
 
   foreach (MUTUALLY_EXCLUSIVE_LABEL_NAMES as $group) {
-    $term_slugs = array_map(function ($term) {
-      return $term->slug;
-    }, $terms);
+    $term_slugs = wp_list_pluck($terms, 'slug');
     $intersection = array_intersect($term_slugs, $group);
     if (count($intersection) > 1) {
       $exclusive_term = get_term_by('slug', $group[0], 'product_label');
@@ -527,6 +525,15 @@ function wbp_admin_init()
   if (!wp_doing_ajax()) {
     add_action('current_screen', 'wbp_on_current_screen');
   }
+
+  require_once __DIR__ . '/includes/class-admin-kleinanzeigen-list-table.php';
+  require_once __DIR__ . '/includes/class-admin-kleinanzeigen-task-list-table.php';
+
+  global $wp_list_table;
+  global $wp_task_list_table;
+
+  $wp_list_table = new Kleinanzeigen_List_Table();
+  $wp_task_list_table = new Kleinanzeigen_Task_List_Table();
 
   add_action('admin_enqueue_scripts', 'wbp_add_admin_ajax_scripts', 10);
   add_action('admin_enqueue_scripts', 'wbp_wc_screen_styles');

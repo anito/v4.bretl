@@ -1,10 +1,4 @@
 <?php
-global $wp_list_table;
-global $wp_task_list_table;
-
-$wp_list_table = new Kleinanzeigen_List_Table();
-$wp_task_list_table = new Kleinanzeigen_Task_List_Table();
-
 function parse_kleinanzeigen_id($val)
 {
   preg_match('/(\/?)(\d{8,})/', $val, $matches);
