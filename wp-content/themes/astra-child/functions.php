@@ -106,6 +106,74 @@ function wbp_has_price_diff($record, $product)
   return $kleinanzeigen_price !== $woo_price;
 }
 
+function wbp_get_product_variation($product, $term_name, $taxonomy)
+{
+  $avail_variations = $product->get_available_variations();
+  $variations = array_filter($avail_variations, function ($variation) use ($taxonomy, $term_name) {
+    $attribute = $variation['attributes']['attribute_' . $taxonomy];
+    return $attribute === sanitize_title($term_name);
+  });
+  return reset($variations);
+}
+
+function wbp_create_product_variation($product_id, $term_name, $attr_name, $attributes)
+{
+  $product = new WC_Product_Variable($product_id);
+
+  $taxonomy = wc_attribute_taxonomy_name($attr_name);
+
+  // If taxonomy doesn't exists we create it (Thanks to Carl F. Corneil)
+  if (!taxonomy_exists($taxonomy)) {
+    register_taxonomy(
+      $taxonomy,
+      'product_variation',
+      array(
+        'hierarchical' => false,
+        'label' => $attr_name,
+        'query_var' => true,
+        'rewrite' => array('slug' => sanitize_title($attr_name)), // The base slug
+      ),
+    );
+  }
+
+  // Get the post Terms names from the parent variable product.
+  $post_term_names =  wp_get_post_terms($product_id, $taxonomy, array('fields' => 'names'));
+
+  // Check if the post term exist and if not we set it in the parent variable product.
+  if (!in_array($term_name, $post_term_names))
+    wp_set_post_terms($product_id, $term_name, $taxonomy, true);
+
+  $variation_post = array(
+    'post_title'  => $product->get_name(),
+    'post_name'   => 'product-' . $product_id . '-variation',
+    'post_status' => 'publish',
+    'post_parent' => $product_id,
+    'post_type'   => 'product_variation',
+    'menu_order'  => $attributes['menu_order'],
+    'guid'        => $product->get_permalink()
+  );
+
+  // Create the product variation or use an existing one
+  $variation_arr = wbp_get_product_variation($product, $term_name, $taxonomy);
+  if ($variation_arr) {
+    $variation_id = $variation_arr['variation_id'];
+  } else {
+    $variation_id = wp_insert_post($variation_post);
+  }
+  $variation = new WC_Product_Variation($variation_id);
+
+  $variation->set_regular_price($attributes['regular_price']);
+  $variation->set_sku(!empty($attributes['sku']) ? $attributes['sku'] : '');
+  $variation->save();
+
+  if (!term_exists($term_name, $taxonomy)) {
+    wp_insert_term($term_name, $taxonomy); // Create the term
+  }
+  $term_slug = get_term_by('name', $term_name, $taxonomy)->slug; // Get the term slug
+  update_post_meta($variation_id, 'attribute_' . $taxonomy, $term_slug);
+  return $variation;
+}
+
 function wbp_set_pseudo_sale_price($product, $price, $percent = 10)
 {
   $regular_price = (int) $price + (int) $price * $percent / 100;
@@ -153,6 +221,44 @@ function wbp_handle_product_contents_aktion($args)
     require_once __DIR__ . '/includes/product-term-handler.php';
     wbp_set_product_term($product, $term->term_id, 'cat', true);
   }
+  return $product;
+}
+
+function wbp_handle_product_contents_rent($args)
+{
+  extract($args);
+
+  /**
+   * Handle Product Category
+   */
+  $term = get_term_by('name', isset(WC_COMMON_TAXONOMIES['rent']) ? WC_COMMON_TAXONOMIES['rent'] : '', 'product_cat');
+
+  if ($term) {
+    require_once __DIR__ . '/includes/product-term-handler.php';
+    wbp_set_product_term($product, $term->term_id, 'cat', true);
+  }
+
+  /**
+   * Handle Mietmaschinen Variations
+   */
+  $product_id = $product->get_ID();
+  if ('variable' !== $product->get_type()) {
+    $product = new WC_Product_Variable($product);
+    wp_set_object_terms($product_id, 'variable', 'product_type');
+  }
+
+  $attr_name = WC_CUSTOM_PRODUCT_ATTRIBUTES['rent'];
+
+  // Check if the Term name exist and if not we create it.
+  $attributes = get_mietdauer_attributes($attr_name, (int) $price);
+  $terms = $attributes['attributes'][$attr_name];
+  foreach ($terms as $key => $term) {
+    $term_name = $term['name'];
+    $attributes = array_merge($term['attributes'], array('menu_order' => $key));
+    wbp_set_pa_term($product, $attr_name, $term['name'], true, array('is_variation' => 1));
+    wbp_create_product_variation($product_id, $term_name, $attr_name, $attributes);
+  }
+
   return $product;
 }
 
@@ -520,6 +626,45 @@ function wbp_on_current_screen($screen)
   }
 }
 
+function get_mietdauer_attributes($attr_name, $price)
+{
+  return array(
+    'attributes' => array(
+      $attr_name => array(
+        array(
+          'name' => __('1 Tag', 'astra-child'),
+          'attributes' => array('regular_price' => (int) $price)
+        ),
+        array(
+          'name' => __('2 Tage', 'astra-child'),
+          'attributes' => array('regular_price' => (int) $price * 2)
+        ),
+        array(
+          'name' => __('3 Tage', 'astra-child'),
+          'attributes' => array('regular_price' => (int) $price * 3)
+        ),
+        array(
+          'name' => __('4 Tage', 'astra-child'),
+          'attributes' => array('regular_price' => (int) $price * 4)
+        ),
+        array(
+          'name' => __('5 Tage', 'astra-child'),
+          'attributes' => array('regular_price' => (int) $price * 5)
+        ),
+        array(
+          'name' => __('6 Tage', 'astra-child'),
+          'attributes' => array('regular_price' => (int) $price * 6)
+        ),
+        array(
+          'name' => __('7 Tage', 'astra-child'),
+          'attributes' => array('regular_price' => (int) $price * 7)
+        ),
+      )
+    ),
+    'sku' => '',
+  );
+}
+
 function wbp_admin_init()
 {
   if (!wp_doing_ajax()) {
@@ -842,7 +987,7 @@ function wbp_get_task_list_items($products, $ads, $task_type)
     $products_has_sku = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'EXISTS'));
     foreach ($products_has_sku as $product) {
       $sku = (int) $product->get_sku();
-      $record = $ads[$records[$sku]];
+      $record = isset($records[$sku]) ? $ads[$records[$sku]] : null;
       $items[] = compact('product', 'task_type', 'record');
     }
     return $items;
@@ -853,7 +998,7 @@ function wbp_get_task_list_items($products, $ads, $task_type)
     foreach ($featured_posts as $post) {
       $product = new WC_Product($post->ID);
       $sku = (int) $product->get_sku();
-      $record = $ads[$records[$sku]];
+      $record = isset($records[$sku]) ? $ads[$records[$sku]] : null;
       $items[] = compact('product', 'task_type', 'record');
     }
     return $items;

@@ -106,6 +106,28 @@ function wbp_ajax_fix_price()
         $product->set_regular_price($price);
       }
       $product->save();
+
+      // Fix price for Mietmaschinen
+      $categories = get_the_terms($post_ID, 'product_cat');
+      if (!empty($categories)) {
+        $key = 'rent';
+        $cat_name = WC_COMMON_TAXONOMIES[$key];
+        $cat_names = wp_list_pluck($categories, 'name');
+        if (in_array($cat_name, $cat_names)) {
+          $attr_name = WC_CUSTOM_PRODUCT_ATTRIBUTES[$key];
+          $attr_slug = wc_attribute_taxonomy_name($attr_name);
+
+          $attributes = get_mietdauer_attributes($attr_name, (int) $price);
+          $terms = $attributes['attributes'][$attr_name];
+          foreach ($terms as $key => $term) {
+            $term_name = $term['name'];
+            $attributes = array_merge($term['attributes'], array('menu_order' => $key));
+            wbp_set_pa_term($product, $attr_name, $term['name'], true, array('is_variation' => 1));
+            wbp_create_product_variation($product->get_id(), $term_name, $attr_name, $attributes);
+          }
+
+        }
+      }
     }
   }
 
@@ -141,17 +163,17 @@ function wbp_ajax_toggle_publish_post()
 
   // Maybe remove sku from product
   if (is_null($disconnect)) {
-    $force_status = null;
     $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
   } else {
-    disable_sku($post_ID);
-    $force_status = 'draft';
+    $product = disable_sku($post_ID);
+    $product->save();
+    $post_status = 'draft';
   }
 
   if ($post_ID) {
     wp_update_post(array(
       'ID' => $post_ID,
-      'post_status' => $force_status ?? $post_status
+      'post_status' => $post_status
     ));
   }
 
@@ -193,7 +215,7 @@ function wbp_ajax_feature_post()
   $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-  if($post_ID) {
+  if ($post_ID) {
     $product = wc_get_product($post_ID);
     $product->set_featured(!$product->is_featured());
     $product->save();
@@ -229,7 +251,7 @@ function wbp_ajax_save_post()
   $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-  if(!is_null($args)) {
+  if (!is_null($args)) {
     $args = (array) json_decode(base64_decode($args));
   } else {
     $args = array();
@@ -273,10 +295,11 @@ function wbp_ajax_connect()
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
   if (isset($post_ID) && isset($ad)) {
-    enable_sku($post_ID, $ad);
+    $product = enable_sku($post_ID, $ad);
   } else {
-    disable_sku($post_ID);
+    $product = disable_sku($post_ID);
   }
+  $product->save();
 
   $data = prepare_list_table($paged);
   $row = render_list_row($kleinanzeigen_id, $data);
@@ -295,7 +318,8 @@ function wbp_ajax_disconnect()
   $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-  disable_sku($post_ID);
+  $product = disable_sku($post_ID);
+  $product->save();
 
   switch ($screen) {
     case 'edit-product':
@@ -335,9 +359,9 @@ function wbp_ajax_import_kleinanzeigen_data()
   }
 
   if ($kleinanzeigendata) {
+    $searchable_content = '';
     $content = isset($kleinanzeigendata->content) ? $kleinanzeigendata->content : null;
     $record = isset($kleinanzeigendata->record) ? (object) $kleinanzeigendata->record : null;
-    $searchable_content = '';
 
     if ($record) {
       // Ad is publicly available
@@ -383,7 +407,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'leicht gebraucht' => 'Leicht Gebraucht',
         'limited edition' => 'Limited Edition',
         'lim. edition' => 'Limited Edition',
-        'mietmaschine' => 'Mieten',
+        'mietmaschine' => array('Mieten', 'fn' => array('rent', 'default')),
         'neu' => 'Neu',
         'neumaschine' => 'Neu',
         'neufahrzeug' => 'Neu',
@@ -392,7 +416,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
       );
 
-      // handle contents
+      // Handle contents
       foreach ($parts as $key => $val) {
 
         if (wbp_text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
@@ -414,7 +438,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         }
       }
 
-      // handle brands
+      // Handle brands
       $brands = get_terms([
         'taxonomy' => 'product_brand',
         'hide_empty' => false
@@ -432,21 +456,25 @@ function wbp_ajax_import_kleinanzeigen_data()
         }
       }
 
-
-      // handle product attributes
+      // Handle product attributes
       foreach ($tags as $key => $tag) {
-        wbp_set_pa_term($product, $tag, true);
+        wbp_set_pa_term($product, WC_CUSTOM_PRODUCT_ATTRIBUTES['specials'], $tag, true);
       }
-
-      try {
-        $product->set_sku($kleinanzeigen_id);
-      } catch (Exception $e) {
-      }
-      $product->save();
     }
 
     if ($record) {
-      enable_sku($post_ID, $record);
+      $product = enable_sku($post_ID, $record);
+      if (is_wp_error($product)) {
+        $error_data = $product->get_error_data();
+        if (isset($error_data['resource_id'])) {
+          if (is_callable('write_log')) {
+            // write_log($error_data);
+          }
+          wp_delete_post($error_data['resource_id'], true);
+        }
+      } else {
+        $product->save();
+      };
     }
 
     wp_insert_post(array(
@@ -551,7 +579,7 @@ function wbp_ajax_delete_post()
   $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
   $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : '';
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-  
+
   $product = wc_get_product($post_ID);
   if ($product) {
     $product->delete(true);
@@ -628,7 +656,8 @@ function wbp_upload_image($url, $post_ID)
   return $attachmentId;
 }
 
-function render_wc_admin_list_row($post_ID) {
+function render_wc_admin_list_row($post_ID)
+{
   $wp_wc_admin_list_table = new Extended_WC_Admin_List_Table_Products();
 
   ob_start();
@@ -636,7 +665,8 @@ function render_wc_admin_list_row($post_ID) {
   return ob_get_clean();
 }
 
-function prepare_list_table($paged) {
+function prepare_list_table($paged)
+{
   global $wp_list_table;
 
   $data = wbp_get_json_data(array('paged' => $paged));
@@ -686,13 +716,14 @@ function render_head()
 function wbp_render_tasks()
 {
   global $wp_list_table;
-  
+
   ob_start();
   $wp_list_table->render_tasks();
   return ob_get_clean();
 }
 
-function wbp_get_record($id) {
+function wbp_get_record($id)
+{
   $ads = wbp_get_all_ads();
   $ids = array_column($ads, 'id');
   $record_key = array_search($id, $ids);

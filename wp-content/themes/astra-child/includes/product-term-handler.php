@@ -47,7 +47,7 @@ function wbp_process_sale($post_ID, $post)
 
   // Product Sale Attribute
   if (SYNC_COMMON_TAX_AND_ATTS) {
-    wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['sale'], $is_on_sale);
+    // wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['sale'], $is_on_sale);
   }
 }
 
@@ -79,7 +79,7 @@ function wbp_process_featured($product)
 
   // Product Featured attribute
   if (SYNC_COMMON_TAX_AND_ATTS) {
-    wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['featured'], $is_featured);
+    // wbp_set_pa_term($product, WC_COMMON_TAXONOMIES['featured'], $is_featured);
   }
 }
 
@@ -154,7 +154,7 @@ function wbp_process_kleinanzeigen($post_ID, $post)
         $product->set_sku($kleinanzeigen_id);
         $product->save();
       } catch (Exception $e) {
-        $sku_error = new WP_Error('invalid_sku', __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child'));
+        $sku_error = new WP_Error(400, 'invalid sku', __('A Product with the same Ad ID already exists. Enter a different Ad ID or delete this draft.', 'astra-child'));
       }
     }
   }
@@ -164,12 +164,12 @@ function wbp_process_kleinanzeigen($post_ID, $post)
 
     global $wpdb;
 
-    $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
+    $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_type = 'product' AND post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
     $results = $wpdb->get_results($prepare);
     if (count($results) >= 1) {
       foreach ($results as $result) {
         if ($result->ID != $post_ID) {
-          $sku_error = new WP_Error('invalid_sku', __('A product with the same title already exists. Enter a different title or delete this draft.', 'astra-child'));
+          $sku_error = new WP_Error(400, 'invalid sku', __('A product with the same title already exists. Enter a different title or delete this draft.', 'astra-child') . '(' . $result->ID . '/' . $post_ID . ')');
         }
       }
     }
@@ -191,11 +191,12 @@ function wbp_process_kleinanzeigen($post_ID, $post)
     'post_title' => $title
   ]);
 
-  if ($sku_error) {
-    disable_sku($post_ID);
+  if (!(is_wp_error($sku_error))) {
+    $product = enable_sku($post_ID, $ad);
   } else {
-    enable_sku($post_ID, $ad);
+    $product = disable_sku($post_ID);
   }
+  $product->save();
 }
 
 function wbp_set_product_term($product, $term_id, $type, $bool)
@@ -216,40 +217,36 @@ function wbp_set_product_term($product, $term_id, $type, $bool)
 /**
  * Add or remove term to/from product attribute
  */
-function wbp_set_pa_term($product, $term_name, $bool, $attr = 'specials')
+function wbp_set_pa_term($product, $taxonomy_name, $term_name, $bool, $args = array())
 {
-  $name = WC_CUSTOM_PRODUCT_ATTRIBUTES[$attr];
-  $slug = wc_sanitize_taxonomy_name(stripslashes($name));
-
-  $taxonomy = 'pa_' . $slug;
+  $taxonomy = wc_attribute_taxonomy_name($taxonomy_name);
   $product_id = $product->get_id();
-  $attributes = $product->get_attributes();
-
-  $term_ids = [];
-  if (!empty($attributes) && isset($attributes[$taxonomy])) {
-    $term_ids = array_merge($term_ids, $attributes[$taxonomy]['data']['options']);
-  }
-
 
   if (!term_exists($term_name, $taxonomy)) {
     wp_insert_term($term_name, $taxonomy);
   }
+
+  $terms = wp_get_object_terms($product_id, $taxonomy);
+  $term_ids = wp_list_pluck($terms, 'term_id');
 
   $term_id = get_term_by('name', $term_name, $taxonomy)->term_id;
   $term_ids = wbp_toggle_array_item($term_ids, $term_id, $bool); // remove or add the term
 
   wp_set_object_terms($product_id, $term_ids, $taxonomy);
 
-  $attributes[$taxonomy] = array(
+  $prev_attributes = get_post_meta($product_id, '_product_attributes', true);
+  $attributes = ! empty($prev_attributes) ? $prev_attributes : array();
+  $attributes[$taxonomy] = wp_parse_args($args, array(
     'name'          => $taxonomy,
     'value'         => $term_ids,
     'position'      => 1,
     'is_visible'    => 1,
     'is_variation'  => 0,
-    'is_taxonomy'   => '1'
-  );
+    'is_taxonomy'   => 1
+  ));
 
   update_post_meta($product_id, '_product_attributes', $attributes);
+  return $term_ids;
 }
 
 function wbp_toggle_array_item($ids, $id, $bool = null)
@@ -271,14 +268,15 @@ function enable_sku($post_ID, $ad)
   if ($product) {
     try {
       $product->set_sku($ad->id);
-      $product->save();
-
-      update_post_meta((int) $post_ID, 'kleinanzeigen_id', $ad->id);
-      update_post_meta((int) $post_ID, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($ad->url));
-      update_post_meta((int) $post_ID, 'kleinanzeigen_search_url', wbp_get_kleinanzeigen_search_url($ad->id));
-      update_post_meta((int) $post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
-    } catch (Exception $e) {
+    } catch (WC_Data_Exception $e) {
+      return new WP_Error($e->getErrorCode(), $e->getMessage(), $e->getErrorData());
     }
+    update_post_meta((int) $post_ID, 'kleinanzeigen_id', $ad->id);
+    update_post_meta((int) $post_ID, 'kleinanzeigen_url', wbp_get_kleinanzeigen_url($ad->url));
+    update_post_meta((int) $post_ID, 'kleinanzeigen_search_url', wbp_get_kleinanzeigen_search_url($ad->id));
+    update_post_meta((int) $post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
+
+    return $product;
   }
 }
 
@@ -287,12 +285,13 @@ function disable_sku($post_ID)
   $product = wc_get_product($post_ID);
 
   $product->set_sku('');
-  $product->save();
 
   delete_post_meta($post_ID, 'kleinanzeigen_id');
   delete_post_meta($post_ID, 'kleinanzeigen_url');
   delete_post_meta($post_ID, 'kleinanzeigen_search_url');
   delete_post_meta($post_ID, 'kleinanzeigen_record');
+
+  return $product;
 }
 
 /**
