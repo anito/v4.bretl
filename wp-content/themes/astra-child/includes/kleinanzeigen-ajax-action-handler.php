@@ -398,6 +398,7 @@ function wbp_ajax_import_kleinanzeigen_data()
         'topzustand' => 'Top',
         'topausstattung' => 'Top',
         'aktion' => array('Aktion', 'fn' => array('aktion', 'default')),
+        'aktionswochen' => array('Aktionswochen', 'fn' => array('aktionswochen', 'default')),
         'aktionsmodell' => 'Aktion',
         'klima' => 'Klima',
         'am lager' => 'Sofort lieferbar',

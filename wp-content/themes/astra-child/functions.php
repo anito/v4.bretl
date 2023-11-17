@@ -262,6 +262,19 @@ function wbp_handle_product_contents_rent($args)
   return $product;
 }
 
+function wbp_handle_product_contents_aktionswochen($args)
+{
+  $product = $args['product'];
+
+  $term = get_term_by('name', isset(WC_COMMON_TAXONOMIES['aktionswochen']) ? WC_COMMON_TAXONOMIES['aktionswochen'] : '', 'product_cat');
+
+  if ($term) {
+    require_once __DIR__ . '/includes/product-term-handler.php';
+    wbp_set_product_term($product, $term->term_id, 'cat', true);
+  }
+  return $product;
+}
+
 function wbp_handle_product_contents_default($args)
 {
   $product = $args['product'];
@@ -312,6 +325,10 @@ function wbp_filter_exclusive_label_terms($terms)
         array(
           'neuwertig',
           'neu'
+        ),
+        array(
+          'aktionswochen',
+          'aktion'
         ),
       )
     );
