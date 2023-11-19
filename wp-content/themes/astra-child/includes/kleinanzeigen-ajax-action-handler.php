@@ -165,8 +165,11 @@ function wbp_ajax_toggle_publish_post()
   if (is_null($disconnect)) {
     $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
   } else {
-    $product = disable_sku($post_ID);
-    $product->save();
+    $product = wc_get_product($post_ID);
+    if ($product) {
+      disable_sku($product);
+      $product->save();
+    }
     $post_status = 'draft';
   }
 
@@ -294,12 +297,15 @@ function wbp_ajax_connect()
   $ad = wbp_find_kleinanzeige($kleinanzeigen_id);
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-  if (isset($post_ID) && isset($ad)) {
-    $product = enable_sku($post_ID, $ad);
-  } else {
-    $product = disable_sku($post_ID);
+  $product = wc_get_product($post_ID);
+  if ($product) {
+    if (isset($ad)) {
+      enable_sku($product, $ad);
+    } else {
+      disable_sku($product);
+    }
+    $product->save();
   }
-  $product->save();
 
   $data = prepare_list_table($paged);
   $row = render_list_row($kleinanzeigen_id, $data);
@@ -318,8 +324,11 @@ function wbp_ajax_disconnect()
   $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
   $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-  $product = disable_sku($post_ID);
-  $product->save();
+  $product = wc_get_product($post_ID);
+  if ($product) {
+    disable_sku($product);
+    $product->save();
+  }
 
   switch ($screen) {
     case 'edit-product':
@@ -464,7 +473,7 @@ function wbp_ajax_import_kleinanzeigen_data()
     }
 
     if ($record) {
-      $product = enable_sku($post_ID, $record);
+      $product = enable_sku($product, $record);
       if (is_wp_error($product)) {
         $error_data = $product->get_error_data();
         if (isset($error_data['resource_id'])) {

@@ -349,6 +349,16 @@ function wbp_filter_exclusive_label_terms($terms)
   return $terms;
 }
 
+function wbp_get_kleinanzeigen_url($url)
+{
+  return KLEINANZEIGEN_URL . $url;
+}
+
+function wbp_get_kleinanzeigen_search_url($id)
+{
+  return KLEINANZEIGEN_URL . ($id ? '/s-' . $id . '/k0' : '/');
+}
+
 function wbp_publish_guard($data)
 {
   require_once __DIR__ . '/includes/kleinanzeigen-ajax-action-handler.php';
@@ -369,16 +379,6 @@ function wbp_quick_edit_product_save($post)
     // Render custom columns
     new Extended_WC_Admin_List_Table_Products();
   };
-}
-
-function wbp_get_kleinanzeigen_url($url)
-{
-  return KLEINANZEIGEN_URL . $url;
-}
-
-function wbp_get_kleinanzeigen_search_url($id)
-{
-  return KLEINANZEIGEN_URL . ($id ? '/s-' . $id . '/k0' : '/');
 }
 
 function wbp_save_post($post_ID, $post)
@@ -748,6 +748,15 @@ function wbp_get_wc_placeholder_image($default_placeholder)
 add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', 'wbp_get_wc_placeholder_image');
 
 /**
+ * Replace default Elementor image placeholdder
+ */
+function custom_elementor_placeholder_image()
+{
+  return get_stylesheet_directory_uri() . '/images/placeholder.jpg';
+}
+add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');
+
+/**
  * Add Metabox to product screen
  *
  */
@@ -972,15 +981,6 @@ function wbp_product_custom_fields()
   );
   echo '</div>';
 }
-
-/**
- * Replace default Elementor image placeholdder
- */
-function custom_elementor_placeholder_image()
-{
-  return get_stylesheet_directory_uri() . '/images/placeholder.jpg';
-}
-add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');
 
 /**
  * Kleinanzeigen.de
