@@ -349,6 +349,10 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         ), $args);
 
         $success = wp_update_post($postarr);
+        $product = wc_get_product($post_ID);
+        if("trash" === $product->get_status()) {
+          wbp_ka()->delete_product($post_ID, true);
+        }
       }
 
       switch ($screen) {

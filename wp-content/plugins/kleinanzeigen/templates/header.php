@@ -221,7 +221,6 @@ $todos = $products['todos'];
     if ($('#invalid-ads-count').text() > 0) {
       const el = $('.task [data-task-type="has-sku"]');
       const parent = el.closest('.task');
-      parent.addClass('warning');
       $('.dashicons-warning', parent).removeClass('hidden');
     }
 

@@ -144,6 +144,11 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
   }
 
+  .ka-list-modal .footer {
+    position: absolute;
+    bottom: 20px;
+  }
+
   .action-button.disabled {
     pointer-events: none;
   }

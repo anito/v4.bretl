@@ -157,11 +157,13 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $this->vars = wp_parse_args($vars, array(
       'header-template' => array(
         'template' => 'blank',
-        'args' => array()),
+        'args' => array()
+      ),
       'footer-template' => array(
         'template' => 'blank',
         'args' => array()
-      )));
+      )
+    ));
   }
 
   function render_header()
@@ -329,11 +331,19 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     );
   }
 
+  public function render_empty_row() {
+    echo '<tr style="display: none;"></tr>';
+  }
+
   function render_row($item)
   {
     // Extracts $products | $task_type | $record
     extract($item);
 
+    if (!$product) {
+      return $this->render_empty_row();
+    }
+    
     list($columns, $hidden) = $this->get_column_info();
 
     $post_ID = $product->get_id();
@@ -342,7 +352,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $shop_price_html = wp_kses_post($product->get_price_html());
     $ka_price = isset($record) ? $record->price : '-';
 
-?>
+    ?>
     <tr id="<?php echo $post_ID ?>">
       <?php
 

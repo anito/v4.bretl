@@ -39,7 +39,7 @@ if (!class_exists('Kleinanzeigen')) {
       add_filter('get_the_terms', array($this, 'label_filter'), 20, 3);
 
       add_action("woocommerce_before_product_object_save", array($this, "product_before_save"), 99, 2);
-      
+
       add_action("save_post", array($this, "save_post"), 99, 3);
       add_action("save_post", array($this, "quick_edit_product_save"), 10, 3);
       add_filter("update_post_metadata", array($this, 'prevent_metadata_update'), 10, 4);
@@ -419,21 +419,22 @@ if (!class_exists('Kleinanzeigen')) {
 
     public function publish_guard($post)
     {
-      if('product' !== $post['post_type']) return $post;
+      if ('product' !== $post['post_type']) return $post;
 
       // Check for valid product title when publishing
       require_once $this->plugin_path('/includes/class-utils.php');
       if (!Utils::is_valid_title($post['post_title']) && $post['post_status'] == 'publish') {
         $post['post_status'] = 'draft';
         // prevent adding duplicate DUPLIKAT info to title
-        $post['post_title'] = Utils::sanitize_title($post['post_title']);
+        $post['post_title'] = Utils::sanitize_dup_title($post['post_title']);
       }
       return $post;
     }
 
-    public function quick_edit_product_save($post)
+    public function quick_edit_product_save($data)
     {
-      if ('product' !== $post['post_type']) return $post;
+      if (is_int($data)) return $data;
+      if ('product' !== $data['post_type']) return $data;
 
       // Check for a quick editsave action
       if (wp_doing_ajax() && isset($_POST['ID'])) {
@@ -491,8 +492,8 @@ if (!class_exists('Kleinanzeigen')) {
       } else {
         $ad = isset($_POST['kleinanzeigendata']['record']) ? (object) $_POST['kleinanzeigendata']['record'] : null;
         $ad = is_null($ad) ? (isset($_POST['kleinanzeigen_id']) ? $this->find_kleinanzeige((int) $_POST['kleinanzeigen_id']) : null) : $ad;
-        
-        if(is_null($ad)) {
+
+        if (is_null($ad)) {
           $this->disable_sku($product);
         } else {
           $this->enable_sku($product, $ad);
@@ -540,6 +541,11 @@ if (!class_exists('Kleinanzeigen')) {
         $json = get_post_meta($post_ID, 'kleinanzeigen_record', true);
         return (object) json_decode($json, true);
       };
+      $comment = function ($pos_key = 1, $content = '') {
+        $pos = array_combine(range(0, 2), array('', '-start', '-end'));
+        $name = isset($pos[$pos_key]) ? $pos[$pos_key] : $pos[0];
+        return '<!--COMMENT' . strtoupper($name) . '-->' . $content;
+      };
 
       $is_recover = "true" === get_post_meta($post_ID, 'kleinanzeigen_recover', true);
       if ($is_recover) {
@@ -574,20 +580,25 @@ if (!class_exists('Kleinanzeigen')) {
       if (count($results) >= 1) {
         foreach ($results as $result) {
           if ($result->ID != $post_ID) {
-            $sku_errors[] = new WP_Error(400, __('A product with the same title already exists.\nDelete this draft or enter a different title.', 'wbp-kleinanzeigen'));
+            $sku_errors[] = new WP_Error(400, __('A product with the same title already exists. Delete this draft or enter a different title.', 'wbp-kleinanzeigen'));
           }
         }
       }
 
+      // Cleanup comments
+      $content = preg_replace('/(?:' . $comment(1) . ')\s*(.|\r|\n)*(?:' . $comment(2) . ')/', '', $content);
+
       if (!empty($sku_errors)) {
-        $title = wp_strip_all_tags(Utils::sanitize_title($title . " [ DUPLIKAT " . 0 . " ]"));
-        $before_content = '<div style="max-width: 50%;">';
-        $content = '';
-        $after_content = '</div>';
+        $title = wp_strip_all_tags(Utils::sanitize_dup_title($title . " [ DUPLIKAT " . 0 . " ]"));
+        $before_content = $comment(1, '<div style="max-width: 100%;">');
+        $inner_content = '';
+        $after_content = $comment(2, '</div>');
         foreach ($sku_errors as $sku_error) {
-          $content .= '<div style="display: inline-block; border: 1px solid red; border-radius: 5px; border-left: 5px solid red; margin-bottom: 5px; padding: 5px 10px; color: #f99;"><b style="font-size: 14px;">' . $sku_error->get_error_message() . '</div>';
+          $inner_content .= '<div style="display: inline-block; border: 1px solid red; border-radius: 5px; border-left: 5px solid red; margin-bottom: 5px; padding: 5px 10px; color: #f44;"><b style="font-size: 14px;">' . $sku_error->get_error_message() . '</div>';
         }
-        $content = sprintf('%1$s' . $content . '%2$s', $before_content, $after_content);
+        $content = sprintf('%1$s' . $inner_content . '%2$s' . '%3$s', $before_content, $after_content, $content);
+      } else {
+        $title = Utils::sanitize_dup_title($title, '', array('cleanup' => true));
       }
 
       // Avoid recursion
@@ -595,7 +606,7 @@ if (!class_exists('Kleinanzeigen')) {
       wp_insert_post([
         'ID' => $post_ID,
         'post_type' => 'product',
-        'post_status' => !empty($sku_errors) ? 'draft' : $_POST['post_status'],
+        'post_status' => !empty($sku_errors) ? 'draft' : (isset($_POST['post_status']) ? $_POST['post_status'] : ''),
         'post_content' => $content,
         'post_excerpt' => $product->get_short_description(),
         'post_title' => $title
@@ -604,7 +615,7 @@ if (!class_exists('Kleinanzeigen')) {
 
     public function prevent_metadata_update($data, $id, $meta_key, $meta_value)
     {
-      if('kleinanzeigen_id' !== $meta_key) return $data;
+      if ('kleinanzeigen_id' !== $meta_key) return $data;
 
       $product = wc_get_product($id);
       $sku = $product->get_sku();
@@ -799,7 +810,7 @@ if (!class_exists('Kleinanzeigen')) {
        */
       $terms = [];
       $term_names = isset(WC_TERMS['rent']) ? WC_TERMS['rent'] : array();
-      foreach($term_names as $term_name) {
+      foreach ($term_names as $term_name) {
         $term = get_term_by('name', $term_name, 'product_tag');
         wbp_th()->set_product_term($product, $term->term_id, 'tag', true);
       }
@@ -990,10 +1001,52 @@ if (!class_exists('Kleinanzeigen')) {
       return $product;
     }
 
+    function delete_product($id, $force = false)
+    {
+      $product = wc_get_product($id);
+
+      if (empty($product))
+        return new WP_Error(999, sprintf(__('No %s is associated with #%d', 'woocommerce'), 'product', $id));
+
+      // If we're forcing, then delete permanently.
+      if ($force) {
+        if ($product->is_type('variable')) {
+          foreach ($product->get_children() as $child_id) {
+            $child = wc_get_product($child_id);
+            $child->delete(true);
+          }
+        } elseif ($product->is_type('grouped')) {
+          foreach ($product->get_children() as $child_id) {
+            $child = wc_get_product($child_id);
+            $child->set_parent_id(0);
+            $child->save();
+          }
+        }
+
+        $product->delete(true);
+        $result = $product->get_id() > 0 ? false : true;
+      } else {
+        $product->delete();
+        $result = 'trash' === $product->get_status();
+      }
+
+      if (!$result) {
+        return new WP_Error(999, sprintf(__('This %s cannot be deleted', 'woocommerce'), 'product'));
+      }
+
+      // Delete parent product transients.
+      if ($parent_id = wp_get_post_parent_id($id)) {
+        wc_delete_product_transients($parent_id);
+      }
+      return true;
+    }
+    
     public function return_false()
     {
       return false;
     }
+
+
   }
 }
 

@@ -147,11 +147,19 @@ if (!class_exists('Utils')) {
       return $matches[1] . ++$matches[2] . $matches[3];
     }
 
-    static function sanitize_title($title, $appendix = "")
+    static function sanitize_dup_title($title, $appendix = "", $args = array())
     {
-      preg_match('/((?!DUPLIKAT \d+).)*(\[ DUPLIKAT \d+ \])/', $title . $appendix, $matches);
-      if (isset($matches[0])) {
-        return preg_replace_callback('/(.*\[ DUPLIKAT )(\d+)( \])/', array('self', 'reg_increment'), $matches[0]);
+      $defaults = array('cleanup' => false);
+      $args = ! is_array($args) ? array($args) : $args;
+      $options = wp_parse_args($args, $defaults);
+
+      if(true === $options['cleanup']) {
+        $title = preg_replace('/(\[ DUPLIKAT \d+ \])/', '', $title . $appendix);
+      } else {
+        preg_match('/((?!DUPLIKAT \d+).)*(\[ DUPLIKAT \d+ \])/', $title . $appendix, $matches);
+        if (isset($matches[0])) {
+          return preg_replace_callback('/(.*\[ DUPLIKAT )(\d+)( \])/', array('self', 'reg_increment'), $matches[0]);
+        }
       }
       return $title;
     }

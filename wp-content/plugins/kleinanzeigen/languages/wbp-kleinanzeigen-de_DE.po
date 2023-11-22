@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Astra Child\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-04 03:49+0000\n"
-"PO-Revision-Date: 2023-11-08 12:02+0000\n"
+"PO-Revision-Date: 2023-11-22 14:24+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -15,309 +15,317 @@ msgstr ""
 "X-Loco-Version: 2.6.6; wp-6.3.2\n"
 "X-Domain: astra-child"
 
-#: templates/kleinanzeigen/header.php:3
+#: templates/header.php:3
 #, php-format
 msgid "%s (%s)"
 msgstr ""
 
-#: includes/product-term-handler.php:157
-msgid ""
-"A Product with the same Ad ID already exists. Enter a different Ad ID or "
-"delete this draft."
+#: includes/class-kleinanzeigen.php:943
+msgid "1 Tag"
 msgstr ""
-"Es existiert bereits ein Produkt mit dieser Anzeige ID. Lösche bitte diesen "
-"Entwurf oder verwende eine andere Anzeige ID für den Import."
 
-#: includes/product-term-handler.php:172
-msgid ""
-"A product with the same title already exists. Enter a different title or "
-"delete this draft."
+#: includes/class-kleinanzeigen.php:947
+msgid "2 Tage"
 msgstr ""
-"Es existiert bereits ein Produkt mit dem gleichen Titel. Verwende bitte "
-"einen anderen Produkttitel oder lösche diesen Entwurf."
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:374
+#: includes/class-kleinanzeigen.php:951
+msgid "3 Tage"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:955
+msgid "4 Tage"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:959
+msgid "5 Tage"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:963
+msgid "6 Tage"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:967
+msgid "7 Tage"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:566
+msgid ""
+"A Product with the same Ad ID already exists. Delete this draft or enter a "
+"different Ad ID."
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:583
+msgid ""
+"A product with the same title already exists. Delete this draft or enter a "
+"different title."
+msgstr ""
+
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:380
 #| msgid "Accept price"
 msgid "Accept KA price"
 msgstr "KA Preis übernehmen"
 
-#: functions.php:797
-msgid "Ad Url"
-msgstr "Kleinanzeigen Url"
-
-#: functions.php:593 templates/kleinanzeigen/header.php:20
+#: templates/header.php:22
 msgid "Ads"
 msgstr "Kleinanzeigen"
 
-#: templates/kleinanzeigen/header.php:14
+#: templates/header.php:15
 #, php-format
 msgid "Ads: %s"
 msgstr "Anzeigen: %s"
 
-#: templates/kleinanzeigen/header.php:158
+#: templates/header.php:174
 msgid "All done"
 msgstr "Alles erledigt"
 
-#: woocommerce/assistance/assistance-needed.php:2
-msgid "Assistance required"
-msgstr "Einweisung wird benötigt"
-
-#. Name of the theme
-msgid "Astra Child"
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:370
+msgid "Autonomous"
 msgstr ""
 
-#. Description of the theme
-msgid ""
-"Astra is the fastest, fully customizable &amp; beautiful theme suitable for "
-"blogs, personal portfolios and business websites. It is very lightweight "
-"(less than 50KB on frontend) and offers unparalleled speed. Built with SEO "
-"in mind, Astra comes with schema.org code integrated so search engines will "
-"love your site. Astra offers plenty of sidebar options and widget areas "
-"giving you a full control for customizations. Furthermore, we have included "
-"special features and templates so feel free to choose any of your favorite "
-"page builder plugin to create pages flexibly. Some of the other features: # "
-"WooCommerce Ready # Responsive # Compatible with major plugins # Translation "
-"Ready # Extendible with premium addons # Regularly updated # Designed, "
-"Developed, Maintained &amp; Supported by Brainstorm Force. Looking for a "
-"perfect base theme? Look no further. Astra is fast, fully customizable and "
-"beautiful theme!"
+#: templates/header.php:40
+msgid "Autonomous products (Unlinked products)"
 msgstr ""
 
-#. Author of the theme
-#: functions.php:767
+#. Author of the plugin
 msgid "Axel Nitzschner"
 msgstr ""
 
-#: templates/kleinanzeigen/dashboard/dashboard.php:33
+#: templates/dashboard/dashboard.php:33
 msgid "Close"
 msgstr "Schliessen"
 
-#: woocommerce/emails/email-order-details.php:110
-msgid "Colorized areas will are hidden from clients"
-msgstr "Farbige Bereiche werden dem Kunden nicht angezeigt."
-
-#: includes/class-admin-kleinanzeigen-list-table.php:418
+#: includes/class-admin-kleinanzeigen-list-table.php:414
 msgid "Connect"
 msgstr "Verknüpfen"
 
-#: includes/class-admin-kleinanzeigen-list-table.php:28
+#: includes/class-admin-kleinanzeigen-list-table.php:27
 msgid "Contains Default Category"
 msgstr "Enthält Standard Kategorie"
 
-#: templates/kleinanzeigen/dashboard/kleinanzeigen-create-control.php:3
+#: templates/header.php:35
+msgid "Contains invalid linked products"
+msgstr "Enthält ungültige Verknüpfungen"
+
+#: templates/dashboard/kleinanzeigen-create-control.php:3
 msgid "Create"
 msgstr "Anlegen"
 
-#: functions.php:665
-msgid "Datasheet"
-msgstr "Datenblatt"
-
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:31
+#: templates/dashboard/invalid-sku-results.php:31
 msgid "Deactivate"
 msgstr "Deaktivieren"
 
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:43
+#: templates/dashboard/invalid-sku-results.php:43
 msgid "Deactivate all"
 msgstr "Alle deaktivieren"
 
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:31
+#: templates/dashboard/invalid-sku-results.php:31
 msgid "Deactivated"
 msgstr "Deaktiviert"
 
-#: includes/class-admin-kleinanzeigen-list-table.php:423
-#: includes/class-extended-wc-admin-list-table-products.php:120
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:372
+msgid "Delete"
+msgstr ""
+
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:372
+msgid "Deleted"
+msgstr ""
+
+#: includes/class-admin-kleinanzeigen-list-table.php:419
+#: includes/class-extended-wc-admin-list-table-products.php:137
 msgid "Disconnect"
 msgstr "Trennen"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:365
-#: includes/class-admin-kleinanzeigen-task-list-table.php:366
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:32
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:370
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:371
+#: templates/dashboard/invalid-sku-results.php:32
 msgid "Disconnected"
 msgstr "Getrennt"
 
-#: templates/kleinanzeigen/header.php:96
+#: templates/header.php:112
 msgid "Drafts"
 msgstr "Ausgeblendet"
 
-#: includes/duplicate-content.php:106
-msgid "Duplicate"
-msgstr "Duplizieren"
+#: includes/class-kleinanzeigen.php:65
+msgid "Error:"
+msgstr ""
 
-#: functions.php:800
-msgid "Enable eBay link for this product"
-msgstr "Aktiviere einen Kleinanzeigen Link für dieses Produkt"
-
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:5
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:5
+#: templates/dashboard/invalid-sku-results.php:5
+#: templates/dashboard/invalid-price-results.php:5
 msgid "Evaluation Results"
 msgstr "Ergebnisse der Überprüfung"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:130
-#: templates/kleinanzeigen/header.php:26
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:132
+#: templates/header.php:44
 msgid "Featured products"
 msgstr "Empfohlene Produkte"
 
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:52
+#: templates/dashboard/invalid-price-results.php:52
 msgid "Fix all prices"
 msgstr "Alle Preise korrigieren"
 
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:42
+#: templates/dashboard/invalid-price-results.php:42
 msgid "Fix price"
 msgstr "Preis korrigieren"
 
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:42
+#: templates/dashboard/invalid-price-results.php:42
 msgid "Fixed"
 msgstr "Korrigiert"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:365
-#: includes/class-admin-kleinanzeigen-task-list-table.php:380
-#: includes/class-extended-wc-admin-list-table-products.php:124
-#: templates/kleinanzeigen/dashboard/footer-invalid-ad.php:3
-#: templates/kleinanzeigen/dashboard/toggle-publish-link.php:2
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:371
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:386
+#: includes/class-extended-wc-admin-list-table-products.php:141
+#: templates/dashboard/footer-invalid-ad.php:3
+#: templates/dashboard/toggle-publish-link.php:2
 msgid "Hide"
 msgstr "Ausblenden"
 
-#. Author URI of the theme
-msgid "http://wpastra.com/about/"
+#. Author URI of the plugin
+msgid "https://webpremiere.de/plugins/kleinanzeigen-import-plugin"
 msgstr ""
 
-#: includes/class-extended-wc-admin-list-table-products.php:107
-#: templates/kleinanzeigen/dashboard/kleinanzeigen-actions.php:6
-#: templates/kleinanzeigen/metaboxes/kleinanzeigen-import.php:10
+#. URI of the plugin
+msgid "https://wordpress.org/plugins/kleinanzeigen.de/"
+msgstr ""
+
+#: includes/class-extended-wc-admin-list-table-products.php:124
+#: templates/dashboard/kleinanzeigen-actions.php:6
+#: templates/metaboxes/kleinanzeigen-import.php:10
 msgid "Import Data"
 msgstr "Daten importieren"
 
-#: includes/class-extended-wc-admin-list-table-products.php:112
-#: templates/kleinanzeigen/dashboard/kleinanzeigen-actions.php:10
-#: templates/kleinanzeigen/metaboxes/kleinanzeigen-import.php:14
+#: includes/class-extended-wc-admin-list-table-products.php:129
+#: templates/dashboard/kleinanzeigen-actions.php:10
+#: templates/metaboxes/kleinanzeigen-import.php:14
 msgid "Import Images"
 msgstr "Fotos importieren"
 
-#: templates/kleinanzeigen/header.php:39
+#: templates/header.php:55
 msgid "Inconsistencies discovered"
 msgstr "Inkonsistenzen entdeckt"
 
-#: includes/class-admin-kleinanzeigen-list-table.php:29
+#: includes/class-admin-kleinanzeigen-list-table.php:28
 msgid "Invalid Category"
 msgstr "Ungültige Kategorie"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:70
-#: templates/kleinanzeigen/header.php:47
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:72
+#: templates/header.php:63
 #| msgid "Invalid Links"
 msgid "Invalid links"
 msgstr "Ungültige Verknüpfungen"
 
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:32
+#: templates/dashboard/invalid-sku-results.php:32
 msgid "Just disconnect"
 msgstr "Nur trennen"
 
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:44
+#: templates/dashboard/invalid-sku-results.php:44
 msgid "Just disconnect all"
 msgstr "Alle nur trennen"
 
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:33
+#: templates/dashboard/invalid-price-results.php:33
 msgid "KA price"
 msgstr "KA Preis"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:374
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:380
 #| msgid "Price accepted"
 msgid "KA Price accepted"
 msgstr "KA Preis übernommen"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:366
-#: templates/kleinanzeigen/dashboard/footer-invalid-ad.php:7
+#: templates/dashboard/footer-invalid-ad.php:7
 msgid "Keep visible"
 msgstr "Weiterhin anzeigen"
 
-#: functions.php:891
+#: includes/class-kleinanzeigen.php:281
 msgid "Kleinanzeigen"
 msgstr ""
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:100
-#: templates/kleinanzeigen/header.php:24
+#. Name of the plugin
+msgid "Kleinanzeigen.de"
+msgstr ""
+
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:102
+#: templates/header.php:34
 #| msgid "Linked Products"
 msgid "Linked products"
 msgstr "Verknüpfte Produkte"
 
-#: templates/kleinanzeigen/metaboxes/kleinanzeigen-import.php:18
+#: templates/metaboxes/kleinanzeigen-import.php:18
 msgid "Load Ad"
 msgstr "Anzeige laden"
 
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:23
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:22
+#: templates/dashboard/invalid-sku-results.php:22
+#: templates/dashboard/invalid-price-results.php:23
 msgid "No products found"
 msgstr "Keine Produkte gefunden"
 
-#: includes/class-admin-kleinanzeigen-list-table.php:26
+#: includes/class-admin-kleinanzeigen-list-table.php:25
 msgid "Not visible"
 msgstr "Nicht sichtbar"
 
-#: functions.php:915 functions.php:990 functions.php:991
+#: includes/class-kleinanzeigen.php:301 includes/class-kleinanzeigen.php:302
+#: includes/class-kleinanzeigen.php:328
 msgid "Overview"
 msgstr "Übersicht"
 
-#: templates/kleinanzeigen/header.php:14
+#: templates/header.php:15
 #, php-format
 msgid "Page: %s"
 msgstr "Seite: %s"
 
-#: includes/class-admin-kleinanzeigen-list-table.php:27
+#. Description of the plugin
+msgid "Plugin Description"
+msgstr ""
+
+#: includes/class-admin-kleinanzeigen-list-table.php:26
 msgid "Price deviation"
 msgstr "Preisdifferenz"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:85
-#: templates/kleinanzeigen/header.php:61
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:87
+#: templates/header.php:77
 msgid "Price deviations"
 msgstr "Preisdifferenzen"
 
-#: functions.php:780
-#, php-format
-msgctxt "Price range: from"
-msgid "from %1$s"
-msgstr "ab %1s"
-
-#: templates/kleinanzeigen/dashboard/invalid-sku-results.php:8
+#: templates/dashboard/invalid-sku-results.php:8
 msgid "Products based on not accessible ads"
 msgstr "Produkte die auf eine ungültigen Anzeigen ID verweisen"
 
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:8
+#: templates/dashboard/invalid-price-results.php:8
 msgid "Products with price differences"
 msgstr "Produkte mit Preisdifferenz"
 
-#: templates/kleinanzeigen/header.php:87
+#: templates/header.php:103
 msgid "Published"
 msgstr "Veröffentlicht"
 
-#: functions.php:672
-msgid "Quote Request"
-msgstr "Anfrage stellen"
-
-#: functions.php:933 functions.php:999 functions.php:1000
+#: includes/class-kleinanzeigen.php:310 includes/class-kleinanzeigen.php:311
+#: includes/class-kleinanzeigen.php:346
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: templates/kleinanzeigen/dashboard/invalid-price-results.php:37
+#: templates/dashboard/invalid-price-results.php:37
 msgid "Shop price"
 msgstr "Shop Preis"
 
-#: functions.php:703
-msgid "Technical Details"
-msgstr "Technische Details"
+#: templates/header.php:29
+msgid "Shop products"
+msgstr ""
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:145
+#: includes/class-kleinanzeigen.php:65
+msgid "Template not found"
+msgstr ""
+
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:147
 msgid "Title"
 msgstr "Titel"
 
-#: templates/kleinanzeigen/header.php:17
+#: templates/header.php:18
 msgid "Total published"
 msgstr "Insgesamt veröffentlicht"
 
-#: templates/kleinanzeigen/header.php:105
+#: templates/header.php:121
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: includes/class-admin-kleinanzeigen-task-list-table.php:115
-#: templates/kleinanzeigen/header.php:25
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:117
 #| msgid "Unlinked Products"
 msgid "Unlinked products"
 msgstr "Nicht verknüpfte Produkte"
