@@ -4,4 +4,4 @@
 	url = https://github.com/anito/wp-maintenance-mode.git
 [submodule "wp-content/plugins/kleinanzeigen"]
 	path = wp-content/plugins/kleinanzeigen
-	url = https://github.com/anito/kleinanzeigen.de.git
+	url = https://github.com/anito/kleinanzeigen.git
