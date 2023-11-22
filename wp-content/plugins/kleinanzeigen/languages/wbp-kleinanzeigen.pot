@@ -1,0 +1,71 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kleinanzeigen.de\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-20 11:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.6; wp-6.4.1\n"
+"X-Domain: wbp-kleinanzeigen"
+
+#: includes/class-kleinanzeigen.php:528
+msgid ""
+"A Product with the same Ad ID already exists. Enter a different Ad ID or "
+"delete this draft."
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:543
+msgid ""
+"A product with the same title already exists. Enter a different title or "
+"delete this draft."
+msgstr ""
+
+#. Author of the plugin
+msgid "Axel Nitzschner"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:63
+msgid "Error:"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://webpremiere.de/plugins/kleinanzeigen-import-plugin"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://wordpress.org/plugins/kleinanzeigen.de/"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:272
+msgid "Kleinanzeigen"
+msgstr ""
+
+#. Name of the plugin
+msgid "Kleinanzeigen.de"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:292 includes/class-kleinanzeigen.php:293
+#: includes/class-kleinanzeigen.php:319
+msgid "Overview"
+msgstr ""
+
+#. Description of the plugin
+msgid "Plugin Description"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:301 includes/class-kleinanzeigen.php:302
+#: includes/class-kleinanzeigen.php:337
+msgid "Settings"
+msgstr ""
+
+#: includes/class-kleinanzeigen.php:63
+msgid "Template not found"
+msgstr ""

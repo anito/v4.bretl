@@ -1,0 +1,470 @@
+.wbp-kleinanzeigen-page {
+	--publish: #1cc71c;
+	--draft: orange;
+	--unknown: #ff5b5b;
+}
+.wbp-kleinanzeigen-main-header {
+	margin: 40px 0 10px;
+}
+#kleinanzeigen-head-wrap {
+	margin-right: 20px;
+	padding: 20px;
+	display: flex;
+}
+.section-wrapper {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+.left-sections {
+	display: flex;
+	background-color: #ffffff;
+	border-radius: 5px;
+	border: 1px solid #ddd;
+}
+section#color-definitions {
+	position: fixed;
+	right: 0;
+	top: 0;
+	z-index: 99;
+	display: flex;
+}
+#color-definitions .section-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px;
+	background-color: #ffffff;
+	border-bottom-left-radius: 20px;
+	border-left: 1px solid;
+	border-bottom: 1px solid;
+	border-color: #ddd;
+	box-shadow: 1px 0 24px 12px rgba(0, 0, 0, 0.2);
+}
+.status-wrapper {
+	display: flex;
+	justify-content: space-between;
+	flex: 1 0 100%;
+}
+.info-box li {
+	font-weight: 100;
+	font-size: 0.8em;
+}
+.wbp-kleinanzeigen-section .pagination {
+	margin: 20px 0 0;
+}
+.wbp-kleinanzeigen-section .pagination a {
+	text-align: center;
+	width: 50px;
+	margin-right: 10px;
+}
+#kleinanzeigen-list {
+	margin-right: 20px;
+}
+.wp-list-table {
+	position: relative;
+}
+.wp-list-table::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: #fff;
+	opacity: 0;
+	pointer-events: none;
+	transition: all 0.3s ease-in;
+}
+.wp-list-table.loading::after {
+	opacity: 0.3;
+}
+.color-box.status {
+	align-self: center;
+}
+.color-box.disconnected {
+	background-color: rgb(56, 56, 56);
+	background-image: repeating-linear-gradient(
+		-45deg,
+		white 0 4px,
+		rgb(185 185 185) 4px 8px
+	);
+}
+.wp-list-table .column.status.connected-publish,
+.color-box.connected-publish {
+	background-color: var(--publish);
+}
+.wp-list-table .column.status.connected-draft,
+.color-box.connected-draft {
+	background-color: var(--draft);
+}
+.wp-list-table .column.status.disconnected-publish {
+	background-color: var(--publish);
+	background-image: repeating-linear-gradient(
+		-45deg,
+		white 0 5px,
+		var(--publish) 5px 10px
+	);
+}
+.wp-list-table .column.status.disconnected-draft,
+.color-box.disconnected-draft {
+	background-color: var(--draft);
+	background-image: repeating-linear-gradient(
+		-45deg,
+		white 0 5px,
+		var(--draft) 5px 10px
+	);
+}
+.wp-list-table .column.status.invalid,
+section .color-box.invalid {
+	background-color: var(--unknown);
+}
+.wp-list-table .column.status.connected-unknown,
+.color-box.unknown {
+	background-color: rgb(71, 71, 71);
+}
+section .color-box {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 99px;
+	line-height: 1rem;
+	padding: 3px;
+	text-align: center;
+	font-size: 0.9em;
+	color: #fff;
+}
+section .color-box .inner {
+	background: #ffffff;
+	color: #000000;
+	width: 10px;
+	height: 10px;
+	border-radius: 99px;
+	padding: 3px;
+	vertical-align: middle;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+section .description {
+	font-size: 0.8em;
+	color: #000;
+}
+section .box-wrapper {
+	display: flex;
+	flex: 0 1 auto;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+	width: 100%;
+}
+.box-wrapper.inset {
+	padding: 5px;
+	border-radius: 99px;
+	background-color: #eee;
+}
+section .box-wrapper .count {
+	font-size: 0.9em;
+	font-weight: 300;
+	line-height: 1.6em;
+	margin-left: 10px;
+	text-align: center;
+}
+section .box-wrapper .description {
+	display: flex;
+	align-items: center;
+	padding-right: 10px;
+	font-weight: 300;
+}
+section .summary {
+	display: flex;
+	justify-content: space-between;
+}
+section .summary .count:nth-child(2) {
+	margin-left: 10px;
+}
+.wp-list-table .column-shop-price .woocommerce-price-suffix {
+	display: none;
+}
+.wp-list-kleinanzeigen-ads .manage-column[class*="status"],
+.column[class*="column-status"] {
+	width: 5px;
+	padding: 0;
+}
+.wp-list-kleinanzeigen-ads .column-image {
+	width: 120px;
+}
+.wp-list-kleinanzeigen-ads .column-id {
+	width: 10%;
+}
+.wp-list-kleinanzeigen-ads .column-title {
+	width: auto;
+}
+.wp-list-kleinanzeigen-ads .column-shop-actions {
+	width: 140px;
+}
+.wp-list-kleinanzeigen-ads .column-shop-actions-import {
+	width: 130px;
+	padding-left: 30px;
+}
+.wp-list-kleinanzeigen-ads .column-empty {
+	width: auto;
+}
+.wp-list-kleinanzeigen-ads .column-date {
+	width: auto;
+}
+.wp-list-kleinanzeigen-ads .column-price,
+.wp-list-kleinanzeigen-ads .column-shop-price {
+	width: 90px;
+}
+.wp-list-kleinanzeigen-ads .column-description {
+	width: auto;
+}
+.wp-list-kleinanzeigen-ads .column-shop-categories {
+	width: auto;
+}
+.wp-list-kleinanzeigen-ads .column-shop-labels {
+	width: 90px;
+}
+.wp-list-kleinanzeigen-ads .column-shop-featured {
+	width: 30px;
+}
+.wp-list-kleinanzeigen-ads .column-shop-brands {
+	width: auto;
+}
+.wp-list-kleinanzeigen-ads .column-content {
+	position: relative;
+}
+.wp-list-kleinanzeigen-ads [class*="column-shop-"] {
+	background-color: rgb(193 227 250 / 12%);
+}
+.wp-list-kleinanzeigen-ads [id*="-wbp-action"] {
+	position: relative;
+}
+.wp-list-kleinanzeigen-ads tr[class*="diff"] {
+	background-color: #ff00001e;
+}
+.wp-list-kleinanzeigen-ads .diff.price-diff .column[class*="-price"] {
+	text-decoration: underline;
+	text-decoration-style: wavy;
+	text-decoration-thickness: 0.06em;
+	text-decoration-color: red;
+}
+.wp-list-kleinanzeigen-ads .column-content .spinner {
+	position: absolute;
+	left: -25px;
+	top: 3px;
+	margin: 0;
+}
+.wp-list-kleinanzeigen-ads .column-content a.button {
+	text-align: center;
+	margin-bottom: 5px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	width: 130px;
+}
+.wp-list-kleinanzeigen-ads .column-content .dashicons {
+	font-size: 1em;
+	display: inline-block;
+	line-height: 1em;
+	height: auto;
+	vertical-align: baseline;
+	pointer-events: none;
+}
+.wp-list-kleinanzeigen-ads .column-content .button .dashicons {
+	font-size: 1.3em;
+	line-height: 1.3em;
+	vertical-align: sub;
+}
+.wp-list-kleinanzeigen-ads .column-content a[disabled],
+.wp-list-kleinanzeigen-ads .column-content .button[disabled],
+.wp-list-kleinanzeigen-ads td.busy a,
+.wp-list-kleinanzeigen-ads td.busy .button,
+#kleinanzeigen-head-wrap .button.disabled {
+	pointer-events: none;
+	cursor: auto;
+}
+.wp-list-kleinanzeigen-ads .column-content a,
+.wp-list-kleinanzeigen-ads .column-content .button {
+	cursor: pointer;
+}
+
+.divider-bottom {
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #eee;
+}
+.divider-top {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid #eee;
+}
+.summary .indicator.indicator-publish {
+	background-color: var(--publish);
+}
+.summary .indicator.indicator-draft {
+	background-color: var(--draft);
+}
+.summary .indicator.indicator-unknown {
+	background-color: var(--unknown);
+}
+.summary .indicator {
+	display: inline-block;
+	width: 5px;
+	height: 0.8em;
+	margin-left: 10px;
+}
+section .box-wrapper.summary-status {
+	justify-content: center;
+	font-size: 0.8em;
+	font-weight: 300;
+	margin-bottom: 0;
+}
+section .box-wrapper.summary-status .trigger {
+	cursor: pointer;
+}
+section .box-wrapper.summary-status .trigger .text {
+	text-decoration: underline;
+}
+section .box-wrapper.summary-status .outer {
+	height: 0;
+	overflow: hidden;
+	width: 100px;
+	transition: all 0.3s;
+}
+section .box-wrapper.summary-status .trigger.active ~ .outer {
+	height: auto;
+	max-height: calc(100vh - 400px);
+	width: 300px;
+	overflow: auto;
+}
+section .box-wrapper.summary-status .status-wrapper {
+	display: flex;
+	flex-direction: column;
+}
+section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
+	transform: rotate(90deg);
+}
+.todo {
+	display: flex;
+}
+.todo .title {
+	width: 50%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.todo {
+	display: flex;
+}
+.todo .title {
+	flex-basis: 70%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.todo .reason {
+	flex-basis: 30%;
+	padding-left: 30px;
+}
+
+/**
+* Styles for imported templates
+*/
+.wp-list-kleinanzeigen-ads tbody tr.no-items,
+.wp-list-task-kleinanzeigen-ads tbody tr.no-items {
+	display: flex;
+	justify-content: center;
+}
+
+.wp-list-task-kleinanzeigen-ads .column-status-start {
+	width: 0.4%;
+	padding: 0;
+}
+
+.wp-list-task-kleinanzeigen-ads .column-image {
+	width: 10%;
+}
+
+.wp-list-task-kleinanzeigen-ads .column-title {
+	width: 30%;
+}
+.wp-list-task-kleinanzeigen-ads .column-ka-price {
+	width: 10%;
+}
+
+.wp-list-task-kleinanzeigen-ads .column-shop-price {
+	width: 10%;
+}
+
+.wp-list-task-kleinanzeigen-ads .column-featured {
+	width: 30px;
+}
+
+.wp-list-task-kleinanzeigen-ads .column-actions {
+	width: 33%;
+	text-align: center;
+}
+
+.wp-list-task-kleinanzeigen-ads .column-actions a {
+	max-width: 90px;
+}
+
+.wp-list-task-kleinanzeigen-ads {
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+.wp-list-task-kleinanzeigen-ads.empty {
+	display: table;
+}
+
+.wp-list-task-kleinanzeigen-ads thead td,
+.wp-list-task-kleinanzeigen-ads thead th,
+.wp-list-task-kleinanzeigen-ads tfoot td,
+.wp-list-task-kleinanzeigen-ads tfoot th {
+	background-color: #fff;
+	position: sticky;
+	top: 0;
+	height: 30px;
+	padding: 5px;
+}
+
+.wp-list-task-kleinanzeigen-ads thead th,
+.wp-list-task-kleinanzeigen-ads tbody td,
+.wp-list-task-kleinanzeigen-ads tfoot th {
+	padding: 8px;
+	vertical-align: middle;
+}
+
+.wp-list-task-kleinanzeigen-ads.striped > tbody > :nth-child(odd) {
+	background-color: #f6f7f7;
+}
+
+.wp-list-task-kleinanzeigen-ads tbody {
+	overflow: auto;
+	height: 320px;
+	display: block;
+}
+
+.wp-list-task-kleinanzeigen-ads thead tr,
+.wp-list-task-kleinanzeigen-ads tbody tr,
+.wp-list-task-kleinanzeigen-ads tfoot tr {
+	display: inline-table;
+	width: 100%;
+}
+
+.wp-list-task-kleinanzeigen-ads tbody td .action-button {
+	width: 130px;
+	margin: 5px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#kleinanzeigen-task-list .tablenav.bottom {
+	margin-bottom: 30px;
+}

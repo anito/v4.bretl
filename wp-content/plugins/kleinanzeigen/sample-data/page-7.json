@@ -1,0 +1,27 @@
+{
+  "ads" : [ {
+    "id" : 1756217990,
+    "url" : "/s-anzeige/allrad-traktor-carraro-tigre-3800-neu-topausstattung/1756217990-276-19311",
+    "image" : "https://img.kleinanzeigen.de/api/v1/prod-ads/images/61/610df2d5-ba30-47dd-b033-9cea1c65b0c2?rule=$_2.JPG",
+    "retinaImage" : "https://img.kleinanzeigen.de/api/v1/prod-ads/images/61/610df2d5-ba30-47dd-b033-9cea1c65b0c2?rule=$_35.JPG",
+    "title" : "Allrad Traktor CARRARO TIGRE 3800 NEU TopAusstattung",
+    "date" : "22.10.2023",
+    "location" : "Sachsen - Glashütte",
+    "description" : "Die neuen STAGE 5 Maschinen sind da.\nDreizylinder YANMAR Diesel 26PS\nHeckkraftheber mit Dreipunktaufnahme 8...",
+    "price" : "17.990 € VB",
+    "tags" : [ "Weitere Nutzfahrzeuge & Anhänger" ],
+    "hasVirtualTour" : false,
+    "imageCount" : 14
+  } ],
+  "categoriesSearchData" : [ {
+    "id" : 80,
+    "title" : "Haus & Garten",
+    "totalAds" : 25
+  }, {
+    "id" : 210,
+    "title" : "Auto, Rad & Boot",
+    "totalAds" : 126
+  } ],
+  "locationsSearchData" : [ ],
+  "editWatchListUrl" : "/m-merkliste-bearbeiten-pro.html"
+}
