@@ -2,6 +2,6 @@
 [submodule "wp-content/plugins/wp-maintenance-mode"]
 	path = wp-content/plugins/wp-maintenance-mode
 	url = https://github.com/anito/wp-maintenance-mode.git
-[submodule "wp-content/plugins/kleinanzeigen.de"]
-	path = wp-content/plugins/kleinanzeigen.de
+[submodule "wp-content/plugins/kleinanzeigen"]
+	path = wp-content/plugins/kleinanzeigen
 	url = https://github.com/anito/kleinanzeigen.de.git
