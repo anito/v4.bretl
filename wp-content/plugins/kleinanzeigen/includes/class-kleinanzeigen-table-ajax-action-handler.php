@@ -31,6 +31,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax__ajax_import_kleinanzeigen_data', array($this, '_ajax_import_kleinanzeigen_data'));
       add_action('wp_ajax__ajax_import_kleinanzeigen_images', array($this, '_ajax_import_kleinanzeigen_images'));
       add_action('wp_ajax__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
+      add_action('wp_ajax__ajax_heartbeat', array($this, '_ajax_heartbeat'));
 
       add_action('wp_ajax_nopriv__ajax_connect', array($this, '_ajax_connect'));
       add_action('wp_ajax_nopriv__ajax_fix_price', array($this, '_ajax_fix_price'));
@@ -45,6 +46,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_data', array($this, '_ajax_import_kleinanzeigen_data'));
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_images', array($this, '_ajax_import_kleinanzeigen_images'));
       add_action('wp_ajax_nopriv__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
+      add_action('wp_ajax_nopriv__ajax_heartbeat', array($this, '_ajax_heartbeat'));
     }
 
     public function _ajax_get_remote()
@@ -112,6 +114,11 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $this->ajax_get_brand_images();
     }
 
+    public function _ajax_heartbeat()
+    {
+      $this->ajax_heartbeat();
+    }
+
     public function parse_kleinanzeigen_id($val)
     {
       preg_match('/(\/?)(\d{8,})/', $val, $matches);
@@ -138,6 +145,11 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         return $this->remote_call($url, $tries, $retry);
       }
       return $response;
+    }
+
+    public function ajax_heartbeat() {
+      $data = $_POST['heartbeat'];
+      die(json_encode(compact('data')));
     }
 
     public function get_remote()

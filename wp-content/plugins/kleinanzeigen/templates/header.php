@@ -6,17 +6,26 @@ $ad_cats = implode(', ', $cats);
 $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
 $num_pages = ceil($total_ads / KLEINANZEIGEN_PER_PAGE);
 $todos = $products['todos'];
+
+define('ORIENTATION_COOKIE_KEY', 'kleinanzeigen-view-o');
+$getOrientationCookie = function ($val) {
+  $val = isset($_COOKIE[ORIENTATION_COOKIE_KEY]) ? $_COOKIE[ORIENTATION_COOKIE_KEY] : $val;
+  setcookie(ORIENTATION_COOKIE_KEY, $val, strtotime('+1 year'));
+  return $val;
+};
+$orientation = $getOrientationCookie('horizontal');
+$orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' => $orientation);
 ?>
 <div class="section-wrapper">
-  <div class="left-sections">
-    <section class="wbp-kleinanzeigen-section">
+  <div class="left-sections sections">
+    <section class="wbp-kleinanzeigen">
       <div class="section-inner">
         <div style="display: flex; flex-direction: column;">
           <h2 style="display: flex; justify-content: space-between;"><?php echo sprintf(__('Page: %s', 'wbp-kleinanzeigen'), $paged) ?><small style="margin-left: 20px; font-size: 12px;"><?php echo sprintf(__('Ads: %s', 'wbp-kleinanzeigen'), count($items)); ?></small></h2>
           <div class="overview-wrap">
-            <fieldset class="fieldset">
+            <fieldset class="fieldset tasks">
               <legend><?php echo __('Total published', 'wbp-kleinanzeigen') ?></legend>
-              <div class="overview tasks">
+              <div class="tasks">
                 <div class="task">
                   <div class="task-name">
                     <span><strong><?php echo __('Ads', 'wbp-kleinanzeigen'); ?></strong></span>
@@ -50,32 +59,34 @@ $todos = $products['todos'];
         </div>
 
         <div id="inconsistencies" class="hidden">
-          <fieldset class="fieldset tasks" style="flex-direction: column; background-color: #fff0f0;">
+          <fieldset class="fieldset tasks">
             <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
             <legend><?php echo __('Inconsistencies discovered', 'wbp-kleinanzeigen') ?></legend>
-            <div class="task invalid-ad">
-              <div class="general-action">
-                <div class="action-header">
-                  <div class="">
-                    <div class="task-count-wrapper warning">
-                      <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+            <div class="tasks">
+              <div class="task invalid-ad">
+                <div class="general-action">
+                  <div class="action-header">
+                    <div class="">
+                      <div class="task-count-wrapper">
+                        <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                      </div>
+                      <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid links', 'wbp-kleinanzeigen') ?></a></span>
+                      (<span id="invalid-ads-count" class="task-count">0</span>)
                     </div>
-                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid links', 'wbp-kleinanzeigen') ?></a></span>
-                    (<span id="invalid-ads-count" class="task-count">0</span>)
                   </div>
                 </div>
               </div>
-            </div>
-            <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
-            <div class="task invalid-price">
-              <div class="general-action">
-                <div class="action-header">
-                  <div class="">
-                    <div class="task-count-wrapper warning">
-                      <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+              <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
+              <div class="task invalid-price">
+                <div class="general-action">
+                  <div class="action-header">
+                    <div class="">
+                      <div class="task-count-wrapper">
+                        <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                      </div>
+                      <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price deviations', 'wbp-kleinanzeigen') ?></a></span>
+                      (<span id="invalid-price-count" class="task-count">0</span>)
                     </div>
-                    <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price deviations', 'wbp-kleinanzeigen') ?></a></span>
-                    (<span id="invalid-price-count" class="task-count">0</span>)
                   </div>
                 </div>
               </div>
@@ -92,7 +103,7 @@ $todos = $products['todos'];
 
       </div>
     </section>
-    <section class="wbp-shop-section">
+    <section class="wbp-shop">
       <div class="section-inner">
 
         <div class="divider-bottom">
@@ -139,64 +150,67 @@ $todos = $products['todos'];
       </div>
     </section>
   </div>
-  <div class="right-sections">
-    <section id="color-definitions">
-      <div class="section-inner" style="padding-top: 50px; min-width: 140px;">
-
-        <div class="box-wrapper inset">
-          <span class="status-wrapper">
-            <span class="color-box status connected-publish"><?php echo count($products['publish']) ?></span>
-            <span class="description">Veröffentlicht</span>
-          </span>
+  <div id="color-definitions" class="right-sections sections">
+    <section class="color-definition">
+      <div class="section-inner">
+        <div class="first-section orientation <?php echo $orientation ?>">
+          <div class="box-wrapper chip">
+            <span class="status-wrapper">
+              <span class="color-box status connected-publish"><?php echo count($products['publish']) ?></span>
+              <span class="description">Veröffentlicht</span>
+            </span>
+          </div>
+          <div class="box-wrapper chip">
+            <span class="status-wrapper">
+              <span class="color-box status connected-draft"><?php echo count($products['draft']) ?></span>
+              <span class="description">Ausgeblendet</span>
+            </span>
+          </div>
+          <div class="box-wrapper chip">
+            <span class="status-wrapper">
+              <span class="color-box status invalid"><?php echo count($products['unknown']) ?></span>
+              <span class="description">Unbekannt</span>
+            </span>
+          </div>
+          <div class="box-wrapper chip">
+            <span class="status-wrapper">
+              <span class="color-box status disconnected"><span class="inner"><?php echo count($products['no-sku']) ?></span></span>
+              <span class="description">Nicht verknüpft</span>
+            </span>
+          </div>
         </div>
-        <div class="box-wrapper inset">
-          <span class="status-wrapper">
-            <span class="color-box status connected-draft"><?php echo count($products['draft']) ?></span>
-            <span class="description">Ausgeblendet</span>
-          </span>
-        </div>
-        <div class="box-wrapper inset">
-          <span class="status-wrapper">
-            <span class="color-box status invalid"><?php echo count($products['unknown']) ?></span>
-            <span class="description">Unbekannt</span>
-          </span>
-        </div>
-        <div class="box-wrapper inset">
-          <span class="status-wrapper">
-            <span class="color-box status disconnected"><span class="inner"><?php echo count($products['no-sku']) ?></span></span>
-            <span class="description">Nicht verknüpft</span>
-          </span>
-        </div>
-        <div class="box-wrapper summary-status divider-top">
-          <span class="status-wrapper">
-            <?php if (0 === count($todos)) : ?>
-              <div>
-                <i class="dashicons dashicons-yes"></i><span><?php echo  __('All done', 'wbp-kleinanzeigen'); ?></span>
-              </div>
-            <?php else : ?>
-              <div class="trigger"><span class="text">
+        <div class="summary-status">
+          <?php if (!empty($todos)) : ?>
+            <div class="trigger chip">
+              <span class="text-wrapper">
+                <i class="dashicons dashicons-bell"></i>
+                <span class="text">
                   <?php if (1 === count($todos)) :
-                    echo sprintf(__('%d Meldung'), count($todos));
+                    echo sprintf(__('%d'), count($todos));
                   else :
-                    echo sprintf(__('%d Meldungen'), count($todos)); ?>
+                    echo sprintf(__('%d'), count($todos)); ?>
 
                   <?php endif ?>
-                </span><i class="dashicons dashicons-arrow-right"></i>
+                </span>
+                <i class="dashicons dashicons-arrow-right"></i>
+              </span>
+            </div>
+            <div class="outer">
+              <div class="content">
+                <ul>
+                  <?php foreach ($todos as $todo) { ?>
+                    <li class="todo">
+                      <span class="title"><a href="#ad-id-<?php echo $todo['id'] ?>"><?php echo $todo['title'] ?></a>:</span>
+                      <span class="reason"><?php echo $todo['reason'] ?></span>
+                    </li>
+                  <?php } ?>
+                </ul class="todos">
               </div>
-              <div class="outer">
-                <div class="content">
-                  <ul>
-                    <?php foreach ($todos as $todo) { ?>
-                      <li class="todo">
-                        <span class="title"><a href="#ad-id-<?php echo $todo['id'] ?>"><?php echo $todo['title'] ?></a>:</span>
-                        <span class="reason"><?php echo $todo['reason'] ?></span>
-                      </li>
-                    <?php } ?>
-                  </ul class="todos">
-                </div>
-              </div>
-            <?php endif ?>
-          </span>
+            </div>
+          <?php endif ?>
+        </div>
+        <div class="view-switcher">
+          <i class="dashicons dashicons-image-rotate-right" style="font-size: .7em;"></i>
         </div>
       </div>
     </section>
@@ -205,14 +219,20 @@ $todos = $products['todos'];
 <script>
   jQuery(document).ready(($) => {
 
-    const tasks = <?php echo json_encode($tasks) ?>;
+    const _tasks = <?php echo json_encode($tasks) ?>;
+    const _orientation_obj = <?php echo json_encode($orientation_arr) ?>;
     const {
       init_head,
-      render_tasks
-    } = ajax_object;
+      render_tasks,
+      heartbeat,
+      createOrientation
+    } = {
+      ...kleinanzeigen_ajax_object,
+      ...kleinanzeigen_utils_object
+    };
 
     init_head();
-    render_tasks(tasks);
+    render_tasks(_tasks);
 
     $('.trigger', '.right-sections').click(function() {
       $(this).toggleClass('active');
@@ -224,120 +244,42 @@ $todos = $products['todos'];
       $('.dashicons-warning', parent).removeClass('hidden');
     }
 
+    const orientation = createOrientation(_orientation_obj);
+    const {
+      horizontal,
+      vertical
+    } = orientation.getValues();
+
+    const toggleTarget = $('.right-sections .first-section');
+    const cb = (val) => {
+      toggleTarget.toggleClass(vertical, vertical === val);
+      toggleTarget.toggleClass(horizontal, horizontal === val);
+    }
+
+    $('.view-switcher').on('click', () => {
+      const val = orientation.toggle(cb);
+    })
+
   })
 </script>
 
 <style>
-  .wbp-kleinanzeigen-section .tasks .task .explanation {
-    padding: 5px;
-    background-color: aqua;
-    font-size: .8em;
-    font-weight: 100;
-  }
-
-  .wbp-kleinanzeigen-section .tasks .task .general-action .action-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .wbp-kleinanzeigen-section .tasks .task .general-action .action-buttons {
-    display: flex;
-    align-items: center;
-    margin-left: 30px;
-  }
-
-  .wbp-kleinanzeigen-section .tasks .task .general-action .action-buttons .dashicons {
-    font-size: 15px;
-    line-height: 18px;
-    margin-left: 10px;
-    width: 15px;
-    height: 15px;
-  }
-
-  .wbp-kleinanzeigen-section .tasks .task .general-action .action-buttons .button {
-    min-width: 200px;
-    text-align: center;
-  }
-
-  .wbp-kleinanzeigen-section .action-header-title {
-    display: inline-block;
-    margin-right: 10px;
-    line-height: 1em;
-  }
-
-  .wbp-kleinanzeigen-section .task-count {
-    display: inline-block;
-  }
-
-  .wbp-kleinanzeigen-section .task-count-wrapper {
-    margin-right: 8px;
-    display: inline-block;
-    text-align: center;
-    font-size: 11px;
-  }
-
-  .wbp-kleinanzeigen-section .task-count-wrapper.chip {
-    border-radius: 99px;
-    border: 1px solid;
-    padding: 1px 4px;
-  }
-
-  .wbp-kleinanzeigen-section .dashicons {
-    font-size: 14px;
-    vertical-align: middle;
-    width: 10px;
-    height: 10px;
-    line-height: 0.5em;
-  }
-
-  .wbp-kleinanzeigen-section .chip.task-count {
-    border-radius: 99px;
-    border: 1px solid;
-    padding: 3px 3px;
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    text-align: center;
-  }
-
-  .overview.tasks {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
-  .overview.tasks .task {
-    display: flex;
-    justify-content: space-between;
-  }
-
   #kleinanzeigen-head-wrap .wbp-shop-section .dashicons {
     margin-right: 10px;
   }
 
-  #kleinanzeigen-head-wrap .left-sections .section-inner {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 10px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections .section-inner .overview-wrap {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
   #kleinanzeigen-head-wrap .fieldset {
-    display: flex;
-    flex: 1;
     border: 1px solid #eee;
     background-color: #f8fbff;
     padding: 10px;
+    margin-bottom: 10px;
     font-size: 11px;
     font-weight: 300;
+  }
+
+  #kleinanzeigen-head-wrap #inconsistencies .fieldset {
+    background-color: #fff0f0;
+    border-color: #f6d6d6;
   }
 
   #kleinanzeigen-head-wrap .fieldset legend {
@@ -345,42 +287,6 @@ $todos = $products['todos'];
     background-color: #ffffff;
     font-size: 10px;
     border: 1px solid #eee;
-  }
-
-  #kleinanzeigen-head-wrap .section-inner .warning {
-    color: red !important;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections section:not(:last-child) .section-inner {
-    border-right: 1px solid #eee;
-    padding-right: 30px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections section {
-    display: flex;
-    padding: 20px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections section:first-child {
-    max-width: 490px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections section:not(:first-child) {
-    padding-left: 0px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections section:not(:first-child) .section-inner {
-    padding-left: 10px;
-    padding-right: 30px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections .wbp-shop-section {
-    max-width: 220px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections .info {
-    display: inline-block;
-    max-width: 300px;
   }
 
   #kleinanzeigen-head-wrap .info-box li .dashicons {
@@ -401,5 +307,9 @@ $todos = $products['todos'];
 
   #kleinanzeigen-head-wrap .left-sections section h2 {
     margin-bottom: 10px;
+  }
+
+  #kleinanzeigen-head-wrap .section-inner .warning {
+    color: red !important;
   }
 </style>

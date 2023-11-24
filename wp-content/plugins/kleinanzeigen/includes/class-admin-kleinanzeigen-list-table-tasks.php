@@ -356,10 +356,6 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     <tr id="<?php echo $post_ID ?>">
       <?php
 
-      foreach ($columns as $column_name => $column_display_name) {
-        $class = $column_name . ' column column-' . $column_name;
-        if (in_array($column_name, $hidden)) $class .= ' hidden';
-
         // Setup Actions
         $post_ID = $product->get_id();
         $title = $product->get_title();
@@ -409,6 +405,10 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             $status = $sku ? 'connected-unknown' : 'disconnected-unknown';
             break;
         }
+
+      foreach ($columns as $column_name => $column_display_name) {
+        $class = $column_name . ' column column-' . $column_name;
+        if (in_array($column_name, $hidden)) $class .= ' hidden';
 
         switch ($column_name) {
           case "status-start": {
@@ -478,7 +478,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         jQuery(document).ready(($) => {
           const {
             featurePost
-          } = ajax_object;
+          } = kleinanzeigen_ajax_object;
 
           const table = $('.wp-list-task-kleinanzeigen-ads');
           const post_ID = "<?php echo $product ? $post_ID : '' ?>";

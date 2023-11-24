@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-  const { admin_ajax, screen, edit_link } = ajax_object;
+  const { admin_ajax, screen, edit_link } = kleinanzeigen_ajax_object;
 
   // hide controls if sku is not available
   const sku = document.getElementById("kleinanzeigen_id");
@@ -470,7 +470,7 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
     e.stopPropagation();
 
-    const el = e.target.closest('a');
+    const el = e.target.closest("a");
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const task_type = el.dataset.taskType;
@@ -483,7 +483,7 @@ jQuery(document).ready(function ($) {
         post_ID,
         kleinanzeigen_id,
         task_type,
-        screen: _screen
+        screen: _screen,
       },
       success: (data) => {
         setTimeout(() => {
@@ -515,7 +515,7 @@ jQuery(document).ready(function ($) {
         post_ID,
         args,
         task_type,
-        screen: _screen
+        screen: _screen,
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
@@ -555,7 +555,7 @@ jQuery(document).ready(function ($) {
         kleinanzeigen_id,
         price,
         task_type,
-        screen: _screen
+        screen: _screen,
       },
       beforeSend: () => {
         $(el).parents("td").addClass("busy");
@@ -614,12 +614,16 @@ jQuery(document).ready(function ($) {
         }
 
         if (row) {
-          rowEl = $(`.wp-list-kleinanzeigen-ads tr#ad-id-${kleinanzeigen_id}`);
+          rowEl = $(
+            `.wp-list-kleinanzeigen-ads tr#ad-id-${kleinanzeigen_id}`
+          );
           $(rowEl)?.replaceWith(row);
         }
 
         if (modal_row) {
-          modalRowEl = $(`.wp-list-task-kleinanzeigen-ads tr#${post_ID}`);
+          modalRowEl = $(
+            `.wp-list-task-kleinanzeigen-ads tr#${post_ID}`
+          );
           $(modalRowEl)?.replaceWith(modal_row);
         }
 
@@ -631,7 +635,9 @@ jQuery(document).ready(function ($) {
         );
 
         if ("create" === el.dataset.action) {
-          rowEl = document.querySelector(`tr#ad-id-${kleinanzeigen_id}`);
+          rowEl = document.querySelector(
+            `tr#ad-id-${kleinanzeigen_id}`
+          );
 
           setTimeout(() => {
             rowEl.dispatchEvent(
@@ -655,8 +661,8 @@ jQuery(document).ready(function ($) {
   switch (screen) {
     case "toplevel_page_wbp-kleinanzeigen":
     case "edit-product":
-      ajax_object = {
-        ...ajax_object,
+      kleinanzeigen_ajax_object = {
+        ...kleinanzeigen_ajax_object,
         createPost,
         deletePost,
         publishPost,
@@ -668,6 +674,7 @@ jQuery(document).ready(function ($) {
         importImages,
         deleteImages,
         processDataImport,
+        heartbeat,
       };
       break;
     case "product":
@@ -700,7 +707,8 @@ jQuery(document).ready(function ($) {
     const wrapper = document.getElementById("kleinanzeigen-ad-wrapper");
     if (wrapper) {
       const iframe =
-        wrapper.querySelector("iframe") || document.createElement("iframe");
+        wrapper.querySelector("iframe") ||
+        document.createElement("iframe");
       iframe.src = "";
       wrapper.innerHTML = "";
       wrapper.appendChild(iframe);
@@ -777,7 +785,8 @@ jQuery(document).ready(function ($) {
   }
 
   function processImageImport(json, el, callback) {
-    const { post_ID, kleinanzeigen_id, post_status, content, screen } = json;
+    const { post_ID, kleinanzeigen_id, post_status, content, screen } =
+      json;
     const postdata = { post_ID, kleinanzeigen_id, post_status };
 
     let doc;
@@ -791,7 +800,9 @@ jQuery(document).ready(function ($) {
 
     let images = [];
     doc.documentElement
-      .querySelectorAll("#viewad-product .galleryimage-large img[data-imgsrc]")
+      .querySelectorAll(
+        "#viewad-product .galleryimage-large img[data-imgsrc]"
+      )
       .forEach((image) => {
         images.push(image.dataset.imgsrc);
       });
@@ -799,9 +810,9 @@ jQuery(document).ready(function ($) {
     const kleinanzeigendata = { images };
 
     if (images.length) {
-      msg = `${images.length} Foto${1 === images.length ? "" : "s"} wurde${
-        1 === images.length ? "" : "n"
-      } importiert.`;
+      msg = `${images.length} Foto${
+        1 === images.length ? "" : "s"
+      } wurde${1 === images.length ? "" : "n"} importiert.`;
     } else {
       msg = "Es konnten keine Fotos gefunden werden.";
     }
@@ -822,6 +833,18 @@ jQuery(document).ready(function ($) {
       error: (error) => {
         console.log(error);
       },
+    });
+  }
+
+  function heartbeat(data) {
+    $.post({
+      url: admin_ajax,
+      data: {
+        action: "_ajax_heartbeat",
+        heartbeat: data || {},
+      },
+      success: (data) => console.log(data),
+      error: (error) => console.log(error),
     });
   }
 });

@@ -402,8 +402,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
           list.display()
 
-          ajax_object.init_head = list.init_head;
-          ajax_object.render_tasks = list.render_tasks;
+          kleinanzeigen_ajax_object.init_head = list.init_head;
+          kleinanzeigen_ajax_object.render_tasks = list.render_tasks;
 
         })(jQuery);
       </script>

@@ -135,13 +135,18 @@ if (!class_exists('Kleinanzeigen')) {
     public function add_admin_ajax_scripts()
     {
       wp_enqueue_script("kleinanzeigen-ajax", $this->assets_url() . "js/ajax.js", array(), $this->get_version());
+      wp_enqueue_script("kleinanzeigen-utils", $this->assets_url() . "js/utils.js", array(), $this->get_version());
 
-      wp_localize_script('kleinanzeigen-ajax', 'ajax_object', array(
+      wp_localize_script('kleinanzeigen-ajax', 'kleinanzeigen_ajax_object', array(
         'admin_ajax' => admin_url('admin-ajax.php'),
         'home_url' => home_url(),
         'screen' => $this->screen_id,
         'edit_link' => admin_url('post.php?action=edit&post='),
         'nonce' => wp_create_nonce()
+      ));
+      wp_localize_script('kleinanzeigen-utils', 'kleinanzeigen_utils_object', array(
+        'admin_ajax' => admin_url('admin-ajax.php'),
+        'screen' => $this->screen_id,
       ));
     }
 

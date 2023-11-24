@@ -149,7 +149,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
                 importImages,
                 deleteImages,
                 disconnect
-              } = ajax_object;
+              } = kleinanzeigen_ajax_object;
 
               const sku = '<?php echo $sku; ?>';
               const post_status = '<?php echo $post_status ?>';

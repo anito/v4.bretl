@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kleinanzeigen.de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-22 14:23+0000\n"
+"POT-Creation-Date: 2023-11-22 15:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -79,6 +79,7 @@ msgid "All done"
 msgstr ""
 
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:370
+#: templates/dashboard/footer-invalid-ad.php:6
 msgid "Autonomous"
 msgstr ""
 
@@ -88,6 +89,10 @@ msgstr ""
 
 #. Author of the plugin
 msgid "Axel Nitzschner"
+msgstr ""
+
+#: templates/dashboard/footer-invalid-ad.php:3
+msgid "Choose one of the following options:"
 msgstr ""
 
 #: templates/dashboard/dashboard.php:33
@@ -123,6 +128,7 @@ msgid "Deactivated"
 msgstr ""
 
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:372
+#: templates/dashboard/footer-invalid-ad.php:14
 msgid "Delete"
 msgstr ""
 
@@ -149,8 +155,8 @@ msgstr ""
 msgid "Error:"
 msgstr ""
 
-#: templates/dashboard/invalid-sku-results.php:5
 #: templates/dashboard/invalid-price-results.php:5
+#: templates/dashboard/invalid-sku-results.php:5
 msgid "Evaluation Results"
 msgstr ""
 
@@ -174,7 +180,7 @@ msgstr ""
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:371
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:386
 #: includes/class-extended-wc-admin-list-table-products.php:141
-#: templates/dashboard/footer-invalid-ad.php:3
+#: templates/dashboard/footer-invalid-ad.php:10
 #: templates/dashboard/toggle-publish-link.php:2
 msgid "Hide"
 msgstr ""
@@ -228,10 +234,6 @@ msgstr ""
 msgid "KA Price accepted"
 msgstr ""
 
-#: templates/dashboard/footer-invalid-ad.php:7
-msgid "Keep visible"
-msgstr ""
-
 #: includes/class-kleinanzeigen.php:281
 msgid "Kleinanzeigen"
 msgstr ""
@@ -249,8 +251,8 @@ msgstr ""
 msgid "Load Ad"
 msgstr ""
 
-#: templates/dashboard/invalid-sku-results.php:22
 #: templates/dashboard/invalid-price-results.php:23
+#: templates/dashboard/invalid-sku-results.php:22
 msgid "No products found"
 msgstr ""
 

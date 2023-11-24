@@ -17,34 +17,29 @@
 if (!defined('WPINC')) {
   die();
 }
+define("KLEINANZEIGEN_URL", 'https://www.kleinanzeigen.de');
+define("KLEINANZEIGEN_CUSTOMER_URL", KLEINANZEIGEN_URL . '/pro/Auto-Traktor-Bretschneider/ads/');
+define("KLEINANZEIGEN_PER_PAGE", 25);
 
-if (!defined('KLEINANZEIGEN_URL'))
-  define("KLEINANZEIGEN_URL", 'https://www.kleinanzeigen.de');
-if (!defined('KLEINANZEIGEN_CUSTOMER_URL'))
-  define("KLEINANZEIGEN_CUSTOMER_URL", KLEINANZEIGEN_URL . '/pro/Auto-Traktor-Bretschneider/ads/');
-if (!defined('KLEINANZEIGEN_PER_PAGE'))
-  define("KLEINANZEIGEN_PER_PAGE", 25);
-if (!defined('WC_TERMS'))
-  define("WC_TERMS", [
-    'rent' => array('miete', 'mieten')
-  ]);
-if (!defined('WC_PRODUCT_LABELS'))
-  define("WC_PRODUCT_LABELS", [
-    'sale' => 'Aktionspreis',
-  ]);
-if (!defined('WC_COMMON_TAXONOMIES'))
-  define("WC_COMMON_TAXONOMIES", [
-    'rent' => 'Mietmaschinen',
-    'aktionswochen' => 'Aktionswochen',
-    'aktion' => 'Aktionen',
-    'sale' => 'Aktionspreise',
-    'featured' => 'Empfehlungen',
-  ]);
-if (!defined('WC_CUSTOM_PRODUCT_ATTRIBUTES'))
-  define("WC_CUSTOM_PRODUCT_ATTRIBUTES", [
-    'specials' => 'Merkmale',
-    'rent' => 'Mietdauer',
-  ]);
+define("USE_AD_DUMMY_DATA", 0);
+
+define("WC_TERMS", [
+  'rent' => array('miete', 'mieten')
+]);
+define("WC_PRODUCT_LABELS", [
+  'sale' => 'Aktionspreis',
+]);
+define("WC_COMMON_TAXONOMIES", [
+  'rent' => 'Mietmaschinen',
+  'aktionswochen' => 'Aktionswochen',
+  'aktion' => 'Aktionen',
+  'sale' => 'Aktionspreise',
+  'featured' => 'Empfehlungen',
+]);
+define("WC_CUSTOM_PRODUCT_ATTRIBUTES", [
+  'specials' => 'Merkmale',
+  'rent' => 'Mietdauer',
+]);
 
 // If class `Webpremiere_Kleinanzeigen` doesn't exists yet.
 if (!class_exists('Webpremiere_Kleinanzeigen')) {

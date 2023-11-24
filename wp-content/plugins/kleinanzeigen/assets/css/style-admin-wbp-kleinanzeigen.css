@@ -16,30 +16,264 @@
 	justify-content: space-between;
 	width: 100%;
 }
+.sections {
+	background-color: #fff;
+}
+
 .left-sections {
 	display: flex;
-	background-color: #ffffff;
 	border-radius: 5px;
 	border: 1px solid #ddd;
 }
-section#color-definitions {
+.right-sections {
+	border-radius: 5px;
+	border: 1px solid #ddd;
+	border-bottom-left-radius: 20px;
+}
+section.wbp-kleinanzeigen .tasks .task .explanation {
+	padding: 5px;
+	background-color: aqua;
+	font-size: 0.8em;
+	font-weight: 100;
+}
+
+section.wbp-kleinanzeigen .tasks .task .general-action .action-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+section.wbp-kleinanzeigen .tasks .task .general-action .action-buttons {
+	display: flex;
+	align-items: center;
+	margin-left: 30px;
+}
+
+section.wbp-kleinanzeigen
+	.tasks
+	.task
+	.general-action
+	.action-buttons
+	.dashicons {
+	font-size: 15px;
+	line-height: 18px;
+	margin-left: 10px;
+	width: 15px;
+	height: 15px;
+}
+
+section.wbp-kleinanzeigen .tasks .task .general-action .action-buttons .button {
+	min-width: 200px;
+	text-align: center;
+}
+
+section.wbp-kleinanzeigen .action-header-title {
+	display: inline-block;
+	margin-right: 10px;
+	line-height: 1em;
+}
+
+section.wbp-kleinanzeigen .task-count {
+	display: inline-block;
+}
+
+section.wbp-kleinanzeigen .task-count-wrapper {
+	margin-right: 8px;
+	display: inline-block;
+	text-align: center;
+	font-size: 11px;
+}
+
+section.wbp-kleinanzeigen .task-count-wrapper.chip {
+	border-radius: 99px;
+	border: 1px solid;
+	padding: 1px 4px;
+}
+
+section.wbp-kleinanzeigen .dashicons {
+	font-size: 14px;
+	vertical-align: middle;
+	width: 10px;
+	height: 10px;
+	line-height: 0.5em;
+}
+
+section.wbp-kleinanzeigen .chip.task-count {
+	border-radius: 99px;
+	border: 1px solid;
+	padding: 3px 3px;
+	width: 12px;
+	height: 12px;
+	display: inline-block;
+	text-align: center;
+}
+
+.tasks .task {
+	display: flex;
+	justify-content: space-between;
+}
+
+.left-sections section.wbp-kleinanzeigen .section-inner {
+	border-right: 1px solid #eee;
+	padding-right: 30px;
+}
+
+.left-sections section {
+	display: flex;
+	padding: 20px;
+}
+
+.left-sections section.wbp-kleinanzeigen {
+	max-width: 490px;
+}
+
+.left-sections section.wbp-shop {
+	padding-left: 0px;
+}
+
+.left-sections section.wbp-shop .section-inner {
+	padding-left: 10px;
+	padding-right: 30px;
+}
+
+.left-sections section.wbp-shop {
+	max-width: 220px;
+}
+
+.left-sections .info {
+	display: inline-block;
+	max-width: 300px;
+}
+
+#color-definitions {
 	position: fixed;
 	right: 0;
 	top: 0;
 	z-index: 99;
 	display: flex;
 }
-#color-definitions .section-inner {
+section.color-definition {
+	padding: 42px 20px 10px 10px;
+}
+section .first-section.orientation.horizontal {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
-	padding: 20px;
-	background-color: #ffffff;
-	border-bottom-left-radius: 20px;
-	border-left: 1px solid;
-	border-bottom: 1px solid;
-	border-color: #ddd;
-	box-shadow: 1px 0 24px 12px rgba(0, 0, 0, 0.2);
+}
+section .orientation {
+	display: none;
+}
+section .first-section.orientation.vertical {
+	display: block;
+}
+section .first-section.vertical {
+	min-width: 140px;
+}
+section .box-wrapper {
+	margin-right: 10px;
+}
+section .box-wrapper:last-child {
+	margin-right: 0;
+}
+section .box-wrapper {
+	margin-right: 10px;
+}
+section .first-section.vertical .box-wrapper {
+	margin-right: 0;
+	margin-bottom: 10px;
+}
+section .color-box {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 99px;
+	line-height: 1rem;
+	padding: 3px;
+	text-align: center;
+	font-size: 0.9em;
+	color: #fff;
+}
+section .color-box .inner {
+	background: #ffffff;
+	color: #000000;
+	width: 10px;
+	height: 10px;
+	border-radius: 99px;
+	padding: 3px;
+	vertical-align: middle;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+section .description {
+	font-size: 0.8em;
+	color: #000;
+}
+section .chip {
+	padding: 5px;
+	border-radius: 99px;
+	background-color: #eee;
+}
+section .box-wrapper .count {
+	font-size: 0.9em;
+	font-weight: 300;
+	line-height: 1.6em;
+	margin-left: 10px;
+	text-align: center;
+}
+section .box-wrapper .description {
+	display: flex;
+	align-items: center;
+	padding: 0 10px;
+	font-weight: 300;
+	text-wrap: nowrap;
+}
+section .summary {
+	display: flex;
+	justify-content: space-between;
+}
+section .summary .count:nth-child(2) {
+	margin-left: 10px;
+}
+section .summary-status {
+	font-size: 0.8em;
+	font-weight: 300;
+}
+section .summary-status .trigger {
+	display: flex;
+	cursor: pointer;
+	margin-top: 10px;
+	margin-right: 10px;
+	transition: all 0.3s ease-out;
+}
+section .summary-status .trigger.active {
+	margin-right: 0;
+}
+section .summary-status .trigger .text-wrapper {
+	background: #000; /* line-height: 1.9em; */
+	color: #fff;
+	padding: 2px 7px;
+	display: inline-block;
+	border-radius: 99px;
+	text-align: center;
+	display: flex;
+	justify-content: space-between;
+}
+section .summary-status .outer {
+	height: 0;
+	overflow: hidden;
+	width: 0;
+	transition: all 0.3s;
+}
+section .summary-status .trigger.active ~ .outer {
+	height: auto;
+	max-height: calc(100vh - 400px);
+	width: 440px;
+	overflow: auto;
+}
+section .summary-status .trigger.active .dashicons-arrow-right {
+	transform: rotate(90deg);
 }
 .status-wrapper {
 	display: flex;
@@ -50,10 +284,10 @@ section#color-definitions {
 	font-weight: 100;
 	font-size: 0.8em;
 }
-.wbp-kleinanzeigen-section .pagination {
+section.wbp-kleinanzeigen .pagination {
 	margin: 20px 0 0;
 }
-.wbp-kleinanzeigen-section .pagination a {
+section.wbp-kleinanzeigen .pagination a {
 	text-align: center;
 	width: 50px;
 	margin-right: 10px;
@@ -122,68 +356,6 @@ section .color-box.invalid {
 .wp-list-table .column.status.connected-unknown,
 .color-box.unknown {
 	background-color: rgb(71, 71, 71);
-}
-section .color-box {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 20px;
-	height: 20px;
-	border-radius: 99px;
-	line-height: 1rem;
-	padding: 3px;
-	text-align: center;
-	font-size: 0.9em;
-	color: #fff;
-}
-section .color-box .inner {
-	background: #ffffff;
-	color: #000000;
-	width: 10px;
-	height: 10px;
-	border-radius: 99px;
-	padding: 3px;
-	vertical-align: middle;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-section .description {
-	font-size: 0.8em;
-	color: #000;
-}
-section .box-wrapper {
-	display: flex;
-	flex: 0 1 auto;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 10px;
-	width: 100%;
-}
-.box-wrapper.inset {
-	padding: 5px;
-	border-radius: 99px;
-	background-color: #eee;
-}
-section .box-wrapper .count {
-	font-size: 0.9em;
-	font-weight: 300;
-	line-height: 1.6em;
-	margin-left: 10px;
-	text-align: center;
-}
-section .box-wrapper .description {
-	display: flex;
-	align-items: center;
-	padding-right: 10px;
-	font-weight: 300;
-}
-section .summary {
-	display: flex;
-	justify-content: space-between;
-}
-section .summary .count:nth-child(2) {
-	margin-left: 10px;
 }
 .wp-list-table .column-shop-price .woocommerce-price-suffix {
 	display: none;
@@ -293,11 +465,13 @@ section .summary .count:nth-child(2) {
 }
 
 .divider-bottom {
+	display: block;
 	margin-bottom: 10px;
 	padding-bottom: 10px;
 	border-bottom: 1px solid #eee;
 }
 .divider-top {
+	display: block;
 	margin-top: 10px;
 	padding-top: 10px;
 	border-top: 1px solid #eee;
@@ -317,45 +491,8 @@ section .summary .count:nth-child(2) {
 	height: 0.8em;
 	margin-left: 10px;
 }
-section .box-wrapper.summary-status {
-	justify-content: center;
-	font-size: 0.8em;
-	font-weight: 300;
-	margin-bottom: 0;
-}
-section .box-wrapper.summary-status .trigger {
-	cursor: pointer;
-}
-section .box-wrapper.summary-status .trigger .text {
-	text-decoration: underline;
-}
-section .box-wrapper.summary-status .outer {
-	height: 0;
-	overflow: hidden;
-	width: 100px;
-	transition: all 0.3s;
-}
-section .box-wrapper.summary-status .trigger.active ~ .outer {
-	height: auto;
-	max-height: calc(100vh - 400px);
-	width: 300px;
-	overflow: auto;
-}
-section .box-wrapper.summary-status .status-wrapper {
-	display: flex;
-	flex-direction: column;
-}
-section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
-	transform: rotate(90deg);
-}
 .todo {
 	display: flex;
-}
-.todo .title {
-	width: 50%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 .todo {
 	display: flex;
@@ -368,7 +505,14 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 }
 .todo .reason {
 	flex-basis: 30%;
-	padding-left: 30px;
+	padding-left: 20px;
+	padding-right: 30px;
+}
+.view-switcher {
+	position: absolute;
+	bottom: -2px;
+	right: 2px;
+	cursor: pointer;
 }
 
 /**
@@ -407,10 +551,6 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 .wp-list-task-kleinanzeigen-ads .column-actions {
 	width: 33%;
 	text-align: center;
-}
-
-.wp-list-task-kleinanzeigen-ads .column-actions a {
-	max-width: 90px;
 }
 
 .wp-list-task-kleinanzeigen-ads {
@@ -458,7 +598,7 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 }
 
 .wp-list-task-kleinanzeigen-ads tbody td .action-button {
-	width: 130px;
+	width: var(--button-width, 100px);
 	margin: 5px;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -467,4 +607,16 @@ section .box-wrapper.summary-status .trigger.active .dashicons-arrow-right {
 
 #kleinanzeigen-task-list .tablenav.bottom {
 	margin-bottom: 30px;
+}
+
+/**
+ * Action button width depending on task type
+*/
+.wp-list-task-kleinanzeigen-ads .column-actions a[data-task-type="invalid-ad"] {
+	--button-width: 90px;
+}
+.wp-list-task-kleinanzeigen-ads
+	.column-actions
+	a[data-task-type="invalid-price"] {
+	--button-width: auto;
 }
