@@ -232,9 +232,14 @@ section .box-wrapper .description {
 section .summary {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 }
-section .summary .count:nth-child(2) {
-	margin-left: 10px;
+section .summary .icon-text {
+    display: flex;
+    align-items: center;
+}
+section .summary .icon-text .icon {
+    margin-right: 5px;
 }
 section .summary-status {
 	font-size: 0.8em;

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Astra Child\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-04 03:49+0000\n"
-"PO-Revision-Date: 2023-11-23 14:53+0000\n"
+"PO-Revision-Date: 2023-11-24 04:09+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -20,35 +20,35 @@ msgstr ""
 msgid "%s (%s)"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:943
+#: includes/class-kleinanzeigen.php:948
 msgid "1 Tag"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:947
+#: includes/class-kleinanzeigen.php:952
 msgid "2 Tage"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:951
+#: includes/class-kleinanzeigen.php:956
 msgid "3 Tage"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:955
+#: includes/class-kleinanzeigen.php:960
 msgid "4 Tage"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:959
+#: includes/class-kleinanzeigen.php:964
 msgid "5 Tage"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:963
+#: includes/class-kleinanzeigen.php:968
 msgid "6 Tage"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:967
+#: includes/class-kleinanzeigen.php:972
 msgid "7 Tage"
 msgstr ""
 
-#: includes/class-kleinanzeigen.php:566
+#: includes/class-kleinanzeigen.php:571
 msgid ""
 "A Product with the same Ad ID already exists. Delete this draft or enter a "
 "different Ad ID."
@@ -56,7 +56,7 @@ msgstr ""
 "Es existiert bereits ein Produkt mit dieser Anzeige ID. Lösche bitte diesen "
 "Entwurf oder verwende eine andere Anzeige ID für den Import."
 
-#: includes/class-kleinanzeigen.php:583
+#: includes/class-kleinanzeigen.php:588
 msgid ""
 "A product with the same title already exists. Delete this draft or enter a "
 "different title."
@@ -64,40 +64,36 @@ msgstr ""
 "Es existiert bereits ein Produkt mit dem gleichen Titel. Lösche bitte diesen "
 "Entwurf oder verwende einen anderen Titel für dieses Produkt. "
 
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:380
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:386
 #| msgid "Accept price"
 msgid "Accept KA price"
 msgstr "KA Preis übernehmen"
 
-#: templates/header.php:22
+#: templates/header.php:31
 msgid "Ads"
 msgstr "Kleinanzeigen"
 
-#: templates/header.php:15
+#: templates/header.php:24
 #, php-format
 msgid "Ads: %s"
 msgstr "Anzeigen: %s"
 
-#: templates/header.php:174
-msgid "All done"
-msgstr "Alles erledigt"
-
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:370
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:376
 #: templates/dashboard/footer-invalid-ad.php:6
 msgid "Autonomous"
-msgstr "Autonom"
+msgstr "Eigenständig"
 
-#: templates/header.php:40
+#: templates/header.php:49
 msgid "Autonomous products (Unlinked products)"
-msgstr "Autonome Produkte (nicht verknüpft)"
+msgstr "Eigenständige Produkte (nicht verknüpft)"
 
 #. Author of the plugin
 msgid "Axel Nitzschner"
 msgstr ""
 
 #: templates/dashboard/footer-invalid-ad.php:3
-msgid "Choose one of the following options:"
-msgstr "Wähle am Produkt eine der folgenden Optionen:"
+msgid "Choose one of the following options to unlink the listet products:"
+msgstr "Was soll mit den Produkten passieren? Folgende Optionen sind möglich:"
 
 #: templates/dashboard/dashboard.php:33
 msgid "Close"
@@ -111,7 +107,7 @@ msgstr "Verknüpfen"
 msgid "Contains Default Category"
 msgstr "Enthält Standard Kategorie"
 
-#: templates/header.php:35
+#: templates/header.php:44
 msgid "Contains invalid linked products"
 msgstr "Enthält ungültige Verknüpfungen"
 
@@ -131,12 +127,12 @@ msgstr "Alle deaktivieren"
 msgid "Deactivated"
 msgstr "Deaktiviert"
 
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:372
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:378
 #: templates/dashboard/footer-invalid-ad.php:14
 msgid "Delete"
 msgstr "Löschen"
 
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:372
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:378
 msgid "Deleted"
 msgstr "Gelöscht"
 
@@ -145,15 +141,15 @@ msgstr "Gelöscht"
 msgid "Disconnect"
 msgstr "Trennen"
 
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:370
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:371
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:376
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:377
 #: templates/dashboard/invalid-sku-results.php:32
 msgid "Disconnected"
 msgstr "Getrennt"
 
-#: templates/header.php:112
+#: templates/header.php:123
 msgid "Drafts"
-msgstr "Ausgeblendet"
+msgstr "Deaktiviert"
 
 #: includes/class-kleinanzeigen.php:65
 msgid "Error:"
@@ -165,7 +161,7 @@ msgid "Evaluation Results"
 msgstr "Ergebnisse der Überprüfung"
 
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:132
-#: templates/header.php:44
+#: templates/header.php:53
 msgid "Featured products"
 msgstr "Empfohlene Produkte"
 
@@ -181,13 +177,17 @@ msgstr "Preis korrigieren"
 msgid "Fixed"
 msgstr "Korrigiert"
 
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:371
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:386
+#: templates/header.php:166
+msgid "Hidden"
+msgstr "Deaktiviert"
+
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:377
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:392
 #: includes/class-extended-wc-admin-list-table-products.php:141
 #: templates/dashboard/footer-invalid-ad.php:10
 #: templates/dashboard/toggle-publish-link.php:2
 msgid "Hide"
-msgstr "Ausblenden"
+msgstr "Deaktivieren"
 
 #. Author URI of the plugin
 msgid "https://webpremiere.de/plugins/kleinanzeigen-import-plugin"
@@ -209,7 +209,7 @@ msgstr "Daten importieren"
 msgid "Import Images"
 msgstr "Fotos importieren"
 
-#: templates/header.php:55
+#: templates/header.php:64
 msgid "Inconsistencies discovered"
 msgstr "Inkonsistenzen entdeckt"
 
@@ -218,7 +218,7 @@ msgid "Invalid Category"
 msgstr "Ungültige Kategorie"
 
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:72
-#: templates/header.php:63
+#: templates/header.php:73
 #| msgid "Invalid Links"
 msgid "Invalid links"
 msgstr "Ungültige Verknüpfungen"
@@ -235,12 +235,12 @@ msgstr "Alle nur trennen"
 msgid "KA price"
 msgstr "KA Preis"
 
-#: includes/class-admin-kleinanzeigen-list-table-tasks.php:380
+#: includes/class-admin-kleinanzeigen-list-table-tasks.php:386
 #| msgid "Price accepted"
 msgid "KA Price accepted"
 msgstr "KA Preis übernommen"
 
-#: includes/class-kleinanzeigen.php:281
+#: includes/class-kleinanzeigen.php:286
 msgid "Kleinanzeigen"
 msgstr "Kleinanzeigen"
 
@@ -249,7 +249,7 @@ msgid "Kleinanzeigen.de"
 msgstr "Kleinanzeigen.de"
 
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:102
-#: templates/header.php:34
+#: templates/header.php:43
 #| msgid "Linked Products"
 msgid "Linked products"
 msgstr "Verknüpfte Produkte"
@@ -267,12 +267,12 @@ msgstr "Keine Produkte gefunden"
 msgid "Not visible"
 msgstr "Nicht sichtbar"
 
-#: includes/class-kleinanzeigen.php:301 includes/class-kleinanzeigen.php:302
-#: includes/class-kleinanzeigen.php:328
+#: includes/class-kleinanzeigen.php:306 includes/class-kleinanzeigen.php:307
+#: includes/class-kleinanzeigen.php:333
 msgid "Overview"
 msgstr "Übersicht"
 
-#: templates/header.php:15
+#: templates/header.php:24
 #, php-format
 msgid "Page: %s"
 msgstr "Seite: %s"
@@ -286,7 +286,7 @@ msgid "Price deviation"
 msgstr "Preisdifferenz"
 
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:87
-#: templates/header.php:77
+#: templates/header.php:87
 msgid "Price deviations"
 msgstr "Preisdifferenzen"
 
@@ -298,12 +298,12 @@ msgstr "Produkte die auf eine ungültigen Anzeigen ID verweisen"
 msgid "Products with price differences"
 msgstr "Produkte mit Preisdifferenz"
 
-#: templates/header.php:103
+#: templates/header.php:114 templates/header.php:160
 msgid "Published"
 msgstr "Veröffentlicht"
 
-#: includes/class-kleinanzeigen.php:310 includes/class-kleinanzeigen.php:311
-#: includes/class-kleinanzeigen.php:346
+#: includes/class-kleinanzeigen.php:315 includes/class-kleinanzeigen.php:316
+#: includes/class-kleinanzeigen.php:351
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -311,7 +311,7 @@ msgstr "Einstellungen"
 msgid "Shop price"
 msgstr "Shop Preis"
 
-#: templates/header.php:29
+#: templates/header.php:38
 msgid "Shop products"
 msgstr "Produkte im Onlineshop"
 
@@ -323,15 +323,19 @@ msgstr ""
 msgid "Title"
 msgstr "Titel"
 
-#: templates/header.php:18
+#: templates/header.php:27
 msgid "Total published"
 msgstr "Insgesamt veröffentlicht"
 
-#: templates/header.php:121
+#: templates/header.php:132 templates/header.php:172
 msgid "Unknown"
 msgstr "Unbekannt"
+
+#: templates/header.php:178
+msgid "Unlinked"
+msgstr "Nicht verknüpft"
 
 #: includes/class-admin-kleinanzeigen-list-table-tasks.php:117
 #| msgid "Unlinked Products"
 msgid "Unlinked products"
-msgstr "Nicht verknüpfte Produkte"
+msgstr "Eigenständige Produkte"

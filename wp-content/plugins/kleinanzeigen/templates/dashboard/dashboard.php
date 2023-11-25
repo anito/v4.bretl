@@ -41,6 +41,14 @@
 <script>
   jQuery(document).ready(($) => {
 
+    const resize = function() {
+      root.style.setProperty('--modal-height', window.innerHeight - 550 + 'px');
+    }
+
+    const root = document.querySelector(':root');
+    $(window).on('resize', resize)
+    resize();
+
     $('.ka-list-modal .close').on('click', function(e) {
       if (e.target === e.currentTarget) {
         $('body').removeClass('show-modal');
@@ -54,6 +62,7 @@
   :root {
     --admin-sidebar: 160px;
     --admin-topbar: 32px;
+    scroll-behavior: smooth;
   }
 
   body.folded {
@@ -102,6 +111,10 @@
     border-radius: 8px;
     padding: 20px;
     position: relative;
+  }
+
+  .ka-list-modal-body tbody {
+    height: var(--modal-height, 500px);
   }
 
   .ka-list-header {

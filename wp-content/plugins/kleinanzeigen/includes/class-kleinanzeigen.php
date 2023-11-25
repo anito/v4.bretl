@@ -544,7 +544,11 @@ if (!class_exists('Kleinanzeigen')) {
 
       $recover = function ($post_ID) {
         $json = get_post_meta($post_ID, 'kleinanzeigen_record', true);
-        return (object) json_decode($json, true);
+        $_POST['kleinanzeigen_recover'] = 'false';
+
+        $ad_obj = (object) json_decode($json, true);
+
+        return isset($ad_obj->id) ? $ad_obj : null;
       };
       $comment = function ($pos_key = 1, $content = '') {
         $pos = array_combine(range(0, 2), array('', '-start', '-end'));
@@ -555,7 +559,7 @@ if (!class_exists('Kleinanzeigen')) {
       $is_recover = "true" === get_post_meta($post_ID, 'kleinanzeigen_recover', true);
       if ($is_recover) {
         $ad = $recover($post_ID);
-        $_POST['kleinanzeigen_id'] = $ad->id;
+        if($ad) $_POST['kleinanzeigen_id'] = $ad->id;
       }
 
       if ($ad) {

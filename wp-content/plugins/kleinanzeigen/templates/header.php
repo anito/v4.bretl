@@ -111,29 +111,35 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
           <h2>&nbsp;</h2>
           <h2><small>
               <div class="summary">
-                <span><i class="dashicons dashicons-visibility"></i><?php echo __('Published', 'wbp-kleinanzeigen') ?>:</span>
-                <span>
+                <div class="title">
+                  <span class="icon-text"><i class="icon dashicons dashicons-visibility"></i><?php echo __('Published', 'wbp-kleinanzeigen') ?>:</span>
+                </div>
+                <div class="info">
                   <span class="count"><?php echo count($products['publish']) ?></span>
                   <span class="indicator indicator-publish"></span>
-                </span>
+                </div>
               </div>
             </small></h2>
           <h2><small>
               <div class="summary">
-                <span><i class="dashicons dashicons-hidden"></i><?php echo __('Drafts', 'wbp-kleinanzeigen') ?>:</span>
-                <span>
+                <div class="title">
+                  <span class="icon-text"><i class="icon dashicons dashicons-hidden"></i><?php echo __('Drafts', 'wbp-kleinanzeigen') ?>:</span>
+                </div>
+                <div class="info">
                   <span class="count"><?php echo count($products['draft']) ?></span>
                   <span class="indicator indicator-draft"></span>
-                </span>
+                </div>
               </div>
             </small></h2>
           <h2><small>
               <div class="summary">
-                <span><i class="dashicons dashicons-editor-help"></i><?php echo __('Unknown', 'wbp-kleinanzeigen') ?>:</span>
-                <span>
+                <div class="title">
+                  <span class="icon-text"><i class="icon dashicons dashicons-editor-help"></i><?php echo __('Unknown', 'wbp-kleinanzeigen') ?>:</span>
+                </div>
+                <div class="info">
                   <span class="count"><?php echo count($products['unknown']) ?></span>
                   <span class="indicator indicator-unknown"></span>
-                </span>
+                </div>
               </div>
             </small></h2>
 
@@ -157,25 +163,25 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
           <div class="box-wrapper chip">
             <span class="status-wrapper">
               <span class="color-box status connected-publish"><?php echo count($products['publish']) ?></span>
-              <span class="description">Veröffentlicht</span>
+              <span class="description"><?php echo __('Published', 'wbp-kleinanzeigen') ?></span>
             </span>
           </div>
           <div class="box-wrapper chip">
             <span class="status-wrapper">
               <span class="color-box status connected-draft"><?php echo count($products['draft']) ?></span>
-              <span class="description">Ausgeblendet</span>
+              <span class="description"><?php echo __('Hidden', 'wbp-kleinanzeigen') ?></span>
             </span>
           </div>
           <div class="box-wrapper chip">
             <span class="status-wrapper">
               <span class="color-box status invalid"><?php echo count($products['unknown']) ?></span>
-              <span class="description">Unbekannt</span>
+              <span class="description"><?php echo __('Unknown', 'wbp-kleinanzeigen') ?></span>
             </span>
           </div>
           <div class="box-wrapper chip">
             <span class="status-wrapper">
               <span class="color-box status disconnected"><span class="inner"><?php echo count($products['no-sku']) ?></span></span>
-              <span class="description">Nicht verknüpft</span>
+              <span class="description"><?php echo __('Unlinked', 'wbp-kleinanzeigen') ?></span>
             </span>
           </div>
         </div>
@@ -269,7 +275,7 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
   }
 
   #kleinanzeigen-head-wrap .fieldset {
-    border: 1px solid #eee;
+    border: 0 solid #eee;
     background-color: #f8fbff;
     padding: 10px;
     margin-bottom: 10px;
