@@ -1,10 +1,14 @@
 jQuery(document).ready(function ($) {
 
+
   const { screen, heartbeat } = {
-		...kleinanzeigen_ajax_object,
-		...kleinanzeigen_utils_object,
+		...KleinanzeigenAjax,
+		...KleinanzeigenUtils,
   };
 
+  const init = () => {
+    console.log($('body').hasClass('show-modal'));
+  }
   const getCookie = (key) => {
     const regex = new RegExp(`(?<=${key}=)([\\w\\S-])+(?=;)`);
     const matches = document.cookie.match(regex);
@@ -76,8 +80,9 @@ jQuery(document).ready(function ($) {
 
   switch (screen) {
     case "toplevel_page_wbp-kleinanzeigen":
-      kleinanzeigen_utils_object = {
-        ...kleinanzeigen_utils_object,
+      init();
+      KleinanzeigenUtils = {
+        ...KleinanzeigenUtils,
         getCookie,
         setCookie,
         createOrientation,

@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-  const { admin_ajax, screen, edit_link } = kleinanzeigen_ajax_object;
+  const { admin_ajax, screen, edit_link } = KleinanzeigenAjax;
 
   // hide controls if sku is not available
   const sku = document.getElementById("kleinanzeigen_id");
@@ -661,8 +661,8 @@ jQuery(document).ready(function ($) {
   switch (screen) {
     case "toplevel_page_wbp-kleinanzeigen":
     case "edit-product":
-      kleinanzeigen_ajax_object = {
-        ...kleinanzeigen_ajax_object,
+      KleinanzeigenAjax = {
+        ...KleinanzeigenAjax,
         createPost,
         deletePost,
         publishPost,

@@ -233,8 +233,8 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
       heartbeat,
       createOrientation
     } = {
-      ...kleinanzeigen_ajax_object,
-      ...kleinanzeigen_utils_object
+      ...KleinanzeigenAjax,
+      ...KleinanzeigenUtils
     };
 
     init_head();

@@ -478,7 +478,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         jQuery(document).ready(($) => {
           const {
             featurePost
-          } = kleinanzeigen_ajax_object;
+          } = KleinanzeigenAjax;
 
           const table = $('.wp-list-task-kleinanzeigen-ads');
           const post_ID = "<?php echo $product ? $post_ID : '' ?>";

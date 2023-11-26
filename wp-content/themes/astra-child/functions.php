@@ -4,13 +4,11 @@ require_once __DIR__ . '/includes/duplicate-content.php';
 
 function wbp_init()
 {
-  if (!wp_doing_ajax()) {
-    $theme = wp_get_theme();
-    /**
-     * Define Constants
-     */
-    define('CHILD_THEME_ASTRA_CHILD_VERSION', $theme->__get('version'));
-  }
+  $theme = wp_get_theme();
+  /**
+   * Define Constants
+   */
+  define('CHILD_THEME_ASTRA_CHILD_VERSION', $theme->__get('version'));
 }
 add_filter('init', 'wbp_init');
 

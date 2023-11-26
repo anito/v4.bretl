@@ -584,7 +584,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             disconnect,
             publishPost,
             featurePost
-          } = kleinanzeigen_ajax_object;
+          } = KleinanzeigenAjax;
 
           const post_ID = "<?php echo $product ? $post_ID : '' ?>";
           const record = <?php echo json_encode($record) ?>;
