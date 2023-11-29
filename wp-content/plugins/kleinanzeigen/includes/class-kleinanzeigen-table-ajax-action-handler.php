@@ -8,7 +8,7 @@ if (!defined('WPINC')) {
 // If class `Kleinanzeigen_Ajax_Action_Handler` doesn't exists yet.
 if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
-  class Kleinanzeigen_Ajax_Action_Handler
+  class Kleinanzeigen_Ajax_Action_Handler extends Kleinanzeigen
   {
 
     public function __construct()
@@ -161,13 +161,13 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         $kleinanzeigen_id_raw = isset($formdata['kleinanzeigen_id']) ? $formdata['kleinanzeigen_id'] : false;
         $kleinanzeigen_id = $this->parse_kleinanzeigen_id($kleinanzeigen_id_raw);
 
-        $remoteUrl = wbp_ka()->get_kleinanzeigen_search_url($kleinanzeigen_id);
+        $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($kleinanzeigen_id);
       } else {
         $remoteUrl = home_url();
       }
 
       $response = $this->remote_call($remoteUrl, 5);
-      $record = wbp_ka()->find_kleinanzeige($kleinanzeigen_id) ?? '';
+      $record = wbp_fn()->find_kleinanzeige($kleinanzeigen_id) ?? '';
 
       if ($record) {
         $record = html_entity_decode(json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
@@ -197,7 +197,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         $product = wc_get_product($post_ID);
         if ($product) {
           if ($product->is_on_sale()) {
-            wbp_ka()->set_pseudo_sale_price($product, $price, 10);
+            wbp_fn()->set_pseudo_sale_price($product, $price, 10);
           } else {
             $product->set_regular_price($price);
           }
@@ -213,13 +213,13 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
               $attr_name = WC_CUSTOM_PRODUCT_ATTRIBUTES[$key];
               $attr_slug = wc_attribute_taxonomy_name($attr_name);
 
-              $attributes = wbp_ka()->get_mietdauer_attributes($attr_name, (int) $price);
+              $attributes = wbp_fn()->get_mietdauer_attributes($attr_name, (int) $price);
               $terms = $attributes['attributes'][$attr_name];
               foreach ($terms as $key => $term) {
                 $term_name = $term['name'];
                 $attributes = array_merge($term['attributes'], array('menu_order' => $key));
                 wbp_th()->set_pa_term($product, $attr_name, $term['name'], true, array('is_variation' => 1));
-                wbp_ka()->create_product_variation($product->get_id(), $term_name, $attr_name, $attributes);
+                wbp_fn()->create_product_variation($product->get_id(), $term_name, $attr_name, $attributes);
               }
             }
           }
@@ -227,7 +227,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       switch ($screen) {
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $data = $this->prepare_list_table($paged);
           $row = $this->render_list_row($kleinanzeigen_id, $data);
@@ -262,7 +262,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       } else {
         $product = wc_get_product($post_ID);
         if($product) {
-          wbp_ka()->disable_sku($product);
+          wbp_fn()->disable_sku($product);
           $product->save();
         }
         $post_status = 'draft';
@@ -280,7 +280,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $data = $this->prepare_list_table($paged);
           $row = $this->render_list_row($kleinanzeigen_id, $data);
@@ -288,7 +288,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       switch ($screen) {
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $head = $this->render_head();
           break;
@@ -320,7 +320,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       switch ($screen) {
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $data = $this->prepare_list_table($paged);
           $row = $this->render_list_row($kleinanzeigen_id, $data);
@@ -328,6 +328,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           break;
       }
 
+      $modal_row = null;
       switch ($screen) {
         case 'modal':
           $record = $this->get_record($kleinanzeigen_id);
@@ -363,12 +364,12 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         $success = wp_update_post($postarr);
         $product = wc_get_product($post_ID);
         if("trash" === $product->get_status()) {
-          wbp_ka()->delete_product($post_ID, true);
+          wbp_fn()->delete_product($post_ID, true);
         }
       }
 
       switch ($screen) {
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $data = $this->prepare_list_table($paged);
           $row = $this->render_list_row($kleinanzeigen_id, $data);
@@ -376,6 +377,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           break;
       }
 
+      $modal_row = null;
       switch ($screen) {
         case 'modal':
           $record = $this->get_record($kleinanzeigen_id);
@@ -393,15 +395,15 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
       $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
       $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : '';
-      $ad = wbp_ka()->find_kleinanzeige($kleinanzeigen_id);
+      $ad = wbp_fn()->find_kleinanzeige($kleinanzeigen_id);
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
       $product = wc_get_product($post_ID);
       if ($product) {
         if (isset($ad)) {
-          wbp_ka()->enable_sku($product, $ad);
+          wbp_fn()->enable_sku($product, $ad);
         } else {
-          wbp_ka()->disable_sku($product);
+          wbp_fn()->disable_sku($product);
         }
         $product->save();
       }
@@ -425,7 +427,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
       $product = wc_get_product($post_ID);
       if ($product) {
-        wbp_ka()->disable_sku($product);
+        wbp_fn()->disable_sku($product);
         $product->save();
       }
 
@@ -434,7 +436,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
         case 'modal':
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
           $data = $this->prepare_list_table($paged);
           $row = $this->render_list_row($kleinanzeigen_id, $data);
           $head = $this->render_head();
@@ -528,20 +530,20 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           // Handle contents
           foreach ($parts as $key => $val) {
 
-            if (wbp_ka()->text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
+            if (wbp_fn()->text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
 
               $fns = isset($val['fn']) ? $val['fn'] : 'default';
               $fns = !is_array($fns) ? array($fns) : $fns;
 
               foreach ($fns as $fn) {
-                if (is_callable(array(wbp_ka(), 'handle_product_contents_' . $fn), false, $callable_name)) {
+                if (is_callable(array(wbp_fn(), 'handle_product_contents_' . $fn), false, $callable_name)) {
 
                   if (!is_array($val)) {
                     $term_name = $val;
                   } elseif (isset($val[0])) {
                     $term_name = $val[0];
                   }
-                  $product = call_user_func(array(wbp_ka(), 'handle_product_contents_' . $fn), compact('product', 'price', 'title', 'content', 'term_name'));
+                  $product = call_user_func(array(wbp_fn(), 'handle_product_contents_' . $fn), compact('product', 'price', 'title', 'content', 'term_name'));
                 }
               }
             }
@@ -555,9 +557,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
           foreach ($brands as $brand) {
             $exists = false;
-            if (wbp_ka()->text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
+            if (wbp_fn()->text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
               $exists = true;
-            } elseif (wbp_ka()->text_contains(esc_html($brand->name), esc_html($searchable_content))) {
+            } elseif (wbp_fn()->text_contains(esc_html($brand->name), esc_html($searchable_content))) {
               $exists = true;
             }
             if (true === $exists) {
@@ -571,7 +573,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           }
 
           if ($record) {
-            $product = wbp_ka()->enable_sku($product, $record);
+            $product = wbp_fn()->enable_sku($product, $record);
             if (!is_wp_error($product)) {
               $product->save();
             } else {
@@ -601,14 +603,14 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
           $data = $this->prepare_list_table($paged);
           $row = $this->render_list_row($kleinanzeigen_id, $data);
           break;
       }
 
       switch ($screen) {
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
           $head = $this->render_head();
           break;
       }
@@ -658,7 +660,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
-        case 'toplevel_page_wbp-kleinanzeigen':
+        case 'toplevel_page_kleinanzeigen':
           $data = $this->prepare_list_table($paged);
           $row = $this->render_list_row($kleinanzeigen_id, $data);
           break;
@@ -768,7 +770,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function render_wc_admin_list_row($post_ID)
     {
-      require_once wbp_ka()->plugin_path('/includes/class-extended-wc-admin-list-table-products.php');
+      require_once wbp_ka()->plugin_path('includes/class-kleinanzeigen-wc-admin-list-table-products.php');
       $wp_wc_admin_list_table = new Extended_WC_Admin_List_Table_Products();
 
       ob_start();
@@ -835,7 +837,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function get_record($id)
     {
-      $ads = wbp_ka()->get_all_ads();
+      $ads = wbp_fn()->get_all_ads();
       $ids = array_column($ads, 'id');
       $record_key = array_search($id, $ids);
       return is_int($record_key) ? $ads[$record_key] : null;

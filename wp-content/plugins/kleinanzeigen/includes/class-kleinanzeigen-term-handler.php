@@ -232,33 +232,6 @@ if (!class_exists('Kleinanzeigen_Term_Handler')) {
       }
       return $ids;
     }
-    
-    /**
-     * Handle a custom 'sku_compare' query var to get products with the 'sku_compare' meta.
-     * @param array $query - Args for WP_Query.
-     * @param array $query_vars - Query vars from WC_Product_Query.
-     * @return array modified $query
-     */
-    static public function handle_cpt_get_products_query($query, $query_vars)
-    {
-      if (!empty($query_vars['sku_compare'])) {
-        $query['meta_query'][] = array(
-          'key' => '_sku',
-          'compare' => esc_attr($query_vars['sku_compare']),
-        );
-      }
-      if (!empty($query_vars['featured_products'])) {
-        $query['meta_query'][] = array(
-          'taxonomy'         => 'product_visibility',
-          'terms'            => 'featured',
-          'field'            => 'name',
-          'operator'         => 'IN',
-          'include_children' => false, // optional
-        );
-      }
-    
-      return $query;
-    }
 
     public function add_the_product_term($name, $type)
     {

@@ -20,7 +20,7 @@ if (!class_exists('Utils')) {
       $options = wp_parse_args($args, $defaults);
       extract($options);
 
-      $remoteUrl = KLEINANZEIGEN_CUSTOMER_URL . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
+      $remoteUrl = self::parse_remote_url() . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
 
       if(USE_AD_DUMMY_DATA) {
         $dir = 'sample-data';
@@ -43,6 +43,13 @@ if (!class_exists('Utils')) {
       } else {
         return $response;
       }
+    }
+
+    public static function parse_remote_url() {
+      $url = trailingslashit(KLEINANZEIGEN_URL);
+      $pro_account = get_option('kleinanzeigen_is_pro_account', '') === "1" ? 'pro/' : '';
+      $account_name = get_option('kleinanzeigen_account_name', '');
+      return sanitize_url("{$url}{$pro_account}{$account_name}/ads", array('http', 'https'));
     }
 
     static function read($file) {
@@ -89,10 +96,13 @@ if (!class_exists('Utils')) {
 
     static function error_check($data, $error_template)
     {
+
+      if(is_null($data)) {
+        $data = new WP_Error(403, __('No data found', 'kleinanzeigen'));
+      }
       if (is_wp_error($data)) {
         die(json_encode(array(
-
-          "head" => wbp_include_kleinanzeigen_template($error_template, true, array('message' => $data->get_error_message()))
+          "head" => wbp_ka()->include_template($error_template, true, array('message' => $data->get_error_message()))
 
         )));
       }
