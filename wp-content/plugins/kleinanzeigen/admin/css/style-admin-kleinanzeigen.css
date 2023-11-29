@@ -1,532 +1,532 @@
 #kleinanzeigen-admin-display {
-	--publish: #1cc71c;
-	--draft: orange;
-	--unknown: #ff5b5b;
+  --publish: #1cc71c;
+  --draft: orange;
+  --unknown: #ff5b5b;
 }
 .kleinanzeigen-page-header {
-	display: flex;
-	align-items: center;
-	margin: 15px 0 10px;
+  display: flex;
+  align-items: center;
+  margin: 15px 0 10px;
 }
 #kleinanzeigen-head-wrap {
-	margin-right: 20px;
-	padding: 20px;
-	display: flex;
+  margin-right: 20px;
+  padding: 20px;
+  display: flex;
 }
 .section-wrapper {
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 .sections {
-	background-color: #fff;
-	overflow: hidden;
+  background-color: #fff;
+  overflow: hidden;
 }
 
 .left-sections {
-	display: flex;
-	flex-direction: column;
-	border-radius: 5px;
-	border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 .right-sections {
-	border-radius: 5px;
-	border: 1px solid #ddd;
-	border-bottom-left-radius: 20px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  border-bottom-left-radius: 20px;
 }
 .left-upper-section {
-    display: flex;
+  display: flex;
 }
 section.pagination {
-    background: aliceblue;
+  background: aliceblue;
 }
 section.wbp-kleinanzeigen .tasks .task .explanation {
-	padding: 5px;
-	background-color: aqua;
-	font-size: 0.8em;
-	font-weight: 100;
+  padding: 5px;
+  background-color: aqua;
+  font-size: 0.8em;
+  font-weight: 100;
 }
 
 section.wbp-kleinanzeigen .tasks .task .general-action .action-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 section.wbp-kleinanzeigen .tasks .task .general-action .action-buttons {
-	display: flex;
-	align-items: center;
-	margin-left: 30px;
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
 }
 
 section.wbp-kleinanzeigen
-	.tasks
-	.task
-	.general-action
-	.action-buttons
-	.dashicons {
-	font-size: 15px;
-	line-height: 18px;
-	margin-left: 10px;
-	width: 15px;
-	height: 15px;
+  .tasks
+  .task
+  .general-action
+  .action-buttons
+  .dashicons {
+  font-size: 15px;
+  line-height: 18px;
+  margin-left: 10px;
+  width: 15px;
+  height: 15px;
 }
 
 section.wbp-kleinanzeigen .tasks .task .general-action .action-buttons .button {
-	min-width: 200px;
-	text-align: center;
+  min-width: 200px;
+  text-align: center;
 }
 
 section.wbp-kleinanzeigen .action-header-title {
-	display: inline-block;
-	margin-right: 10px;
-	line-height: 1em;
+  display: inline-block;
+  margin-right: 10px;
+  line-height: 1em;
 }
 
 section.wbp-kleinanzeigen .task-count {
-	display: inline-block;
+  display: inline-block;
 }
 
 section.wbp-kleinanzeigen .task-count-wrapper {
-	margin-right: 8px;
-	display: inline-block;
-	text-align: center;
-	font-size: 11px;
+  margin-right: 8px;
+  display: inline-block;
+  text-align: center;
+  font-size: 11px;
 }
 
 section.wbp-kleinanzeigen .task-count-wrapper.chip {
-	border-radius: 99px;
-	border: 1px solid;
-	padding: 1px 4px;
+  border-radius: 99px;
+  border: 1px solid;
+  padding: 1px 4px;
 }
 
 section.wbp-kleinanzeigen .dashicons {
-	font-size: 14px;
-	vertical-align: middle;
-	width: 10px;
-	height: 10px;
-	line-height: 0.5em;
+  font-size: 14px;
+  vertical-align: middle;
+  width: 10px;
+  height: 10px;
+  line-height: 0.5em;
 }
 
 section.wbp-kleinanzeigen .chip.task-count {
-	border-radius: 99px;
-	border: 1px solid;
-	padding: 3px 3px;
-	width: 12px;
-	height: 12px;
-	display: inline-block;
-	text-align: center;
+  border-radius: 99px;
+  border: 1px solid;
+  padding: 3px 3px;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  text-align: center;
 }
 
 .tasks .task {
-	display: flex;
-	justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 section.wbp-kleinanzeigen .section-inner {
-	border-right: 1px solid #eee;
-	padding-right: 30px;
-	flex-grow: 1;
+  border-right: 1px solid #eee;
+  padding-right: 30px;
+  flex-grow: 1;
 }
 
 .left-sections section {
-	display: flex;
-	padding: 20px;
+  display: flex;
+  padding: 20px;
 }
 
 section.wbp-kleinanzeigen {
-	max-width: 490px;
-	width: 450px;
+  max-width: 490px;
+  width: 450px;
 }
 
 section.wbp-shop {
-	padding-left: 0px;
+  padding-left: 0px;
 }
 
 section.wbp-shop .section-inner {
-	padding-left: 10px;
-	padding-right: 30px;
+  padding-left: 10px;
+  padding-right: 30px;
 }
 
 section.wbp-shop {
-	max-width: 220px;
+  max-width: 220px;
 }
 
 .left-sections .info {
-	display: inline-block;
-	max-width: 300px;
+  display: inline-block;
+  max-width: 300px;
 }
 
 #color-definitions {
-	position: fixed;
-	right: 0;
-	top: 0;
-	z-index: 99;
-	display: flex;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 99;
+  display: flex;
 }
 section.color-definition {
-	padding: 42px 20px 10px 10px;
+  padding: 42px 20px 10px 10px;
 }
 section .first-section.orientation.horizontal {
-	display: flex;
-	align-items: center;
+  display: flex;
+  align-items: center;
 }
 section .orientation {
-	display: none;
+  display: none;
 }
 section .first-section.orientation.vertical {
-	display: block;
+  display: block;
 }
 section .first-section.vertical {
-	min-width: 140px;
+  min-width: 140px;
 }
 section .box-wrapper {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 section .box-wrapper:last-child {
-	margin-right: 0;
+  margin-right: 0;
 }
 section .box-wrapper {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 section .first-section.vertical .box-wrapper {
-	margin-right: 0;
-	margin-bottom: 10px;
+  margin-right: 0;
+  margin-bottom: 10px;
 }
 section .color-box {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 20px;
-	height: 20px;
-	border-radius: 99px;
-	line-height: 1rem;
-	padding: 3px;
-	text-align: center;
-	font-size: 0.9em;
-	color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 99px;
+  line-height: 1rem;
+  padding: 3px;
+  text-align: center;
+  font-size: 0.9em;
+  color: #fff;
 }
 section .color-box .inner {
-	background: #ffffff;
-	color: #000000;
-	width: 10px;
-	height: 10px;
-	border-radius: 99px;
-	padding: 3px;
-	vertical-align: middle;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  background: #ffffff;
+  color: #000000;
+  width: 10px;
+  height: 10px;
+  border-radius: 99px;
+  padding: 3px;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 section .description {
-	font-size: 0.8em;
-	color: #000;
+  font-size: 0.8em;
+  color: #000;
 }
 section .chip {
-	padding: 5px;
-	border-radius: 99px;
-	background-color: #eee;
+  padding: 5px;
+  border-radius: 99px;
+  background-color: #eee;
 }
 section .box-wrapper .count {
-	font-size: 0.9em;
-	font-weight: 300;
-	line-height: 1.6em;
-	margin-left: 10px;
-	text-align: center;
+  font-size: 0.9em;
+  font-weight: 300;
+  line-height: 1.6em;
+  margin-left: 10px;
+  text-align: center;
 }
 section .box-wrapper .description {
-	display: flex;
-	align-items: center;
-	padding: 0 10px;
-	font-weight: 300;
-	text-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-weight: 300;
+  text-wrap: nowrap;
 }
 section .summary {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 section .summary .icon-text {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 section .summary .icon-text .icon {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 section .summary-status {
-	font-size: 0.8em;
-	font-weight: 300;
+  font-size: 0.8em;
+  font-weight: 300;
 }
 section .summary-status .trigger {
-	display: flex;
-	cursor: pointer;
-	margin-top: 10px;
-	margin-right: 10px;
-	transition: all 0.3s ease-out;
+  display: flex;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 10px;
+  transition: all 0.3s ease-out;
 }
 section .summary-status .trigger.active {
-	margin-right: 0;
+  margin-right: 0;
 }
 section .summary-status .trigger .text-wrapper {
-	background: #000; /* line-height: 1.9em; */
-	color: #fff;
-	padding: 2px 7px;
-	display: inline-block;
-	border-radius: 99px;
-	text-align: center;
-	display: flex;
-	justify-content: space-between;
+  background: #000; /* line-height: 1.9em; */
+  color: #fff;
+  padding: 2px 7px;
+  display: inline-block;
+  border-radius: 99px;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
 }
 section .summary-status .outer {
-	height: 0;
-	overflow: hidden;
-	width: 0;
-	transition: all 0.3s;
+  height: 0;
+  overflow: hidden;
+  width: 0;
+  transition: all 0.3s;
 }
 section .summary-status .trigger.active ~ .outer {
-	height: auto;
-	max-height: calc(100vh - 400px);
-	width: 420px;
-	overflow: auto;
+  height: auto;
+  max-height: calc(100vh - 400px);
+  width: 420px;
+  overflow: auto;
 }
 section .summary-status .trigger.active .dashicons-arrow-right {
-	transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 .status-wrapper {
-	display: flex;
-	justify-content: space-between;
-	flex: 1 0 100%;
+  display: flex;
+  justify-content: space-between;
+  flex: 1 0 100%;
 }
 .info-box li {
-	font-weight: 100;
-	font-size: 0.8em;
+  font-weight: 100;
+  font-size: 0.8em;
 }
 section.pagination a.button {
-	text-align: center;
-	width: 50px;
-	margin-right: 10px;
+  text-align: center;
+  width: 50px;
+  margin-right: 10px;
 }
 #kleinanzeigen-list {
-	margin-right: 20px;
+  margin-right: 20px;
 }
 .wp-list-table {
-	position: relative;
+  position: relative;
 }
 .wp-list-table::after {
-	content: "";
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background: #fff;
-	opacity: 0;
-	pointer-events: none;
-	transition: all 0.3s ease-in;
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease-in;
 }
 .wp-list-table.loading::after {
-	opacity: 0.3;
+  opacity: 0.3;
 }
 .color-box.status {
-	align-self: center;
+  align-self: center;
 }
 .color-box.disconnected {
-	background-color: rgb(56, 56, 56);
-	background-image: repeating-linear-gradient(
-		-45deg,
-		white 0 4px,
-		rgb(185 185 185) 4px 8px
-	);
+  background-color: rgb(56, 56, 56);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    white 0 4px,
+    rgb(185 185 185) 4px 8px
+  );
 }
 .wp-list-table .column.status.connected-publish,
 .color-box.connected-publish {
-	background-color: var(--publish);
+  background-color: var(--publish);
 }
 .wp-list-table .column.status.connected-draft,
 .color-box.connected-draft {
-	background-color: var(--draft);
+  background-color: var(--draft);
 }
 .wp-list-table .column.status.disconnected-publish {
-	background-color: var(--publish);
-	background-image: repeating-linear-gradient(
-		-45deg,
-		white 0 5px,
-		var(--publish) 5px 10px
-	);
+  background-color: var(--publish);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    white 0 5px,
+    var(--publish) 5px 10px
+  );
 }
 .wp-list-table .column.status.disconnected-draft,
 .color-box.disconnected-draft {
-	background-color: var(--draft);
-	background-image: repeating-linear-gradient(
-		-45deg,
-		white 0 5px,
-		var(--draft) 5px 10px
-	);
+  background-color: var(--draft);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    white 0 5px,
+    var(--draft) 5px 10px
+  );
 }
 .wp-list-table .column.status.invalid,
 section .color-box.invalid {
-	background-color: var(--unknown);
+  background-color: var(--unknown);
 }
 .wp-list-table .column.status.connected-unknown,
 .color-box.unknown {
-	background-color: rgb(71, 71, 71);
+  background-color: rgb(71, 71, 71);
 }
 .wp-list-table .column-shop-price .woocommerce-price-suffix {
-	display: none;
+  display: none;
 }
 .wp-list-kleinanzeigen .manage-column[class*="status"],
 .column[class*="column-status"] {
-	width: 5px;
-	padding: 0;
+  width: 5px;
+  padding: 0;
 }
 .wp-list-kleinanzeigen .column-image {
-	width: 120px;
+  width: 120px;
 }
 .wp-list-kleinanzeigen .column-id {
-	width: 10%;
+  width: 10%;
 }
 .wp-list-kleinanzeigen .column-title {
-	width: auto;
+  width: auto;
 }
 .wp-list-kleinanzeigen .column-shop-actions {
-	width: 140px;
+  width: 140px;
 }
 .wp-list-kleinanzeigen .column-shop-actions-import {
-	width: 130px;
-	padding-left: 30px;
+  width: 130px;
+  padding-left: 30px;
 }
 .wp-list-kleinanzeigen .column-empty {
-	width: auto;
+  width: auto;
 }
 .wp-list-kleinanzeigen .column-date {
-	width: auto;
+  width: auto;
 }
 .wp-list-kleinanzeigen .column-price,
 .wp-list-kleinanzeigen .column-shop-price {
-	width: 90px;
+  width: 90px;
 }
 .wp-list-kleinanzeigen .column-description {
-	width: auto;
+  width: auto;
 }
 .wp-list-kleinanzeigen .column-shop-categories {
-	width: auto;
+  width: auto;
 }
 .wp-list-kleinanzeigen .column-shop-labels {
-	width: 90px;
+  width: 90px;
 }
 .wp-list-kleinanzeigen .column-shop-featured {
-	width: 30px;
+  width: 30px;
 }
 .wp-list-kleinanzeigen .column-shop-brands {
-	width: auto;
+  width: auto;
 }
 .wp-list-kleinanzeigen .column-content {
-	position: relative;
+  position: relative;
 }
 .wp-list-kleinanzeigen [class*="column-shop-"] {
-	background-color: rgb(193 227 250 / 12%);
+  background-color: rgb(193 227 250 / 12%);
 }
 .wp-list-kleinanzeigen [id*="-wbp-action"] {
-	position: relative;
+  position: relative;
 }
 .wp-list-kleinanzeigen tr[class*="diff"] {
-	background-color: #ff00001e;
+  background-color: #ff00001e;
 }
 .wp-list-kleinanzeigen .diff.price-diff .column[class*="-price"] {
-	text-decoration: underline;
-	text-decoration-style: wavy;
-	text-decoration-thickness: 0.06em;
-	text-decoration-color: red;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-thickness: 0.06em;
+  text-decoration-color: red;
 }
 .wp-list-kleinanzeigen .column-content .spinner {
-	position: absolute;
-	left: -25px;
-	top: 3px;
-	margin: 0;
+  position: absolute;
+  left: -25px;
+  top: 3px;
+  margin: 0;
 }
 .wp-list-kleinanzeigen .column-content a.button {
-	text-align: center;
-	margin-bottom: 5px;
-	text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
-	width: 130px;
+  text-align: center;
+  margin-bottom: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 130px;
 }
 .wp-list-kleinanzeigen .column-content .dashicons {
-	font-size: 1em;
-	display: inline-block;
-	line-height: 1em;
-	height: auto;
-	vertical-align: baseline;
-	pointer-events: none;
+  font-size: 1em;
+  display: inline-block;
+  line-height: 1em;
+  height: auto;
+  vertical-align: baseline;
+  pointer-events: none;
 }
 .wp-list-kleinanzeigen .column-content .button .dashicons {
-	font-size: 1.3em;
-	line-height: 1.3em;
-	vertical-align: sub;
+  font-size: 1.3em;
+  line-height: 1.3em;
+  vertical-align: sub;
 }
 .wp-list-kleinanzeigen .column-content a[disabled],
 .wp-list-kleinanzeigen .column-content .button[disabled],
 .wp-list-kleinanzeigen td.busy a,
 .wp-list-kleinanzeigen td.busy .button,
 #kleinanzeigen-head-wrap .button.disabled {
-	pointer-events: none;
-	cursor: auto;
+  pointer-events: none;
+  cursor: auto;
 }
 .wp-list-kleinanzeigen .column-content a,
 .wp-list-kleinanzeigen .column-content .button {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .divider-bottom {
-	display: block;
-	margin-bottom: 10px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid #eee;
+  display: block;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 .divider-top {
-	display: block;
-	margin-top: 10px;
-	padding-top: 10px;
-	border-top: 1px solid #eee;
+  display: block;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
 }
 .summary .indicator.indicator-publish {
-	background-color: var(--publish);
+  background-color: var(--publish);
 }
 .summary .indicator.indicator-draft {
-	background-color: var(--draft);
+  background-color: var(--draft);
 }
 .summary .indicator.indicator-unknown {
-	background-color: var(--unknown);
+  background-color: var(--unknown);
 }
 .summary .indicator {
-	display: inline-block;
-	width: 5px;
-	height: 0.8em;
-	margin-left: 10px;
+  display: inline-block;
+  width: 5px;
+  height: 0.8em;
+  margin-left: 10px;
 }
 .todo {
-	display: flex;
+  display: flex;
 }
 .todo {
-	display: flex;
+  display: flex;
 }
 .todo .title {
-	flex-basis: 70%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  flex-basis: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .todo .reason {
-	flex-basis: 30%;
-	padding-left: 20px;
-	padding-right: 30px;
+  flex-basis: 30%;
+  padding-left: 20px;
+  padding-right: 30px;
 }
 .view-switcher {
-	position: absolute;
-	bottom: -2px;
-	right: 2px;
-	cursor: pointer;
+  position: absolute;
+  bottom: -2px;
+  right: 2px;
+  cursor: pointer;
 }
 
 /**
@@ -534,103 +534,101 @@ section .color-box.invalid {
 */
 .wp-list-kleinanzeigen tbody tr.no-items,
 .wp-list-kleinanzeigen-tasks tbody tr.no-items {
-	display: flex;
-	justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .wp-list-kleinanzeigen-tasks .column-status-start {
-	width: 0.4%;
-	padding: 0;
+  width: 0.4%;
+  padding: 0;
 }
 
 .wp-list-kleinanzeigen-tasks .column-image {
-	width: 10%;
+  width: 10%;
 }
 
 .wp-list-kleinanzeigen-tasks .column-title {
-	width: 30%;
+  width: 30%;
 }
 .wp-list-kleinanzeigen-tasks .column-ka-price {
-	width: 10%;
+  width: 10%;
 }
 
 .wp-list-kleinanzeigen-tasks .column-shop-price {
-	width: 10%;
+  width: 10%;
 }
 
 .wp-list-kleinanzeigen-tasks .column-featured {
-	width: 30px;
+  width: 30px;
 }
 
 .wp-list-kleinanzeigen-tasks .column-actions {
-	width: 33%;
-	text-align: center;
+  width: 33%;
+  text-align: center;
 }
 
 .wp-list-kleinanzeigen-tasks {
-	table-layout: fixed;
-	border-collapse: collapse;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 .wp-list-kleinanzeigen-tasks.empty {
-	display: table;
+  display: table;
 }
 
 .wp-list-kleinanzeigen-tasks thead td,
 .wp-list-kleinanzeigen-tasks thead th,
 .wp-list-kleinanzeigen-tasks tfoot td,
 .wp-list-kleinanzeigen-tasks tfoot th {
-	background-color: #fff;
-	position: sticky;
-	top: 0;
-	height: 30px;
-	padding: 5px;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  height: 30px;
+  padding: 5px;
 }
 
 .wp-list-kleinanzeigen-tasks thead th,
 .wp-list-kleinanzeigen-tasks tbody td,
 .wp-list-kleinanzeigen-tasks tfoot th {
-	padding: 8px;
-	vertical-align: middle;
+  padding: 8px;
+  vertical-align: middle;
 }
 
 .wp-list-kleinanzeigen-tasks.striped > tbody > :nth-child(odd) {
-	background-color: #f6f7f7;
+  background-color: #f6f7f7;
 }
 
 .wp-list-kleinanzeigen-tasks tbody {
-	overflow: auto;
-	height: 320px;
-	display: block;
+  overflow: auto;
+  height: 320px;
+  display: block;
 }
 
 .wp-list-kleinanzeigen-tasks thead tr,
 .wp-list-kleinanzeigen-tasks tbody tr,
 .wp-list-kleinanzeigen-tasks tfoot tr {
-	display: inline-table;
-	width: 100%;
+  display: inline-table;
+  width: 100%;
 }
 
 .wp-list-kleinanzeigen-tasks tbody td .action-button {
-	width: var(--button-width, 100px);
-	margin: 5px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  width: var(--button-width, 100px);
+  margin: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #kleinanzeigen-task-list .tablenav.bottom {
-	margin-bottom: 30px;
+  margin-bottom: 30px;
 }
 
 /**
  * Action button width depending on task type
 */
 .wp-list-kleinanzeigen-tasks .column-actions a[data-task-type="invalid-ad"] {
-	--button-width: 90px;
+  --button-width: 90px;
 }
-.wp-list-kleinanzeigen-tasks
-	.column-actions
-	a[data-task-type="invalid-price"] {
-	--button-width: auto;
+.wp-list-kleinanzeigen-tasks .column-actions a[data-task-type="invalid-price"] {
+  --button-width: auto;
 }

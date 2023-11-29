@@ -16,7 +16,7 @@
  * Plugin Name:       Kleinanzeigen.de
  * Plugin URI:        https://www.wplauncher.com
  * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           1.0.0
+ * Version:           2.0.0
  * Author:            Axel Nitzschner
  * Author URI:        https://www.wplauncher.com
  * License:           GPL-2.0+
@@ -27,7 +27,7 @@
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
-	die;
+  die;
 }
 
 /**
@@ -35,28 +35,28 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('KLEINANZEIGEN_VERSION', '1.0.0');
+define('KLEINANZEIGEN_VERSION', '2.0.0');
 define('KLEINANZEIGEN_URL', 'https://www.kleinanzeigen.de');
 define('KLEINANZEIGEN_PER_PAGE', 25);
 
 define('USE_AD_DUMMY_DATA', 0);
 
 define('WC_TERMS', [
-	'rent' => array('miete', 'mieten')
+  'rent' => array('miete', 'mieten')
 ]);
 define('WC_PRODUCT_LABELS', [
-	'sale' => 'Aktionspreis',
+  'sale' => 'Aktionspreis',
 ]);
 define('WC_COMMON_TAXONOMIES', [
-	'rent' => 'Mietmaschinen',
-	'aktionswochen' => 'Aktionswochen',
-	'aktion' => 'Aktionen',
-	'sale' => 'Aktionspreise',
-	'featured' => 'Empfehlungen',
+  'rent' => 'Mietmaschinen',
+  'aktionswochen' => 'Aktionswochen',
+  'aktion' => 'Aktionen',
+  'sale' => 'Aktionspreise',
+  'featured' => 'Empfehlungen',
 ]);
 define('WC_CUSTOM_PRODUCT_ATTRIBUTES', [
-	'specials' => 'Merkmale',
-	'rent' => 'Mietdauer',
+  'specials' => 'Merkmale',
+  'rent' => 'Mietdauer',
 ]);
 
 /**
@@ -65,8 +65,8 @@ define('WC_CUSTOM_PRODUCT_ATTRIBUTES', [
  */
 function activate_kleinanzeigen()
 {
-	require_once plugin_dir_path(__FILE__) . 'includes/class-kleinanzeigen-activator.php';
-	Kleinanzeigen_Activator::activate();
+  require_once plugin_dir_path(__FILE__) . 'includes/class-kleinanzeigen-activator.php';
+  Kleinanzeigen_Activator::activate();
 }
 
 /**
@@ -75,8 +75,8 @@ function activate_kleinanzeigen()
  */
 function deactivate_kleinanzeigen()
 {
-	require_once plugin_dir_path(__FILE__) . 'includes/class-kleinanzeigen-deactivator.php';
-	Kleinanzeigen_Deactivator::deactivate();
+  require_once plugin_dir_path(__FILE__) . 'includes/class-kleinanzeigen-deactivator.php';
+  Kleinanzeigen_Deactivator::deactivate();
 }
 
 register_activation_hook(__FILE__, 'activate_kleinanzeigen');
@@ -99,10 +99,10 @@ require plugin_dir_path(__FILE__) . 'includes/class-kleinanzeigen.php';
  */
 if (!function_exists('wbp_ka')) {
 
-	function wbp_ka()
-	{
+  function wbp_ka()
+  {
 
-		return Kleinanzeigen::get_instance();
-	}
+    return Kleinanzeigen::get_instance();
+  }
 }
 wbp_ka()->run();
