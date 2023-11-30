@@ -81,19 +81,42 @@ class Kleinanzeigen
    *
    * @since    1.0.0
    */
-  public function __construct()
+  public function __construct($file)
   {
-    if (defined('KLEINANZEIGEN_VERSION')) {
-      self::$version = KLEINANZEIGEN_VERSION;
-    } else {
-      self::$version = '1.0.0';
+    if (!defined('KLEINANZEIGEN_VERSION')) {
+      $data = $this->get_plugin_data($file);
+      define('KLEINANZEIGEN_VERSION', $data['Version']);
     }
-    self::$plugin_name = 'kleinanzeigen';
+    self::$version = KLEINANZEIGEN_VERSION;
+    self::$plugin_name = strtolower($data['Name']);
 
     $this->load_dependencies();
     $this->set_locale();
     $this->define_admin_hooks();
     $this->define_public_hooks();
+  }
+
+  private function get_plugin_data($plugin_file)
+  {
+
+    $default_headers = array(
+      'Name'        => 'Plugin Name',
+      'PluginURI'   => 'Plugin URI',
+      'Version'     => 'Version',
+      'Description' => 'Description',
+      'Author'      => 'Author',
+      'AuthorURI'   => 'Author URI',
+      'TextDomain'  => 'Text Domain',
+      'DomainPath'  => 'Domain Path',
+      'Network'     => 'Network',
+      'RequiresWP'  => 'Requires at least',
+      'RequiresPHP' => 'Requires PHP',
+      'UpdateURI'   => 'Update URI',
+    );
+
+    $plugin_data = get_file_data($plugin_file, $default_headers, 'plugin');
+
+    return $plugin_data;
   }
 
   /**
@@ -299,11 +322,11 @@ class Kleinanzeigen
     return self::$version;
   }
 
-  public static function get_instance()
+  public static function get_instance($file)
   {
     // If the single instance hasn't been set, set it now.
     if (null == self::$instance) {
-      self::$instance = new self;
+      self::$instance = new self($file);
     }
     return self::$instance;
   }

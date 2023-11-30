@@ -314,7 +314,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
   }
 
-  public static function get_instance()
+  public static function get_instance($file)
   {
     // If the single instance hasn't been set, set it now.
     if (null == self::$instance) {

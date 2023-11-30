@@ -1,14 +1,13 @@
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-29 22:51+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: \n"
-"Language: \n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"POT-Creation-Date: 2023-11-29 21:47+0000\n"
+"PO-Revision-Date: 2023-11-30 01:44+0000\n"
+"Last-Translator: \n"
+"Language-Team: Deutsch\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -54,55 +53,59 @@ msgid ""
 "A Product with the same Ad ID already exists. Delete this draft or enter a "
 "different Ad ID."
 msgstr ""
+"Es existiert bereits ein Produkt mit dieser Anzeige ID. Lösche bitte diesen "
+"Entwurf oder verwende eine andere Anzeige ID für den Import."
 
 #: includes/class-kleinanzeigen-functions.php:419
 msgid ""
 "A product with the same title already exists. Delete this draft or enter a "
 "different title."
 msgstr ""
+"Es existiert bereits ein Produkt mit dem gleichen Titel. Lösche bitte diesen "
+"Entwurf oder verwende einen anderen Titel für dieses Produkt. "
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:386
 msgid "Accept KA price"
-msgstr ""
+msgstr "KA Preis übernehmen"
 
 #. ID used to identify this section and with which to register options
 #: admin/class-kleinanzeigen-admin.php:187
 msgid "Account"
-msgstr ""
+msgstr "Konto"
 
 #: admin/class-kleinanzeigen-admin.php:205
 msgid "Account name"
-msgstr ""
+msgstr "Konto Name"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:66
 msgid "Action required"
-msgstr ""
+msgstr "Aktion erforderlich"
 
 #: admin/partials/kleinanzeigen-page-header.php:10
 msgid "Ad import from Kleinanzeigen.de"
-msgstr ""
+msgstr "Anzeigen Import aus Kleinanzeigen.de"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:33
 msgid "Ads"
-msgstr ""
+msgstr "Anzeigen"
 
 #: admin/class-kleinanzeigen-admin.php:250
 msgid "Ads per page"
-msgstr ""
+msgstr "Anzeigen pro Seite"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:26
 #, php-format
 msgid "Ads: %s"
-msgstr ""
+msgstr "Anzeigen: %s"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:376
 #: admin/partials/dashboard/footer-invalid-ad.php:6
 msgid "Autonomous"
-msgstr ""
+msgstr "Eigenständig"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:51
 msgid "Autonomous products (Unlinked products)"
-msgstr ""
+msgstr "Eigenständige Produkte (nicht verknüpft)"
 
 #. Author of the plugin
 msgid "Axel Nitzschner"
@@ -110,101 +113,103 @@ msgstr ""
 
 #: admin/partials/dashboard/footer-invalid-ad.php:3
 msgid "Choose one of the following options to unlink the listet products:"
-msgstr ""
+msgstr "Erläuterung zu den Optionen:"
 
 #: admin/partials/dashboard/kleinanzeigen-admin-display.php:33
 msgid "Close"
-msgstr ""
+msgstr "Schliessen"
 
 #: includes/class-kleinanzeigen-list-table.php:417
 msgid "Connect"
-msgstr ""
+msgstr "Verknüpfen"
 
 #: includes/class-kleinanzeigen-list-table.php:27
 msgid "Contains Default Category"
-msgstr ""
+msgstr "Enthält Standard Kategorie"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:46
 msgid "Contains invalid linked products"
-msgstr ""
+msgstr "Ungültige Verknüpfungen enthalten"
 
 #: admin/partials/dashboard/kleinanzeigen-create-control.php:3
 msgid "Create"
-msgstr ""
+msgstr "Erstellen"
 
 #: admin/partials/dashboard/invalid-sku-results.php:31
 msgid "Deactivate"
-msgstr ""
+msgstr "Deaktivieren"
 
 #: admin/partials/dashboard/invalid-sku-results.php:43
 msgid "Deactivate all"
-msgstr ""
+msgstr "Alle deaktivieren"
 
 #: admin/partials/dashboard/footer-invalid-ad.php:11
 msgid "Deactivate product. You can reactivate it at anytime later."
 msgstr ""
+"Das Produkt im Online Shop deaktivieren. Es kann später jederzeit als "
+"eigenständiges Produkt wieder aktiviert werden."
 
 #: admin/partials/dashboard/invalid-sku-results.php:31
 msgid "Deactivated"
-msgstr ""
+msgstr "Deaktiviert"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:378
 #: admin/partials/dashboard/footer-invalid-ad.php:14
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: admin/partials/dashboard/footer-invalid-ad.php:15
 msgid "Delete product permanently."
-msgstr ""
+msgstr "Produkt endgültig löschen."
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:378
 msgid "Deleted"
-msgstr ""
+msgstr "Gelöscht"
 
 #: includes/class-kleinanzeigen-list-table.php:422
 #: includes/class-kleinanzeigen-wc-admin-list-table-products.php:137
 msgid "Disconnect"
-msgstr ""
+msgstr "Trennen"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:376
 #: includes/class-kleinanzeigen-list-table-tasks.php:377
 #: admin/partials/dashboard/invalid-sku-results.php:32
 msgid "Disconnected"
-msgstr ""
+msgstr "Getrennt"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:120
 msgid "Drafts"
-msgstr ""
+msgstr "Entwürfe"
 
 #: includes/class-kleinanzeigen.php:236
 msgid "Error:"
-msgstr ""
+msgstr "Fehler:"
 
 #: admin/partials/dashboard/invalid-sku-results.php:5
 #: admin/partials/dashboard/invalid-price-results.php:5
 msgid "Evaluation Results"
-msgstr ""
+msgstr "Ergebnisse:"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:132
 #: admin/partials/kleinanzeigen-admin-header-display.php:55
 msgid "Featured products"
-msgstr ""
+msgstr "Empfohlene Produkte"
 
 #: admin/partials/dashboard/invalid-price-results.php:52
 msgid "Fix all prices"
-msgstr ""
+msgstr "Alle Preise übernehmen"
 
 #: admin/partials/dashboard/invalid-price-results.php:42
 msgid "Fix price"
-msgstr ""
+msgstr "Preis übernehmen"
 
 #: admin/partials/dashboard/invalid-price-results.php:42
 msgid "Fixed"
-msgstr ""
+msgstr "Korrigiert"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:177
 msgid "Hidden"
-msgstr ""
+msgstr "Deaktiviert"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:377
 #: includes/class-kleinanzeigen-list-table-tasks.php:392
@@ -212,7 +217,7 @@ msgstr ""
 #: admin/partials/dashboard/footer-invalid-ad.php:10
 #: admin/partials/dashboard/toggle-publish-link.php:2
 msgid "Hide"
-msgstr ""
+msgstr "Deaktivieren"
 
 #. Author URI of the plugin
 msgid "https://webpremiere.de"
@@ -226,38 +231,38 @@ msgstr ""
 #: admin/partials/dashboard/kleinanzeigen-actions.php:6
 #: admin/partials/metaboxes/kleinanzeigen-import.php:10
 msgid "Import Data"
-msgstr ""
+msgstr "Daten importieren"
 
 #: includes/class-kleinanzeigen-wc-admin-list-table-products.php:129
 #: admin/partials/dashboard/kleinanzeigen-actions.php:10
 #: admin/partials/metaboxes/kleinanzeigen-import.php:14
 msgid "Import Images"
-msgstr ""
+msgstr "Bilder importieren"
 
 #: includes/class-kleinanzeigen-list-table.php:28
 msgid "Invalid Category"
-msgstr ""
+msgstr "Ungültige Kategorie"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:72
 #: admin/partials/kleinanzeigen-admin-header-display.php:75
 msgid "Invalid links"
-msgstr ""
+msgstr "Ungültige Verknüpfungen"
 
 #: admin/partials/dashboard/invalid-sku-results.php:32
 msgid "Just disconnect"
-msgstr ""
+msgstr "Nur trennen"
 
 #: admin/partials/dashboard/invalid-sku-results.php:44
 msgid "Just disconnect all"
-msgstr ""
+msgstr "Alle nur trennen"
 
 #: admin/partials/dashboard/invalid-price-results.php:33
 msgid "KA price"
-msgstr ""
+msgstr "KA Preis"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:386
 msgid "KA Price accepted"
-msgstr ""
+msgstr "KA Preis übernommen"
 
 #. Name of the plugin
 msgid "Kleinanzeigen"
@@ -266,118 +271,123 @@ msgstr ""
 #: includes/class-kleinanzeigen-list-table-tasks.php:102
 #: admin/partials/kleinanzeigen-admin-header-display.php:45
 msgid "Linked products"
-msgstr ""
+msgstr "Verknüpfte Produkte"
 
 #: admin/partials/metaboxes/kleinanzeigen-import.php:18
 msgid "Load Ad"
-msgstr ""
+msgstr "Anzeige laden"
 
 #: admin/partials/dashboard/footer-invalid-ad.php:7
 msgid "Make product autonomous."
 msgstr ""
+"Das Produkt im Online Shop als eigenständiges Produkt weiterhin aktiviert "
+"lassen"
 
 #: includes/class-utils.php:101
 msgid "No data found"
-msgstr ""
+msgstr "Keine Daten gefunden"
 
 #: admin/partials/dashboard/invalid-sku-results.php:22
 #: admin/partials/dashboard/invalid-price-results.php:23
 msgid "No products found"
-msgstr ""
+msgstr "Keine Produkte gefunden"
 
 #: includes/class-kleinanzeigen-list-table.php:25
 msgid "Not visible"
-msgstr ""
+msgstr "Nicht sichtbar"
 
 #: admin/partials/kleinanzeigen-admin-display.php:19
 #: admin/partials/dashboard/kleinanzeigen-admin-display.php:3
 msgid "Overview"
-msgstr ""
+msgstr "Übersicht"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:26
 #, php-format
 msgid "Page: %s"
-msgstr ""
+msgstr "Seite: %s"
 
 #: admin/class-kleinanzeigen-admin.php:266
 msgid "Please enter your account data."
-msgstr ""
+msgstr "Bitte gebe deine Account Daten ein."
 
 #: includes/class-kleinanzeigen-list-table.php:26
 msgid "Price deviation"
-msgstr ""
+msgstr "Preisabweichung"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:87
 #: admin/partials/kleinanzeigen-admin-header-display.php:89
 msgid "Price deviations"
-msgstr ""
+msgstr "Preisabweichungen"
 
 #: admin/class-kleinanzeigen-admin.php:227
 msgid "Pro Account"
-msgstr ""
+msgstr "Pro Account"
 
 #: admin/partials/dashboard/invalid-sku-results.php:8
 msgid "Products based on not accessible ads"
-msgstr ""
+msgstr "Produkte mit Verweis auf eine ungültigen Anzeigen ID"
 
 #: admin/partials/dashboard/invalid-price-results.php:8
 msgid "Products with price differences"
-msgstr ""
+msgstr "Produkte mit Preisabweichungen"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:109
 #: admin/partials/kleinanzeigen-admin-header-display.php:171
 msgid "Published"
-msgstr ""
+msgstr "Veröffentlicht"
 
 #: admin/partials/kleinanzeigen-admin-settings-display.php:18
 #: admin/partials/dashboard/settings.php:3
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: admin/partials/dashboard/invalid-price-results.php:37
 msgid "Shop price"
-msgstr ""
+msgstr "Preis im Onlineshop"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:40
 msgid "Shop products"
-msgstr ""
+msgstr "Produkte im Onlineshop"
 
 #. Description of the plugin
 msgid "Synchronize Kleinanzeigen to your Woocommerce Shop"
-msgstr ""
+msgstr "Synchronisiere Kleinanzeigen mit deinem Onlineshop"
 
 #: includes/class-kleinanzeigen.php:236
 msgid "Template not found"
-msgstr ""
+msgstr "Vorlage nicht gefunden"
 
 #: admin/class-kleinanzeigen-admin.php:142
 #, php-format
 msgid "The account %1$s could not be found"
-msgstr ""
+msgstr "Der Account %1$s konnte nicht gefunden werden"
 
 #: admin/class-kleinanzeigen-admin.php:153
 msgid ""
 "There was an error adding this setting. Please try again. If this persists, "
 "shoot us an email."
 msgstr ""
+"Die Einstellungen konnten nicht gespeichert werden. Bitte versuche es noch "
+"einmal. Sollte es wiederholt zu einem Fehler kommen, kontaktiere uns bitte "
+"per E-mail."
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:147
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:29
 msgid "Total published"
-msgstr ""
+msgstr "Insgesamt veröffentlicht"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:131
 #: admin/partials/kleinanzeigen-admin-header-display.php:183
 msgid "Unknown"
-msgstr ""
+msgstr "Unbekannt"
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:189
 msgid "Unlinked"
-msgstr ""
+msgstr "Nicht verknüpft"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:117
 msgid "Unlinked products"
-msgstr ""
+msgstr "Eigenständige Produkte"

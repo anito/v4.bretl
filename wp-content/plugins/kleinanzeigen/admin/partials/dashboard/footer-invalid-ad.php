@@ -4,14 +4,14 @@
   </div>
   <div style="display: flex;">
     <span style="flex: 0 0 130px; margin-right: 10px;"><b><?php echo __('Autonomous', 'kleinanzeigen') ?>:</b></span>
-    <span style="flex: 0 0 auto;">Das Produkt im Online Shop als eigenständiges Produkt weiterhin aktiviert lassen.</span>
+    <span style="flex: 0 0 auto;"><?php echo __('Make product autonomous.', 'kleinanzeigen') ?></span>
   </div>
   <div style="display: flex;">
     <span style="flex: 0 0 130px; margin-right: 10px;"><b><?php echo __('Hide', 'kleinanzeigen') ?>:</b></span>
-    <span style="flex: 0 0 auto;">Das Produkt im Online Shop deaktivieren. Es kann später jederzeit als eigenständiges Produkt wieder aktiviert werden.</span>
+    <span style="flex: 0 0 auto;"><?php echo __('Deactivate product. You can reactivate it at anytime later.', 'kleinanzeigen') ?></span>
   </div>
   <div style="display: flex;">
     <span style="flex: 0 0 130px; margin-right: 10px;"><b><?php echo __('Delete', 'kleinanzeigen') ?>:</b></span>
-    <span style="flex: 0 0 auto;">Produkt endgültig löschen.</span>
+    <span style="flex: 0 0 auto;"><?php echo __('Delete product permanently.', 'kleinanzeigen') ?></span>
   </div>
 </div>

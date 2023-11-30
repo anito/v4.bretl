@@ -20,15 +20,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $this->register();
     }
 
-    public static function get_instance()
-    {
-      // If the single instance hasn't been set, set it now.
-      if (null == self::$instance) {
-        self::$instance = new self;
-      }
-      return self::$instance;
-    }
-
     public function register() {
       add_action('current_screen', array($this, 'on_current_screen'));
       add_filter('get_the_terms', array($this, 'get_the_terms'), 10, 3);
@@ -880,6 +871,15 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     public function return_false()
     {
       return false;
+    }
+
+    public static function get_instance($file = null)
+    {
+      // If the single instance hasn't been set, set it now.
+      if (null == self::$instance) {
+        self::$instance = new self;
+      }
+      return self::$instance;
     }
   }
 }

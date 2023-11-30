@@ -13,12 +13,12 @@
  * @package           Kleinanzeigen
  *
  * @wordpress-plugin
- * Plugin Name:       Kleinanzeigen.de
+ * Plugin Name:       Kleinanzeigen
  * Plugin URI:        https://www.wplauncher.com
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           2.0.0
+ * Description:       Synchronize Kleinanzeigen to your Woocommerce Shop
+ * Version:           2.0.1
  * Author:            Axel Nitzschner
- * Author URI:        https://www.wplauncher.com
+ * Author URI:        https://webpremiere.de
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       kleinanzeigen
@@ -35,7 +35,6 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('KLEINANZEIGEN_VERSION', '2.0.0');
 define('KLEINANZEIGEN_URL', 'https://www.kleinanzeigen.de');
 define('KLEINANZEIGEN_PER_PAGE', 25);
 
@@ -102,7 +101,7 @@ if (!function_exists('wbp_ka')) {
   function wbp_ka()
   {
 
-    return Kleinanzeigen::get_instance();
+    return Kleinanzeigen::get_instance(__FILE__);
   }
 }
 wbp_ka()->run();
