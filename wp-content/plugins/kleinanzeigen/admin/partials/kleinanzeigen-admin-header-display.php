@@ -4,7 +4,7 @@ $cats = array_map(function ($category) {
 }, $categories);
 $ad_cats = implode(', ', $cats);
 $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
-$num_pages = ceil($total_ads / KLEINANZEIGEN_PER_PAGE);
+$num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', 25));
 $todos = $products['todos'];
 
 define('ORIENTATION_COOKIE_KEY', 'kleinanzeigen-view-o');
@@ -18,12 +18,19 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 ?>
 <div class="section-wrapper">
   <div class="left-sections sections">
-    <div class="left-upper-section">
+    <div class="left-top-section">
+      <section style="display: flex; justify-content: space-between; padding-bottom: 0;">
+        <span>
+          <h2 style="margin: 0;"><?php echo sprintf(__('Page: %s', 'kleinanzeigen'), $paged) ?></h2>
+        </span>
+        <small><?php echo sprintf(__('Ads: %s', 'kleinanzeigen'), count($items)); ?></small>
+      </section>
+    </div>
+    <div class="left-middle-section">
 
       <section class="wbp-kleinanzeigen">
         <div class="section-inner">
           <div style="display: flex; flex-direction: column;">
-            <h2 style="display: flex; justify-content: space-between;"><?php echo sprintf(__('Page: %s', 'kleinanzeigen'), $paged) ?><small style="margin-left: 20px; font-size: 12px;"><?php echo sprintf(__('Ads: %s', 'kleinanzeigen'), count($items)); ?></small></h2>
             <div class="overview-wrap">
               <fieldset class="fieldset tasks">
                 <legend><?php echo __('Total published', 'kleinanzeigen') ?></legend>
@@ -48,8 +55,8 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
                     <div class="task-value"><?php echo count($published_has_sku); ?></div>
                   </div>
                   <div class="task">
-                    <div class="task-name"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Autonomous products (Unlinked products)', 'kleinanzeigen'); ?></a></div>
-                    <div class="otask-value"><?php echo count($published_no_sku); ?></div>
+                    <div class="task-name"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Autonomous products', 'kleinanzeigen'); ?></a></div>
+                    <div class="task-value"><?php echo count($published_no_sku); ?></div>
                   </div>
                   <div class="task">
                     <div class="task-name"><a href="#" class="start-task" data-task-type="featured"><?php echo __('Featured products', 'kleinanzeigen'); ?></a></div>
@@ -72,7 +79,7 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
                         <div class="task-count-wrapper">
                           <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
                         </div>
-                        <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Invalid links', 'kleinanzeigen') ?></a></span>
+                        <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Orphaned products', 'kleinanzeigen') ?></a></span>
                         (<span id="invalid-ads-count" class="task-count">0</span>)
                       </div>
                     </div>
@@ -158,7 +165,7 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
         ?>
           <a href="<?php echo $remote_url . '?paged=' . $i ?>" type="button" class="button <?php echo ($i == (int) $paged ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
         <?php } ?>
-        </section>
+      </section>
     </div>
   </div>
   <div id="color-definitions" class="right-sections sections">
@@ -203,8 +210,8 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 
                   <?php endif ?>
                 </span>
-                <i class="dashicons dashicons-arrow-right"></i>
               </span>
+              <i class="dashicons dashicons-arrow-right"></i>
             </div>
             <div class="outer">
               <div class="content">
@@ -310,10 +317,6 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 
   #kleinanzeigen-head-wrap .left-sections section h2 {
     margin: 5px 0 20px;
-  }
-
-  #kleinanzeigen-head-wrap .left-sections section h2:first-child {
-    margin-bottom: 20px;
   }
 
   #kleinanzeigen-head-wrap .left-sections section h2 {

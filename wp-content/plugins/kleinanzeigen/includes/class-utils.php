@@ -14,27 +14,34 @@ if (!class_exists('Utils')) {
     static function get_json_data($args = array())
     {
       $defaults = array(
-        'pageSize' => KLEINANZEIGEN_PER_PAGE,
+        'pageSize' => get_option('kleinanzeigen_items_per_page', 25),
         'paged' => 1
       );
       $options = wp_parse_args($args, $defaults);
       extract($options);
 
-      $remoteUrl = self::parse_remote_url() . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
+      $remote_url = self::parse_remote_url();
 
-      if(USE_AD_DUMMY_DATA) {
+      if (!$remote_url) {
+        $admin_url = admin_url('/admin.php?page=' . wbp_ka()->get_plugin_name() . '-settings');
+        return new WP_Error(403, sprintf(__('Please ensure you have entered a valid account name in %s.', 'kleinanzeigen'), "<a href={$admin_url}>" . __('Settings', 'kleinanzeigen') . '</a>'));
+      }
+
+      $remote_url = $remote_url . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
+
+      if (USE_AD_DUMMY_DATA) {
         $dir = 'sample-data';
         $fn = 'page-' . $paged . '.json';
         $file = wbp_ka()->plugin_path($dir . '/' . $fn);
-        
-        if(!file_exists($file)) {
-          $response = wp_remote_get($remoteUrl);
+
+        if (!file_exists($file)) {
+          $response = wp_remote_get($remote_url);
           self::write($fn, $response['body'], $dir);
         }
 
         $response['body'] = self::read($file);
       } else {
-        $response = wp_remote_get($remoteUrl);
+        $response = wp_remote_get($remote_url);
       }
 
       if (!is_wp_error($response)) {
@@ -45,23 +52,27 @@ if (!class_exists('Utils')) {
       }
     }
 
-    public static function parse_remote_url() {
+    public static function parse_remote_url()
+    {
       $url = trailingslashit(KLEINANZEIGEN_URL);
       $pro_account = get_option('kleinanzeigen_is_pro_account', '') === "1" ? 'pro/' : '';
       $account_name = get_option('kleinanzeigen_account_name', '');
-      return sanitize_url("{$url}{$pro_account}{$account_name}/ads", array('http', 'https'));
+      $remote_url = !empty($account_name) ? sanitize_url("{$url}{$pro_account}{$account_name}/ads", array('http', 'https')) : null;
+      return $remote_url;
     }
 
-    static function read($file) {
+    static function read($file)
+    {
       if (!file_exists($file)) {
         return;
       }
       return file_get_contents($file);
     }
 
-    static function write($fn, $data, $dir = 'tmp', ) {
+    static function write($fn, $data, $dir = 'tmp',)
+    {
       $dir = wbp_ka()->plugin_path($dir);
-      if(! file_exists($dir)) {
+      if (!file_exists($dir)) {
         mkdir($dir);
       }
 
@@ -79,7 +90,6 @@ if (!class_exists('Utils')) {
 
       $changePerms($file);
       file_put_contents($file, $data);
-
     }
     static function toggle_array_item($ids, $id, $bool = null)
     {
@@ -94,11 +104,11 @@ if (!class_exists('Utils')) {
       return $ids;
     }
 
-    static function error_check($data, $error_template)
+    static function account_error_check($data, $error_template)
     {
 
-      if(is_null($data)) {
-        $data = new WP_Error(403, __('No data found', 'kleinanzeigen'));
+      if (!$data) {
+        $data = new WP_Error(403, __('No account data found', 'kleinanzeigen'));
       }
       if (is_wp_error($data)) {
         die(json_encode(array(
@@ -160,10 +170,10 @@ if (!class_exists('Utils')) {
     static function sanitize_dup_title($title, $appendix = "", $args = array())
     {
       $defaults = array('cleanup' => false);
-      $args = ! is_array($args) ? array($args) : $args;
+      $args = !is_array($args) ? array($args) : $args;
       $options = wp_parse_args($args, $defaults);
 
-      if(true === $options['cleanup']) {
+      if (true === $options['cleanup']) {
         $title = preg_replace('/(\[ DUPLIKAT \d+ \])/', '', $title . $appendix);
       } else {
         preg_match('/((?!DUPLIKAT \d+).)*(\[ DUPLIKAT \d+ \])/', $title . $appendix, $matches);

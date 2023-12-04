@@ -128,7 +128,7 @@ if (!function_exists('wbp_rt')) {
    * @since  1.0.0
    * @return object
    */
-  function wbp_rt()
+  function wbp_rt(): Kleinanzeigen_Register_WC_Taxonomies
   {
     return Kleinanzeigen_Register_WC_Taxonomies::get_instance();
   }

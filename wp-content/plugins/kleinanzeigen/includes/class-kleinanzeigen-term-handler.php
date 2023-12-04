@@ -279,7 +279,7 @@ if (!function_exists('wbp_th')) {
    * @since  1.0.0
    * @return object
    */
-  function wbp_th()
+  function wbp_th(): Kleinanzeigen_Term_Handler
   {
     return Kleinanzeigen_Term_Handler::get_instance();
   }

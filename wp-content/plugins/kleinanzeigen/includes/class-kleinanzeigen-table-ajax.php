@@ -358,7 +358,10 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
             },
 
             render_tasks: function(tasks) {
-              const inconsistencies = tasks.filter(task => task.priority === 1 && task.product_ids.length);
+
+              const inconsistencies = Object.entries(tasks).filter((task) => {
+                return task[1].priority === 1 && task[1]['items'].length
+              })
 
               if (!inconsistencies.length) {
                 $("#inconsistencies").addClass('hidden');
@@ -366,15 +369,21 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
               }
 
               $("#inconsistencies").removeClass('hidden');
-              tasks.forEach(task => {
-                let count = task.product_ids.length;
+
+              Object.entries(tasks).forEach((task) => {
+                const name = task[0];
+                const items = task[1]['items'];
+                const product_ids = items.map(item => item.product_id)
+
+                const count = items.length;
                 if (count) {
-                  $(`#kleinanzeigen-head-wrap .task.${task.name} .task-count`).html(count);
-                  $(`#kleinanzeigen-head-wrap .task.${task.name} a`).data('product-ids', task.product_ids);
+                  $(`#kleinanzeigen-head-wrap .task.${name} .task-count`).html(count);
+                  $(`#kleinanzeigen-head-wrap .task.${name} a`).data('product-ids', product_ids);
                 } else {
-                  $(`#kleinanzeigen-head-wrap .task.${task.name}`).addClass('hidden');
-                  $(`#kleinanzeigen-head-wrap .task.${task.name} a`).addClass('disabled');
+                  $(`#kleinanzeigen-head-wrap .task.${name}`).addClass('hidden');
+                  $(`#kleinanzeigen-head-wrap .task.${name} a`).addClass('disabled');
                 }
+
               })
 
             },

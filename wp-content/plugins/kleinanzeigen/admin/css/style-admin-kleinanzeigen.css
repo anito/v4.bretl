@@ -3,6 +3,9 @@
   --draft: orange;
   --unknown: #ff5b5b;
 }
+#kleinanzeigen-admin-display .hidden {
+  display: none;
+}
 .kleinanzeigen-page-header {
   display: flex;
   align-items: center;
@@ -28,17 +31,22 @@
   flex-direction: column;
   border-radius: 5px;
   border: 1px solid #ddd;
+  width: 700px;
 }
 .right-sections {
   border-radius: 5px;
   border: 1px solid #ddd;
   border-bottom-left-radius: 20px;
 }
-.left-upper-section {
+.left-middle-section {
   display: flex;
+}
+.left-sections sections {
+  width: 700px;
 }
 section.pagination {
   background: aliceblue;
+  flex-wrap: wrap;
 }
 section.wbp-kleinanzeigen .tasks .task .explanation {
   padding: 5px;
@@ -268,9 +276,9 @@ section .summary-status .trigger.active {
   margin-right: 0;
 }
 section .summary-status .trigger .text-wrapper {
-  background: #000; /* line-height: 1.9em; */
+  background: #000;
   color: #fff;
-  padding: 2px 7px;
+  padding: 2px 14px;
   display: inline-block;
   border-radius: 99px;
   text-align: center;
@@ -305,6 +313,7 @@ section.pagination a.button {
   text-align: center;
   width: 50px;
   margin-right: 10px;
+  margin-bottom: 5px;
 }
 #kleinanzeigen-list {
   margin-right: 20px;

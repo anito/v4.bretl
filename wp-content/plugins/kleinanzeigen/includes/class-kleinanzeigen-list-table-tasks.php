@@ -67,10 +67,10 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       case 'invalid-ad':
         $vars = array(
           'header-template' => array(
-            'template' => 'modal-header',
+            'template' => 'modal-table-header',
             'args' => array(
-              'header' => __('Invalid links', 'kleinanzeigen'),
-              'subheader' => 'Liste von verknüpften Produkten deren Anzeige nicht mehr auffindbar ist'
+              'header' => __('Orphaned products', 'kleinanzeigen'),
+              'subheader' => 'Für die folgenden Produkte ist keine Anzeige mehr vorhanden. Bitte wähle jeweils eine entsprechende Aktion.'
             )
           ),
           'footer-template' => array(
@@ -82,7 +82,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       case 'invalid-price':
         $vars = array(
           'header-template' => array(
-            'template' => 'modal-header',
+            'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Price deviations', 'kleinanzeigen'),
               'subheader' => 'Auflistung von Produkten mit Preisunterschied zur verknüpften Anzeige'
@@ -97,7 +97,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       case 'has-sku':
         $vars = array(
           'header-template' => array(
-            'template' => 'modal-header',
+            'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Linked products', 'kleinanzeigen'),
               'subheader' => 'Auflistung verknüpfter Produkte'
@@ -112,10 +112,10 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       case 'no-sku':
         $vars = array(
           'header-template' => array(
-            'template' => 'modal-header',
+            'template' => 'modal-table-header',
             'args' => array(
-              'header' => __('Unlinked products', 'kleinanzeigen'),
-              'subheader' => 'Auflistung von Produkten ohne Verknüpfung'
+              'header' => __('Autonomous products', 'kleinanzeigen'),
+              'subheader' => 'Liste der eigenständigen Produkte'
             )
           ),
           'footer-template' => array(
@@ -127,7 +127,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       case 'featured':
         $vars = array(
           'header-template' => array(
-            'template' => 'modal-header',
+            'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Featured products', 'kleinanzeigen'),
               'subheader' => 'Auflistung von empfohlenen Produkten'
@@ -142,7 +142,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       default:
         $vars = array(
           'header-template' => array(
-            'template' => 'modal-header',
+            'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Title', 'kleinanzeigen'),
               'subheader' => ''
@@ -289,7 +289,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     /**
      * How many records for page do you want to show?
      */
-    $per_page = KLEINANZEIGEN_PER_PAGE;
+    $per_page = get_option('kleinanzeigen_items_per_page', 25);
 
     /**
      * Define of column_headers. It's an array that contains:
@@ -373,7 +373,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             $disabled['disconnect'] = !$sku;
             $disabled['delete'] = !$post_ID;
             $label = array(
-              'disconnect' => $product->get_sku() ? __('Autonomous', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+              'disconnect' => $product->get_sku() ? __('Keep', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
               'deactivate' => (!$disabled['deactivate']) ? __('Hide', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
               'delete' => (!$disabled['delete']) ? __('Delete', 'kleinanzeigen') : __('Deleted', 'kleinanzeigen')
             );

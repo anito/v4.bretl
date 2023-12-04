@@ -34,12 +34,17 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
    */
   public function __construct()
   {
-    self::$plugin_name  = parent::$plugin_name;
-    self::$version      = parent::$version;
 
-    add_action('admin_init', array($this, 'loadFiles'), -999);
+    add_action('init', array($this, 'loadFiles'), -999);
     add_action('admin_menu', array($this, 'addPluginAdminMenu'), 9);
     add_action('admin_init', array($this, 'registerAndBuildFields'));
+
+    // Cron
+    add_action('kleinanzeigen_clear_invalid_sku', array($this, 'job_clear_invalid_sku'));
+    add_action('kleinanzeigen_sync_price', array($this, 'job_sync_price'));
+    add_action('init', array($this, 'register_jobs'));
+
+    add_filter('cron_schedules', array($this, 'schedules'));
   }
 
   public function loadFiles()
@@ -114,11 +119,71 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     ));
   }
 
+  public function schedules($schedules)
+  {
+    $schedules = array_merge($schedules, array(
+      'every_minute' => array(
+        'interval' => 60,
+        'display'  => __('Every minute'),
+      ),
+      'five_minutes' => array(
+        'interval' => 5 * 60,
+        'display'  => __('Every 5 minutes'),
+      )
+    ));
+    return $schedules;
+  }
+
+  public function register_jobs()
+  {
+
+    // Remove kleinanzeigen_url from product meta
+    if (!wp_next_scheduled('kleinanzeigen_clear_invalid_sku')) {
+      wp_schedule_event(time(), 'every_minute', 'kleinanzeigen_clear_invalid_sku');
+    }
+
+    // Sync price
+    if("1" === get_option('kleinanzeigen_schedule_invalid_prices')) {
+      if (!wp_next_scheduled('kleinanzeigen_sync_price')) {
+        wp_schedule_event(time(), 'every_minute', 'kleinanzeigen_sync_price');
+      }
+    } else {
+      wp_unschedule_hook('kleinanzeigen_sync_price');
+    }
+
+    // wp_unschedule_hook('kleinanzeigen_clear_invalid_sku');
+  }
+
+  public function job_clear_invalid_sku()
+  {
+    $items = wbp_fn()->build_tasks('invalid-ad')['items'];
+    $product_ids = wp_list_pluck($items, 'product_id');
+
+    
+    foreach($product_ids as $id) {
+      if (!empty(get_metadata('post', $id, 'kleinanzeigen_url'))) {
+        wbp_fn()->disable_sku_url($id);
+      }
+    }
+  }
+
+  public function job_sync_price()
+  {
+    $items = wbp_fn()->build_tasks('invalid-price')['items'];
+    $product_ids = wp_list_pluck($items, 'product_id');
+    $records = wp_list_pluck($items, 'record');
+    
+    foreach($items as $item) {
+      $price = Utils::extract_kleinanzeigen_price($item['record']->price);
+      wbp_fn()->fix_price($item['product_id'], $price);
+    }
+  }
+
   public function addPluginAdminMenu()
   {
     $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI3LjkuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9InV1aWQtY2Y1MDkyNzItMDBlMi00YjJlLWJmZWUtNTZlZjA5ZDhhMDRmIgoJIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTE1IDEzMSIKCSBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMTUgMTMxOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0E3QUFBRDt9Cjwvc3R5bGU+CjxnIGlkPSJ1dWlkLWRhZDJmZmE0LTgzNzctNDg3Ni04OTY0LWQ3ODEyYWE0NGU5MSI+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNODAuOCwxMjFjLTE0LjksMC0yMi4yLTEwLjQtMjMuNi0xMi41Yy00LjQsNC4zLTExLDEyLjUtMjMsMTIuNWMtMTMuOCwwLTI1LjQtMTAuNC0yNS40LTI3LjNWMzcuMwoJCUM4LjgsMjAuNCwyMC40LDEwLDM0LjIsMTBzMjUuNCwxMSwyNS40LDI3LjFjMi43LTEsNS41LTEuNCw4LjUtMS40YzE0LjIsMCwyNS40LDExLjYsMjUuNCwyNS42YzAsMy45LTAuNyw3LjQtMi40LDEwLjcKCQljOSw0LDE1LjEsMTMuMSwxNS4xLDIzLjRDMTA2LjIsMTA5LjUsOTQuOCwxMjEsODAuOCwxMjFMODAuOCwxMjF6IE02My4zLDEwMi4zYzMuNyw2LjQsOS44LDEwLjIsMTcuNSwxMC4yCgkJYzkuMywwLDE2LjktNy43LDE2LjktMTcuMWMwLTcuNC00LjgtMTMuOS0xMS42LTE2LjJMNjMuMywxMDIuM0M2My4zLDEwMi4zLDYzLjMsMTAyLjMsNjMuMywxMDIuM3ogTTM0LjIsMTguNQoJCWMtOC40LDAtMTYuOSw1LjgtMTYuOSwxOC44djU2LjNjMCwxMyw4LjUsMTguOCwxNi45LDE4LjhjNi43LDAsMTAuNC0zLjQsMTYuNC05LjRsMi42LTIuN2MtMS40LTQuMS0yLjEtOC42LTIuMS0xMy41VjM3LjMKCQlDNTEuMSwyNC40LDQyLjYsMTguNSwzNC4yLDE4LjVMMzQuMiwxOC41TDM0LjIsMTguNXogTTU5LjYsNDYuNHY0MC40YzAsMi4zLDAuMiw0LjUsMC42LDYuNWwxOC40LTE4LjZjNS4zLTUuNCw2LjQtOS4zLDYuNC0xMy42CgkJYzAtOS4xLTcuMi0xNy4xLTE2LjktMTcuMUM2NSw0NC4yLDYyLjIsNDQuOSw1OS42LDQ2LjRMNTkuNiw0Ni40TDU5LjYsNDYuNHoiLz4KPC9nPgo8L3N2Zz4K';
-    add_menu_page(self::$plugin_name, 'Kleinanzeigen', 'administrator', self::$plugin_name, array($this, 'displayPluginAdminDashboard'), $icon_svg, 10);
-    add_submenu_page(self::$plugin_name, 'Kleinanzeigen Settings', 'Settings', 'administrator', self::$plugin_name . '-settings', array($this, 'displayPluginAdminSettings'));
+    add_menu_page(self::$plugin_name, __('Kleinanzeigen', 'kleinanzeigen'), 'administrator', self::$plugin_name, array($this, 'displayPluginAdminDashboard'), $icon_svg, 10);
+    add_submenu_page(self::$plugin_name, __('Kleinanzeigen Settings', 'kleinanzeigen'), __('Settings', 'kleinanzeigen'), 'administrator', self::$plugin_name . '-settings', array($this, 'displayPluginAdminSettings'));
   }
 
   public function displayPluginAdminDashboard()
@@ -136,9 +201,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       add_action('admin_notices', array($this, 'kleinanzeigenSettingsMessages'));
       do_action('admin_notices', $_GET['error_message']);
     }
-    if (isset($_GET['settings-updated'])) {}
+    if (isset($_GET['settings-updated'])) {
+    }
 
-    if(!Utils::get_json_data()) {
+    if (!Utils::get_json_data()) {
       add_settings_error('kleinanzeigen_account_name', 403, sprintf(__('The account %1$s could not be found', 'kleinanzeigen'), '<em class="">"' . get_option('kleinanzeigen_account_name') . '"</em>'), 'error');
     }
 
@@ -254,6 +320,36 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $args
     );
     $register($args['id'], array($this, 'sanitize_option'));
+
+    // Section Scheduling
+    add_settings_section(
+      'kleinanzeigen_background_tasks_section', // ID used to identify this section and with which to register options
+      __('Auto sync', 'kleinanzeigen'), // Title
+      array($this, 'kleinanzeigen_background_tasks_section'), // Callback
+      'kleinanzeigen_account_settings' // Page on which to add this section of options
+    );
+
+    // Schedule invalid prices
+    $args = array(
+      'type'              => 'input',
+      'subtype'           => 'checkbox',
+      'id'                => 'kleinanzeigen_schedule_invalid_prices',
+      'name'              => 'kleinanzeigen_schedule_invalid_prices',
+      'required'          => 'true',
+      'get_options_list'  => '',
+      'value_type'        => 'normal',
+      'wp_data'           => 'option',
+      'description'       => __('Replace product price with changed Kleinanzeigen price', 'kleinanzeigen')
+    );
+    add_settings_field(
+      $args['id'],
+      __('Price', 'kleinanzeigen'),
+      array($this, 'kleinanzeigen_render_settings_field'),
+      'kleinanzeigen_account_settings',
+      'kleinanzeigen_background_tasks_section',
+      $args
+    );
+    $register($args['id'], array($this, 'sanitize_option'));
   }
 
   public function sanitize_option($data)
@@ -264,6 +360,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function kleinanzeigen_display_general_account()
   {
     echo '<em>' . __('Please enter your account data.', 'kleinanzeigen') . '</em>';
+  }
+
+  public function kleinanzeigen_background_tasks_section()
+  {
+    echo '<em>' . __('Periodically background synchronization', 'kleinanzeigen') . '</em>';
   }
 
   public function kleinanzeigen_render_settings_field($args)
@@ -307,6 +408,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           $checked = ($value) ? 'checked' : '';
           echo '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '" "' . $args['required'] . '" name="' . $args['name'] . '" size="40" value="1" ' . $checked . ' />';
         }
+
+        if (isset($args['description'])) {
+          echo '<p class="description">' . $args['description'] . '</p>';
+        }
+
         break;
       default:
         # code...

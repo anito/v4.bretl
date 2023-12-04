@@ -58,7 +58,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   {
 
     $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-    $data = Utils::error_check(Utils::get_json_data(), 'error-message.php');
+    $data = Utils::account_error_check(Utils::get_json_data(), 'error-message.php');
 
     if (isset($data)) {
       $categories = $data->categoriesSearchData;
@@ -76,15 +76,18 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array(), 'todos' => array());
     foreach ($this->items as $item) {
 
-      $product_by_sku = wbp_fn()->get_product_by_sku($item->id);
+      $product_by_sku = wbp_fn()->get_product_by_sku($item->id) ?? null;
       if (!$product_by_sku) {
         $product_by_title = wbp_fn()->get_product_by_title($item->title);
       }
-      $product = $product_by_sku ? $product_by_sku : ($product_by_title ? $product_by_title : false);
-      $product ? (!$product_by_sku ? $products['no-sku'][]  = $item->id : null) : null;
-      $product ? (wbp_fn()->has_price_diff($item, $product) ? $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$PRICE_DIFF) : null) : null;
+
+      $product = $product_by_sku ?? ($product_by_title ?? false);
 
       if ($product) {
+
+        !$product_by_sku && $products['no-sku'][] = $item->id;
+        wbp_fn()->has_price_diff($item, $product) && $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$PRICE_DIFF);
+
         switch ($product->get_status()) {
           case 'publish':
             $products['publish'][] = $product;
@@ -112,48 +115,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$INVISIBLE);
       }
     }
-    
-    $items = $this->items;
-    $tasks = $this->render_tasks();
-    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'featured_products', 'tasks'));
-  }
 
-  function render_tasks()
-  {
-    $tasks = array(array(
-      'name' => 'invalid-ad',
-      'priority' => 1,
-      'product_ids' => array()
-    ), array(
-      'name' => 'invalid-price',
-      'priority' => 1,
-      'product_ids' => array()
-    ), array(
-      'name' => 'has-sku',
-      'priority' => 0,
-      'product_ids' => array()
-    ), array(
-      'name' => 'no-sku',
-      'priority' => 0,
-      'product_ids' => array()
-    ), array(
-      'name' => 'featured',
-      'priority' => 0,
-      'product_ids' => array()
-    ));
-    $ads = wbp_fn()->get_all_ads();
-    $args = array(
-      'status' => 'publish',
-      'limit' => -1
-    );
-    $products = wc_get_products($args);
-    foreach ($tasks as $key => $task) {
-      $data = wbp_fn()->get_task_list_items($products, $ads, $task['name']);
-      foreach ($data as $item) {
-        $tasks[$key]['product_ids'][] = $item['product']->get_ID();
-      }
-    }
-    return $tasks;
+    $items = $this->items;
+    $tasks = wbp_fn()->build_tasks();
+    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'featured_products', 'tasks'));
   }
 
   /**
@@ -270,7 +235,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     /**
      * How many records for page do you want to show?
      */
-    $per_page = KLEINANZEIGEN_PER_PAGE;
+    $per_page = get_option('kleinanzeigen_items_per_page', 25);
 
     /**
      * Define of column_headers. It's an array that contains:

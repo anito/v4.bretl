@@ -194,36 +194,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : 1;
 
       if (isset($post_ID) && isset($price)) {
-        $product = wc_get_product($post_ID);
-        if ($product) {
-          if ($product->is_on_sale()) {
-            wbp_fn()->set_pseudo_sale_price($product, $price, 10);
-          } else {
-            $product->set_regular_price($price);
-          }
-          $product->save();
-
-          // Fix price for Mietmaschinen
-          $categories = get_the_terms($post_ID, 'product_cat');
-          if (!empty($categories)) {
-            $key = 'rent';
-            $cat_name = WC_COMMON_TAXONOMIES[$key];
-            $cat_names = wp_list_pluck($categories, 'name');
-            if (in_array($cat_name, $cat_names)) {
-              $attr_name = WC_CUSTOM_PRODUCT_ATTRIBUTES[$key];
-              $attr_slug = wc_attribute_taxonomy_name($attr_name);
-
-              $attributes = wbp_fn()->get_mietdauer_attributes($attr_name, (int) $price);
-              $terms = $attributes['attributes'][$attr_name];
-              foreach ($terms as $key => $term) {
-                $term_name = $term['name'];
-                $attributes = array_merge($term['attributes'], array('menu_order' => $key));
-                wbp_th()->set_pa_term($product, $attr_name, $term['name'], true, array('is_variation' => 1));
-                wbp_fn()->create_product_variation($product->get_id(), $term_name, $attr_name, $attributes);
-              }
-            }
-          }
-        }
+        wbp_fn()->fix_price($post_ID, $price);
       }
 
       switch ($screen) {
@@ -651,11 +622,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
       update_post_meta((int) $post_ID, 'kleinanzeigen_id', $kleinanzeigen_id);
 
-      wp_update_post(array(
-        'ID' => $post_ID,
-        'post_type' => 'product',
-      ));
-
       switch ($screen) {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
@@ -826,12 +792,12 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       return ob_get_clean();
     }
 
-    public function render_tasks()
+    public function build_tasks()
     {
       global $wp_list_table;
 
       ob_start();
-      $wp_list_table->render_tasks();
+      $wp_list_table->build_tasks();
       return ob_get_clean();
     }
 
