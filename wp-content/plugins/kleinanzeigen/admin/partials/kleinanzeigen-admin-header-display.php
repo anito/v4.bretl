@@ -78,9 +78,9 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
                       <div class="">
                         <div class="task-count-wrapper">
                           <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                          <span id="invalid-ads-count" class="task-count">0</span>
                         </div>
                         <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Orphaned products', 'kleinanzeigen') ?></a></span>
-                        (<span id="invalid-ads-count" class="task-count">0</span>)
                       </div>
                     </div>
                   </div>
@@ -92,9 +92,9 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
                       <div class="">
                         <div class="task-count-wrapper">
                           <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                          <span id="invalid-price-count" class="task-count">0</span>
                         </div>
                         <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price deviations', 'kleinanzeigen') ?></a></span>
-                        (<span id="invalid-price-count" class="task-count">0</span>)
                       </div>
                     </div>
                   </div>

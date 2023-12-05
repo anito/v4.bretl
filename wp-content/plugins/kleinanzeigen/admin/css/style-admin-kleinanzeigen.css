@@ -114,6 +114,7 @@ section.wbp-kleinanzeigen .dashicons {
   width: 10px;
   height: 10px;
   line-height: 0.5em;
+  color: #000;
 }
 
 section.wbp-kleinanzeigen .chip.task-count {
@@ -129,6 +130,22 @@ section.wbp-kleinanzeigen .chip.task-count {
 .tasks .task {
   display: flex;
   justify-content: space-between;
+  position: relative;
+}
+
+.task .task-count {
+  border-radius: 99px;
+  background: #000;
+  color: #fff;
+  padding: 0 4px;
+  text-align: center;
+  min-width: 3px;
+  height: auto;
+  font-size: 0.4rem;
+  line-height: 0.8rem;
+  position: absolute;
+  left: 8px;
+  top: -5px;
 }
 
 section.wbp-kleinanzeigen .section-inner {
