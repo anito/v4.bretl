@@ -29,8 +29,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       add_action("woocommerce_before_product_object_save", array($this, "product_before_save"), 99, 2);
       add_filter('woocommerce_product_data_store_cpt_get_products_query', array($this, 'handle_cpt_get_products_query'), 10, 2);
 
-      add_action("save_post", array($this, "save_post"), 99, 3);
-      add_action("save_post", array($this, "quick_edit_product_save"), 10, 3);
+      add_action("save_post", array($this, "save_post"), 99, 2);
+      add_action("save_post", array($this, "quick_edit_product_save"), 10, 1);
       add_filter("update_post_metadata", array($this, 'prevent_metadata_update'), 10, 4);
 
       add_action("wp_insert_post_data", array($this, "publish_guard"), 99, 3);
@@ -474,6 +474,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $_POST['kleinanzeigen_id'] = isset($ad->id) ? $ad->id : '';
       }
 
+      // $ad = $recover($post_ID);
+
       if ($ad) {
         $ad_title = $ad->title;
         $title = $ad_title;
@@ -534,6 +536,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'post_excerpt' => $product->get_short_description(),
         'post_title' => $title
       ]);
+      add_action('save_post', array($this, 'save_post'), 99, 2);
     }
 
     public function prevent_metadata_update($data, $id, $meta_key, $meta_value)
@@ -984,6 +987,29 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         self::$instance = new self;
       }
       return self::$instance;
+    }
+
+    public function dropdown_invalid_ads($selected = '')
+    {
+      $r = '';
+
+      $actions = array(
+        'keep' => __('Keep', 'kleinanzeigen'),
+        'deactivate' => __('Deactivate', 'kleinanzeigen'),
+        'delete' => __('Delete', 'kleinanzeigen'),
+      );
+
+      $r .= "\n\t<option value=0>" . __('No action', 'kleinanzeigen') . "</option>";
+      foreach ($actions as $action => $name) {
+        // Preselect specified action.
+        if ($selected === $action) {
+          $r .= "\n\t<option selected='selected' value='" . esc_attr($action) . "'>$name</option>";
+        } else {
+          $r .= "\n\t<option value='" . esc_attr($action) . "'>$name</option>";
+        }
+      }
+
+      return $r;
     }
   }
 }

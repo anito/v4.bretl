@@ -73,31 +73,19 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
               <legend><?php echo __('Action required', 'kleinanzeigen') ?></legend>
               <div class="tasks">
                 <div class="task invalid-ad">
-                  <div class="general-action">
-                    <div class="action-header">
-                      <div class="">
-                        <div class="task-count-wrapper">
-                          <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                          <span id="invalid-ads-count" class="task-count">0</span>
-                        </div>
-                        <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-ad" title="<?php echo $title ?>"><?php echo __('Orphaned products', 'kleinanzeigen') ?></a></span>
-                      </div>
-                    </div>
+                  <div class="task-name">
+                    <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                    <a href="#" class="start-task" data-task-type="invalid-ad"><?php echo __('Orphaned products', 'kleinanzeigen'); ?></a>
                   </div>
+                  <div class="task-value">0</div>
                 </div>
                 <?php $title = "Zeige alle Produkte des Shops, deren Preise nicht mehr mit denen auf Kleinanzeigen.de übereinstimmen." ?>
                 <div class="task invalid-price">
-                  <div class="general-action">
-                    <div class="action-header">
-                      <div class="">
-                        <div class="task-count-wrapper">
-                          <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                          <span id="invalid-price-count" class="task-count">0</span>
-                        </div>
-                        <span class="action-header-title"><a href="#" class="start-task info" data-task-type="invalid-price" title="<?php echo $title ?>"><?php echo __('Price deviations', 'kleinanzeigen') ?></a></span>
-                      </div>
-                    </div>
+                  <div class="task-name">
+                    <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                    <a href="#" class="start-task" data-task-type="invalid-price"><?php echo __('Price deviations', 'kleinanzeigen'); ?></a>
                   </div>
+                  <div class="task-value">0</div>
                 </div>
               </div>
             </fieldset>
@@ -149,7 +137,7 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
             <ul>
               <li>
                 <i class="dashicons dashicons-warning"></i>
-                <span>Bitte beachte, dass nach einem Datenimport das Produkt immer den Status <strong>Entwurf</strong> erhält und erneut veröffentlicht werden muss.</span>
+                <span><?php echo __('Note, that product status will be changing to <em>Draft</em> after data import.', 'kleinanzeigen') ?></span>
               </li>
             </ul>
           </div>

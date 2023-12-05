@@ -19,6 +19,7 @@ function add_allowed_origins($origins)
 {
   return array_merge($origins, [
     'https://dev.auto-traktor-bretschneider.de',
+    'https://dev.auto-traktor-bretschneider.mbp',
     'http://localhost:5173'
   ]);
 }

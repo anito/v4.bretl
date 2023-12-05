@@ -1,9 +1,7 @@
 jQuery(document).ready(function ($) {
-
-
   const { screen, heartbeat } = {
-		...KleinanzeigenAjax,
-		...KleinanzeigenUtils,
+    ...KleinanzeigenAjax,
+    ...KleinanzeigenUtils,
   };
 
   const getCookie = (key) => {
@@ -11,10 +9,10 @@ jQuery(document).ready(function ($) {
     const matches = document.cookie.match(regex);
     return matches?.length ? matches[0] : null;
   };
-  
+
   const setCookie = (name, value, days) => {
     // const oneYearFromNow = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-  
+
     if (days) {
       var date = new Date();
       date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
@@ -25,20 +23,20 @@ jQuery(document).ready(function ($) {
     const cookie = name + "=" + value + expires + ";path=/wp-admin";
     document.cookie = cookie;
   };
-  
+
   const createOrientation = (data, prefix = "") => {
     const { cookie_key, cookie_val } = data;
     const _prefix = prefix ? `${prefix}__` : "";
     const horizontal = `${_prefix}horizontal`;
     const vertical = `${_prefix}vertical`;
     const defaultOrientation = cookie_val;
-  
+
     const settings = {
       set: (val, cb) => {
         const regex = new RegExp(_prefix);
         const cookie_val = settings.getValues()[val.replace(regex, "")];
         localStorage.setItem(cookie_key, cookie_val);
-  
+
         setCookie(cookie_key, cookie_val, 365);
         heartbeat({
           cookie_key,
@@ -75,6 +73,11 @@ jQuery(document).ready(function ($) {
     return settings;
   };
 
+  function focus_after_edit_post() {
+    KleinanzeigenAjax.display();
+    window.removeEventListener('focus', focus_after_edit_post)
+  }
+
   switch (screen) {
     case "toplevel_page_kleinanzeigen":
       KleinanzeigenUtils = {
@@ -82,7 +85,8 @@ jQuery(document).ready(function ($) {
         getCookie,
         setCookie,
         createOrientation,
+        focus_after_edit_post,
       };
       break;
-    }
-})
+  }
+});

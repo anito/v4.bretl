@@ -85,29 +85,6 @@ section.wbp-kleinanzeigen .tasks .task .general-action .action-buttons .button {
   text-align: center;
 }
 
-section.wbp-kleinanzeigen .action-header-title {
-  display: inline-block;
-  margin-right: 10px;
-  line-height: 1em;
-}
-
-section.wbp-kleinanzeigen .task-count {
-  display: inline-block;
-}
-
-section.wbp-kleinanzeigen .task-count-wrapper {
-  margin-right: 8px;
-  display: inline-block;
-  text-align: center;
-  font-size: 11px;
-}
-
-section.wbp-kleinanzeigen .task-count-wrapper.chip {
-  border-radius: 99px;
-  border: 1px solid;
-  padding: 1px 4px;
-}
-
 section.wbp-kleinanzeigen .dashicons {
   font-size: 14px;
   vertical-align: middle;
@@ -115,37 +92,13 @@ section.wbp-kleinanzeigen .dashicons {
   height: 10px;
   line-height: 0.5em;
   color: #000;
-}
-
-section.wbp-kleinanzeigen .chip.task-count {
-  border-radius: 99px;
-  border: 1px solid;
-  padding: 3px 3px;
-  width: 12px;
-  height: 12px;
-  display: inline-block;
-  text-align: center;
+  margin-right: 5px;
 }
 
 .tasks .task {
   display: flex;
   justify-content: space-between;
   position: relative;
-}
-
-.task .task-count {
-  border-radius: 99px;
-  background: #000;
-  color: #fff;
-  padding: 0 4px;
-  text-align: center;
-  min-width: 3px;
-  height: auto;
-  font-size: 0.4rem;
-  line-height: 0.8rem;
-  position: absolute;
-  left: 8px;
-  top: -5px;
 }
 
 section.wbp-kleinanzeigen .section-inner {

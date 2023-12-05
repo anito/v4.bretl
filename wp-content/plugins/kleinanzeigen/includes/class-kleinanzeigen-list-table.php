@@ -551,8 +551,12 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             connect,
             disconnect,
             publishPost,
-            featurePost
-          } = KleinanzeigenAjax;
+            featurePost,
+            focus_after_edit_post
+          } = {
+            ...KleinanzeigenAjax,
+            ...KleinanzeigenUtils
+          };
 
           const post_ID = "<?php echo $product ? $post_ID : '' ?>";
           const record = <?php echo json_encode($record) ?>;
@@ -624,6 +628,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
               impImagesEl.click();
             }
 
+          })
+
+          $('[data-action=edit-post]', `#ad-id-${kleinanzeigen_id}`).on('click', function(e) {
+            window.addEventListener('focus', focus_after_edit_post);
           })
         })
       </script>

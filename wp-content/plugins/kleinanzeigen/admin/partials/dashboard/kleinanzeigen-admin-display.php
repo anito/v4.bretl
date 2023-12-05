@@ -2,7 +2,7 @@
   <div id="icon-themes" class="icon32"></div>
   <h2><?php echo __('Overview', 'kleinanzeigen') ?></h2>
   <header id="kleinanzeigen-head-wrap">
-    <h2><span class="spinner is-active" style="float: left; margin: 0 7px 0;"></span><?php echo __('Loading', 'kleinanzeigen') ?>...</h2>
+    <h2><span class="spinner is-active" style="float: left; margin: 0 7px 0;"></span><?php echo __('Loading data', 'kleinanzeigen') ?>...</h2>
   </header>
   <form name="kleinanzeigen-list" id="kleinanzeigen-list" method="get">
 

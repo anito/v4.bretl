@@ -377,7 +377,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
                 const count = items.length;
                 if (count) {
-                  $(`#kleinanzeigen-head-wrap .task.${name} .task-count`).html(count);
+                  $(`#kleinanzeigen-head-wrap .task.${name} .task-value`).html(count);
                   $(`#kleinanzeigen-head-wrap .task.${name} a`).data('product-ids', product_ids);
                 } else {
                   $(`#kleinanzeigen-head-wrap .task.${name}`).addClass('hidden');
@@ -414,6 +414,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
           KleinanzeigenAjax.init_head = list.init_head;
           KleinanzeigenAjax.render_tasks = list.render_tasks;
+          KleinanzeigenAjax.display = list.display;
 
         })(jQuery);
       </script>
