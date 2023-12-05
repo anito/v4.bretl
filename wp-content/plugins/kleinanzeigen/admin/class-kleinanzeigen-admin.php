@@ -441,8 +441,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'get_options_list'  => wbp_fn()->dropdown_invalid_ads(get_option('kleinanzeigen_schedule_invalid_ads')),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      // 'label'             => __('Action to be performed for invalid ads', 'kleinanzeigen'),
-      'description'       => __('Choose an action to be performed when an ad has become invalid due to reservation, deactivation or deletion', 'kleinanzeigen'),
+      'description'       => __('Determine how to proceed with the product when its ad has become invalid due to reservation, deactivation or deletion', 'kleinanzeigen'),
     );
     add_settings_field(
       $args['id'],

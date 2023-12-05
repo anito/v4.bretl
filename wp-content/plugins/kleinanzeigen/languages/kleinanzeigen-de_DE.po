@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-29 21:47+0000\n"
-"PO-Revision-Date: 2023-12-05 17:11+0000\n"
+"PO-Revision-Date: 2023-12-05 17:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -69,11 +69,11 @@ msgid "Accept KA price"
 msgstr "KA Preis übernehmen"
 
 #. ID used to identify this section and with which to register options
-#: admin/class-kleinanzeigen-admin.php:306
+#: admin/class-kleinanzeigen-admin.php:309
 msgid "Account"
 msgstr "Account"
 
-#: admin/class-kleinanzeigen-admin.php:324
+#: admin/class-kleinanzeigen-admin.php:327
 msgid "Account name"
 msgstr "Account Name"
 
@@ -89,7 +89,7 @@ msgstr "Anzeigen Import aus Kleinanzeigen.de"
 msgid "Ads"
 msgstr "Anzeigen"
 
-#: admin/class-kleinanzeigen-admin.php:467
+#: admin/class-kleinanzeigen-admin.php:469
 #| msgid ""
 #| "Ads on Kleinanzeigen.de will be periodically evaluated. Perform the "
 #| "following if an ad has been altered"
@@ -100,7 +100,7 @@ msgstr ""
 "Anzeigen auf Kleinanzeigen.de werden in regelmäßigen Abständen überprüft. "
 "Bei Änderungen automatisch folgendes durchführen:"
 
-#: admin/class-kleinanzeigen-admin.php:369
+#: admin/class-kleinanzeigen-admin.php:372
 msgid "Ads per page"
 msgstr "Anzeigen pro Seite"
 
@@ -110,7 +110,7 @@ msgid "Ads: %s"
 msgstr "Anzeigen: %s"
 
 #. ID used to identify this section and with which to register options
-#: admin/class-kleinanzeigen-admin.php:380
+#: admin/class-kleinanzeigen-admin.php:383
 msgid "Auto sync"
 msgstr "Automatische Synchronisierung"
 
@@ -122,15 +122,6 @@ msgstr "Eigenständige Produkte"
 #. Author of the plugin
 msgid "Axel Nitzschner"
 msgstr "Axel Nitzschner"
-
-#: admin/class-kleinanzeigen-admin.php:442
-msgid ""
-"Choose an action to be performed when an ad has become invalid due to "
-"reservation, deactivation or deletion"
-msgstr ""
-"Wähle eine Aktion die automatisch durchgeführt werden soll, wenn eine "
-"Kleinanzeige (z.B. durch Reservierung, Deaktivierung oder Entfernen) nicht "
-"mehr auffindbar ist."
 
 #: admin/partials/dashboard/kleinanzeigen-admin-display.php:35
 msgid "Close"
@@ -185,6 +176,15 @@ msgstr "Produkt endgültig löschen."
 msgid "Deleted"
 msgstr "Gelöscht"
 
+#: admin/class-kleinanzeigen-admin.php:444
+msgid ""
+"Determine how to proceed with the product when its ad has become invalid due "
+"to reservation, deactivation or deletion"
+msgstr ""
+"Lege hier fest was mit dem Produkt passieren soll, wenn dessen Kleinanzeige "
+"(z.B. durch Reservierung, Deaktivierung oder Entfernen) nicht mehr "
+"auffindbar ist"
+
 #: includes/class-kleinanzeigen-list-table.php:387
 #: includes/class-kleinanzeigen-wc-admin-list-table-products.php:137
 msgid "Disconnect"
@@ -212,6 +212,22 @@ msgstr "Fehler:"
 #: admin/partials/dashboard/invalid-price-results.php:5
 msgid "Evaluation Results"
 msgstr "Ergebnisse:"
+
+#: admin/class-kleinanzeigen-admin.php:136
+msgid "Every 10 minutes"
+msgstr "Alle 10 min"
+
+#: admin/class-kleinanzeigen-admin.php:132
+msgid "Every 5 minutes"
+msgstr "Alle 5 Minuten"
+
+#: admin/class-kleinanzeigen-admin.php:140
+msgid "Every day"
+msgstr ""
+
+#: admin/class-kleinanzeigen-admin.php:128
+msgid "Every minute"
+msgstr "Jede Minute"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:132
 #: admin/partials/kleinanzeigen-admin-header-display.php:62
@@ -289,11 +305,11 @@ msgid "Keep"
 msgstr "Behalten"
 
 #. Name of the plugin
-#: admin/class-kleinanzeigen-admin.php:238
+#: admin/class-kleinanzeigen-admin.php:241
 msgid "Kleinanzeigen"
 msgstr "Kleinanzeigen"
 
-#: admin/class-kleinanzeigen-admin.php:239
+#: admin/class-kleinanzeigen-admin.php:242
 msgid "Kleinanzeigen Settings"
 msgstr "Kleinanzeigen Einstellungen"
 
@@ -345,11 +361,11 @@ msgstr ""
 "Bitte beachte, dass nach einem Datenimport das Produkt immer den Status "
 "<strong>Entwurf</strong> erhält und erneut veröffentlicht werden muss."
 
-#: admin/class-kleinanzeigen-admin.php:446
+#: admin/class-kleinanzeigen-admin.php:448
 msgid "Orphaned ad action"
 msgstr "Aktion bei verwaister Anzeige"
 
-#: admin/class-kleinanzeigen-admin.php:423
+#: admin/class-kleinanzeigen-admin.php:426
 msgid "Orphaned links"
 msgstr "Verwaiste Links"
 
@@ -379,11 +395,11 @@ msgstr ""
 "Bitte stelle sicher, dass du in den %s einen gültigen Account Namen "
 "angegeben hast."
 
-#: admin/class-kleinanzeigen-admin.php:462
+#: admin/class-kleinanzeigen-admin.php:464
 msgid "Please enter your account data."
 msgstr "Bitte gebe hier deine Account Daten ein."
 
-#: admin/class-kleinanzeigen-admin.php:400
+#: admin/class-kleinanzeigen-admin.php:403
 msgid "Price changes"
 msgstr "Preisänderungen"
 
@@ -396,7 +412,7 @@ msgstr "Preisabweichung"
 msgid "Price deviations"
 msgstr "Preisabweichungen"
 
-#: admin/class-kleinanzeigen-admin.php:346
+#: admin/class-kleinanzeigen-admin.php:349
 msgid "Pro Account"
 msgstr "Pro Account"
 
@@ -413,16 +429,16 @@ msgstr "Produkte mit Preisabweichungen"
 msgid "Published"
 msgstr "Veröffentlicht"
 
-#: admin/class-kleinanzeigen-admin.php:419
+#: admin/class-kleinanzeigen-admin.php:422
 msgid "Remove orphaned Kleinanzeigen links on products"
 msgstr "Entferne verwaiste Kleinanzeigen-Links an Produkten"
 
-#: admin/class-kleinanzeigen-admin.php:396
+#: admin/class-kleinanzeigen-admin.php:399
 #| msgid "Replace product price with changed Kleinanzeigen price"
 msgid "Replace product price by updated Kleinanzeigen price"
 msgstr "Ersetze Produkt-Preis durch geänderten Kleinanzeigen-Preis"
 
-#: admin/class-kleinanzeigen-admin.php:239 includes/class-utils.php:27
+#: admin/class-kleinanzeigen-admin.php:242 includes/class-utils.php:27
 #: admin/partials/kleinanzeigen-admin-settings-display.php:18
 #: admin/partials/dashboard/settings.php:3
 msgid "Settings"
@@ -444,12 +460,12 @@ msgstr "Synchronisiere Kleinanzeigen mit deinem Onlineshop"
 msgid "Template not found"
 msgstr "Vorlage nicht gefunden"
 
-#: admin/class-kleinanzeigen-admin.php:261
+#: admin/class-kleinanzeigen-admin.php:264
 #, php-format
 msgid "The account %1$s could not be found"
 msgstr "Der Account %1$s konnte nicht gefunden werden"
 
-#: admin/class-kleinanzeigen-admin.php:272
+#: admin/class-kleinanzeigen-admin.php:275
 msgid ""
 "There was an error adding this setting. Please try again. If this persists, "
 "shoot us an email."
