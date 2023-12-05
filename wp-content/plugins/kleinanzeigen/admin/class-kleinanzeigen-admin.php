@@ -339,7 +339,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'description'       => __('Replace product price with changed Kleinanzeigen price', 'kleinanzeigen')
+      'label'       => __('Replace product price by updated Kleinanzeigen price', 'kleinanzeigen'),
     );
     add_settings_field(
       $args['id'],
@@ -409,6 +409,9 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           echo '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '" "' . $args['required'] . '" name="' . $args['name'] . '" size="40" value="1" ' . $checked . ' />';
         }
 
+        if (isset($args['label'])) {
+          echo '<label for="' . $args['id'] . '" class="description">&nbsp;' . $args['label'] . '</label>';
+        }
         if (isset($args['description'])) {
           echo '<p class="description">' . $args['description'] . '</p>';
         }

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-29 21:47+0000\n"
-"PO-Revision-Date: 2023-12-04 21:22+0000\n"
+"PO-Revision-Date: 2023-12-05 00:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -311,7 +311,7 @@ msgid "Not visible"
 msgstr "Nicht sichtbar"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:72
-#: admin/partials/kleinanzeigen-admin-header-display.php:82
+#: admin/partials/kleinanzeigen-admin-header-display.php:83
 msgid "Orphaned products"
 msgstr "Verwaiste Produkte"
 
@@ -353,7 +353,7 @@ msgid "Price deviation"
 msgstr "Preisabweichung"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:87
-#: admin/partials/kleinanzeigen-admin-header-display.php:96
+#: admin/partials/kleinanzeigen-admin-header-display.php:97
 msgid "Price deviations"
 msgstr "Preisabweichungen"
 
@@ -375,8 +375,9 @@ msgid "Published"
 msgstr "Veröffentlicht"
 
 #: admin/class-kleinanzeigen-admin.php:342
-msgid "Replace product price with changed Kleinanzeigen price"
-msgstr "Ersetze Produkt-Preis durch veränderten Kleinanzeigen-Preis"
+#| msgid "Replace product price with changed Kleinanzeigen price"
+msgid "Replace product price by updated Kleinanzeigen price"
+msgstr "Ersetze Produkt-Preis durch geänderten Kleinanzeigen-Preis"
 
 #: admin/class-kleinanzeigen-admin.php:186 includes/class-utils.php:27
 #: admin/partials/kleinanzeigen-admin-settings-display.php:18
