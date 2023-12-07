@@ -129,6 +129,12 @@ if (!class_exists('Utils')) {
 
     static function upload_image($url, $post_ID)
     {
+      if (!function_exists('download_url')) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+      }
+
       $attachmentId = null;
       if ($url !== "") {
         $file = array();

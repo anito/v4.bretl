@@ -1,14 +1,6 @@
 <?php
 
-/**
- * The admin-specific functionality of the plugin.
- *
- * @link       https://www.wplauncher.com
- * @since      1.0.0
- *
- * @package    Kleinanzeigen
- * @subpackage Kleinanzeigen/admin
- */
+use Pelago\Emogrifier\CssInliner;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -43,6 +35,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_sync_price', array($this, 'job_sync_price'));
     add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
     add_action('kleinanzeigen_remove_url_invalid_sku', array($this, 'job_remove_url_invalid_sku'));
+    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_new_products'));
     add_action('init', array($this, 'register_jobs'));
 
     add_filter('cron_schedules', array($this, 'schedules'));
@@ -172,6 +165,15 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     } else {
       wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
     }
+
+    // Sync create new products
+    if ("1" === get_option('kleinanzeigen_schedule_new_ads', '0')) {
+      if (!wp_next_scheduled('kleinanzeigen_create_new_products')) {
+        wp_schedule_event(time(), 'ten_minutes', 'kleinanzeigen_create_new_products');
+      }
+    } else {
+      wp_unschedule_hook('kleinanzeigen_create_new_products');
+    }
   }
 
   public function job_remove_url_invalid_sku()
@@ -193,6 +195,96 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     foreach ($items as $item) {
       $price = Utils::extract_kleinanzeigen_price($item['record']->price);
       wbp_fn()->fix_price($item['product_id'], $price);
+    }
+  }
+
+  public function job_create_new_products()
+  {
+    $items = wbp_fn()->build_tasks('new-product')['items'];
+
+    require_once $this->plugin_path('vendor/autoload.php');
+    foreach ($items as $item) {
+      $record = (object) $item['record'];
+
+      libxml_use_internal_errors(true);
+      $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
+
+      $contents = file_get_contents($remoteUrl);
+
+      $doc = new DOMDocument();
+      $doc->loadHTML($contents);
+      $el = $doc->getElementById('viewad-description-text');
+      $content = $doc->saveHTML($el);
+
+      $product = new WC_Product();
+      $product->set_name($record->title);
+      $product->set_status('publish');
+      $post_ID = $product->save();
+
+      $success = wp_insert_post(array(
+        'ID' => $post_ID,
+        'post_title' => $record->title,
+        'post_type' => 'product',
+        'post_status' => $product->get_status('publish'),
+        'post_content' => $content,
+        'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
+      ), true);
+
+      wbp_fn()->set_product_data($product, $record, $content);
+      $product = wbp_fn()->enable_sku($product, $record);
+
+      if (is_wp_error($product)) {
+        $error_data = $product->get_error_data();
+        if (isset($error_data['resource_id'])) {
+          if (is_callable('write_log')) {
+            // write_log($error_data);
+          }
+          wp_delete_post($error_data['resource_id'], true);
+        }
+        die();
+      };
+
+      $xpath = new DOMXpath($doc);
+      $items = $xpath->query("//div[@class='galleryimage-element']/img/@data-imgsrc");
+
+      $images = array();
+      foreach ($items as $item) {
+        $images[] = $item->value;
+      }
+
+      Utils::remove_attachments($post_ID);
+
+      $ids = [];
+      for ($i = 0; $i < count($images); $i++) {
+        $url = $images[$i];
+        $ids[] = Utils::upload_image($url, $post_ID);
+        if ($i === 0) {
+          set_post_thumbnail((int) $post_ID, $ids[0]);
+        }
+      }
+
+      unset($ids[0]); // remove main image from gallery
+      $success = update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
+      update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
+
+      add_action('kleinanzeigen_email_header', array($this, 'email_header'));
+      add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
+      add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
+
+      $email = '';
+      $additional_content = '';
+      $to_email = get_bloginfo('admin_email');
+      $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+      $edit_link = admin_url('post.php?action=edit&post=' . $post_ID);
+      $product_title = $record->title;
+      $kleinanzeigen_url = wbp_fn()->get_kleinanzeigen_url($record->url);
+      $email_heading = __('New ad-based product created', 'kleinanzeigen');
+      $headers = array('content-type: text/html');
+
+      $email_content = $this->include_template('emails/new-product.php', true, compact('email', 'additional_content', 'product_title', 'edit_link', 'blogname', 'email_heading', 'kleinanzeigen_url'));
+      $email_content = $this->style_inline($email_content);
+
+      wp_mail($to_email, $email_heading, $email_content, $headers);
     }
   }
 
@@ -218,19 +310,18 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         default:
       }
 
-      if(isset($args)) {
+      if (isset($args)) {
 
         $postarr = array_merge(array(
           'ID' => $post_ID
         ), $args);
-  
+
         wp_update_post($postarr);
         $product = wc_get_product($post_ID);
-  
+
         if ("trash" === $product->get_status()) {
           wbp_fn()->delete_product($post_ID, true);
         }
-
       }
     }
   }
@@ -452,6 +543,52 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $args
     );
     $register($args['id'], array($this, 'sanitize_option'));
+
+    // Schedule new ads
+    unset($args);
+    $args = array(
+      'type'              => 'input',
+      'subtype'           => 'checkbox',
+      'id'                => 'kleinanzeigen_schedule_new_ads',
+      'name'              => 'kleinanzeigen_schedule_new_ads',
+      'required'          => 'true',
+      'get_options_list'  => '',
+      'value_type'        => 'normal',
+      'wp_data'           => 'option',
+      'label'             => __('Automatically create product for new ad', 'kleinanzeigen'),
+    );
+    add_settings_field(
+      $args['id'],
+      __('Autocreate new products', 'kleinanzeigen'),
+      array($this, 'kleinanzeigen_render_settings_field'),
+      'kleinanzeigen_account_settings',
+      'kleinanzeigen_background_tasks_section',
+      $args
+    );
+    $register($args['id'], array($this, 'sanitize_option'));
+
+    // Send email new ads
+    unset($args);
+    $args = array(
+      'type'              => 'input',
+      'subtype'           => 'checkbox',
+      'id'                => 'kleinanzeigen_send_mail_on_new_ad',
+      'name'              => 'kleinanzeigen_send_mail_on_new_ad',
+      'required'          => 'true',
+      'get_options_list'  => '',
+      'value_type'        => 'normal',
+      'wp_data'           => 'option',
+      'label'             => __('Send email when product was automatically created', 'kleinanzeigen'),
+    );
+    add_settings_field(
+      $args['id'],
+      __('Send email on autocreation', 'kleinanzeigen'),
+      array($this, 'kleinanzeigen_render_settings_field'),
+      'kleinanzeigen_account_settings',
+      'kleinanzeigen_background_tasks_section',
+      $args
+    );
+    $register($args['id'], array($this, 'sanitize_option'));
   }
 
   public function sanitize_option($data)
@@ -527,6 +664,83 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     if (isset($args['description'])) {
       echo '<p class="description">' . $args['description'] . '</p>';
     }
+  }
+
+  /**
+   * Get the email header.
+   *
+   * @param mixed $email_heading Heading for the email.
+   */
+  public function email_header($email_heading)
+  {
+    $this->include_template('emails/email-header.php', false, array('email_heading' => $email_heading));
+  }
+
+  /**
+   * Get the email footer.
+   */
+  public function email_footer()
+  {
+    $this->include_template('emails/email-footer.php');
+  }
+
+  /**
+   * Apply inline styles to dynamic content.
+   *
+   * We only inline CSS for html emails, and to do so we use Emogrifier library (if supported).
+   *
+   * @version 4.0.0
+   * @param string|null $content Content that will receive inline styles.
+   * @return string
+   */
+  public function style_inline($content)
+  {
+
+    $css = $this->include_template('emails/email-styles.php', true);
+
+
+    $css_inliner_class = CssInliner::class;
+
+    if (class_exists($css_inliner_class)) {
+      try {
+        $css_inliner = CssInliner::fromHtml($content)->inlineCss($css);
+
+        do_action('woocommerce_emogrifier', $css_inliner, $this);
+
+        $dom_document = $css_inliner->getDomDocument();
+
+        Pelago\Emogrifier\HtmlProcessor\HtmlPruner::fromDomDocument($dom_document)->removeElementsWithDisplayNone();
+        $content = Pelago\Emogrifier\HtmlProcessor\CssToAttributeConverter::fromDomDocument($dom_document)
+          ->convertCssToVisualAttributes()
+          ->render();
+      } catch (Exception $e) {
+      }
+    }
+
+    return $content;
+  }
+
+  public function replace_placeholders($string)
+  {
+    $domain = wp_parse_url(home_url(), PHP_URL_HOST);
+
+    return str_replace(
+      array(
+        '{site_title}',
+        '{site_address}',
+        '{site_url}',
+        '{woocommerce}',
+        '{WooCommerce}',
+      ),
+      array(
+        wp_specialchars_decode(get_option('blogname'), ENT_QUOTES),
+        $domain,
+        $domain,
+        '<a href="https://woocommerce.com">WooCommerce</a>',
+        '<a href="https://woocommerce.com">WooCommerce</a>',
+      ),
+      $string
+    );
   }
 
   public static function get_instance($file)

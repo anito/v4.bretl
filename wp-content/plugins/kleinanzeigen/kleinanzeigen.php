@@ -16,7 +16,7 @@
  * Plugin Name:       Kleinanzeigen
  * Plugin URI:        https://www.wplauncher.com
  * Description:       Synchronize Kleinanzeigen to your Woocommerce Shop
- * Version:           2.0.2
+ * Version:           2.0.3
  * Author:            Axel Nitzschner
  * Author URI:        https://webpremiere.de
  * License:           GPL-2.0+
@@ -31,9 +31,8 @@ if (!defined('WPINC')) {
 }
 
 /**
- * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
+ * Plugin specific constants
+ * 
  */
 define('KLEINANZEIGEN_URL', 'https://www.kleinanzeigen.de');
 

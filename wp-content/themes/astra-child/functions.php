@@ -52,10 +52,10 @@ function add_scripts()
   wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
 
   // Homepage hero
-  if(0) {
+  if (0) {
     $js_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.js');
     $css_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.css');
-  
+
     wp_enqueue_script('app-hero', $js_uri, false, CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
     wp_enqueue_style('app-hero', $css_uri, false, CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
     wp_localize_script('app-hero', 'app_hero', array(
@@ -259,9 +259,8 @@ function wbp_woo_custom_tabs($tabs)
     'callback' => 'wbp_woo_tab_content',
   );
 
-  $meta = get_post_meta($product->id);
-  $datasheets = $meta['_datasheet'][0];
-  if (!empty($datasheets)) {
+  $meta = get_post_meta($product->get_id());
+  if (!empty($meta['_datasheet'])) {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
       'priority'   => 20,

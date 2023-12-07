@@ -614,16 +614,12 @@ jQuery(document).ready(function ($) {
         }
 
         if (row) {
-          rowEl = $(
-            `.wp-list-kleinanzeigen tr#ad-id-${kleinanzeigen_id}`
-          );
+          rowEl = $(`.wp-list-kleinanzeigen tr#ad-id-${kleinanzeigen_id}`);
           $(rowEl)?.replaceWith(row);
         }
 
         if (modal_row) {
-          modalRowEl = $(
-            `.wp-list-kleinanzeigen-tasks tr#${post_ID}`
-          );
+          modalRowEl = $(`.wp-list-kleinanzeigen-tasks tr#${post_ID}`);
           $(modalRowEl)?.replaceWith(modal_row);
         }
 
@@ -635,9 +631,7 @@ jQuery(document).ready(function ($) {
         );
 
         if ("create" === el.dataset.action) {
-          rowEl = document.querySelector(
-            `tr#ad-id-${kleinanzeigen_id}`
-          );
+          rowEl = document.querySelector(`tr#ad-id-${kleinanzeigen_id}`);
 
           setTimeout(() => {
             rowEl.dispatchEvent(
@@ -707,8 +701,7 @@ jQuery(document).ready(function ($) {
     const wrapper = document.getElementById("kleinanzeigen-ad-wrapper");
     if (wrapper) {
       const iframe =
-        wrapper.querySelector("iframe") ||
-        document.createElement("iframe");
+        wrapper.querySelector("iframe") || document.createElement("iframe");
       iframe.src = "";
       wrapper.innerHTML = "";
       wrapper.appendChild(iframe);
@@ -727,16 +720,15 @@ jQuery(document).ready(function ($) {
     }
   }
 
-  function processDataImport(json, el, callback = () => {}) {
-    const record = JSON.parse(json.record);
+  function processDataImport(data, el, callback = () => {}) {
     const {
       post_ID,
       kleinanzeigen_id,
       post_status,
       content: description,
       screen,
-    } = json;
-    const postdata = { post_ID, kleinanzeigen_id, post_status };
+      record
+    } = data;
 
     let doc, content;
     try {
@@ -750,17 +742,15 @@ jQuery(document).ready(function ($) {
     // const raw_title = doc.getElementById("viewad-title")?.innerText;
     // const raw_price = doc.getElementById("viewad-price")?.innerText;
 
-    const kleinanzeigendata = {
-      content,
-      record,
-    };
-
     $.post({
       url: admin_ajax,
       data: {
         action: "_ajax_import_kleinanzeigen_data",
-        postdata,
-        kleinanzeigendata,
+        post_ID,
+        kleinanzeigen_id,
+        post_status,
+        content,
+        record,
         screen,
       },
       success: (data) => {
@@ -785,9 +775,7 @@ jQuery(document).ready(function ($) {
   }
 
   function processImageImport(json, el, callback) {
-    const { post_ID, kleinanzeigen_id, post_status, content, screen } =
-      json;
-    const postdata = { post_ID, kleinanzeigen_id, post_status };
+    const { post_ID, kleinanzeigen_id, post_status, content, screen } = json;
 
     let doc;
     try {
@@ -800,9 +788,7 @@ jQuery(document).ready(function ($) {
 
     let images = [];
     doc.documentElement
-      .querySelectorAll(
-        "#viewad-product .galleryimage-large img[data-imgsrc]"
-      )
+      .querySelectorAll("#viewad-product .galleryimage-large img[data-imgsrc]")
       .forEach((image) => {
         images.push(image.dataset.imgsrc);
       });
@@ -810,9 +796,9 @@ jQuery(document).ready(function ($) {
     const kleinanzeigendata = { images };
 
     if (images.length) {
-      msg = `${images.length} Foto${
-        1 === images.length ? "" : "s"
-      } wurde${1 === images.length ? "" : "n"} importiert.`;
+      msg = `${images.length} Foto${1 === images.length ? "" : "s"} wurde${
+        1 === images.length ? "" : "n"
+      } importiert.`;
     } else {
       msg = "Es konnten keine Fotos gefunden werden.";
     }
@@ -821,8 +807,10 @@ jQuery(document).ready(function ($) {
       url: admin_ajax,
       data: {
         action: "_ajax_import_kleinanzeigen_images",
-        postdata,
-        kleinanzeigendata,
+        post_ID,
+        kleinanzeigen_id,
+        post_status,
+        images,
         screen,
       },
       success: (data) => {
@@ -841,7 +829,7 @@ jQuery(document).ready(function ($) {
       url: admin_ajax,
       data: {
         action: "_ajax_heartbeat",
-        heartbeat: data || {},
+        heartbeat: data || {},
       },
       success: (data) => console.log(data),
       error: (error) => console.log(error),

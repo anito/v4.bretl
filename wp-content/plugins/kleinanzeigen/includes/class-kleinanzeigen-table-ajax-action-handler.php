@@ -116,63 +116,26 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function _ajax_heartbeat()
     {
-      $this->ajax_heartbeat();
-    }
-
-    public function parse_kleinanzeigen_id($val)
-    {
-      preg_match('/(\/?)(\d{8,})/', $val, $matches);
-      if (isset($matches[2])) {
-        return $matches[2];
-      }
-      return false;
-    }
-
-    public function remote_call($url, $tries = 3, $retry = 1)
-    {
-      $response = wp_remote_get(esc_url_raw($url), array(
-        'timeout' => 10
-      ));
-
-      if (is_callable('write_log')) {
-        // write_log($response);
-      }
-
-      if (!is_wp_error($response) && ($response['response']['code'] === 200)) {
-        return $response;
-      } elseif ($retry++ < $tries) {
-        sleep($retry * 2);
-        return $this->remote_call($url, $tries, $retry);
-      }
-      return $response;
-    }
-
-    public function ajax_heartbeat() {
-      $data = $_POST['heartbeat'];
-      die(json_encode(compact('data')));
+      wbp_fn()->ajax_heartbeat();
     }
 
     public function get_remote()
     {
-      if (isset($_REQUEST['formdata'])) {
-        $screen = $_REQUEST['screen'];
-        $formdata = $_REQUEST['formdata'];
-        $post_ID = isset($formdata['post_ID']) ? $formdata['post_ID'] : false;
-        $kleinanzeigen_id_raw = isset($formdata['kleinanzeigen_id']) ? $formdata['kleinanzeigen_id'] : false;
-        $kleinanzeigen_id = $this->parse_kleinanzeigen_id($kleinanzeigen_id_raw);
+      if (!isset($_REQUEST['formdata'])) return;
+      $formdata = $_REQUEST['formdata'];
 
-        $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($kleinanzeigen_id);
-      } else {
-        $remoteUrl = home_url();
-      }
+      if (!isset($formdata['post_ID'])) return;
+      $post_ID = $formdata['post_ID'];
 
-      $response = $this->remote_call($remoteUrl, 5);
-      $record = wbp_fn()->find_kleinanzeige($kleinanzeigen_id) ?? '';
+      if (!isset($formdata['kleinanzeigen_id'])) return;
+      $kleinanzeigen_id_raw = $formdata['kleinanzeigen_id'];
+      $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id_raw);
 
-      if ($record) {
-        $record = html_entity_decode(json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
-        update_post_meta($post_ID, 'kleinanzeigen_record', $record);
-      }
+      $screen = $_REQUEST['screen'];
+
+      $remoteUrl  = wbp_fn()->get_kleinanzeigen_search_url($kleinanzeigen_id);
+      $response   = wbp_fn()->remote_call($remoteUrl, 5);
+      $record     = wbp_fn()->find_kleinanzeige($kleinanzeigen_id) ?? null;
 
       die(json_encode(
         [
@@ -232,7 +195,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
       } else {
         $product = wc_get_product($post_ID);
-        if($product) {
+        if ($product) {
           wbp_fn()->disable_sku($product);
           $product->save();
         }
@@ -334,7 +297,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
         wp_update_post($postarr);
         $product = wc_get_product($post_ID);
-        if("trash" === $product->get_status()) {
+        if ("trash" === $product->get_status()) {
           wbp_fn()->delete_product($post_ID, true);
         }
       }
@@ -426,151 +389,57 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function ajax_import_kleinanzeigen_data()
     {
-      if (isset($_REQUEST['postdata'])) {
-        $post_ID = isset($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
-        $kleinanzeigen_id = isset($_REQUEST['postdata']['kleinanzeigen_id']) ? $_REQUEST['postdata']['kleinanzeigen_id'] : null;
+      $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+      $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : null;
+
+      if ($kleinanzeigen_id) {
+        $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id);
       }
 
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-      $kleinanzeigendata = isset($_REQUEST['kleinanzeigendata']) ? (object) $_REQUEST['kleinanzeigendata'] : null;
 
-      if ($kleinanzeigen_id) {
-        $kleinanzeigen_id = $this->parse_kleinanzeigen_id($kleinanzeigen_id);
+
+      $searchable_content = '';
+      $content = isset($_REQUEST['content']) ? $_REQUEST['content'] : null;
+      $record = isset($_REQUEST['record']) ? (object) $_REQUEST['record'] : null;
+
+      if (!$record) {
+        die();
       }
 
-      if ($kleinanzeigendata) {
-        $searchable_content = '';
-        $content = isset($kleinanzeigendata->content) ? $kleinanzeigendata->content : null;
-        $record = isset($kleinanzeigendata->record) ? (object) $kleinanzeigendata->record : null;
+      if (!$post_ID) {
+        $product = new WC_Product();
+        $product->set_name($record->title);
+        $post_ID = $product->save();
+      } else {
+        $product = wc_get_product($post_ID);
+      }
 
-        if ($record) {
-          // Ad is publicly available
-          $title = $record->title;
-          $price = Utils::extract_kleinanzeigen_price($record->price);
-          $excerpt = $record->description;
-          $tags = !empty($record->tags) ? $record->tags : [];
-          $url = $record->url;
-          $searchable_content = $title . ' ' . $excerpt;
-        } else {
-          // Ad is reserved or deleted, don't do anything, keep existing content
+      if ($product) {
+        wbp_fn()->set_product_data($product, $record, $content);
+        $product = wbp_fn()->enable_sku($product, $record);
+
+        if (is_wp_error($product)) {
+          $error_data = $product->get_error_data();
+          if (isset($error_data['resource_id'])) {
+            if (is_callable('write_log')) {
+              // write_log($error_data);
+            }
+            wp_delete_post($error_data['resource_id'], true);
+          }
           die();
-        }
-
-        if (!$post_ID) {
-          $product = new WC_Product();
-          $product->set_name($title);
-          $product->save();
-          $post_ID = $product->get_id();
-        } else {
-          $product = wc_get_product($post_ID);
-        }
-
-        if ($product) {
-          $product->set_regular_price($price);
-          $parts = array(
-            'aktionspreis' => array(
-              'Aktionspreis',
-              'match_type' => 'like',
-              'fn' => 'sale',
-            ),
-            'allrad' => array('Allrad', 'match_type' => 'like'),
-            'vorführ' => array('Vorführmaschine', 'match_type' => 'like'),
-            'topzustand' => 'Top',
-            'top zustand' => 'Top',
-            'topausstattung' => 'Top',
-            'top ausstattung' => 'Top',
-            'aktion' => array('Aktion', 'fn' => array('aktion', 'default')),
-            'aktionswochen' => array('Aktionswochen', 'fn' => array('aktionswochen', 'default')),
-            'aktionsmodell' => 'Aktion',
-            'klima' => 'Klima',
-            'am lager' => 'Sofort lieferbar',
-            'sofort verfügbar' => 'Sofort lieferbar',
-            'sofort lieferbar' => 'Sofort lieferbar',
-            'lagermaschine' => 'Sofort lieferbar',
-            'leicht gebraucht' => 'Leicht Gebraucht',
-            'limited edition' => 'Limited Edition',
-            'lim. edition' => 'Limited Edition',
-            'mietmaschine' => array('Mieten', 'fn' => array('rent', 'default')),
-            'neu' => 'Neu',
-            'neumaschine' => 'Neu',
-            'neufahrzeug' => 'Neu',
-            'neues modell' => 'Neues Modell',
-            'top modell' => 'Top Modell',
-            'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
-          );
-
-          // Handle contents
-          foreach ($parts as $key => $val) {
-
-            if (wbp_fn()->text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
-
-              $fns = isset($val['fn']) ? $val['fn'] : 'default';
-              $fns = !is_array($fns) ? array($fns) : $fns;
-
-              foreach ($fns as $fn) {
-                if (is_callable(array(wbp_fn(), 'handle_product_contents_' . $fn), false, $callable_name)) {
-
-                  if (!is_array($val)) {
-                    $term_name = $val;
-                  } elseif (isset($val[0])) {
-                    $term_name = $val[0];
-                  }
-                  $product = call_user_func(array(wbp_fn(), 'handle_product_contents_' . $fn), compact('product', 'price', 'title', 'content', 'term_name'));
-                }
-              }
-            }
-          }
-
-          // Handle brands
-          $brands = get_terms([
-            'taxonomy' => 'product_brand',
-            'hide_empty' => false
-          ]);
-
-          foreach ($brands as $brand) {
-            $exists = false;
-            if (wbp_fn()->text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
-              $exists = true;
-            } elseif (wbp_fn()->text_contains(esc_html($brand->name), esc_html($searchable_content))) {
-              $exists = true;
-            }
-            if (true === $exists) {
-              wbp_th()->set_product_term($product, $brand->term_id, 'brand', true);
-            }
-          }
-
-          // Handle product attributes
-          foreach ($tags as $key => $tag) {
-            wbp_th()->set_pa_term($product, WC_CUSTOM_PRODUCT_ATTRIBUTES['specials'], $tag, true);
-          }
-
-          if ($record) {
-            $product = wbp_fn()->enable_sku($product, $record);
-            if (!is_wp_error($product)) {
-              $product->save();
-            } else {
-              $error_data = $product->get_error_data();
-              if (isset($error_data['resource_id'])) {
-                if (is_callable('write_log')) {
-                  // write_log($error_data);
-                }
-                wp_delete_post($error_data['resource_id'], true);
-              }
-            };
-          }
-        }
-
-
-        wp_insert_post(array(
-          'ID' => $post_ID,
-          'post_title' => $title,
-          'post_type' => 'product',
-          'post_status' => 'draft',
-          'post_content' => $content,
-          'post_excerpt' => $excerpt // Utils::sanitize_excerpt($content, 300)
-        ), true);
+        };
       }
+
+      wp_insert_post(array(
+        'ID' => $post_ID,
+        'post_title' => $record->title,
+        'post_type' => 'product',
+        'post_status' => 'draft',
+        'post_content' => $content,
+        'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
+      ), true);
 
       switch ($screen) {
         case 'edit-product':
@@ -595,18 +464,16 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function ajax_import_kleinanzeigen_images()
     {
-      if (isset($_REQUEST['postdata'])) {
 
-        $post_ID = isset($_REQUEST['postdata']['post_ID']) ? $_REQUEST['postdata']['post_ID'] : null;
-        $kleinanzeigen_id = isset($_REQUEST['postdata']['kleinanzeigen_id']) ? $_REQUEST['postdata']['kleinanzeigen_id'] : null;
-      }
+      $post_ID =  isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+      $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : null;
 
       if ($kleinanzeigen_id) {
-        $kleinanzeigen_id = $this->parse_kleinanzeigen_id($kleinanzeigen_id);
+        $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id);
       }
+
+      $kleinanzeigen_images = isset($_REQUEST['images']) ? $_REQUEST['images'] : [];
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
-      $kleinanzeigendata = isset($_REQUEST['kleinanzeigendata']) ? $_REQUEST['kleinanzeigendata'] : null;
-      $kleinanzeigen_images = isset($kleinanzeigendata['images']) ? $kleinanzeigendata['images'] : [];
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
       Utils::remove_attachments($post_ID);
