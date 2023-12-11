@@ -33,7 +33,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_sync_price', array($this, 'job_sync_price'));
     add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
     add_action('kleinanzeigen_remove_url_invalid_sku', array($this, 'job_remove_url_invalid_sku'));
-    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_new_product'));
+    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_product'));
     add_filter('pre_update_option', array($this, 'pre_update_option'), 10, 3);
     add_action('init', array($this, 'register_jobs'));
 
@@ -245,7 +245,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
   }
 
-  public function job_create_new_product()
+  public function job_create_product()
   {
     $items = wbp_fn()->build_tasks('new-product')['items'];
 
@@ -255,70 +255,23 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     ));
 
     foreach ($items as $item) {
-      $record = (object) $item['record'];
-
       libxml_use_internal_errors(true);
-      $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
 
+      $record = (object) $item['record'];
+      $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
+      
       $contents = file_get_contents($remoteUrl);
 
       $doc = new DOMDocument();
       $doc->loadHTML($contents);
-      $el = $doc->getElementById('viewad-description-text');
-      $content = $doc->saveHTML($el);
 
-      $product = new WC_Product();
-      $product->set_name($record->title);
-      $product->set_status('publish');
-      $post_ID = $product->save();
+      $post_ID = wbp_fn()->create_product($record, $doc);
 
-      wp_insert_post(array(
-        'ID' => $post_ID,
-        'post_title' => $record->title,
-        'post_type' => 'product',
-        'post_status' => $product->get_status('publish'),
-        'post_content' => $content,
-        'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
-      ), true);
-
-      wbp_fn()->set_product_data($product, $record, $content);
-      $product = wbp_fn()->enable_sku($product, $record);
-
-      if (is_wp_error($product)) {
-        $error_data = $product->get_error_data();
-        if (isset($error_data['resource_id'])) {
-          if (is_callable('write_log')) {
-            // write_log($error_data);
-          }
-          wp_delete_post($error_data['resource_id'], true);
-        }
-        die();
-      };
-
-      $xpath = new DOMXpath($doc);
-      $items = $xpath->query("//div[@class='galleryimage-element']/img/@data-imgsrc");
-
-      $images = array();
-      foreach ($items as $item) {
-        $images[] = $item->value;
-      }
-
-      Utils::remove_attachments($post_ID);
-
-      $ids = [];
-      for ($i = 0; $i < count($images); $i++) {
-        $url = $images[$i];
-        $ids[] = Utils::upload_image($url, $post_ID);
-        if ($i === 0) {
-          set_post_thumbnail((int) $post_ID, $ids[0]);
-        }
-      }
-      unset($ids[0]); // remove main image from gallery
-
-      update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
-      update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
+      wbp_fn()->create_product_images($post_ID, $doc);
 
       wbp_fn()->sendMail($post_ID, $record);
+
+      update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
     }
   }
 

@@ -430,9 +430,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         if (is_wp_error($product)) {
           $error_data = $product->get_error_data();
           if (isset($error_data['resource_id'])) {
-            if (is_callable('write_log')) {
-              // write_log($error_data);
-            }
             wp_delete_post($error_data['resource_id'], true);
           }
           die();

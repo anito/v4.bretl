@@ -665,6 +665,69 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $kleinanzeigen_price !== $woo_price;
     }
 
+    public function create_product($record, $doc)
+    {
+
+      $el = $doc->getElementById('viewad-description-text');
+      $content = $doc->saveHTML($el);
+
+      $product = new WC_Product();
+      $product->set_name($record->title);
+      $product->set_status('publish');
+      $post_ID = $product->save();
+
+      wp_insert_post(array(
+        'ID' => $post_ID,
+        'post_title' => $record->title,
+        'post_type' => 'product',
+        'post_status' => $product->get_status(),
+        'post_content' => $content,
+        'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
+      ), true);
+
+      wbp_fn()->set_product_data($product, $record, $content);
+      $product = wbp_fn()->enable_sku($product, $record);
+
+      if (is_wp_error($product)) {
+        $error_data = $product->get_error_data();
+        if (isset($error_data['resource_id'])) {
+          if (is_callable('write_log')) {
+            // write_log($error_data);
+          }
+          wp_delete_post($error_data['resource_id'], true);
+        }
+        die();
+      };
+
+      return $post_ID;
+    }
+
+    public function create_product_images($post_ID, $doc)
+    {
+
+      $xpath = new DOMXpath($doc);
+      $items = $xpath->query("//div[@class='galleryimage-element']/img/@data-imgsrc");
+
+      $images = array();
+      foreach ($items as $item) {
+        $images[] = $item->value;
+      }
+
+      Utils::remove_attachments($post_ID);
+
+      $ids = [];
+      for ($i = 0; $i < count($images); $i++) {
+        $url = $images[$i];
+        $ids[] = Utils::upload_image($url, $post_ID);
+        if ($i === 0) {
+          set_post_thumbnail((int) $post_ID, $ids[0]);
+        }
+      }
+      unset($ids[0]); // remove main image from gallery
+
+      update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
+    }
+
     public function get_product_variation($product, $term_name, $taxonomy)
     {
       $avail_variations = $product->get_available_variations();
@@ -1254,7 +1317,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $r;
     }
 
-    public function sendMail($post_ID, $record) {
+    public function sendMail($post_ID, $record)
+    {
       add_action('kleinanzeigen_email_header', array($this, 'email_header'));
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
@@ -1327,11 +1391,11 @@ if (!class_exists('Kleinanzeigen_Functions')) {
      */
     public function style_inline($content)
     {
-      
+
       require_once wbp_ka()->plugin_path('vendor/autoload.php');
-      
+
       $css_inliner_class = CssInliner::class;
-      
+
       if (class_exists($css_inliner_class)) {
         try {
           $css = wbp_ka()->include_template('emails/email-styles.php', true);
@@ -1368,4 +1432,4 @@ if (!function_exists('wbp_fn')) {
   }
 }
 
-  wbp_fn();
+wbp_fn();
