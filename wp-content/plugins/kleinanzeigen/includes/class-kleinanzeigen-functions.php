@@ -795,6 +795,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $product_id = $product->get_ID();
       if ('variable' !== $product->get_type()) {
         $product = new WC_Product_Variable($product);
+        $product->save();
         wp_set_object_terms($product_id, 'variable', 'product_type');
       }
 
@@ -1171,8 +1172,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       };
       $jobs = $get_jobs();
       $data = array(
-        'jobs' => $jobs,
-        'jobResults' =>$job_results
+        'jobs'        => $jobs,
+        'jobResults'  => $job_results
       );
       die(json_encode(compact('data')));
     }
@@ -1191,7 +1192,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return self::$instance;
     }
 
-    public function dropdown_invalid_ads($selected = '')
+    public function dropdown_invalid_ads($selected)
     {
       $r = '';
 
@@ -1214,23 +1215,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $r;
     }
 
-    public function dropdown_crawl_interval($selected = '', $schedules)
+    public function dropdown_crawl_interval($selected, $schedules)
     {
       $r = '';
-      // write_log($schedules);
-      // $actions = array_map(function($item, $key) {
-      //   // write_log('key => ' . $key);
-      //   // write_log($item);
-      //   return array($key => $item['display']);
-      // }, $schedules, array_keys($schedules));
-
-      $actions =  [];
-      foreach($schedules as $key => $item) {
-        // $actions[] = array($key => $item['display']);
-        write_log($item['display']);
-      }
-
-      // write_log($actions);
 
       foreach ($schedules as $action => $name) {
         // Preselect specified action.
@@ -1263,6 +1250,47 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $email_content = $this->style_inline($email_content);
 
       wp_mail($to_email, $email_heading, $email_content, $headers);
+    }
+
+    /**
+     * Get the email header.
+     *
+     * @param mixed $email_heading Heading for the email.
+     */
+    public function email_header($email_heading)
+    {
+      $this->include_template('emails/email-header.php', false, array('email_heading' => $email_heading));
+    }
+
+    /**
+     * Get the email footer.
+     */
+    public function email_footer()
+    {
+      $this->include_template('emails/email-footer.php');
+    }
+
+    public function replace_placeholders($string)
+    {
+      $domain = wp_parse_url(home_url(), PHP_URL_HOST);
+
+      return str_replace(
+        array(
+          '{site_title}',
+          '{site_address}',
+          '{site_url}',
+          '{woocommerce}',
+          '{WooCommerce}',
+        ),
+        array(
+          wp_specialchars_decode(get_option('blogname'), ENT_QUOTES),
+          $domain,
+          $domain,
+          '<a href="https://woocommerce.com">WooCommerce</a>',
+          '<a href="https://woocommerce.com">WooCommerce</a>',
+        ),
+        $string
+      );
     }
 
     /**

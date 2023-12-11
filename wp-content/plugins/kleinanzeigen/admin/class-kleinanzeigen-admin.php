@@ -568,7 +568,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'id'                => 'kleinanzeigen_schedule_invalid_ads',
       'name'              => 'kleinanzeigen_schedule_invalid_ads',
       'required'          => 'true',
-      'get_options_list'  => wbp_fn()->dropdown_invalid_ads(get_option('kleinanzeigen_schedule_invalid_ads')),
+      'get_options_list'  => wbp_fn()->dropdown_invalid_ads(get_option('kleinanzeigen_schedule_invalid_ads', '0')),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
       'description'       => __('Determine how to proceed with the product when its ad has become invalid due to reservation, deactivation or deletion', 'kleinanzeigen'),
@@ -637,7 +637,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'id'                => 'kleinanzeigen_crawl_interval',
       'name'              => 'kleinanzeigen_crawl_interval',
       'required'          => 'true',
-      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval'), $this->schedules()),
+      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval', 'every_minute'), $this->schedules()),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
       'label'             => __('Select the interval at which Kleinanzeigen.de should be crawled for changes', 'kleinanzeigen'),
@@ -726,47 +726,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     if (isset($args['description'])) {
       echo '<p class="description">' . $args['description'] . '</p>';
     }
-  }
-
-  /**
-   * Get the email header.
-   *
-   * @param mixed $email_heading Heading for the email.
-   */
-  public function email_header($email_heading)
-  {
-    $this->include_template('emails/email-header.php', false, array('email_heading' => $email_heading));
-  }
-
-  /**
-   * Get the email footer.
-   */
-  public function email_footer()
-  {
-    $this->include_template('emails/email-footer.php');
-  }
-
-  public function replace_placeholders($string)
-  {
-    $domain = wp_parse_url(home_url(), PHP_URL_HOST);
-
-    return str_replace(
-      array(
-        '{site_title}',
-        '{site_address}',
-        '{site_url}',
-        '{woocommerce}',
-        '{WooCommerce}',
-      ),
-      array(
-        wp_specialchars_decode(get_option('blogname'), ENT_QUOTES),
-        $domain,
-        $domain,
-        '<a href="https://woocommerce.com">WooCommerce</a>',
-        '<a href="https://woocommerce.com">WooCommerce</a>',
-      ),
-      $string
-    );
   }
 
   public static function get_instance($file = null)
