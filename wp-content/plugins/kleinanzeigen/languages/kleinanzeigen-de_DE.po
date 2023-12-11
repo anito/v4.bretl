@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-29 21:47+0000\n"
-"PO-Revision-Date: 2023-12-11 04:58+0000\n"
+"PO-Revision-Date: 2023-12-11 06:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -229,7 +229,7 @@ msgstr "Ergebnisse:"
 
 #: admin/class-kleinanzeigen-admin.php:146
 msgid "Every 10 minutes"
-msgstr "Alle 10 min"
+msgstr "Alle 10 Minuten"
 
 #: admin/class-kleinanzeigen-admin.php:130
 msgid "Every 2 minutes"

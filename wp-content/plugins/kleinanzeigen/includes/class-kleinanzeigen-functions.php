@@ -11,10 +11,26 @@ if (!defined('WPINC')) {
 if (!class_exists('Kleinanzeigen_Functions')) {
 
 
-  class Kleinanzeigen_Functions extends Kleinanzeigen
+  class Kleinanzeigen_Functions
   {
 
+    /**
+     * The instance
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $version    The instance
+     */
     private static $instance = null;
+
+    /**
+     * The current screen ID
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      string    $version    The current screen ID
+     */
+    public $screen_id;
 
     public function __construct()
     {
@@ -47,7 +63,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function load_files()
     {
-      require_once $this->plugin_path('includes/class-kleinanzeigen-table-ajax-action-handler.php');
+      require_once wbp_ka()->plugin_path('includes/class-kleinanzeigen-table-ajax-action-handler.php');
     }
 
     /**
@@ -94,14 +110,14 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       switch ($this->screen_id) {
         case 'edit-product':
-          require_once $this->plugin_path('includes/class-kleinanzeigen-wc-admin-list-table-products.php');
+          require_once wbp_ka()->plugin_path('includes/class-kleinanzeigen-wc-admin-list-table-products.php');
 
           new Extended_WC_Admin_List_Table_Products();
 
           break;
         case 'toplevel_page_kleinanzeigen':
-          require_once $this->plugin_path('includes/class-kleinanzeigen-list-table.php');
-          require_once $this->plugin_path('includes/class-kleinanzeigen-list-table-tasks.php');
+          require_once wbp_ka()->plugin_path('includes/class-kleinanzeigen-list-table.php');
+          require_once wbp_ka()->plugin_path('includes/class-kleinanzeigen-list-table-tasks.php');
 
           // setcookie('ka-paged', 1);
           break;
@@ -122,7 +138,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function get_all_ads()
     {
-      require_once $this->plugin_path('includes/class-utils.php');
+      require_once wbp_ka()->plugin_path('includes/class-utils.php');
       // Get first set of data to discover page count
       $data = Utils::account_error_check(Utils::get_json_data(), 'error-message.php');
       $ads = $data->ads;
@@ -315,7 +331,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $shop_price = wp_kses_post($product->get_price_html());
         $shop_price_raw = $product->get_price();
         $ka_price = '-';
-        $title = $product->get_title();
+        $title = $product->get_name();
         $permalink = get_permalink($post_ID);
 
         if (!empty($sku)) {
@@ -345,7 +361,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       if ('product' !== $post['post_type']) return $post;
 
       // Check for valid product title when publishing
-      require_once $this->plugin_path('includes/class-utils.php');
+      require_once wbp_ka()->plugin_path('includes/class-utils.php');
       if (!Utils::is_valid_title($post['post_title']) && $post['post_status'] == 'publish') {
         $post['post_status'] = 'draft';
         // prevent adding duplicate DUPLIKAT info to title
@@ -372,7 +388,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       if ($product) {
         if ($product->is_on_sale()) {
-          wbp_fn()->set_pseudo_sale_price($product, $price, 10);
+          $this->set_pseudo_sale_price($product, $price, 10);
         } else {
           $product->set_regular_price($price);
         }
@@ -388,13 +404,13 @@ if (!class_exists('Kleinanzeigen_Functions')) {
             $attr_name = WC_CUSTOM_PRODUCT_ATTRIBUTES[$key];
             $attr_slug = wc_attribute_taxonomy_name($attr_name);
 
-            $attributes = wbp_fn()->get_mietdauer_attributes($attr_name, (int) $price);
+            $attributes = self::get_mietdauer_attributes($attr_name, (int) $price);
             $terms = $attributes['attributes'][$attr_name];
             foreach ($terms as $key => $term) {
               $term_name = $term['name'];
               $attributes = array_merge($term['attributes'], array('menu_order' => $key));
               wbp_th()->set_pa_term($product, $attr_name, $term['name'], true, array('is_variation' => 1));
-              wbp_fn()->create_product_variation($product->get_id(), $term_name, $attr_name, $attributes);
+              $this->create_product_variation($product->get_id(), $term_name, $attr_name, $attributes);
             }
           }
         }
@@ -485,7 +501,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       $product = wc_get_product($post_ID);
-      $title = $product->get_title();
+      $title = $product->get_name();
       $content = $product->get_description();
       $sku_errors = [];
       $ad = null;
@@ -747,8 +763,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     // Callable product contents functions
     public function handle_product_contents_sale($args)
     {
-      $product = $args['product'];
-      $price = $args['price'];
+      extract($args);
+      $product = wc_get_product($product_id);
 
       $this->set_pseudo_sale_price($product, $price);
       return $this->handle_product_label($args['term_name'], $product);;
@@ -756,7 +772,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function handle_product_contents_aktion($args)
     {
-      $product = $args['product'];
+      extract($args);
+      $product = wc_get_product($product_id);
 
       $term = get_term_by('name', isset(WC_COMMON_TAXONOMIES['aktion']) ? WC_COMMON_TAXONOMIES['aktion'] : '', 'product_cat');
 
@@ -769,6 +786,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     public function handle_product_contents_rent($args)
     {
       extract($args);
+      $product = wc_get_product($product_id);
 
       /**
        * Handle Product Category
@@ -802,7 +820,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $attr_name = WC_CUSTOM_PRODUCT_ATTRIBUTES['rent'];
 
       // Check if the Term name exist and if not create it
-      $attributes = $this->get_mietdauer_attributes($attr_name, (int) $price);
+      $attributes = self::get_mietdauer_attributes($attr_name, (int) $price);
       $terms = $attributes['attributes'][$attr_name];
       foreach ($terms as $key => $term) {
         $term_name = $term['name'];
@@ -816,7 +834,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function handle_product_contents_aktionswochen($args)
     {
-      $product = $args['product'];
+      extract($args);
+      $product = wc_get_product($product_id);
 
       $term = get_term_by('name', isset(WC_COMMON_TAXONOMIES['aktionswochen']) ? WC_COMMON_TAXONOMIES['aktionswochen'] : '', 'product_cat');
 
@@ -828,7 +847,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function handle_product_contents_default($args)
     {
-      $product = $args['product'];
+      extract($args);
+      $product = wc_get_product($product_id);
+
       $this->handle_product_label($args['term_name'], $product);
       return $product;
     }
@@ -909,37 +930,37 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $query->get_posts();
     }
 
-    public function get_mietdauer_attributes($attr_name, $price)
+    public static function get_mietdauer_attributes($attr_name, $price)
     {
       return array(
         'attributes' => array(
           $attr_name => array(
             array(
-              'name' => __('1 Tag', 'kleinanzeigen'),
+              'name' => __('1 Day', 'kleinanzeigen'),
               'attributes' => array('regular_price' => (int) $price)
             ),
             array(
-              'name' => __('2 Tage', 'kleinanzeigen'),
+              'name' => sprintf(__('%d Days', 'kleinanzeigen'), 2),
               'attributes' => array('regular_price' => (int) $price * 2)
             ),
             array(
-              'name' => __('3 Tage', 'kleinanzeigen'),
+              'name' => sprintf(__('%d Days', 'kleinanzeigen'), 3),
               'attributes' => array('regular_price' => (int) $price * 3)
             ),
             array(
-              'name' => __('4 Tage', 'kleinanzeigen'),
+              'name' => sprintf(__('%d Days', 'kleinanzeigen'), 4),
               'attributes' => array('regular_price' => (int) $price * 4)
             ),
             array(
-              'name' => __('5 Tage', 'kleinanzeigen'),
+              'name' => sprintf(__('%d Days', 'kleinanzeigen'), 5),
               'attributes' => array('regular_price' => (int) $price * 5)
             ),
             array(
-              'name' => __('6 Tage', 'kleinanzeigen'),
+              'name' => sprintf(__('%d Days', 'kleinanzeigen'), 6),
               'attributes' => array('regular_price' => (int) $price * 6)
             ),
             array(
-              'name' => __('7 Tage', 'kleinanzeigen'),
+              'name' => sprintf(__('%d Days', 'kleinanzeigen'), 7),
               'attributes' => array('regular_price' => (int) $price * 7)
             ),
           )
@@ -1060,6 +1081,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $tags = !empty($record->tags) ? $record->tags : [];
       $url = $record->url;
       $searchable_content = $title . ' ' . $excerpt;
+      $product_id = $product->get_id();
 
       $product->set_regular_price($price);
       $parts = array(
@@ -1097,20 +1119,21 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       // Handle contents
       foreach ($parts as $key => $val) {
 
-        if (wbp_fn()->text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
+        if ($this->text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
 
           $fns = isset($val['fn']) ? $val['fn'] : 'default';
           $fns = !is_array($fns) ? array($fns) : $fns;
 
           foreach ($fns as $fn) {
-            if (is_callable(array(wbp_fn(), 'handle_product_contents_' . $fn), false, $callable_name)) {
+            if (is_callable(array($this, 'handle_product_contents_' . $fn), false, $callable_name)) {
 
               if (!is_array($val)) {
                 $term_name = $val;
               } elseif (isset($val[0])) {
                 $term_name = $val[0];
               }
-              call_user_func(array(wbp_fn(), 'handle_product_contents_' . $fn), compact('product', 'price', 'title', 'content', 'term_name'));
+
+              $product = call_user_func(array($this, 'handle_product_contents_' . $fn), compact('product_id', 'price', 'title', 'content', 'term_name'));
             }
           }
         }
@@ -1124,9 +1147,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       foreach ($brands as $brand) {
         $exists = false;
-        if (wbp_fn()->text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
+        if ($this->text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
           $exists = true;
-        } elseif (wbp_fn()->text_contains(esc_html($brand->name), esc_html($searchable_content))) {
+        } elseif ($this->text_contains(esc_html($brand->name), esc_html($searchable_content))) {
           $exists = true;
         }
         if (true === $exists) {
@@ -1242,11 +1265,11 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
       $edit_link = admin_url('post.php?action=edit&post=' . $post_ID);
       $product_title = $record->title;
-      $kleinanzeigen_url = wbp_fn()->get_kleinanzeigen_url($record->url);
-      $email_heading = __('New ad-based product created', 'kleinanzeigen');
+      $kleinanzeigen_url = $this->get_kleinanzeigen_url($record->url);
+      $email_heading = __('New product created', 'kleinanzeigen');
       $headers = array('content-type: text/html');
 
-      $email_content = $this->include_template('emails/new-product.php', true, compact('email', 'additional_content', 'product_title', 'edit_link', 'blogname', 'email_heading', 'kleinanzeigen_url'));
+      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('email', 'additional_content', 'product_title', 'edit_link', 'blogname', 'email_heading', 'kleinanzeigen_url'));
       $email_content = $this->style_inline($email_content);
 
       wp_mail($to_email, $email_heading, $email_content, $headers);
@@ -1259,7 +1282,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
      */
     public function email_header($email_heading)
     {
-      $this->include_template('emails/email-header.php', false, array('email_heading' => $email_heading));
+      wbp_ka()->include_template('emails/email-header.php', false, array('email_heading' => $email_heading));
     }
 
     /**
@@ -1267,7 +1290,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
      */
     public function email_footer()
     {
-      $this->include_template('emails/email-footer.php');
+      wbp_ka()->include_template('emails/email-footer.php');
     }
 
     public function replace_placeholders($string)
@@ -1305,13 +1328,13 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     public function style_inline($content)
     {
       
-      require_once $this->plugin_path('vendor/autoload.php');
+      require_once wbp_ka()->plugin_path('vendor/autoload.php');
       
       $css_inliner_class = CssInliner::class;
       
       if (class_exists($css_inliner_class)) {
         try {
-          $css = $this->include_template('emails/email-styles.php', true);
+          $css = wbp_ka()->include_template('emails/email-styles.php', true);
           $css_inliner = CssInliner::fromHtml($content)->inlineCss($css);
 
           do_action('woocommerce_emogrifier', $css_inliner, $this);
@@ -1345,4 +1368,4 @@ if (!function_exists('wbp_fn')) {
   }
 }
 
-wbp_fn();
+  wbp_fn();

@@ -22,7 +22,7 @@ do_action('kleinanzeigen_email_header', $email_heading, $email); ?>
 
 <p><?php printf(esc_html__('Hi %s,', 'kleinanzeigen'), esc_html($blogname)); ?></p>
 <p><?php printf(esc_html__('The product %1$s has been automatically created based on the following ad:', 'kleinanzeigen'), '<strong>' . esc_html($product_title) . '</strong>'); ?></p>
-<p><?php esc_html($kleinanzeigen_url); ?></p>
+<p><?php echo esc_html($kleinanzeigen_url); ?></p>
 <p><?php printf(esc_html__('You can modify the product here %1$s.', 'kleinanzeigen'), esc_html($edit_link)); ?></p>
 
 <?php

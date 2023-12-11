@@ -61,17 +61,6 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
   protected static $version;
 
   /**
-   * The current screen ID
-   *
-   * @since    1.0.0
-   * @access   protected
-   * @var      string    $version    The current screen ID
-   */
-  protected $screen_id;
-  
-
-
-  /**
    * Define the core functionality of the plugin.
    *
    * Set the plugin name and the plugin version that can be used throughout the plugin.

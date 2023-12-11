@@ -33,7 +33,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_sync_price', array($this, 'job_sync_price'));
     add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
     add_action('kleinanzeigen_remove_url_invalid_sku', array($this, 'job_remove_url_invalid_sku'));
-    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_new_products'));
+    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_new_product'));
     add_filter('pre_update_option', array($this, 'pre_update_option'), 10, 3);
     add_action('init', array($this, 'register_jobs'));
 
@@ -237,7 +237,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     wbp_db()->insert_job(array(
       'slug'  => 'kleinanzeigen_sync_price',
       'count' => count($items)
-    ), 'kleinanzeigen_jobs');
+    ));
 
     foreach ($items as $item) {
       $price = Utils::extract_kleinanzeigen_price($item['record']->price);
@@ -245,14 +245,14 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
   }
 
-  public function job_create_new_products()
+  public function job_create_new_product()
   {
     $items = wbp_fn()->build_tasks('new-product')['items'];
 
     wbp_db()->insert_job(array(
       'slug'  => 'kleinanzeigen_create_new_products',
       'count' => count($items)
-    ), 'kleinanzeigen_jobs');
+    ));
 
     foreach ($items as $item) {
       $record = (object) $item['record'];
@@ -313,8 +313,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           set_post_thumbnail((int) $post_ID, $ids[0]);
         }
       }
-
       unset($ids[0]); // remove main image from gallery
+
       update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
       update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
 
@@ -330,7 +330,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     wbp_db()->insert_job(array(
       'slug'  => 'kleinanzeigen_invalid_ad_action',
       'count' => count($items)
-    ), 'kleinanzeigen_jobs');
+    ));
 
     foreach ($items as $item) {
       $post_ID = $item['product_id'];

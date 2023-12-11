@@ -358,7 +358,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
         // Setup Actions
         $post_ID = $product->get_id();
-        $title = $product->get_title();
+        $title = $product->get_name();
         $editlink  = admin_url('post.php?action=edit&post=' . $post_ID);
         $deletelink  = get_delete_post_link($post_ID);
         $permalink = get_permalink($post_ID);
