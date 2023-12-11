@@ -552,7 +552,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             disconnect,
             publishPost,
             featurePost,
-            focus_after_edit_post
+            focus_after_edit_post,
+            handle_visibility_change
           } = {
             ...KleinanzeigenAjax,
             ...KleinanzeigenUtils
@@ -631,8 +632,9 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           })
 
           $('[data-action=edit-post]', `#ad-id-${kleinanzeigen_id}`).on('click', function(e) {
-            window.addEventListener('focus', focus_after_edit_post);
+            // window.addEventListener('focus', focus_after_edit_post);
           })
+          window.addEventListener('visibilitychange', handle_visibility_change);
         })
       </script>
     </tr>

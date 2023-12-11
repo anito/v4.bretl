@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-  const { screen, heartbeat } = {
+  const { screen, poll, cron, display } = {
     ...KleinanzeigenAjax,
     ...KleinanzeigenUtils,
   };
@@ -7,6 +7,7 @@ jQuery(document).ready(function ($) {
   const getCookie = (key) => {
     const regex = new RegExp(`(?<=${key}=)([\\w\\S-])+(?=;)`);
     const matches = document.cookie.match(regex);
+
     return matches?.length ? matches[0] : null;
   };
 
@@ -38,7 +39,7 @@ jQuery(document).ready(function ($) {
         localStorage.setItem(cookie_key, cookie_val);
 
         setCookie(cookie_key, cookie_val, 365);
-        heartbeat({
+        poll({
           cookie_key,
           cookie_val,
         });
@@ -73,19 +74,76 @@ jQuery(document).ready(function ($) {
     return settings;
   };
 
+  const displayTime = (ms) => {
+    return new Intl.DateTimeFormat("de-DE", {
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(ms);
+  };
+
+  const getCronJobs = () =>
+    cron().then((res) => res);
+
+  class CreateScheduledJobs {
+    static instance;
+    scheduled = [];
+    callback;
+
+    get _scheduled() {
+      return this.scheduled;
+    }
+    set _callback(cb) {
+      return (this.callback = cb);
+    }
+
+    getIds = () => this.scheduled.map((job) => job.intervalId);
+    add = (job, remaining) => {
+      job.intervalId = setInterval(this.callback, remaining + 0, job); // add some delay to give cronjob time to execute before next check
+      this.scheduled.push(job);
+      return this.scheduled;
+    };
+    remove = (id) => {
+      clearInterval(id);
+
+      const index = this.scheduled.findIndex((job) => job.intervalId === id);
+      this.scheduled.splice(index, 1);
+      return this.scheduled;
+    };
+    clear = () => {
+      this.scheduled.forEach((job) => {
+        job.intervalId && this.remove(job.intervalId);
+      });
+      return !this.scheduled.length;
+    };
+
+    static getInstance = () =>
+      CreateScheduledJobs.instance || (CreateScheduledJobs.instance = new CreateScheduledJobs());
+  }
+
   function focus_after_edit_post() {
-    KleinanzeigenAjax.display();
-    window.removeEventListener('focus', focus_after_edit_post)
+    display();
+    window.removeEventListener("focus", focus_after_edit_post);
+  }
+
+  function handle_visibility_change(e) {
+    if (!e.target.hidden) {
+      display();
+    }
   }
 
   switch (screen) {
+    case "kleinanzeigen_page_kleinanzeigen-settings":
     case "toplevel_page_kleinanzeigen":
       KleinanzeigenUtils = {
         ...KleinanzeigenUtils,
         getCookie,
         setCookie,
+        getCronJobs,
+        displayTime,
+        CreateScheduledJobs,
         createOrientation,
         focus_after_edit_post,
+        handle_visibility_change,
       };
       break;
   }

@@ -14,3 +14,9 @@
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
+<div class="public-timestamp">
+  <h1>Timestamp</h1>
+  <p>
+    <?php echo wbp_ka()->kleinanzeigen_header_before(); ?>
+  </p>
+</div>

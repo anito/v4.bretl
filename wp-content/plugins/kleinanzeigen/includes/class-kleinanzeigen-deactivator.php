@@ -30,7 +30,14 @@ class Kleinanzeigen_Deactivator {
 	 * @since    1.0.0
 	 */
 	public static function deactivate() {
+		global $wpdb;
 
+		$table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
+
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		$wpdb->query("DROP TABLE IF EXISTS $table_name;");
+
+		delete_option('kleinanzeigen_db_version');
 	}
 
 }

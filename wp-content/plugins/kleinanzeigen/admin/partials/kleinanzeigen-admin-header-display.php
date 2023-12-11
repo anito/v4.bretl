@@ -223,14 +223,13 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
   </div>
 </div>
 <script>
-  jQuery(document).ready(($) => {
+  jQuery(document).ready(async ($) => {
 
     const _tasks = <?php echo json_encode($tasks) ?>;
     const _orientation_obj = <?php echo json_encode($orientation_arr) ?>;
     const {
       init_head,
       render_tasks,
-      heartbeat,
       createOrientation
     } = {
       ...KleinanzeigenAjax,

@@ -12,6 +12,8 @@ function wbp_init()
 }
 add_filter('init', 'wbp_init');
 
+// add_action('init', array(wbp_ka(), 'wbp_header_before'));
+
 /**
  * CSRF allowed domains
  */

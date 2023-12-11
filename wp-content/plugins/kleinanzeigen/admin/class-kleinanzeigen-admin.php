@@ -1,7 +1,5 @@
 <?php
 
-use Pelago\Emogrifier\CssInliner;
-
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -36,6 +34,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
     add_action('kleinanzeigen_remove_url_invalid_sku', array($this, 'job_remove_url_invalid_sku'));
     add_action('kleinanzeigen_create_new_products', array($this, 'job_create_new_products'));
+    add_filter('pre_update_option', array($this, 'pre_update_option'), 10, 3);
     add_action('init', array($this, 'register_jobs'));
 
     add_filter('cron_schedules', array($this, 'schedules'));
@@ -43,6 +42,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   public function loadFiles()
   {
+    require_once $this->plugin_path('includes/class-kleinanzeigen-database.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-functions.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-table-ajax.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-term-handler.php');
@@ -108,17 +108,34 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'nonce'       => wp_create_nonce()
     ));
     wp_localize_script(self::$plugin_name . '-utils', 'KleinanzeigenUtils', array(
-      'admin_ajax' => admin_url('admin-ajax.php'),
-      'screen' => wbp_fn()->screen_id,
+      'admin_ajax'  => admin_url('admin-ajax.php'),
+      'screen'      => wbp_fn()->screen_id,
     ));
   }
 
-  public function schedules($schedules)
+  public function template_path($path)
+  {
+    return is_admin() ? trailingslashit('admin') : $path;
+  }
+
+  public function schedules($schedules = array())
   {
     $schedules = array_merge($schedules, array(
       'every_minute' => array(
         'interval' => 60,
         'display'  => __('Every minute', 'kleinanzeigen'),
+      ),
+      'two_minutes' => array(
+        'interval' => 120,
+        'display'  => __('Every 2 minutes', 'kleinanzeigen'),
+      ),
+      'three_minutes' => array(
+        'interval' => 180,
+        'display'  => __('Every 3 minutes', 'kleinanzeigen'),
+      ),
+      'fore_minutes' => array(
+        'interval' => 240,
+        'display'  => __('Every 4 minutes', 'kleinanzeigen'),
       ),
       'five_minutes' => array(
         'interval' => 5 * 60,
@@ -136,13 +153,29 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     return $schedules;
   }
 
+  public function pre_update_option($value, $option, $old_value)
+  {
+
+    if ('kleinanzeigen_crawl_interval' === $option && $old_value !== $value) {
+
+      wp_unschedule_hook('kleinanzeigen_remove_url_invalid_sku');
+      wp_unschedule_hook('kleinanzeigen_sync_price');
+      wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
+      wp_unschedule_hook('kleinanzeigen_create_new_products');
+    }
+
+    return $value;
+  }
+
   public function register_jobs()
   {
+
+    $interval = get_option('kleinanzeigen_crawl_interval');
 
     // Remove ophaned links from product
     if ("1" === get_option('kleinanzeigen_schedule_remove_orphaned_links')) {
       if (!wp_next_scheduled('kleinanzeigen_remove_url_invalid_sku')) {
-        wp_schedule_event(time(), 'ten_minutes', 'kleinanzeigen_remove_url_invalid_sku');
+        wp_schedule_event(time(), $interval, 'kleinanzeigen_remove_url_invalid_sku');
       }
     } else {
       wp_unschedule_hook('kleinanzeigen_remove_url_invalid_sku');
@@ -151,7 +184,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     // Sync price
     if ("1" === get_option('kleinanzeigen_schedule_invalid_prices')) {
       if (!wp_next_scheduled('kleinanzeigen_sync_price')) {
-        wp_schedule_event(time(), 'ten_minutes', 'kleinanzeigen_sync_price');
+        wp_schedule_event(time(), $interval, 'kleinanzeigen_sync_price');
       }
     } else {
       wp_unschedule_hook('kleinanzeigen_sync_price');
@@ -160,7 +193,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     // Sync invalid ads
     if ("0" !== get_option('kleinanzeigen_schedule_invalid_ads', '0')) {
       if (!wp_next_scheduled('kleinanzeigen_invalid_ad_action')) {
-        wp_schedule_event(time(), 'ten_minutes', 'kleinanzeigen_invalid_ad_action');
+        wp_schedule_event(time(), $interval, 'kleinanzeigen_invalid_ad_action');
       }
     } else {
       wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
@@ -169,7 +202,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     // Sync create new products
     if ("1" === get_option('kleinanzeigen_schedule_new_ads', '0')) {
       if (!wp_next_scheduled('kleinanzeigen_create_new_products')) {
-        wp_schedule_event(time(), 'ten_minutes', 'kleinanzeigen_create_new_products');
+        wp_schedule_event(time(), $interval, 'kleinanzeigen_create_new_products');
       }
     } else {
       wp_unschedule_hook('kleinanzeigen_create_new_products');
@@ -181,16 +214,30 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     $items = wbp_fn()->build_tasks('invalid-ad')['items'];
     $product_ids = wp_list_pluck($items, 'product_id');
 
-    foreach ($product_ids as $id) {
-      if (!empty(get_metadata('post', $id, 'kleinanzeigen_url'))) {
-        wbp_fn()->disable_sku_url($id);
-      }
+    $ids = array_filter($product_ids, function ($id) {
+      return !empty(get_metadata('post', $id, 'kleinanzeigen_url'));
+    });
+
+    wbp_db()->insert_job(array(
+      'slug'  => 'kleinanzeigen_remove_url_invalid_sku',
+      'count' => count($ids)
+    ));
+
+    foreach ($ids as $id) {
+      wbp_fn()->disable_sku_url($id);
     }
   }
 
   public function job_sync_price()
   {
     $items = wbp_fn()->build_tasks('invalid-price')['items'];
+
+    write_log('invalid prices => ' . count($items));
+
+    wbp_db()->insert_job(array(
+      'slug'  => 'kleinanzeigen_sync_price',
+      'count' => count($items)
+    ), 'kleinanzeigen_jobs');
 
     foreach ($items as $item) {
       $price = Utils::extract_kleinanzeigen_price($item['record']->price);
@@ -202,7 +249,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     $items = wbp_fn()->build_tasks('new-product')['items'];
 
-    require_once $this->plugin_path('vendor/autoload.php');
+    wbp_db()->insert_job(array(
+      'slug'  => 'kleinanzeigen_create_new_products',
+      'count' => count($items)
+    ), 'kleinanzeigen_jobs');
+
     foreach ($items as $item) {
       $record = (object) $item['record'];
 
@@ -221,7 +272,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $product->set_status('publish');
       $post_ID = $product->save();
 
-      $success = wp_insert_post(array(
+      wp_insert_post(array(
         'ID' => $post_ID,
         'post_title' => $record->title,
         'post_type' => 'product',
@@ -264,27 +315,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       }
 
       unset($ids[0]); // remove main image from gallery
-      $success = update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
+      update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
       update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
 
-      add_action('kleinanzeigen_email_header', array($this, 'email_header'));
-      add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
-      add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
-
-      $email = '';
-      $additional_content = '';
-      $to_email = get_bloginfo('admin_email');
-      $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
-      $edit_link = admin_url('post.php?action=edit&post=' . $post_ID);
-      $product_title = $record->title;
-      $kleinanzeigen_url = wbp_fn()->get_kleinanzeigen_url($record->url);
-      $email_heading = __('New ad-based product created', 'kleinanzeigen');
-      $headers = array('content-type: text/html');
-
-      $email_content = $this->include_template('emails/new-product.php', true, compact('email', 'additional_content', 'product_title', 'edit_link', 'blogname', 'email_heading', 'kleinanzeigen_url'));
-      $email_content = $this->style_inline($email_content);
-
-      wp_mail($to_email, $email_heading, $email_content, $headers);
+      wbp_fn()->sendMail($post_ID, $record);
     }
   }
 
@@ -292,6 +326,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     $action = get_option('kleinanzeigen_schedule_invalid_ads');
     $items = wbp_fn()->build_tasks('invalid-ad')['items'];
+
+    wbp_db()->insert_job(array(
+      'slug'  => 'kleinanzeigen_invalid_ad_action',
+      'count' => count($items)
+    ), 'kleinanzeigen_jobs');
 
     foreach ($items as $item) {
       $post_ID = $item['product_id'];
@@ -589,6 +628,29 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $args
     );
     $register($args['id'], array($this, 'sanitize_option'));
+
+    // Cron Job Interval
+    unset($args);
+    $args = array(
+      'type'              => 'select',
+      'subtype'           => 'checkbox',
+      'id'                => 'kleinanzeigen_crawl_interval',
+      'name'              => 'kleinanzeigen_crawl_interval',
+      'required'          => 'true',
+      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval'), $this->schedules()),
+      'value_type'        => 'normal',
+      'wp_data'           => 'option',
+      'label'             => __('Select the interval at which Kleinanzeigen.de should be crawled for changes', 'kleinanzeigen'),
+    );
+    add_settings_field(
+      $args['id'],
+      __('Crawl interval', 'kleinanzeigen'),
+      array($this, 'kleinanzeigen_render_settings_field'),
+      'kleinanzeigen_account_settings',
+      'kleinanzeigen_background_tasks_section',
+      $args
+    );
+    $register($args['id'], array($this, 'sanitize_option'));
   }
 
   public function sanitize_option($data)
@@ -684,42 +746,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     $this->include_template('emails/email-footer.php');
   }
 
-  /**
-   * Apply inline styles to dynamic content.
-   *
-   * We only inline CSS for html emails, and to do so we use Emogrifier library (if supported).
-   *
-   * @version 4.0.0
-   * @param string|null $content Content that will receive inline styles.
-   * @return string
-   */
-  public function style_inline($content)
-  {
-
-    $css = $this->include_template('emails/email-styles.php', true);
-
-
-    $css_inliner_class = CssInliner::class;
-
-    if (class_exists($css_inliner_class)) {
-      try {
-        $css_inliner = CssInliner::fromHtml($content)->inlineCss($css);
-
-        do_action('woocommerce_emogrifier', $css_inliner, $this);
-
-        $dom_document = $css_inliner->getDomDocument();
-
-        Pelago\Emogrifier\HtmlProcessor\HtmlPruner::fromDomDocument($dom_document)->removeElementsWithDisplayNone();
-        $content = Pelago\Emogrifier\HtmlProcessor\CssToAttributeConverter::fromDomDocument($dom_document)
-          ->convertCssToVisualAttributes()
-          ->render();
-      } catch (Exception $e) {
-      }
-    }
-
-    return $content;
-  }
-
   public function replace_placeholders($string)
   {
     $domain = wp_parse_url(home_url(), PHP_URL_HOST);
@@ -743,7 +769,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     );
   }
 
-  public static function get_instance($file)
+  public static function get_instance($file = null)
   {
     // If the single instance hasn't been set, set it now.
     if (null == self::$instance) {

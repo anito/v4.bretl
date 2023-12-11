@@ -18,6 +18,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function register_ajax_handler()
     {
+      add_action('wp_ajax__ajax_poll', array($this, '_ajax_poll'));
+      add_action('wp_ajax__ajax_cron', array($this, '_ajax_cron'));
       add_action('wp_ajax__ajax_connect', array($this, '_ajax_connect'));
       add_action('wp_ajax__ajax_fix_price', array($this, '_ajax_fix_price'));
       add_action('wp_ajax__ajax_disconnect', array($this, '_ajax_disconnect'));
@@ -31,8 +33,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax__ajax_import_kleinanzeigen_data', array($this, '_ajax_import_kleinanzeigen_data'));
       add_action('wp_ajax__ajax_import_kleinanzeigen_images', array($this, '_ajax_import_kleinanzeigen_images'));
       add_action('wp_ajax__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
-      add_action('wp_ajax__ajax_heartbeat', array($this, '_ajax_heartbeat'));
 
+      add_action('wp_ajax_nopriv__ajax_poll', array($this, '_ajax_poll'));
+      add_action('wp_ajax_nopriv__ajax_cron', array($this, '_ajax_cron'));
       add_action('wp_ajax_nopriv__ajax_connect', array($this, '_ajax_connect'));
       add_action('wp_ajax_nopriv__ajax_fix_price', array($this, '_ajax_fix_price'));
       add_action('wp_ajax_nopriv__ajax_disconnect', array($this, '_ajax_disconnect'));
@@ -46,7 +49,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_data', array($this, '_ajax_import_kleinanzeigen_data'));
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_images', array($this, '_ajax_import_kleinanzeigen_images'));
       add_action('wp_ajax_nopriv__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
-      add_action('wp_ajax_nopriv__ajax_heartbeat', array($this, '_ajax_heartbeat'));
     }
 
     public function _ajax_get_remote()
@@ -114,9 +116,14 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $this->ajax_get_brand_images();
     }
 
-    public function _ajax_heartbeat()
+    public function _ajax_poll()
     {
-      wbp_fn()->ajax_heartbeat();
+      wbp_fn()->ajax_poll();
+    }
+
+    public function _ajax_cron()
+    {
+      wbp_fn()->ajax_cron();
     }
 
     public function get_remote()

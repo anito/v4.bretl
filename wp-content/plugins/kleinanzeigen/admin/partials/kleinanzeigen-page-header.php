@@ -1,3 +1,4 @@
+<?php echo wbp_ka()->kleinanzeigen_header_before() ?>
 <header class="kleinanzeigen-page-header">
   <h3 style="display: flex; align-items: center; margin: 0;">
     <span style="margin-right: 20px;padding: 5px 10px; border-radius: 8px 8px 8px 0; background: rgb(181, 233, 65);"><svg width="200" viewBox="0 0 787 132" fill="none" xmlns="http://www.w3.org/2000/svg">

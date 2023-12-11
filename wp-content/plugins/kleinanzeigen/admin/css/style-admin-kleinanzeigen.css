@@ -305,6 +305,7 @@ section.pagination a.button {
 }
 .wp-list-table.loading::after {
   opacity: 0.3;
+  pointer-events: all;
 }
 .color-box.status {
   align-self: center;

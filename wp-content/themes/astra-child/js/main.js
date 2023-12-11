@@ -1,4 +1,4 @@
-const observe = (function () {
+const wbp_observe = (function () {
   const MutationObserver =
     window.MutationObserver || window.WebKitMutationObserver;
 
@@ -96,27 +96,29 @@ jQuery.noConflict();
     const storeEl = el?.dataset.store === storeName ? el : null;
     if (storeEl) {
       copyToTarget();
-      observe(storeEl, observerCallback);
+      wbp_observe(storeEl, observerCallback);
     }
   };
 
-  function add_solis_script() {
-    const el = document.getElementById("iframe-solis");
+  function add_intersection_observer(data) {
+    const observe = function (el, src, threshold = 0) {
+      if (undefined !== IntersectionObserver) {
+        const onenter = (o) =>
+          o.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.src = src;
+            else entry.target.src = "";
+          });
+        const observer = new IntersectionObserver(onenter, { threshold });
+        observer.observe(el, onenter);
+      } else {
+        el.src = src;
+      }
+    };
 
-    if (!el) return;
+    const {id, src, threshold} = data;
+    const el = document.getElementById(id);
 
-    const src = "https://solis-traktor.de/";
-    if (undefined !== IntersectionObserver) {
-      const onenter = (o) =>
-        o.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.src = src;
-          else entry.target.src = "";
-        });
-      const observer = new IntersectionObserver(onenter, { threshold: 0.5 });
-      observer.observe(el, onenter);
-    } else {
-      el.src = src;
-    }
+    if (el) observe(el, src, threshold);
   }
 
   function add_toggle_sidebar() {
@@ -194,5 +196,9 @@ jQuery.noConflict();
   add_jet_engine_wishlist_hook("header .wishlist-target", "wishlist");
   add_toggle_sidebar();
   add_show_quote_request();
-  // add_solis_script();
+  add_intersection_observer({
+    id: "solis-iframe",
+    src: "https://solis-traktor.de/",
+    threshold: 0.1,
+  });
 })(jQuery);

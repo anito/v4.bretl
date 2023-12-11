@@ -27,7 +27,7 @@
  * @subpackage Kleinanzeigen/includes
  * @author     Ben Shadle <benshadle@gmail.com>
  */
-class Kleinanzeigen
+class Kleinanzeigen extends Kleinanzeigen_Templates
 {
 
   private static $instance;
@@ -69,8 +69,7 @@ class Kleinanzeigen
    */
   protected $screen_id;
   
-  protected $plugin_path;
-  protected $plugin_url;
+
 
   /**
    * Define the core functionality of the plugin.
@@ -161,6 +160,12 @@ class Kleinanzeigen
     require_once $this->plugin_path('includes/class-kleinanzeigen-functions.php');
 
     /**
+     * The class responsible for registering and rendering templates
+     * side of the site.
+     */
+    require_once $this->plugin_path('includes/class-kleinanzeigen-templates.php');
+
+    /**
      * The class responsible for defining all actions that occur in the public-facing
      * side of the site.
      */
@@ -196,13 +201,13 @@ class Kleinanzeigen
   private function define_admin_hooks()
   {
 
-    // $admin = Kleinanzeigen_Admin::get_instance();
     $admin = new Kleinanzeigen_Admin();
 
     $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_styles');
     $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_scripts');
-
     $this->loader->add_action('admin_init', wbp_fn(), 'table_ajax_handler', -888);
+
+    $this->loader->add_filter('kleinanzeigen/template-path', $admin, 'template_path');
   }
 
   /**
@@ -215,23 +220,19 @@ class Kleinanzeigen
   private function define_public_hooks()
   {
 
+    if(is_admin()) return;
+    
     $plugin_public = new Kleinanzeigen_Public();
 
-    $this->loader->add_action('init', $plugin_public, 'register_shortcode');
+    $this->loader->add_action('init', $plugin_public, 'register_shortcodes');
+    $this->loader->add_action('init', $plugin_public, 'register_and_build');
     $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
     $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+
+    $this->loader->add_filter('kleinanzeigen/template-path', $plugin_public, 'template_path');
   }
 
-  public function plugin_path($path = null)
-  {
-
-    if (!$this->plugin_path) {
-      $this->plugin_path = trailingslashit(dirname(__FILE__, 2));
-    }
-
-    return $this->plugin_path . $path;
-  }
-
+  
   public function assets_url()
   {
 
@@ -246,36 +247,6 @@ class Kleinanzeigen
     }
 
     return $this->plugin_url . $path;
-  }
-
-  public function include_template($path, $return_instead_of_echo = false, $extract_these = array())
-  {
-    if ($return_instead_of_echo) ob_start();
-
-    $template_file = $this->get_template($path);
-
-    if (!file_exists($template_file)) {
-      error_log("Template not found: " . $template_file);
-      echo __('Error:', 'kleinanzeigen') . ' ' . __('Template not found', 'kleinanzeigen') . " (" . $path . ")";
-    } else {
-      extract($extract_these);
-      include $template_file;
-    }
-
-    if ($return_instead_of_echo) return ob_get_clean();
-  }
-
-  private function get_template($name = null)
-  {
-
-    $template = $this->template_path() . $name;
-    return $this->plugin_path($template);
-  }
-
-  private function template_path()
-  {
-    $path = (is_admin() ? 'admin' : 'public') . '/partials';
-    return apply_filters('kleinanzeigen/template-path', trailingslashit($path));
   }
 
   /**
@@ -322,7 +293,7 @@ class Kleinanzeigen
     return self::$version;
   }
 
-  public static function get_instance($file)
+  public static function get_instance($file =  null)
   {
     // If the single instance hasn't been set, set it now.
     if (null == self::$instance) {

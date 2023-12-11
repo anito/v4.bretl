@@ -646,6 +646,32 @@ jQuery(document).ready(function ($) {
     finish();
   }
 
+  const poll = () => {
+    $.post({
+      url: admin_ajax,
+      data: {
+        action: "_ajax_poll",
+      },
+      success: (data) => console.log(data),
+      error: (error) => console.log(error),
+    });
+  }
+
+  const cron = (data) => {
+    return $.post({
+      url: admin_ajax,
+      data: {
+        action: "_ajax_cron",
+        crondata: data || {},
+      },
+      success: (data) => {
+        return data;
+      },
+      error: (error) => console.log(error),
+    });
+  }
+
+
   const MSG_MISSING_KLEINANZEIGEN_ID = "Keine Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
   const MSG_ERROR =
@@ -653,6 +679,7 @@ jQuery(document).ready(function ($) {
 
   let form;
   switch (screen) {
+    case "kleinanzeigen_page_kleinanzeigen-settings":
     case "toplevel_page_kleinanzeigen":
     case "edit-product":
       KleinanzeigenAjax = {
@@ -668,7 +695,8 @@ jQuery(document).ready(function ($) {
         importImages,
         deleteImages,
         processDataImport,
-        heartbeat,
+        poll,
+        cron,
       };
       break;
     case "product":
@@ -727,7 +755,7 @@ jQuery(document).ready(function ($) {
       post_status,
       content: description,
       screen,
-      record
+      record,
     } = data;
 
     let doc, content;
@@ -793,8 +821,6 @@ jQuery(document).ready(function ($) {
         images.push(image.dataset.imgsrc);
       });
 
-    const kleinanzeigendata = { images };
-
     if (images.length) {
       msg = `${images.length} Foto${1 === images.length ? "" : "s"} wurde${
         1 === images.length ? "" : "n"
@@ -821,18 +847,6 @@ jQuery(document).ready(function ($) {
       error: (error) => {
         console.log(error);
       },
-    });
-  }
-
-  function heartbeat(data) {
-    $.post({
-      url: admin_ajax,
-      data: {
-        action: "_ajax_heartbeat",
-        heartbeat: data || {},
-      },
-      success: (data) => console.log(data),
-      error: (error) => console.log(error),
     });
   }
 });

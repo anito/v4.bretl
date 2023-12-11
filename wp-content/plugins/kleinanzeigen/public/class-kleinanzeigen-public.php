@@ -56,7 +56,7 @@ class Kleinanzeigen_Public extends Kleinanzeigen
      * class.
      */
 
-    wp_enqueue_style(self::$plugin_name . '-map', plugin_dir_url(__FILE__) . 'css/map.css', array(), self::$version, 'all');
+    wp_enqueue_style(self::$plugin_name, plugin_dir_url(__FILE__) . 'css/kleinanzeigen-public.css', array(), self::$version, 'all');
   }
 
   /**
@@ -81,16 +81,29 @@ class Kleinanzeigen_Public extends Kleinanzeigen
     wp_enqueue_script(self::$plugin_name, plugin_dir_url(__FILE__) . 'js/kleinanzeigen-public.js', array('jquery'), self::$version, true);
   }
 
-  function shortcode($atts)
+  public function template_path($path)
   {
-    $atts = shortcode_atts(array(
-      'id' => '1',
-    ), $atts);
-    wbp_ka()->include_template('shortcode', false, $atts);
+    return trailingslashit('public');
   }
 
-  public function register_shortcode()
+  function shortcode_timestamp($atts)
   {
-    add_shortcode('iak', array($this, 'shortcode'));
+    $atts = shortcode_atts(array(
+      'timestamp' => wp_next_scheduled('kleinanzeigen_sync_price'),
+    ), $atts, 'timestamp');
+
+    return $this->include_template('timestamp.php', true, $atts);
+  }
+
+  public function register_shortcodes()
+  {
+    add_shortcode('timestamp', array($this, 'shortcode_timestamp'));
+  }
+
+  public function register_and_build() {
+    // wbp_ka()->kleinanzeigen_header_after();
+    // add_action('kleinanzeigen_header_before', array(wbp_fn(), 'add_timestamp_template'));
+    // wbp_fn()->wbp_header_before();
+    // $this->include_template('kleinanzeigen-public-display.php', false);
   }
 }

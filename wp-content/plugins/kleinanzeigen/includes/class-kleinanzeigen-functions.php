@@ -1,5 +1,7 @@
 <?php
 
+use Pelago\Emogrifier\CssInliner;
+
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
   die();
@@ -171,7 +173,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $tasks = array($name => $tasks[$name]);
       } else {
         // Remove high workload tasks (priority === 3)
-        $tasks = array_filter($tasks, function($task) {
+        $tasks = array_filter($tasks, function ($task) {
           return 3 !== $task['priority'];
         });
       }
@@ -293,7 +295,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $product = null;
         $products = wc_get_products(array('status' => array('publish', 'draft', 'trash'), 'limit' => -1, 'sku_compare' => 'EXISTS'));
 
-        $skus = array_map(function($product) {
+        $skus = array_map(function ($product) {
           return (int) $product->get_sku();
         }, $products);
 
@@ -1137,12 +1139,41 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       return $product;
-      
     }
 
-    public function ajax_heartbeat()
+    public function ajax_poll()
     {
-      $data = $_POST['heartbeat'];
+      die(json_encode(array()));
+    }
+
+    public function ajax_cron()
+    {
+      $job = isset($_POST['job']) ? json_decode(wp_unslash($_POST['job'])) : null;
+
+      $job_results = wbp_db()->get_jobs();
+
+      $get_jobs = function () {
+        $cron_list = _get_cron_array();
+        $jobs = array_filter($cron_list, function ($cron) {
+          return 0 === strpos(key($cron), 'kleinanzeigen');
+        });
+        return array_map(function ($job, $key) {
+          $timestamp = $key;
+          $slug = key($job);
+          $uid = key($job[$slug]);
+          return array(
+            'slug'      => $slug,
+            'timestamp' => $timestamp * 1000,
+            'schedule'  => $job[$slug][$uid]['schedule'],
+            'interval'  => $job[$slug][$uid]['interval'],
+          );
+        }, $jobs, array_keys($jobs));
+      };
+      $jobs = $get_jobs();
+      $data = array(
+        'jobs' => $jobs,
+        'jobResults' =>$job_results
+      );
       die(json_encode(compact('data')));
     }
 
@@ -1181,6 +1212,93 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       return $r;
+    }
+
+    public function dropdown_crawl_interval($selected = '', $schedules)
+    {
+      $r = '';
+      // write_log($schedules);
+      // $actions = array_map(function($item, $key) {
+      //   // write_log('key => ' . $key);
+      //   // write_log($item);
+      //   return array($key => $item['display']);
+      // }, $schedules, array_keys($schedules));
+
+      $actions =  [];
+      foreach($schedules as $key => $item) {
+        // $actions[] = array($key => $item['display']);
+        write_log($item['display']);
+      }
+
+      // write_log($actions);
+
+      foreach ($schedules as $action => $name) {
+        // Preselect specified action.
+        if ($selected === $action) {
+          $r .= "\n\t<option selected='selected' value='" . esc_attr($action) . "'>$name[display]</option>";
+        } else {
+          $r .= "\n\t<option value='" . esc_attr($action) . "'>$name[display]</option>";
+        }
+      }
+
+      return $r;
+    }
+
+    public function sendMail($post_ID, $record) {
+      add_action('kleinanzeigen_email_header', array($this, 'email_header'));
+      add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
+      add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
+
+      $email = '';
+      $additional_content = '';
+      $to_email = get_bloginfo('admin_email');
+      $blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+      $edit_link = admin_url('post.php?action=edit&post=' . $post_ID);
+      $product_title = $record->title;
+      $kleinanzeigen_url = wbp_fn()->get_kleinanzeigen_url($record->url);
+      $email_heading = __('New ad-based product created', 'kleinanzeigen');
+      $headers = array('content-type: text/html');
+
+      $email_content = $this->include_template('emails/new-product.php', true, compact('email', 'additional_content', 'product_title', 'edit_link', 'blogname', 'email_heading', 'kleinanzeigen_url'));
+      $email_content = $this->style_inline($email_content);
+
+      wp_mail($to_email, $email_heading, $email_content, $headers);
+    }
+
+    /**
+     * Apply inline styles to dynamic content.
+     *
+     * We only inline CSS for html emails, and to do so we use Emogrifier library (if supported).
+     *
+     * @version 4.0.0
+     * @param string|null $content Content that will receive inline styles.
+     * @return string
+     */
+    public function style_inline($content)
+    {
+      
+      require_once $this->plugin_path('vendor/autoload.php');
+      
+      $css_inliner_class = CssInliner::class;
+      
+      if (class_exists($css_inliner_class)) {
+        try {
+          $css = $this->include_template('emails/email-styles.php', true);
+          $css_inliner = CssInliner::fromHtml($content)->inlineCss($css);
+
+          do_action('woocommerce_emogrifier', $css_inliner, $this);
+
+          $dom_document = $css_inliner->getDomDocument();
+
+          Pelago\Emogrifier\HtmlProcessor\HtmlPruner::fromDomDocument($dom_document)->removeElementsWithDisplayNone();
+          $content = Pelago\Emogrifier\HtmlProcessor\CssToAttributeConverter::fromDomDocument($dom_document)
+            ->convertCssToVisualAttributes()
+            ->render();
+        } catch (Exception $e) {
+        }
+      }
+
+      return $content;
     }
   }
 }
