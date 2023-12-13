@@ -12,8 +12,6 @@ function wbp_init()
 }
 add_filter('init', 'wbp_init');
 
-// add_action('init', array(wbp_ka(), 'wbp_header_before'));
-
 /**
  * CSRF allowed domains
  */
@@ -262,7 +260,7 @@ function wbp_woo_custom_tabs($tabs)
   );
 
   $meta = get_post_meta($product->get_id());
-  if (!empty($meta['_datasheet'])) {
+  if (class_exists('DG_Gallery') && !empty($meta['_datasheet'])) {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
       'priority'   => 20,

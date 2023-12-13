@@ -25,16 +25,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
     add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 10, 2);
     add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 11);
-    // add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 10, 2);
-
-    if (($this->is_fetch)) {
-      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_columns'), 12, 2);
-      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
-    }
-    if ($this->is_pageload || $this->is_quickedit) {
-      add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
-    }
-
+    add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
   }
 
   function render_row($id)
@@ -47,7 +38,6 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   {
     $thumb = $columns['thumb'];
     $name = $columns['name'];
-    $title = $columns['title'];
     $date = $columns['date'];
     $price = $columns['price'];
     $tag = $columns['product_tag'];
@@ -56,7 +46,6 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
     unset($columns['thumb']);
     unset($columns['name']);
-    unset($columns['title']);
     unset($columns['sku']);
     unset($columns['price']);
     unset($columns['date']);
@@ -99,9 +88,9 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
     switch ($column_name) {
       case 'thumb_': {
-        $this->render_thumb_column();
-        break;
-      }
+          $this->render_thumb_column();
+          break;
+        }
       case 'product_label': {
           echo implode(', ', $product_labels);
           break;
@@ -117,7 +106,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           break;
         }
       case 'sync': {
-        ?>
+?>
           <div class="sync-column-content">
             <div id="import-kleinanzeigen-data-wbp-action-<?php echo $post_ID ?>" style="flex: 1;">
               <span class="spinner"></span>
@@ -138,7 +127,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
             </div>
             <div id="publish-post-wbp-action-<?php echo $post_ID ?>" class="publish-column-content">
               <span class="spinner"></span>
-              <a id="publish-post-<?php echo $post_ID ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_ID ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Hide', 'kleinanzeigen') : __('Publish') ?></a>
+              <a id="publish-post-<?php echo $post_ID ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Hide', 'kleinanzeigen') : __('Publish') ?></a>
             </div>
           </div>
           <script>

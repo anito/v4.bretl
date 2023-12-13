@@ -171,7 +171,77 @@ body {
 }
 
 .link {
-	color: <?php echo esc_attr( $link_color ); ?>;
+  color: <?php echo esc_attr( $link_color ); ?>;
+}
+
+.center {
+  text-align: center;
+}
+
+#body_content .margin-top-10 {
+  margin-top: 10px;
+}
+
+#body_content .margin-bottom-10 {
+  margin-bottom: 10px;
+}
+
+#body_content .margin-top-20 {
+  margin-top: 20px;
+}
+
+#body_content .margin-bottom-20 {
+  margin-bottom: 20px;
+}
+
+#body_content .margin-top-30 {
+  margin-top: 30px;
+}
+
+#body_content .margin-bottom-30 {
+  margin-bottom: 30px;
+}
+
+#body_content .margin-top-40 {
+  margin-top: 40px;
+}
+
+#body_content .margin-bottom-40 {
+  margin-bottom: 40px;
+}
+
+#body_content .margin-top-50 {
+  margin-top: 50px;
+}
+
+#body_content .margin-bottom-50 {
+  margin-bottom: 50px;
+}
+
+.button {
+  display: inline-block;
+  width: 180px;
+  border: 2px solid <?php echo esc_attr( $link_color ); ?>; 
+  border-radius: 5px;
+  min-height: 26px;
+  line-height: 2.18181818;
+  padding: 5px 8px;
+  text-align: center;
+  margin: 10px;
+  text-decoration: none;
+}
+
+.button.button-primary {
+  color: <?php echo esc_attr( $base_text ); ?>;
+  background-color: <?php echo esc_attr( $link_color ); ?>; 
+  border: 0 none;
+}
+
+.thumbnail {
+  margin: 10px;
+  padding: 2px;
+  border: 2px solid <?php echo esc_attr( $link_color ); ?>
+  border-radius: 8px;
 }
 
 #header_wrapper {

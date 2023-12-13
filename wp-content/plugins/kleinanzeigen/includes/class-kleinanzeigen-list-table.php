@@ -12,7 +12,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   private static $INVISIBLE;
   private static $PRICE_DIFF;
   private static $CONTAINS_DEFAULT_CAT;
-  private static $NO_CAT;
+  private static $DEFAULT_CAT;
 
   function __construct()
   {
@@ -25,7 +25,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     self::$INVISIBLE = __('Not visible', 'kleinanzeigen');
     self::$PRICE_DIFF = __('Price deviation', 'kleinanzeigen');
     self::$CONTAINS_DEFAULT_CAT = __('Contains Default Category', 'kleinanzeigen');
-    self::$NO_CAT = __('Invalid Category', 'kleinanzeigen');
+    self::$DEFAULT_CAT = __('Default Category', 'kleinanzeigen');
   }
 
   /**
@@ -105,7 +105,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         if (in_array($default_cat_id, $ids)) {
           $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
           if (1 === count($ids)) {
-            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$NO_CAT);
+            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self:: $DEFAULT_CAT . ' (' . $default_cat->name . ')');
           } else {
             $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
           }

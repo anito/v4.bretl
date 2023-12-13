@@ -24,7 +24,7 @@ if (!class_exists('Kleinanzeigen_Templates')) {
 
     public function register()
     {
-      add_action('init', array($this, 'wbp_header_before'));
+      add_action('display_timestamp', array($this, 'add_timestamp_template'));
     }
     
     public function plugin_path($path = null)
@@ -67,19 +67,12 @@ if (!class_exists('Kleinanzeigen_Templates')) {
       return apply_filters('kleinanzeigen/template-path', null);
     }
 
-    public function wbp_header_before() {
-      if(current_user_can('edit_posts')) {
-        add_action('astra_header_before', array($this, 'add_timestamp_template'));
-      }
-      add_action('kleinanzeigen_header_before', array($this, 'add_timestamp_template'));
-    }
-
     public function add_timestamp_template() {
       $this->include_template('timestamp.php', false);
     }
 
-    public function kleinanzeigen_header_before() {
-      do_action('kleinanzeigen_header_before');
+    public function display_timestamp() {
+      do_action('display_timestamp');
     }
 
     public static function get_instance()

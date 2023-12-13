@@ -27,6 +27,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     add_action('init', array($this, 'loadFiles'), -999);
     add_action('admin_menu', array($this, 'addPluginAdminMenu'), 9);
+    add_filter('pre_option_kleinanzeigen_send_mail_on_new_ad', array($this, 'option_kleinanzeigen_send_mail_on_new_ad'));
+    add_filter("option_page_capability_kleinanzeigen_account_settings", array($this, 'grant_option_cap'));
     add_action('admin_init', array($this, 'registerAndBuildFields'));
 
     // Cron jobs
@@ -45,13 +47,13 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     require_once $this->plugin_path('includes/class-kleinanzeigen-database.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-functions.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-table-ajax.php');
-    require_once $this->plugin_path('includes/class-kleinanzeigen-term-handler.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-list-table.php');
+    require_once $this->plugin_path('includes/class-kleinanzeigen-term-handler.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-table-ajax-modal.php');
-    require_once $this->plugin_path('includes/class-kleinanzeigen-register-wc-taxonomies.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-list-table-tasks.php');
-    require_once $this->plugin_path('includes/class-kleinanzeigen-wc-admin-list-table-products.php');
+    require_once $this->plugin_path('includes/class-kleinanzeigen-register-wc-taxonomies.php');
     require_once $this->plugin_path('includes/class-kleinanzeigen-table-ajax-action-handler.php');
+    require_once $this->plugin_path('includes/class-kleinanzeigen-wc-admin-list-table-products.php');
   }
 
   /**
@@ -111,6 +113,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'admin_ajax'  => admin_url('admin-ajax.php'),
       'screen'      => wbp_fn()->screen_id,
     ));
+  }
+
+  public function grant_option_cap($capabilities)
+  {
+    return self::$capability;
   }
 
   public function template_path($path)
@@ -232,8 +239,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     $items = wbp_fn()->build_tasks('invalid-price')['items'];
 
-    write_log('invalid prices => ' . count($items));
-
     wbp_db()->insert_job(array(
       'slug'  => 'kleinanzeigen_sync_price',
       'count' => count($items)
@@ -259,7 +264,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
       $record = (object) $item['record'];
       $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
-      
+
       $contents = file_get_contents($remoteUrl);
 
       $doc = new DOMDocument();
@@ -321,8 +326,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function addPluginAdminMenu()
   {
     $icon_svg = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI3LjkuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9InV1aWQtY2Y1MDkyNzItMDBlMi00YjJlLWJmZWUtNTZlZjA5ZDhhMDRmIgoJIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTE1IDEzMSIKCSBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxMTUgMTMxOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0E3QUFBRDt9Cjwvc3R5bGU+CjxnIGlkPSJ1dWlkLWRhZDJmZmE0LTgzNzctNDg3Ni04OTY0LWQ3ODEyYWE0NGU5MSI+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNODAuOCwxMjFjLTE0LjksMC0yMi4yLTEwLjQtMjMuNi0xMi41Yy00LjQsNC4zLTExLDEyLjUtMjMsMTIuNWMtMTMuOCwwLTI1LjQtMTAuNC0yNS40LTI3LjNWMzcuMwoJCUM4LjgsMjAuNCwyMC40LDEwLDM0LjIsMTBzMjUuNCwxMSwyNS40LDI3LjFjMi43LTEsNS41LTEuNCw4LjUtMS40YzE0LjIsMCwyNS40LDExLjYsMjUuNCwyNS42YzAsMy45LTAuNyw3LjQtMi40LDEwLjcKCQljOSw0LDE1LjEsMTMuMSwxNS4xLDIzLjRDMTA2LjIsMTA5LjUsOTQuOCwxMjEsODAuOCwxMjFMODAuOCwxMjF6IE02My4zLDEwMi4zYzMuNyw2LjQsOS44LDEwLjIsMTcuNSwxMC4yCgkJYzkuMywwLDE2LjktNy43LDE2LjktMTcuMWMwLTcuNC00LjgtMTMuOS0xMS42LTE2LjJMNjMuMywxMDIuM0M2My4zLDEwMi4zLDYzLjMsMTAyLjMsNjMuMywxMDIuM3ogTTM0LjIsMTguNQoJCWMtOC40LDAtMTYuOSw1LjgtMTYuOSwxOC44djU2LjNjMCwxMyw4LjUsMTguOCwxNi45LDE4LjhjNi43LDAsMTAuNC0zLjQsMTYuNC05LjRsMi42LTIuN2MtMS40LTQuMS0yLjEtOC42LTIuMS0xMy41VjM3LjMKCQlDNTEuMSwyNC40LDQyLjYsMTguNSwzNC4yLDE4LjVMMzQuMiwxOC41TDM0LjIsMTguNXogTTU5LjYsNDYuNHY0MC40YzAsMi4zLDAuMiw0LjUsMC42LDYuNWwxOC40LTE4LjZjNS4zLTUuNCw2LjQtOS4zLDYuNC0xMy42CgkJYzAtOS4xLTcuMi0xNy4xLTE2LjktMTcuMUM2NSw0NC4yLDYyLjIsNDQuOSw1OS42LDQ2LjRMNTkuNiw0Ni40TDU5LjYsNDYuNHoiLz4KPC9nPgo8L3N2Zz4K';
-    add_menu_page(self::$plugin_name, __('Kleinanzeigen', 'kleinanzeigen'), 'administrator', self::$plugin_name, array($this, 'displayPluginAdminDashboard'), $icon_svg, 10);
-    add_submenu_page(self::$plugin_name, __('Kleinanzeigen Settings', 'kleinanzeigen'), __('Settings', 'kleinanzeigen'), 'administrator', self::$plugin_name . '-settings', array($this, 'displayPluginAdminSettings'));
+    add_menu_page(self::$plugin_name, __('Kleinanzeigen', 'kleinanzeigen'), self::$capability, self::$plugin_name, array($this, 'displayPluginAdminDashboard'), $icon_svg, 10);
+    add_submenu_page(self::$plugin_name, __('Kleinanzeigen Settings', 'kleinanzeigen'), __('Settings', 'kleinanzeigen'), self::$capability, self::$plugin_name . '-settings', array($this, 'displayPluginAdminSettings'));
   }
 
   public function displayPluginAdminDashboard()
@@ -369,17 +374,40 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     );
   }
 
+  // user specific option
+  public function option_kleinanzeigen_send_mail_on_new_ad($value)
+  {
+
+    $user_id = wp_get_current_user()->ID;
+    return get_user_meta($user_id, 'kleinanzeigen_send_mail_on_new_ad', true);
+  }
+
   public function registerAndBuildFields()
   {
-    $register = function ($id, $callback = '') {
+
+    $register = function ($id, $callback = '', $is_user_setting = false) {
+
       register_setting(
         'kleinanzeigen_account_settings',
         $id,
         array(
           'sanitize_callback' => $callback,
-          'show_in_rest'      => true
+          'show_in_rest'      => true,
+          'default'           => '0'
         )
       );
+
+      if (true === $is_user_setting) {
+
+        if (!empty($_POST['action']) && 'update' === $_POST['action']) {
+          
+          $user_id = wp_get_current_user()->ID;
+
+          // unchecked checkboxes are not in `$_POST`s array, supply `0` in that case
+          $value = !empty($_POST[$id]) ? $_POST[$id] : '0';
+          update_user_meta($user_id, $id, $value);
+        }
+      }
     };
 
     /**
@@ -400,7 +428,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'text',
       'id'                => 'kleinanzeigen_account_name',
       'name'              => 'kleinanzeigen_account_name',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option'
@@ -422,7 +450,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'checkbox',
       'id'                => 'kleinanzeigen_is_pro_account',
       'name'              => 'kleinanzeigen_is_pro_account',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option'
@@ -444,7 +472,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'number',
       'id'                => 'kleinanzeigen_items_per_page',
       'name'              => 'kleinanzeigen_items_per_page',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => '',
       'disabled'          => true,
       'value_type'        => 'normal',
@@ -475,15 +503,15 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'checkbox',
       'id'                => 'kleinanzeigen_schedule_invalid_prices',
       'name'              => 'kleinanzeigen_schedule_invalid_prices',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => __('Replace product price by updated Kleinanzeigen price', 'kleinanzeigen'),
+      'label'             => __('Accept price changes', 'kleinanzeigen'),
     );
     add_settings_field(
       $args['id'],
-      __('Price changes', 'kleinanzeigen'),
+      __('Prices', 'kleinanzeigen'),
       array($this, 'kleinanzeigen_render_settings_field'),
       'kleinanzeigen_account_settings',
       'kleinanzeigen_background_tasks_section',
@@ -498,7 +526,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'checkbox',
       'id'                => 'kleinanzeigen_schedule_remove_orphaned_links',
       'name'              => 'kleinanzeigen_schedule_remove_orphaned_links',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
@@ -520,7 +548,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'type'              => 'select',
       'id'                => 'kleinanzeigen_schedule_invalid_ads',
       'name'              => 'kleinanzeigen_schedule_invalid_ads',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => wbp_fn()->dropdown_invalid_ads(get_option('kleinanzeigen_schedule_invalid_ads', '0')),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
@@ -543,7 +571,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'checkbox',
       'id'                => 'kleinanzeigen_schedule_new_ads',
       'name'              => 'kleinanzeigen_schedule_new_ads',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
@@ -557,7 +585,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), true);
 
     // Send email new ads
     unset($args);
@@ -566,7 +594,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'checkbox',
       'id'                => 'kleinanzeigen_send_mail_on_new_ad',
       'name'              => 'kleinanzeigen_send_mail_on_new_ad',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
@@ -580,7 +608,33 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), true);
+
+    if(IS_SUBDOMAIN_DEV) {
+      // Send CC to-email new ads
+      unset($args);
+      $args = array(
+        'type'              => 'input',
+        'subtype'           => 'text',
+        'id'                => 'kleinanzeigen_send_cc_mail_on_new_ad',
+        'name'              => 'kleinanzeigen_send_cc_mail_on_new_ad',
+        'required'          => '',
+        'disabled'          => '',
+        'get_options_list'  => '',
+        'value_type'        => 'normal',
+        'wp_data'           => 'option',
+        'label'             => __('Send CC during test phase', 'kleinanzeigen'),
+      );
+      add_settings_field(
+        $args['id'],
+        __('CC during development', 'kleinanzeigen'),
+        array($this, 'kleinanzeigen_render_settings_field'),
+        'kleinanzeigen_account_settings',
+        'kleinanzeigen_background_tasks_section',
+        $args
+      );
+      $register($args['id'], array($this, 'sanitize_option'), true);
+    }
 
     // Cron Job Interval
     unset($args);
@@ -589,7 +643,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'subtype'           => 'checkbox',
       'id'                => 'kleinanzeigen_crawl_interval',
       'name'              => 'kleinanzeigen_crawl_interval',
-      'required'          => 'true',
+      'required'          => '',
       'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval', 'every_minute'), $this->schedules()),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
@@ -630,6 +684,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * 'id'               => self::$plugin_name.'_example_setting',
      * 'name'             => self::$plugin_name.'_example_setting',
      * 'required'         => 'required="required"',
+     * 'disabled'         => 'true | false',
      * 'get_option_list'  => "",
      * 'value_type' = serialized OR normal,
      * 'wp_data'=>(option or post_meta),
@@ -655,12 +710,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
             // hide the actual input bc if it was just a disabled input the info saved in the database would be wrong - bc it would pass empty values and wipe the actual information
             echo $prependStart . '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '_disabled" ' . $step . ' ' . $max . ' ' . $min . ' name="' . $args['name'] . '_disabled" size="40" disabled value="' . esc_attr($value) . '" /><input type="hidden" id="' . $args['id'] . '" ' . $step . ' ' . $max . ' ' . $min . ' name="' . $args['name'] . '" size="40" value="' . esc_attr($value) . '" />' . $prependEnd;
           } else {
-            echo $prependStart . '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '" "' . $args['required'] . '" ' . $step . ' ' . $max . ' ' . $min . ' name="' . $args['name'] . '" size="40" value="' . esc_attr($value) . '" />' . $prependEnd;
+            echo $prependStart . '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '" ' .  $args['required'] . $step . ' ' . $max . ' ' . $min . ' name="' . $args['name'] . '" size="40" data-value="' . esc_attr($value) . '" value="' . esc_attr($value) . '" />' . $prependEnd;
           }
           /*<input required="required" '.$disabled.' type="number" step="any" id="'.self::$plugin_name.'_cost2" name="'.self::$plugin_name.'_cost2" value="' . esc_attr( $cost ) . '" size="25" /><input type="hidden" id="'.self::$plugin_name.'_cost" step="any" name="'.self::$plugin_name.'_cost" value="' . esc_attr( $cost ) . '" />*/
         } else {
           $checked = ($value) ? 'checked' : '';
-          echo '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '" "' . $args['required'] . '" name="' . $args['name'] . '" size="40" value="1" ' . $checked . ' />';
+          echo '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '" ' .  $args['required'] . ' name="' . $args['name'] . '" data-value="' . esc_attr($value) . '" size="40" value="1" ' . $checked . ' />';
         }
 
         break;

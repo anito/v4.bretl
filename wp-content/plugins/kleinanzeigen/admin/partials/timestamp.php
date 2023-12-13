@@ -1,4 +1,3 @@
-<?php setcookie('kleinanzeigen-job-items-count', 12) ?>
 <div class="timestamp-wrap">
   <div class="timestamp" id="wbp-timestamp">
     <span><?php echo __('Loading', 'kleinanzeigen') ?> ...</span>
@@ -84,12 +83,12 @@
         clearInterval(intervalId);
         intervalId = setInterval(render, 1000, el(), {
           job,
-          template: templates('tmr') // Template for displaying remaining
+          template: templates('timer') // Template for displaying remaining
         })
 
       } else {
         render(el(), {
-          template: templates('ntd') // Template "Nothing to do"
+          template: templates('ntodo') // Template "Nothing to do"
         })
         intervalId_wait = setInterval(cronlistCallback, 5000, () => clearInterval(intervalId_wait));
       }
@@ -98,11 +97,12 @@
     const templates = (id) => {
 
       const tmpl = {
-        tmr: (job) => {
+        timer: (job) => {
           const delta = job.timestamp - new Date().getTime();
-          return delta >= 0 ? `<span class="label">Next job: ${job.slug}</span><span class="value">${displayTime(delta)}</span>` : `<span>busy...</span>`;
+          return delta >= 0 ? `<span class="value">${displayTime(delta)}</span><span class="label">${job.slug}</span>` : `<span>busy...</span>`;
         },
-        ntd: `<span class="label">Nothing to do</span>`
+        ntodo: `<span class="label">Nothing to do</span>`,
+        stop: `<span class="label">Cron stopped</span>`
       }
       return tmpl[id];
     }
@@ -122,31 +122,36 @@
     const scheduledJobs = CreateScheduledJobs.getInstance();
     scheduledJobs._callback = cronlistCallback;
 
-    cronlistCallback()
+
+    function cron_start() {
+      cronlistCallback();
+    }
+
+    function cron_stop() {
+      clearInterval(intervalId_wait);
+      clearInterval(intervalId);
+
+      render(el(), {
+        template: templates('stop') // Template "Cron stopped"
+      })
+    }
+
+    cron_start();
+    // cron_stop();
 
   });
 </script>
 
 <style>
-  .timestamp-wrap {
-    position: fixed;
-    right: 0px;
-    bottom: 0px;
-    z-index: 999;
-    margin-bottom: 10px;
-    margin-right: 10px;
-  }
-
   #wbp-timestamp {
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.8em;
-    min-width: 130px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: #3c434a;
     color: #ddd;
-    border-radius: 99px;
+    border-radius: 0 9px 9px;
     padding: 4px 10px 3px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     line-height: 1em;
@@ -154,10 +159,14 @@
   }
 
   #wbp-timestamp .label {
-    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: auto;
   }
-
+  
   #wbp-timestamp .value {
     font-weight: 500;
+    margin-right: 20px;
   }
 </style>

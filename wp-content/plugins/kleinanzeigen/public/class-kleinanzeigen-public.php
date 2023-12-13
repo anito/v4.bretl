@@ -100,10 +100,7 @@ class Kleinanzeigen_Public extends Kleinanzeigen
     add_shortcode('timestamp', array($this, 'shortcode_timestamp'));
   }
 
-  public function register_and_build() {
-    // wbp_ka()->kleinanzeigen_header_after();
-    // add_action('kleinanzeigen_header_before', array(wbp_fn(), 'add_timestamp_template'));
-    // wbp_fn()->wbp_header_before();
-    // $this->include_template('kleinanzeigen-public-display.php', false);
+  public function register_and_build()
+  {
   }
 }

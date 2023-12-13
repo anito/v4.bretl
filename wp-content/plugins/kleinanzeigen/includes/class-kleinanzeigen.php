@@ -31,7 +31,7 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
 {
 
   private static $instance;
-  
+
   /**
    * The loader that's responsible for maintaining and registering all hooks that power
    * the plugin.
@@ -61,6 +61,24 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
   protected static $version;
 
   /**
+   * The plugin data.
+   *
+   * @since    1.0.0
+   * @access   protected
+   * @var      object    $plugin data    The plugin data.
+   */
+  protected static $plugin_data;
+
+  /**
+   * The capability of the plugin.
+   *
+   * @since    1.0.0
+   * @access   protected
+   * @var      string    $capability    The capability of the plugin.
+   */
+  protected static $capability;
+
+  /**
    * Define the core functionality of the plugin.
    *
    * Set the plugin name and the plugin version that can be used throughout the plugin.
@@ -71,12 +89,11 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
    */
   public function __construct($file)
   {
-    if (!defined('KLEINANZEIGEN_VERSION')) {
-      $data = $this->get_plugin_data($file);
-      define('KLEINANZEIGEN_VERSION', $data['Version']);
-    }
-    self::$version = KLEINANZEIGEN_VERSION;
-    self::$plugin_name = strtolower($data['Name']);
+    self::$plugin_data = $this->get_plugin_data($file);
+
+    self::$capability = 'edit_posts';
+    self::$version = self::$plugin_data->Version;
+    self::$plugin_name = strtolower(self::$plugin_data->Name);
 
     $this->load_dependencies();
     $this->set_locale();
@@ -104,7 +121,7 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
 
     $plugin_data = get_file_data($plugin_file, $default_headers, 'plugin');
 
-    return $plugin_data;
+    return (object) $plugin_data;
   }
 
   /**
@@ -209,8 +226,8 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
   private function define_public_hooks()
   {
 
-    if(is_admin()) return;
-    
+    if (is_admin()) return;
+
     $plugin_public = new Kleinanzeigen_Public();
 
     $this->loader->add_action('init', $plugin_public, 'register_shortcodes');
@@ -221,14 +238,14 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
     $this->loader->add_filter('kleinanzeigen/template-path', $plugin_public, 'template_path');
   }
 
-  
+
   public function assets_url()
   {
 
     return trailingslashit($this->plugin_url('assets'));
   }
 
-  public function plugin_url($path = null)
+  public function plugin_url($path = '')
   {
 
     if (!$this->plugin_url) {
@@ -280,6 +297,23 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
   public function get_version()
   {
     return self::$version;
+  }
+
+  public function get_plugin_author()
+  {
+
+    if (!defined('HOST')) {
+      define('HOST', $_SERVER['HTTP_HOST']);
+    }
+
+    $parts = explode('.', HOST);
+    $last = count($parts) - 1;
+    $tld = $parts[$last];
+    
+    $author['email'] = "info@webpremiere.{$tld}";
+    $author['name'] = self::$plugin_data->Name;
+
+    return (object) $author;
   }
 
   public static function get_instance($file =  null)

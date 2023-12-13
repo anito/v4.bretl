@@ -228,6 +228,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           break;
       }
 
+      $head = null;
       switch ($screen) {
         case 'toplevel_page_kleinanzeigen':
         case 'modal':
@@ -455,6 +456,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           break;
       }
 
+      $head = null;
       switch ($screen) {
         case 'toplevel_page_kleinanzeigen':
           $head = $this->render_head();
