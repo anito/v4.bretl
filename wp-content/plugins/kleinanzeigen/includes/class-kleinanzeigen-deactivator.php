@@ -10,6 +10,8 @@
  * @subpackage Kleinanzeigen/includes
  */
 
+require_once plugin_dir_path(__FILE__) . 'class-kleinanzeigen-installer.php';
+
 /**
  * Fired during plugin deactivation.
  *
@@ -20,7 +22,7 @@
  * @subpackage Kleinanzeigen/includes
  * @author     Ben Shadle <benshadle@gmail.com>
  */
-class Kleinanzeigen_Deactivator
+class Kleinanzeigen_Deactivator extends Kleinanzeigen_Installer
 {
 
 	/**
@@ -87,6 +89,16 @@ class Kleinanzeigen_Deactivator
 		foreach ($caps as $key => $granted) {
 
 			$shop_manager->add_cap($key, $granted);
+		}
+
+		$capabilities = self::get_core_capabilities();
+
+		$wp_roles = new WP_Roles();
+
+		foreach ($capabilities as $cap_group) {
+			foreach ($cap_group as $cap) {
+				$wp_roles->add_cap('shop_manager', $cap);
+			}
 		}
 	}
 

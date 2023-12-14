@@ -101,7 +101,7 @@ if (!function_exists('wbp_db')) {
    * Returns instance of the plugin class.
    *
    * @since  1.0.0
-   * @return object
+   * @return Kleinanzeigen_Database
    */
   function wbp_db(): Kleinanzeigen_Database
   {

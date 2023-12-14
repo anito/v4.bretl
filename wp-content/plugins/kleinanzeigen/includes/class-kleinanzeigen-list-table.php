@@ -105,7 +105,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         if (in_array($default_cat_id, $ids)) {
           $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
           if (1 === count($ids)) {
-            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self:: $DEFAULT_CAT . ' (' . $default_cat->name . ')');
+            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$DEFAULT_CAT . ' (' . $default_cat->name . ')');
           } else {
             $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
           }

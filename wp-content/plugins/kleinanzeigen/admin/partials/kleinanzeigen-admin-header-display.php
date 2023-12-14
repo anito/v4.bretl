@@ -87,6 +87,14 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
                   </div>
                   <div class="task-value">0</div>
                 </div>
+                <?php $title = "Zeige alle Produkte die Probleme mit der Kategoriezuweisung haben." ?>
+                <div class="task invalid-cat">
+                  <div class="task-name">
+                    <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
+                    <a href="#" class="start-task" data-task-type="invalid-cat"><?php echo __('Category issues', 'kleinanzeigen'); ?></a>
+                  </div>
+                  <div class="task-value">0</div>
+                </div>
               </div>
             </fieldset>
           </div>
@@ -274,12 +282,13 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
   }
 
   #kleinanzeigen-head-wrap .fieldset {
-    border: 0 solid #eee;
+    border: 1px solid #d3ebff;
     background-color: #f8fbff;
     padding: 10px;
     margin-bottom: 10px;
     font-size: 11px;
     font-weight: 300;
+    box-shadow: -29px 30px 78px 12px rgb(0 134 255 / 15%);
   }
 
   #kleinanzeigen-head-wrap #inconsistencies .fieldset {

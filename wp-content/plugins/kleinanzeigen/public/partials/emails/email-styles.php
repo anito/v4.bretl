@@ -302,6 +302,10 @@ img {
 	max-width: 100%;
 }
 
+.small {
+	font-size: 10px;
+}
+
 /**
  * Media queries are not supported by all email clients, however they do work on modern mobile
  * Gmail clients and can help us achieve better consistency there.

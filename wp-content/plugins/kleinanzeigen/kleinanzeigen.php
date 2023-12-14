@@ -97,6 +97,7 @@ require plugin_dir_path(__FILE__) . 'includes/class-kleinanzeigen.php';
  * not affect the page life cycle.
  *
  * @since    1.0.0
+ * @return Kleinanzeigen
  */
 if (!function_exists('wbp_ka')) {
 

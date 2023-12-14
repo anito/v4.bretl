@@ -91,7 +91,7 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
   {
     self::$plugin_data = $this->get_plugin_data($file);
 
-    self::$capability = 'edit_posts';
+    self::$capability = 'manage_product_terms';
     self::$version = self::$plugin_data->Version;
     self::$plugin_name = strtolower(self::$plugin_data->Name);
 

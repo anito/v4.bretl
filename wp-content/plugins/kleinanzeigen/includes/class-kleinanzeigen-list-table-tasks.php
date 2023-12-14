@@ -94,6 +94,23 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           )
         );
         break;
+      case 'invalid-cat':
+        $default_cat_id = get_option('default_product_cat');
+        $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-table-header',
+            'args' => array(
+              'header' => sprintf(__('Products of category "%1$s"', 'kleinanzeigen'), $default_cat->name),
+              'subheader' => __('It should be avoided to assign products the default category in order to prevent visitors from finding them.', 'kleinanzeigen')
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+        break;
       case 'has-sku':
         $vars = array(
           'header-template' => array(
@@ -385,6 +402,10 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             $disabled = $price === $shop_price;
             $label = $price !== $shop_price ? __('Accept KA price', 'kleinanzeigen') : __('KA Price accepted', 'kleinanzeigen');
             $actions = wbp_ka()->include_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'task_type', 'disabled'));
+            break;
+          case 'invalid-cat':
+            $label = __('Edit', 'kleinanzeigen');
+            $actions = wbp_ka()->include_template('/dashboard/invalid-cat-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
             break;
           case 'has-sku':
           case 'no-sku':

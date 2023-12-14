@@ -167,6 +167,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           'priority' => 1,
           'items' => array()
         ),
+        'invalid-cat' => array(
+          'priority' => 1,
+          'items' => array()
+        ),
         'has-sku' => array(
           'priority' => 2,
           'items' => array()
@@ -213,6 +217,29 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       return isset($tasks[$name]) ? $tasks[$name] : $tasks;
+    }
+
+    public function get_invalid_cat_products()
+    {
+
+      $default_cat_id = get_option('default_product_cat');
+      $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
+
+      $args = array(
+        'post_type' => 'product',
+        'tax_query' => array(
+          array(
+            'taxonomy'  => 'product_cat',
+            'field'     => 'slug',
+            'terms' => array($default_cat->slug),
+          ),
+        ),
+      );
+      $query = new WP_Query($args);
+      $posts = $query->get_posts();
+      return array_map(function($post) {
+        return wc_get_product($post->ID);
+      }, $posts);
     }
 
     public function get_product_by_title($title)
@@ -282,6 +309,15 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $products = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'NOT EXISTS'));
         $record = null;
         foreach ($products as $product) {
+          $items[] = compact('product', 'task_type', 'record');
+        }
+        return $items;
+      }
+      if ($task_type === 'invalid-cat') {
+        $products = $this->get_invalid_cat_products();
+        foreach ($products as $product) {
+          $sku = $product->get_sku();
+          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
           $items[] = compact('product', 'task_type', 'record');
         }
         return $items;
@@ -673,7 +709,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       $product = new WC_Product();
       $product->set_name($record->title);
-      $product->set_status('publish');
+      $product->set_status('draft');
       $post_ID = $product->save();
 
       wp_insert_post(array(
@@ -704,17 +740,17 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function create_product_images($post_ID, $doc)
     {
-      
+
       $images = array();
       $xpath = new DOMXpath($doc);
       $items = $xpath->query("//*[@id='viewad-product']//*[@data-ix]//img/@data-imgsrc");
-      
+
       foreach ($items as $item) {
         $images[] = $item->value;
       }
       $images = array_unique($images);
-      
-      if(count($images)) {
+
+      if (count($images)) {
         Utils::remove_attachments($post_ID);
 
         $ids = [];
@@ -730,11 +766,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         if (count($ids)) {
           update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
         }
-
       }
-
-
-
     }
 
     public function get_product_variation($product, $term_name, $taxonomy)
@@ -1280,7 +1312,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return false;
     }
 
-    public static function get_instance($file = null)
+    public static function get_instance($file = null): Kleinanzeigen_Functions
     {
       // If the single instance hasn't been set, set it now.
       if (null == self::$instance) {
@@ -1342,6 +1374,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
       $edit_link          = admin_url('post.php?action=edit&post=' . $post_ID);
       $permalink          = $permalink = get_permalink($post_ID);
+      $previewlink        = get_preview_post_link($post_ID);
       $plugin_name        = wbp_ka()->get_plugin_name();
       $plugin_link        = admin_url("admin.php?page={$plugin_name}");
       $product_title      = $record->title;
@@ -1354,7 +1387,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         "Bcc: {$author_email}"
       );
 
-      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'edit_link', 'permalink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
+      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
       $email_content = $this->style_inline($email_content);
 
       wp_mail($to_email, $email_heading, $email_content, $headers);
@@ -1445,7 +1478,7 @@ if (!function_exists('wbp_fn')) {
    * Returns instance of the plugin class.
    *
    * @since  1.0.0
-   * @return object
+   * @return Kleinanzeigen_Functions
    */
   function wbp_fn(): Kleinanzeigen_Functions
   {

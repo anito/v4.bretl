@@ -277,7 +277,7 @@ if (!function_exists('wbp_th')) {
    * Returns instance of the plugin class.
    *
    * @since  1.0.0
-   * @return object
+   * @return Kleinanzeigen_Term_Handler
    */
   function wbp_th(): Kleinanzeigen_Term_Handler
   {

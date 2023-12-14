@@ -126,7 +126,7 @@ if (!function_exists('wbp_rt')) {
    * Returns instance of the plugin class.
    *
    * @since  1.0.0
-   * @return object
+   * @return Kleinanzeigen_Register_WC_Taxonomies
    */
   function wbp_rt(): Kleinanzeigen_Register_WC_Taxonomies
   {

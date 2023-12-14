@@ -10,6 +10,8 @@
  * @subpackage Kleinanzeigen/includes
  */
 
+require_once plugin_dir_path(__FILE__) . 'class-kleinanzeigen-installer.php';
+
 /**
  * Fired during plugin activation.
  *
@@ -20,7 +22,7 @@
  * @subpackage Kleinanzeigen/includes
  * @author     Ben Shadle <benshadle@gmail.com>
  */
-class Kleinanzeigen_Activator
+class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
 {
 
   /**
@@ -35,6 +37,7 @@ class Kleinanzeigen_Activator
 
     self::add_job_db();
     self::user_caps();
+    self::setup_environment();
   }
 
   private static function user_caps()
@@ -43,52 +46,68 @@ class Kleinanzeigen_Activator
     $shop_manager = get_role('shop_manager');
 
     $caps = array(
-      'level_9'                => false,
-      'level_8'                => false,
-      'level_7'                => false,
-      'level_6'                => false,
-      'level_5'                => false,
-      'level_4'                => false,
-      'level_3'                => false,
-      'level_2'                => false,
-      'level_1'                => false,
-      'level_0'                => false,
+      'level_9'                => true,
+      'level_8'                => true,
+      'level_7'                => true,
+      'level_6'                => true,
+      'level_5'                => true,
+      'level_4'                => true,
+      'level_3'                => true,
+      'level_2'                => true,
+      'level_1'                => true,
+      'level_0'                => true,
       'read'                   => true,
-      'read_private_pages'     => true,
-      'read_private_posts'     => true,
-      'edit_posts'             => true,
+      'read_private_pages'     => false,
+      'read_private_posts'     => false,
+      'edit_posts'             => false,
       'edit_pages'             => false,
-      'edit_published_posts'   => true,
+      'edit_published_posts'   => false,
       'edit_published_pages'   => false,
-      'edit_private_pages'     => true,
-      'edit_private_posts'     => true,
-      'edit_others_posts'      => true,
+      'edit_private_pages'     => false,
+      'edit_private_posts'     => false,
+      'edit_others_posts'      => false,
       'edit_others_pages'      => false,
-      'publish_posts'          => true,
+      'publish_posts'          => false,
       'publish_pages'          => false,
-      'delete_posts'           => true,
+      'delete_posts'           => false,
       'delete_pages'           => false,
-      'delete_private_pages'   => true,
-      'delete_private_posts'   => true,
+      'delete_private_pages'   => false,
+      'delete_private_posts'   => false,
       'delete_published_pages' => false,
-      'delete_published_posts' => true,
-      'delete_others_posts'    => true,
-      'delete_others_pages'    => true,
+      'delete_published_posts' => false,
+      'delete_others_posts'    => false,
+      'delete_others_pages'    => false,
       'manage_categories'      => false,
       'manage_links'           => false,
       'moderate_comments'      => false,
       'upload_files'           => true,
-      'export'                 => true,
-      'import'                 => true,
+      'export'                 => false,
+      'import'                 => false,
       'list_users'             => true,
       'edit_theme_options'     => false,
     );
 
-    foreach($caps as $key => $granted) {
-      
-      $shop_manager->add_cap($key, $granted);
+    foreach ($caps as $key => $granted) {
 
+      $shop_manager->add_cap($key, $granted);
     }
+
+    $capabilities = self::get_core_capabilities();
+
+    $wp_roles = new WP_Roles();
+
+    foreach ($capabilities as $cap_group) {
+      foreach ($cap_group as $cap) {
+        $wp_roles->add_cap('shop_manager', $cap);
+      }
+    }
+  }
+
+  private static function setup_environment()
+  {
+
+    // TODO
+    // self::register_taxonomies();
   }
 
   private static function add_job_db()
@@ -111,5 +130,53 @@ class Kleinanzeigen_Activator
     dbDelta($sql);
 
     add_option('kleinanzeigen_db_version', $kleinanzeigen_db_version);
+  }
+
+  private static function register_taxonomies()
+  {
+
+    $s = register_taxonomy(
+      'product_lapel',
+      'product',
+      array(
+        'hierarchical'          => false,
+        'update_count_callback' => '_wc_term_recount',
+        'label'                 => __('Lapels', 'kleinanzeigen'),
+        'labels'                => array(
+          'name'                  => __('Product labels', 'kleinanzeigen'),
+          'singular_name'         => __('Lapel', 'kleinanzeigen'),
+          'menu_name'             => _x('Lapels', 'Admin menu name', 'kleinanzeigen'),
+          'search_items'          => __('Search labels', 'kleinanzeigen'),
+          'all_items'             => __('All labels', 'kleinanzeigen'),
+          'parent_item'           => __('Parent label', 'kleinanzeigen'),
+          'parent_item_colon'     => __('Parent label:', 'kleinanzeigen'),
+          'edit_item'             => __('Edit label', 'kleinanzeigen'),
+          'update_item'           => __('Update label', 'kleinanzeigen'),
+          'add_new_item'          => __('Add new label', 'kleinanzeigen'),
+          'new_item_name'         => __('New label name', 'kleinanzeigen'),
+          'not_found'             => __('No labels found', 'kleinanzeigen'),
+          'item_link'             => __('Product Lapel Link', 'kleinanzeigen'),
+          'item_link_description' => __('A link to a product label.', 'kleinanzeigen'),
+        ),
+        'show_in_rest'          => true,
+        'show_ui'               => true,
+        "show_in_menu"          => true,
+        "show_in_nav_menus"     => true,
+        "show_admin_column"     => true,
+        'query_var'             => true,
+        'capabilities'          => array(
+          'manage_terms' => 'manage_product_terms',
+          'edit_terms'   => 'edit_product_terms',
+          'delete_terms' => 'delete_product_terms',
+          'assign_terms' => 'assign_product_terms',
+        ),
+        'rewrite'               => array(
+          'slug'         => 'product_lapel',
+          'with_front'   => true,
+          'hierarchical' => false,
+        ),
+      )
+    );
+    register_taxonomy_for_object_type('product_lapel', 'product');
   }
 }

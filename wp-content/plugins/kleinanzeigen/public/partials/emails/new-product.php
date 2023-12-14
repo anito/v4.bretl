@@ -29,10 +29,10 @@ do_action('kleinanzeigen_email_header', $email_heading); ?>
 <p><?php printf(esc_html__('The product %1$s has been automatically created based on the following ad:', 'kleinanzeigen'), '<strong>' . esc_html($product_title) . '</strong>'); ?></p>
 <p><?php echo esc_html($kleinanzeigen_url); ?></p>
 <p class="center margin-top-20">
-  <span><?php echo '<a href="' . esc_html($permalink) . '" class="button button-primary">' . esc_html__('View product', 'kleinanzeigen') . '</a>'; ?></span>
-  <span><?php echo '<a href="' . esc_html($edit_link) . '" class="button button-primary">' . esc_html__('Edit product', 'kleinanzeigen') . '</a>'; ?></span>
+  <span><?php echo '<a href="' . esc_html($previewlink) . '" class="button button-primary">' . esc_html__('Preview', 'kleinanzeigen') . '</a>'; ?></span>
+  <span><?php echo '<a href="' . esc_html($edit_link) . '" class="button button-primary">' . esc_html__('Edit', 'kleinanzeigen') . '</a>'; ?></span>
 </p>
-<p><?php printf(esc_html__('Manage your Kleinanzeigen.de products in your online store here: %1$s', 'kleinanzeigen'), esc_html($plugin_link)); ?></p>
+<p class="small"><?php printf(esc_html__('Manage your Kleinanzeigen.de products in your online store here: %1$s', 'kleinanzeigen'), esc_html($plugin_link)); ?></p>
 
 <?php
 /**

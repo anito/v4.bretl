@@ -28,7 +28,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('init', array($this, 'loadFiles'), -999);
     add_action('admin_menu', array($this, 'addPluginAdminMenu'), 9);
     add_filter('pre_option_kleinanzeigen_send_mail_on_new_ad', array($this, 'option_kleinanzeigen_send_mail_on_new_ad'));
-    add_filter("option_page_capability_kleinanzeigen_account_settings", array($this, 'grant_option_cap'));
+    add_filter("option_page_capability_kleinanzeigen_account_settings", array($this, 'get_capability'));
     add_action('admin_init', array($this, 'registerAndBuildFields'));
 
     // Cron jobs
@@ -115,7 +115,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     ));
   }
 
-  public function grant_option_cap($capabilities)
+  public function get_capability($capabilities)
   {
     return self::$capability;
   }
