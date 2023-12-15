@@ -186,17 +186,17 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   {
     return array(
       'status-start' => __(''),
-      'image' => __('Bild'),
-      'title' => __('Titel'),
-      'date' => __('Änd.-Datum'),
-      'price' => __('KA Preis'),
-      'shop-price' => __('Shop Preis'),
-      'shop-categories' => __('Kategorien'),
-      'shop-brands' => __('Hersteller'),
-      'shop-labels' => __('Labels'),
+      'image' => __('Image', 'kleinanzeigen'),
+      'title' => __('Title', 'kleinanzeigen'),
+      'date' => __('Date of change', 'kleinanzeigen'),
+      'price' => __('KA Price'),
+      'shop-price' => __('Shop Price', 'kleinanzeigen'),
+      'shop-categories' => __('Categories', 'kleinanzeigen'),
+      'shop-brands' => __('Vendor', 'kleinanzeigen'),
+      'shop-labels' => __('Labels', 'kleinanzeigen'),
       'shop-featured' => '<i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i>',
-      'shop-actions' => __('Aktionen'),
-      'shop-actions-import' => __('Import'),
+      'shop-actions' => __('Actions', 'kleinanzeigen'),
+      'shop-actions-import' => __('Import', 'kleinanzeigen'),
     );
   }
 

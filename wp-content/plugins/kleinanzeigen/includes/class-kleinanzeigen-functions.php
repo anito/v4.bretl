@@ -712,6 +712,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $product->set_status('draft');
       $post_ID = $product->save();
 
+      $this->set_product_data($product, $record, $content);
+
       wp_insert_post(array(
         'ID' => $post_ID,
         'post_title' => $record->title,
@@ -721,19 +723,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
       ), true);
 
-      $this->set_product_data($product, $record, $content);
-      $product = $this->enable_sku($product, $record);
-
-      if (is_wp_error($product)) {
-        $error_data = $product->get_error_data();
-        if (isset($error_data['resource_id'])) {
-          if (is_callable('write_log')) {
-            // write_log($error_data);
-          }
-          wp_delete_post($error_data['resource_id'], true);
-        }
-        die();
-      };
+      $this->enable_sku($product, $record);
 
       return $post_ID;
     }
@@ -842,6 +832,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $regular_price = (int) $price + (int) $price * $percent / 100;
       $product->set_regular_price($regular_price);
       $product->set_sale_price($price);
+      $product->save();
     }
 
     public function text_contains($needle, $haystack, $searchtype = '')
@@ -871,7 +862,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $product = wc_get_product($product_id);
 
       $this->set_pseudo_sale_price($product, $price);
-      return $this->handle_product_label($args['term_name'], $product);;
+      return $this->handle_product_label($args['term_name'], $product);
     }
 
     public function handle_product_contents_aktion($args)

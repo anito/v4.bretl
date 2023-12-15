@@ -392,6 +392,7 @@ jQuery(document).ready(function ($) {
     start();
 
     const el = e.target;
+    const _screen = el.dataset.screen || screen;
 
     let post_ID;
     if (form) {
@@ -419,6 +420,7 @@ jQuery(document).ready(function ($) {
       url: admin_ajax,
       data: {
         action: "_ajax_delete_images",
+        screen: _screen,
         post_ID,
       },
       success: (data) => parseResponse(data, el),

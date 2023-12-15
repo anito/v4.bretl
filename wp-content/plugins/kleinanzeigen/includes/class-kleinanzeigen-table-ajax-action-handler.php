@@ -515,11 +515,18 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function ajax_delete_images()
     {
-      if (isset($_REQUEST['post_ID'])) {
-        $post_ID = $_REQUEST['post_ID'];
-        Utils::remove_attachments($post_ID);
+      if (!isset($_REQUEST['post_ID'])) return;
+
+      $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
+      $post_ID = $_REQUEST['post_ID'];
+      Utils::remove_attachments($post_ID);
+
+      $row = null;
+      switch ($screen) {
+        case 'edit-product':
+          $row = $this->render_wc_admin_list_row($post_ID);
+          break;
       }
-      $row = $this->render_wc_admin_list_row($post_ID);
 
       echo json_encode([
         'data' => compact(['row', 'post_ID'])

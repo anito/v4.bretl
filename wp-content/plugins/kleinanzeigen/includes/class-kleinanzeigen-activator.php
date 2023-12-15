@@ -34,10 +34,11 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
    */
   public static function activate()
   {
+    global $wpdb;
 
     self::add_job_db();
     self::user_caps();
-    self::setup_environment();
+    // self::setup_environment(); // TODO
   }
 
   private static function user_caps()
@@ -99,6 +100,7 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
     foreach ($capabilities as $cap_group) {
       foreach ($cap_group as $cap) {
         $wp_roles->add_cap('shop_manager', $cap);
+        $wp_roles->add_cap('administrator', $cap);
       }
     }
   }
@@ -106,8 +108,7 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
   private static function setup_environment()
   {
 
-    // TODO
-    // self::register_taxonomies();
+    self::register_taxonomies();
   }
 
   private static function add_job_db()

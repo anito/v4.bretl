@@ -24,10 +24,14 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     }
 
     add_filter('list_table_primary_column', array($this, 'list_table_primary_column'), 10, 2);
-    add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 11);
+    add_filter('manage_' . $this->list_table_type . '_posts_columns', array($this, 'define_custom_columns'), 99);
     add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
   }
 
+  function get_primary_column() {
+    return 'name';
+  }
+  
   function render_row($id)
   {
     $wp_list_table = _get_list_table('WP_Posts_List_Table', array('screen' => 'edit-product'));
@@ -87,10 +91,6 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     } else return 0;
 
     switch ($column_name) {
-      case 'thumb_': {
-          $this->render_thumb_column();
-          break;
-        }
       case 'product_label': {
           echo implode(', ', $product_labels);
           break;

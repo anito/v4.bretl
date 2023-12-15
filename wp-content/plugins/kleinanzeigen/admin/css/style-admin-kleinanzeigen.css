@@ -529,14 +529,19 @@ section .color-box.invalid {
 }
 
 .wp-list-kleinanzeigen-tasks .column-title {
-  width: 30%;
+  width: 20%;
 }
+
 .wp-list-kleinanzeigen-tasks .column-ka-price {
   width: 10%;
 }
 
 .wp-list-kleinanzeigen-tasks .column-shop-price {
   width: 10%;
+}
+
+.wp-list-kleinanzeigen-tasks .column-shop-categories {
+  width: 15%;
 }
 
 .wp-list-kleinanzeigen-tasks .column-featured {

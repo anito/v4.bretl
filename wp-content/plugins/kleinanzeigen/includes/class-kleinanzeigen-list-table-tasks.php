@@ -97,12 +97,15 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       case 'invalid-cat':
         $default_cat_id = get_option('default_product_cat');
         $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
+        $subheader = '';
+        $subheader .= __('It should be generally avoided to assign the default category to products.', 'kleinanzeigen') . '<br />';
+        $subheader .= __('Please assign a different category in order to allow visitors to find them.', 'kleinanzeigen');
         $vars = array(
           'header-template' => array(
             'template' => 'modal-table-header',
             'args' => array(
               'header' => sprintf(__('Products of category "%1$s"', 'kleinanzeigen'), $default_cat->name),
-              'subheader' => __('It should be avoided to assign products the default category in order to prevent visitors from finding them.', 'kleinanzeigen')
+              'subheader' => $subheader
             )
           ),
           'footer-template' => array(
@@ -261,13 +264,14 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
   {
     return array(
       'id' => 'ID',
-      'status-start' => '',
-      'image' => __('Bild'),
-      'title' => __('Titel'),
-      'ka-price' => __('KA Preis'),
-      'shop-price' => __('Shop Preis'),
-      'featured' => '<i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i>',
-      'actions' => __('Aktionen'),
+      'status-start'    => '',
+      'image'           => __('Image', 'kleinanzeigen'),
+      'title'           => __('Title', 'kleinanzeigen'),
+      'ka-price'        => __('KA Price', 'kleinanzeigen'),
+      'shop-price'      => __('Shop Price', 'kleinanzeigen'),
+      'shop-categories' => __('Categories', 'kleinanzeigen'),
+      'featured'        => '<i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i>',
+      'actions'         => __('Actions', 'kleinanzeigen'),
     );
   }
 
@@ -348,7 +352,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     );
   }
 
-  public function render_empty_row() {
+  public function render_empty_row()
+  {
     echo '<tr style="display: none;"></tr>';
   }
 
@@ -360,7 +365,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     if (!$product) {
       return $this->render_empty_row();
     }
-    
+
     list($columns, $hidden) = $this->get_column_info();
 
     $post_ID = $product->get_id();
@@ -369,63 +374,64 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $shop_price_html = wp_kses_post($product->get_price_html());
     $ka_price = isset($record) ? $record->price : '-';
 
-    ?>
+?>
     <tr id="<?php echo $post_ID ?>">
       <?php
 
-        // Setup Actions
-        $post_ID = $product->get_id();
-        $title = $product->get_name();
-        $editlink  = admin_url('post.php?action=edit&post=' . $post_ID);
-        $deletelink  = get_delete_post_link($post_ID);
-        $permalink = get_permalink($post_ID);
-        $classes = "";
-        $post_status = $product->get_status();
-        $image = get_the_post_thumbnail_url($post_ID);
+      // Setup Actions
+      $post_ID = $product->get_id();
+      $title = $product->get_name();
+      $editlink  = admin_url('post.php?action=edit&post=' . $post_ID);
+      $deletelink  = get_delete_post_link($post_ID);
+      $permalink = get_permalink($post_ID);
+      $classes = "";
+      $post_status = $product->get_status();
+      $image = get_the_post_thumbnail_url($post_ID);
+      $cat_terms = get_the_terms($post_ID, 'product_cat');
 
-        switch ($task_type) {
-          case 'invalid-ad':
-            $published = 'publish' === $product->get_status();
-            $disabled['deactivate'] = !$sku && !$published;
-            $disabled['disconnect'] = !$sku;
-            $disabled['delete'] = !$post_ID;
-            $label = array(
-              'disconnect' => $product->get_sku() ? __('Keep', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
-              'deactivate' => (!$disabled['deactivate']) ? __('Hide', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
-              'delete' => (!$disabled['delete']) ? __('Delete', 'kleinanzeigen') : __('Deleted', 'kleinanzeigen')
-            );
-            $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled'));
-            break;
-          case 'invalid-price':
-            $price = Utils::extract_kleinanzeigen_price($ka_price);
-            $shop_price = $product->get_price();
-            $disabled = $price === $shop_price;
-            $label = $price !== $shop_price ? __('Accept KA price', 'kleinanzeigen') : __('KA Price accepted', 'kleinanzeigen');
-            $actions = wbp_ka()->include_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'task_type', 'disabled'));
-            break;
-          case 'invalid-cat':
-            $label = __('Edit', 'kleinanzeigen');
-            $actions = wbp_ka()->include_template('/dashboard/invalid-cat-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
-            break;
-          case 'has-sku':
-          case 'no-sku':
-          case 'featured':
-            $label = $post_status === 'publish' ? __('Hide', 'kleinanzeigen') : __('Publish');
-            $actions = wbp_ka()->include_template('/dashboard/toggle-publish-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
-            break;
-          default:
-        }
-        switch ($post_status) {
-          case 'publish':
-            $status = $sku ? 'connected-publish' : 'disconnected-publish';
-            break;
-          case 'draft':
-            $status = $sku ? 'connected-draft' : 'disconnected-draft';
-            break;
-          default:
-            $status = $sku ? 'connected-unknown' : 'disconnected-unknown';
-            break;
-        }
+      switch ($task_type) {
+        case 'invalid-ad':
+          $published = 'publish' === $product->get_status();
+          $disabled['deactivate'] = !$sku && !$published;
+          $disabled['disconnect'] = !$sku;
+          $disabled['delete'] = !$post_ID;
+          $label = array(
+            'disconnect' => $product->get_sku() ? __('Keep', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+            'deactivate' => (!$disabled['deactivate']) ? __('Hide', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+            'delete' => (!$disabled['delete']) ? __('Delete', 'kleinanzeigen') : __('Deleted', 'kleinanzeigen')
+          );
+          $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled'));
+          break;
+        case 'invalid-price':
+          $price = Utils::extract_kleinanzeigen_price($ka_price);
+          $shop_price = $product->get_price();
+          $disabled = $price === $shop_price;
+          $label = $price !== $shop_price ? __('Accept KA price', 'kleinanzeigen') : __('KA Price accepted', 'kleinanzeigen');
+          $actions = wbp_ka()->include_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'task_type', 'disabled'));
+          break;
+        case 'invalid-cat':
+          $label = __('Edit', 'kleinanzeigen');
+          $actions = wbp_ka()->include_template('/dashboard/invalid-cat-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
+          break;
+        case 'has-sku':
+        case 'no-sku':
+        case 'featured':
+          $label = $post_status === 'publish' ? __('Hide', 'kleinanzeigen') : __('Publish');
+          $actions = wbp_ka()->include_template('/dashboard/toggle-publish-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
+          break;
+        default:
+      }
+      switch ($post_status) {
+        case 'publish':
+          $status = $sku ? 'connected-publish' : 'disconnected-publish';
+          break;
+        case 'draft':
+          $status = $sku ? 'connected-draft' : 'disconnected-draft';
+          break;
+        default:
+          $status = $sku ? 'connected-unknown' : 'disconnected-unknown';
+          break;
+      }
 
       foreach ($columns as $column_name => $column_display_name) {
         $class = $column_name . ' column column-' . $column_name;
@@ -466,6 +472,16 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content "><?php echo $shop_price_html ?></div>
+              </td>
+            <?php
+              break;
+            }
+          case "shop-categories": {
+            ?>
+              <td class="<?php echo $class ?>">
+                <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
+                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
+                                            }, $cat_terms !== false ? $cat_terms : [])); ?></a></div>
               </td>
             <?php
               break;
