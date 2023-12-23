@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-29 21:47+0000\n"
-"PO-Revision-Date: 2023-12-14 22:58+0000\n"
+"PO-Revision-Date: 2023-12-23 14:33+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -15,12 +15,12 @@ msgstr ""
 "X-Loco-Version: 2.6.6; wp-6.4.2\n"
 "X-Domain: kleinanzeigen"
 
+#: includes/class-kleinanzeigen-functions.php:1044
 #: includes/class-kleinanzeigen-functions.php:1048
 #: includes/class-kleinanzeigen-functions.php:1052
 #: includes/class-kleinanzeigen-functions.php:1056
 #: includes/class-kleinanzeigen-functions.php:1060
 #: includes/class-kleinanzeigen-functions.php:1064
-#: includes/class-kleinanzeigen-functions.php:1068
 msgid "%d Days"
 msgstr "%d Tage"
 
@@ -29,7 +29,7 @@ msgstr "%d Tage"
 msgid "%s (%s)"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1044
+#: includes/class-kleinanzeigen-functions.php:1040
 msgid "1 Day"
 msgstr "1 Tag"
 
@@ -37,7 +37,7 @@ msgstr "1 Tag"
 msgid "A link to a product label."
 msgstr "Link zum Produkt Label"
 
-#: includes/class-kleinanzeigen-functions.php:591
+#: includes/class-kleinanzeigen-functions.php:593
 msgid ""
 "A Product with the same Ad ID already exists. Delete this draft or enter a "
 "different Ad ID."
@@ -45,7 +45,7 @@ msgstr ""
 "Es existiert bereits ein Produkt mit dieser Anzeige ID. Lösche bitte diesen "
 "Entwurf oder verwende eine andere Anzeige ID für den Import."
 
-#: includes/class-kleinanzeigen-functions.php:608
+#: includes/class-kleinanzeigen-functions.php:610
 msgid ""
 "A product with the same title already exists. Delete this draft or enter a "
 "different title."
@@ -185,7 +185,7 @@ msgstr "Erstellen"
 msgid "Date of change"
 msgstr "Änd. Datum"
 
-#: includes/class-kleinanzeigen-functions.php:1331
+#: includes/class-kleinanzeigen-functions.php:1328
 #: admin/partials/dashboard/invalid-sku-results.php:31
 msgid "Deactivate"
 msgstr "Deaktivieren"
@@ -209,7 +209,7 @@ msgid "Default Category"
 msgstr "Standard Kategorie"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:401
-#: includes/class-kleinanzeigen-functions.php:1332
+#: includes/class-kleinanzeigen-functions.php:1329
 #: admin/partials/dashboard/footer-invalid-ad.php:14
 msgid "Delete"
 msgstr "Löschen"
@@ -387,7 +387,7 @@ msgid "KA Price accepted"
 msgstr "KA Preis übernommen"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:399
-#: includes/class-kleinanzeigen-functions.php:1330
+#: includes/class-kleinanzeigen-functions.php:1327
 #: admin/partials/dashboard/footer-invalid-ad.php:6
 msgid "Keep"
 msgstr "Behalten"
@@ -418,6 +418,22 @@ msgstr ""
 msgid "Linked products"
 msgstr "Verknüpfte Produkte"
 
+#: includes/class-kleinanzeigen-list-table-tasks.php:138
+msgid "List of autonomous Products"
+msgstr "Liste der eigenständigen Produkte"
+
+#: includes/class-kleinanzeigen-list-table-tasks.php:153
+msgid "List of featured products"
+msgstr "Liste der als empfohlen gekennzeichneten Produkte"
+
+#: includes/class-kleinanzeigen-list-table-tasks.php:123
+msgid "List of linked products"
+msgstr "Liste verknüpfter Produkte"
+
+#: includes/class-kleinanzeigen-list-table-tasks.php:88
+msgid "List of products whoes prices deviating from their ads"
+msgstr "Liste der Produkte mit abweichendem Preis"
+
 #: admin/partials/metaboxes/kleinanzeigen-import.php:18
 msgid "Load Ad"
 msgstr "Anzeige laden"
@@ -436,7 +452,7 @@ msgstr ""
 "Das Produkt im Online Shop als eigenständiges Produkt weiterhin aktiviert "
 "lassen"
 
-#: public/partials/emails/new-product.php:35
+#: public/partials/emails/new-product.php:39
 #, php-format
 msgid "Manage your Kleinanzeigen.de products in your online store here: %1$s"
 msgstr ""
@@ -446,7 +462,7 @@ msgstr ""
 msgid "New label name"
 msgstr "Neuer Label Name"
 
-#: includes/class-kleinanzeigen-functions.php:1384
+#: includes/class-kleinanzeigen-functions.php:1382
 msgid "New product online"
 msgstr "Neues Produkt Online"
 
@@ -454,7 +470,7 @@ msgstr "Neues Produkt Online"
 msgid "No account data found"
 msgstr "Account konnte nicht gefunden werden"
 
-#: includes/class-kleinanzeigen-functions.php:1335
+#: includes/class-kleinanzeigen-functions.php:1332
 msgid "No action"
 msgstr "Keine Aktion"
 
@@ -518,8 +534,8 @@ msgstr "Parent label:"
 msgid ""
 "Please assign a different category in order to allow visitors to find them."
 msgstr ""
-"Bitte weise diesen Produkten eine andere Kategorie zu, um Besuchern das "
-"Auffinden zu ermöglichen."
+"Um Besuchern das Auffinden zu ermöglichen, muss eine geeignete Kategorie "
+"zugewiesen werden."
 
 #: includes/class-utils.php:27
 #, php-format
@@ -639,19 +655,28 @@ msgstr "Vorlage nicht gefunden"
 
 #: admin/partials/dashboard/footer-invalid-ad.php:3
 msgid "Term definitions for available actions:"
-msgstr "Bedeutung der verfügbaren Aktionen"
+msgstr "Erläuterung zu den verfügbaren Aktionen"
 
 #: admin/class-kleinanzeigen-admin.php:352
 #, php-format
 msgid "The account %1$s could not be found"
 msgstr "Der Account %1$s konnte nicht gefunden werden"
 
+#: includes/class-kleinanzeigen-list-table-tasks.php:73
+msgid ""
+"The following published products are based on ads that can no longer be "
+"traced. Please select an appropriate action."
+msgstr ""
+"Die Anzeige folgender veröffentlichter Produkte kann nicht mehr aufgefunden "
+"werden. Bitte wähle jeweils eine entsprechende Aktion."
+
 #: public/partials/emails/new-product.php:29
 #, php-format
 msgid ""
 "The product %1$s has been automatically created based on the following ad:"
 msgstr ""
-"Das Produkt %1$s wurde automatisch auf Basis der folgenden Anzeige erstellt:"
+"Das Produkt %1$s wurde soeben automatisch auf Basis folgender Anzeige "
+"erstellt:"
 
 #: admin/class-kleinanzeigen-admin.php:363
 msgid ""
@@ -688,3 +713,11 @@ msgstr "Label aktualisieren"
 #: includes/class-kleinanzeigen-list-table.php:195
 msgid "Vendor"
 msgstr "Hersteller"
+
+#: public/partials/emails/new-product.php:36
+msgid ""
+"☞ This product isn't published yet. Only administrators and shopmanagers may "
+"view or edit unpublished products."
+msgstr ""
+"☞ Dieses Produkt wurde noch nicht veröffentlicht. Nur Administratoren und "
+"Shopmanager dürfen unveröffentlichte Produkt betrachten oder bearbeiten."

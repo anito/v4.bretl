@@ -9,8 +9,53 @@ function wbp_init()
    * Define Constants
    */
   define('CHILD_THEME_ASTRA_CHILD_VERSION', $theme->__get('version'));
+  define('AJAX_FRONT_VARS', array(
+    'admin_ajax'  => admin_url('admin-ajax.php'),
+    'is_login'    => is_login(),
+    'user'        => json_encode(wbp_get_current_user()),
+    'home_url'    => home_url(),
+    'nonce'       => wp_create_nonce()
+  ));
 }
 add_filter('init', 'wbp_init');
+
+function wbp_register_ajax()
+{
+
+  // Ajax actions
+  add_action('wp_ajax__ajax_get_login_form', '_ajax_get_login_form');
+  add_action('wp_ajax__ajax_submit_form', '_ajax_submit_form');
+
+  add_action('wp_ajax_nopriv__ajax_get_login_form', '_ajax_get_login_form');
+  add_action('wp_ajax_nopriv__ajax_submit_form', '_ajax_submit_form');
+}
+add_filter('init', 'wbp_register_ajax');
+
+function wbp_get_current_user()
+{
+  $cur_user = wp_get_current_user();
+  unset($cur_user->user_pass);
+  return $cur_user;
+}
+
+function _ajax_get_login_form()
+{
+  require_once __DIR__ . '/includes/ajax-handler.php';
+
+  wbp_get_login_form();
+}
+
+function _ajax_submit_form()
+{
+  require_once __DIR__ . '/includes/ajax-handler.php';
+
+  wbp_submit_form();
+}
+
+function wbp_doing_login_ajax()
+{
+  return isset($_REQUEST['doing_login_ajax']) ? true : false;
+}
 
 /**
  * CSRF allowed domains
@@ -44,36 +89,177 @@ function wbp_get_themes_file($file_path)
  * @since 1.0.0
  */
 function add_scripts()
-{
+{ ?>
+  <style type="text/css">
+    #login {
+      color: var(--ast-global-color-2);
+      line-height: 1.4;
+      font-size: 14px;
+    }
+
+    .login .login-form.loading::after {
+      background-image: url("<?php echo get_stylesheet_directory_uri(); ?>/images/pulse-2.svg");
+      background-size: 100px 100px;
+    }
+
+    .login .login-form .login-body {
+      transition-property: all;
+      transition-duration: .3s;
+      transition-timing-function: ease-out;
+      transition-delay: .5s;
+      opacity: 1;
+    }
+
+    .login .login-form.loading .login-body {
+      opacity: 0;
+      transition-delay: 0s;
+    }
+  </style>
+
+  <?php
   $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
 
   // Theme styles
   wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'), array(), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
   wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
 
-  // Homepage hero
-  if (0) {
-    $js_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.js');
-    $css_uri = wbp_get_themes_file(get_stylesheet_directory() . '/js/hero/dist/assets/index-*.css');
+  wp_enqueue_script('ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+  wp_enqueue_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
 
-    wp_enqueue_script('app-hero', $js_uri, false, CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
-    wp_enqueue_style('app-hero', $css_uri, false, CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
-    wp_localize_script('app-hero', 'app_hero', array(
-      'app_url' => get_stylesheet_directory_uri() . '/js/hero/dist/',
-      'stylesheet_url' => get_stylesheet_directory_uri()
-    ));
-  }
+  wp_localize_script('ajax-front', 'KleinanzeigenAjaxFront', AJAX_FRONT_VARS);
 
-  wp_register_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
-  wp_enqueue_script('main');
+
 
   if (!IS_DEV_MODE) {
 
     // Vendor scripts
 
   }
+
+  if (wbp_doing_login_ajax()) {
+    wp_dequeue_script('zxcvbn-async');
+    wp_dequeue_script('regenerator-runtime');
+    wp_dequeue_script('wp-polyfill-inert');
+    wp_dequeue_script('wp-polyfill');
+    wp_dequeue_script('wp-hooks');
+    wp_dequeue_script('user-profile');
+  }
 }
 add_action('wp_enqueue_scripts', 'add_scripts');
+
+function add_login_style()
+{ ?>
+  <style type="text/css">
+    #login h1 a,
+    .login h1 a {
+      background-image: url("<?php echo get_stylesheet_directory_uri(); ?>/images/auto-traktor-bretschneider-logo.svg");
+      height: 110px;
+      width: 320px;
+      background-size: 110px 110px;
+      background-repeat: no-repeat;
+      margin-bottom: -102px;
+      position: relative;
+    }
+  </style>
+
+<?php
+}
+add_action('login_enqueue_scripts', 'add_login_style');
+
+function add_login_scripts()
+{
+  if (wbp_doing_login_ajax()) {
+    wp_dequeue_style('login');
+    wp_deregister_script('jquery');
+
+    wp_enqueue_script('login', get_stylesheet_directory_uri() . '/js/login.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+    wp_enqueue_style('dashicons', ABSPATH . WPINC . '/css/dashicons.min.css', array());
+    wp_enqueue_style('wbp-login-base', get_stylesheet_directory_uri() . '/css/login.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
+
+    wp_enqueue_script('ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+    wp_enqueue_script('jquery-serializejson', get_stylesheet_directory_uri() . '/js/jquery.serializejson.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+
+    wp_localize_script('ajax-front', 'KleinanzeigenAjaxFront', AJAX_FRONT_VARS);
+  }
+  wp_enqueue_style('wbp-login', get_stylesheet_directory_uri() . '/css/login-style.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
+}
+add_action('login_enqueue_scripts', 'add_login_scripts');
+
+add_filter('logout_redirect', function () {
+  return esc_url(home_url());
+});
+
+// Privacy policy link filter
+function wbp_privacy_policy_link()
+{
+
+  return '<a class="iubenda-black iubenda-noiframe iubenda-embed iubenda-noiframe" title="Datenschutzerklärung " href="https://www.iubenda.com/privacy-policy/28713011">' . __('Privacy policy', 'astra-child') . '</a>';
+}
+add_filter('the_privacy_policy_link', 'wbp_privacy_policy_link');
+
+
+// Logo link url
+function wbp_login_logo_url()
+{
+  return home_url();
+}
+add_filter('login_headerurl', 'wbp_login_logo_url');
+
+function wbp_footer()
+{
+  get_template_part('templates/footer/login');
+}
+add_action('wp_footer', 'wbp_footer', 99);
+
+
+function wbp_login_form_defaults()
+{
+  return array(
+    'echo'           => true,
+    // Default 'redirect' value takes the user back to the request URI.
+    'redirect'       => (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
+    'form_id'        => 'wbp-loginform',
+    'label_username' => __('Username or Email Address', 'astra-child'),
+    'label_password' => __('Password', 'astra-child'),
+    'label_remember' => __('Remember Me', 'astra-child'),
+    'label_log_in'   => __('Log In', 'astra-child'),
+    'id_username'    => 'wbp-user_login',
+    'id_password'    => 'wbp-user_pass',
+    'id_remember'    => 'wbp-rememberme',
+    'id_submit'      => 'wbp-submit',
+    'remember'       => true,
+    'value_username' => '',
+    // Set 'value_remember' to true to default the "Remember me" checkbox to checked.
+    'value_remember' => false,
+  );
+}
+add_filter('login_form_defaults', 'wbp_login_form_defaults');
+
+
+// Templates for `wp_login_form` function
+function wbp_login_form_top($args)
+{
+  ob_start();
+  get_template_part('templates/login/top', 'login', $args);
+  return ob_get_clean();
+}
+add_filter('login_form_top', 'wbp_login_form_top');
+
+function wbp_login_form_middle($args)
+{
+  ob_start();
+  get_template_part('templates/login/middle', 'login', $args);
+  return ob_get_clean();
+}
+add_filter('login_form_middle', 'wbp_login_form_middle');
+
+function wbp_login_form_bottom($args)
+{
+  ob_start();
+  get_template_part('templates/login/bottom', 'login', $args);
+  return ob_get_clean();
+}
+add_filter('login_form_bottom', 'wbp_login_form_bottom');
 
 /**
  * Default sort for shop and specific categories
@@ -130,15 +316,6 @@ function unsupported_browsers_template()
   get_template_part('custom-templates/custom', 'unsupported-browser');
 }
 // add_action('wp_enqueue_scripts', 'wbp_detectTrident');
-
-function add_cp_data_attribute($tag, $handle, $src)
-{
-  if ('consent-pro' === $handle) {
-    $tag = str_replace('src=', 'data-domain-script=' . CONSENT_PRO_ID . ' src=', $tag);
-  }
-  return $tag;
-}
-add_filter('script_loader_tag', 'add_cp_data_attribute', 10, 3);
 
 function get_certificate()
 {

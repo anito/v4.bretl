@@ -165,10 +165,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     if ('kleinanzeigen_crawl_interval' === $option && $old_value !== $value) {
 
-      wp_unschedule_hook('kleinanzeigen_remove_url_invalid_sku');
       wp_unschedule_hook('kleinanzeigen_sync_price');
       wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
       wp_unschedule_hook('kleinanzeigen_create_new_products');
+      wp_unschedule_hook('kleinanzeigen_remove_url_invalid_sku');
     }
 
     return $value;
@@ -374,7 +374,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     );
   }
 
-  // user specific option
+  // User specific option
   public function option_kleinanzeigen_send_mail_on_new_ad($value)
   {
 
@@ -400,10 +400,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       if (true === $is_user_setting) {
 
         if (!empty($_POST['action']) && 'update' === $_POST['action']) {
-          
+
           $user_id = wp_get_current_user()->ID;
 
-          // unchecked checkboxes are not in `$_POST`s array, supply `0` in that case
+          // unchecked checkboxes are not in `$_POST`s array, specify `0` in that case
           $value = !empty($_POST[$id]) ? $_POST[$id] : '0';
           update_user_meta($user_id, $id, $value);
         }
@@ -610,7 +610,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     );
     $register($args['id'], array($this, 'sanitize_option'), true);
 
-    if(IS_SUBDOMAIN_DEV) {
+    if (IS_SUBDOMAIN_DEV) {
       // Send CC to-email new ads
       unset($args);
       $args = array(

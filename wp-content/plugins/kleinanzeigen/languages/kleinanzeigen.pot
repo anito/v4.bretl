@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-14 22:54+0000\n"
+"POT-Creation-Date: 2023-12-23 14:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -16,12 +16,12 @@ msgstr ""
 "X-Loco-Version: 2.6.6; wp-6.4.1\n"
 "X-Domain: kleinanzeigen"
 
+#: includes/class-kleinanzeigen-functions.php:1044
 #: includes/class-kleinanzeigen-functions.php:1048
 #: includes/class-kleinanzeigen-functions.php:1052
 #: includes/class-kleinanzeigen-functions.php:1056
 #: includes/class-kleinanzeigen-functions.php:1060
 #: includes/class-kleinanzeigen-functions.php:1064
-#: includes/class-kleinanzeigen-functions.php:1068
 msgid "%d Days"
 msgstr ""
 
@@ -30,7 +30,7 @@ msgstr ""
 msgid "%s (%s)"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1044
+#: includes/class-kleinanzeigen-functions.php:1040
 msgid "1 Day"
 msgstr ""
 
@@ -38,13 +38,13 @@ msgstr ""
 msgid "A link to a product label."
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:591
+#: includes/class-kleinanzeigen-functions.php:593
 msgid ""
 "A Product with the same Ad ID already exists. Delete this draft or enter a "
 "different Ad ID."
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:608
+#: includes/class-kleinanzeigen-functions.php:610
 msgid ""
 "A product with the same title already exists. Delete this draft or enter a "
 "different title."
@@ -175,7 +175,7 @@ msgstr ""
 msgid "Date of change"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1331
+#: includes/class-kleinanzeigen-functions.php:1328
 #: admin/partials/dashboard/invalid-sku-results.php:31
 msgid "Deactivate"
 msgstr ""
@@ -197,7 +197,7 @@ msgid "Default Category"
 msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:401
-#: includes/class-kleinanzeigen-functions.php:1332
+#: includes/class-kleinanzeigen-functions.php:1329
 #: admin/partials/dashboard/footer-invalid-ad.php:14
 msgid "Delete"
 msgstr ""
@@ -370,7 +370,7 @@ msgid "KA Price accepted"
 msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:399
-#: includes/class-kleinanzeigen-functions.php:1330
+#: includes/class-kleinanzeigen-functions.php:1327
 #: admin/partials/dashboard/footer-invalid-ad.php:6
 msgid "Keep"
 msgstr ""
@@ -401,6 +401,22 @@ msgstr ""
 msgid "Linked products"
 msgstr ""
 
+#: includes/class-kleinanzeigen-list-table-tasks.php:138
+msgid "List of autonomous Products"
+msgstr ""
+
+#: includes/class-kleinanzeigen-list-table-tasks.php:153
+msgid "List of featured products"
+msgstr ""
+
+#: includes/class-kleinanzeigen-list-table-tasks.php:123
+msgid "List of linked products"
+msgstr ""
+
+#: includes/class-kleinanzeigen-list-table-tasks.php:88
+msgid "List of products whoes prices deviating from their ads"
+msgstr ""
+
 #: admin/partials/metaboxes/kleinanzeigen-import.php:18
 msgid "Load Ad"
 msgstr ""
@@ -417,7 +433,7 @@ msgstr ""
 msgid "Make product autonomous."
 msgstr ""
 
-#: public/partials/emails/new-product.php:35
+#: public/partials/emails/new-product.php:39
 #, php-format
 msgid "Manage your Kleinanzeigen.de products in your online store here: %1$s"
 msgstr ""
@@ -426,7 +442,7 @@ msgstr ""
 msgid "New label name"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1384
+#: includes/class-kleinanzeigen-functions.php:1382
 msgid "New product online"
 msgstr ""
 
@@ -434,7 +450,7 @@ msgstr ""
 msgid "No account data found"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1335
+#: includes/class-kleinanzeigen-functions.php:1332
 msgid "No action"
 msgstr ""
 
@@ -614,6 +630,12 @@ msgstr ""
 msgid "The account %1$s could not be found"
 msgstr ""
 
+#: includes/class-kleinanzeigen-list-table-tasks.php:73
+msgid ""
+"The following published products are based on ads that can no longer be "
+"traced. Please select an appropriate action."
+msgstr ""
+
 #: public/partials/emails/new-product.php:29
 #, php-format
 msgid ""
@@ -651,4 +673,10 @@ msgstr ""
 
 #: includes/class-kleinanzeigen-list-table.php:195
 msgid "Vendor"
+msgstr ""
+
+#: public/partials/emails/new-product.php:36
+msgid ""
+"☞ This product isn't published yet. Only administrators and shopmanagers may "
+"view or edit unpublished products."
 msgstr ""

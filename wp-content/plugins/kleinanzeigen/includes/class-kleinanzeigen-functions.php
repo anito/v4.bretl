@@ -1,5 +1,6 @@
 <?php
 
+use Elementor\Core\Files\CSS\Post_Preview;
 use Pelago\Emogrifier\CssInliner;
 
 // If this file is called directly, abort.
@@ -227,6 +228,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       $args = array(
         'post_type' => 'product',
+        'post_status' => array('publish'),
         'tax_query' => array(
           array(
             'taxonomy'  => 'product_cat',
@@ -237,7 +239,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       );
       $query = new WP_Query($args);
       $posts = $query->get_posts();
-      return array_map(function($post) {
+      return array_map(function ($post) {
         return wc_get_product($post->ID);
       }, $posts);
     }
@@ -976,31 +978,35 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function filter_exclusive_label_terms($terms)
     {
-      if (!defined('MUTUALLY_EXCLUSIVE_LABEL_NAMES')) {
-        define(
-          'MUTUALLY_EXCLUSIVE_LABEL_NAMES',
-          array(
-            array(
-              'neuwertig',
-              'neu'
-            ),
-            array(
-              'aktionswochen',
-              'aktion'
-            ),
-          )
-        );
-      }
+    
+      $exclusive_labels = array(
+        array(
+          'neuwertig',
+          'neu'
+        ),
+        array(
+          'guter zustand',
+          'neu'
+        ),
+        array(
+          'top zustand',
+          'neu'
+        ),
+        array(
+          'aktionswochen',
+          'aktion'
+        ),
+      );
 
-      foreach (MUTUALLY_EXCLUSIVE_LABEL_NAMES as $group) {
-        $term_slugs = wp_list_pluck($terms, 'slug');
-        $intersection = array_intersect($term_slugs, $group);
+      foreach ($exclusive_labels as $group) {
+        $term_names = array_map('strtolower', wp_list_pluck($terms, 'name'));
+        $intersection = array_intersect($term_names, $group);
         if (count($intersection) > 1) {
-          $exclusive_term = get_term_by('slug', $group[0], 'product_label');
-          $diff_term_slugs = array_diff($term_slugs, $group);
-          $diff_terms = array_map(function ($slug) {
-            return get_term_by('slug', $slug, 'product_label');
-          }, $diff_term_slugs);
+          $exclusive_term = get_term_by('name', $group[0], 'product_label');
+          $diff_term_names = array_diff($term_names, $group);
+          $diff_terms = array_map(function ($name) {
+            return get_term_by('name', $name, 'product_label');
+          }, $diff_term_names);
           $terms = array_merge(array($exclusive_term), $diff_terms);
         }
       }
@@ -1187,30 +1193,31 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           'match_type' => 'like',
           'fn' => 'sale',
         ),
-        'allrad' => array('Allrad', 'match_type' => 'like'),
-        'vorführ' => array('Vorführmaschine', 'match_type' => 'like'),
-        'topzustand' => 'Top',
-        'top zustand' => 'Top',
-        'topausstattung' => 'Top',
-        'top ausstattung' => 'Top',
-        'aktion' => array('Aktion', 'fn' => array('aktion', 'default')),
-        'aktionswochen' => array('Aktionswochen', 'fn' => array('aktionswochen', 'default')),
-        'aktionsmodell' => 'Aktion',
-        'klima' => 'Klima',
-        'am lager' => 'Sofort lieferbar',
-        'sofort verfügbar' => 'Sofort lieferbar',
-        'sofort lieferbar' => 'Sofort lieferbar',
-        'lagermaschine' => 'Sofort lieferbar',
-        'leicht gebraucht' => 'Leicht Gebraucht',
-        'limited edition' => 'Limited Edition',
-        'lim. edition' => 'Limited Edition',
-        'mietmaschine' => array('Mieten', 'fn' => array('rent', 'default')),
-        'neu' => 'Neu',
-        'neumaschine' => 'Neu',
-        'neufahrzeug' => 'Neu',
-        'neues modell' => 'Neues Modell',
-        'top modell' => 'Top Modell',
-        'neuwertig' => array('Neuwertig', 'match_type' => 'like'),
+        'allrad'              => array('Allrad', 'match_type' => 'like'),
+        'vorführ'             => array('Vorführmaschine', 'match_type' => 'like'),
+        'topzustand'          => 'Top',
+        'top zustand'         => 'Top',
+        'guter zustand'       => 'Guter Zustand',
+        'topausstattung'      => 'Top',
+        'top ausstattung'     => 'Top',
+        'aktion'              => array('Aktion', 'fn' => array('aktion', 'default')),
+        'aktionswochen'       => array('Aktionswochen', 'fn' => array('aktionswochen', 'default')),
+        'aktionsmodell'       => 'Aktion',
+        'klima'               => 'Klima',
+        'am lager'            => 'Sofort lieferbar',
+        'sofort verfügbar'    => 'Sofort lieferbar',
+        'sofort lieferbar'    => 'Sofort lieferbar',
+        'lagermaschine'       => 'Sofort lieferbar',
+        'leicht gebraucht'    => 'Leicht Gebraucht',
+        'limited edition'     => 'Limited Edition',
+        'lim. edition'        => 'Limited Edition',
+        'mietmaschine'        => array('Mieten', 'fn' => array('rent', 'default')),
+        'neu'                 => 'Neu',
+        'neumaschine'         => 'Neu',
+        'neufahrzeug'         => 'Neu',
+        'neues modell'        => 'Neues Modell',
+        'top modell'          => 'Top Modell',
+        'neuwertig'           => array('Neuwertig', 'match_type' => 'like'),
       );
 
       // Handle contents
@@ -1358,7 +1365,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
 
       $author_email       = wbp_ka()->get_plugin_author()->email;
-      $cc_mail_dev        = get_option('kleinanzeigen_send_cc_mail_on_new_ad', '');
+      $mail_dev_only      = get_option('kleinanzeigen_send_cc_mail_on_new_ad', '');
 
       $additional_content = '';
       $to_email           = get_bloginfo('admin_email');
@@ -1369,16 +1376,19 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $plugin_name        = wbp_ka()->get_plugin_name();
       $plugin_link        = admin_url("admin.php?page={$plugin_name}");
       $product_title      = $record->title;
+      $post_status        = get_post_status($post_ID);
       $thumbnail          = get_the_post_thumbnail_url($post_ID);
       $kleinanzeigen_url  = $this->get_kleinanzeigen_url($record->url);
       $email_heading      = __('New product online', 'kleinanzeigen');
       $headers = array(
         'content-type: text/html',
-        "Cc:  {$cc_mail_dev}",
         "Bcc: {$author_email}"
       );
+      if (IS_SUBDOMAIN_DEV) {
+        $headers[] = "Cc:  {$mail_dev_only}";
+      }
 
-      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
+      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'post_status', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
       $email_content = $this->style_inline($email_content);
 
       wp_mail($to_email, $email_heading, $email_content, $headers);

@@ -115,7 +115,7 @@ jQuery.noConflict();
       }
     };
 
-    const {id, src, threshold} = data;
+    const { id, src, threshold } = data;
     const el = document.getElementById(id);
 
     if (el) observe(el, src, threshold);
@@ -153,7 +153,7 @@ jQuery.noConflict();
       if (root.classList.contains("sidebar-open")) {
         clickHandler();
       }
-    }
+    };
 
     toggleEl.addEventListener("click", clickHandler);
 
@@ -190,6 +190,7 @@ jQuery.noConflict();
       }
     })(window, document);
   }
+
   // add_fb_div();
   // add_image_disclaimer();
   add_iubenda_script();

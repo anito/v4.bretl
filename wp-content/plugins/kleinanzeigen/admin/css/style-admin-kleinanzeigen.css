@@ -103,7 +103,7 @@ section.wbp-kleinanzeigen .dashicons {
 }
 
 section.wbp-kleinanzeigen .section-inner {
-  border-right: 1px solid #eee;
+  border-right: 1px solid #c0ed63;
   padding-right: 30px;
   flex-grow: 1;
 }
@@ -463,7 +463,7 @@ section .color-box.invalid {
   display: block;
   margin-bottom: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #c0ed63;
 }
 .divider-top {
   display: block;

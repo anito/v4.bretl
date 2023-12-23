@@ -68,7 +68,7 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
           </div>
 
           <div id="inconsistencies" class="hidden">
-            <fieldset class="fieldset tasks">
+            <fieldset class="fieldset tasks" style="position: relative;">
               <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
               <legend><?php echo __('Action required', 'kleinanzeigen') ?></legend>
               <div class="tasks">

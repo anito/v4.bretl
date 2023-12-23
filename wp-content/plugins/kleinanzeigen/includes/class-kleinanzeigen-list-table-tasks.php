@@ -70,7 +70,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Orphaned products', 'kleinanzeigen'),
-              'subheader' => 'Für die folgenden Produkte ist keine Anzeige mehr vorhanden. Bitte wähle jeweils eine entsprechende Aktion.'
+              'subheader' => __('The following published products are based on ads that can no longer be traced. Please select an appropriate action.', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
@@ -85,7 +85,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Price deviations', 'kleinanzeigen'),
-              'subheader' => 'Auflistung von Produkten mit Preisunterschied zur verknüpften Anzeige'
+              'subheader' => __('List of products whoes prices deviating from their ads', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
@@ -120,7 +120,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Linked products', 'kleinanzeigen'),
-              'subheader' => 'Auflistung verknüpfter Produkte'
+              'subheader' => __('List of linked products', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
@@ -135,7 +135,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Autonomous products', 'kleinanzeigen'),
-              'subheader' => 'Liste der eigenständigen Produkte'
+              'subheader' => __('List of autonomous Products', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
@@ -150,7 +150,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Featured products', 'kleinanzeigen'),
-              'subheader' => 'Auflistung von empfohlenen Produkten'
+              'subheader' => __('List of featured products', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
