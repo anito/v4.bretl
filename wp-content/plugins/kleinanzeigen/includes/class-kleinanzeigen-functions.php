@@ -354,6 +354,11 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }, $products);
 
         $diffs = array_diff($records, $skus);
+        $diffs = array_filter($diffs, function($val) use($ads, $_records) {
+          $title = $ads[$_records[$val]]->title;
+          $identical_products = $this->product_title_equals($title);
+          return 0 === count($identical_products);
+        }, ARRAY_FILTER_USE_BOTH);
 
         $items = array();
         foreach ($diffs as $key => $sku) {
@@ -599,11 +604,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       // Check for duplicate titles
+      $results = $this->product_title_equals($title);
 
-      global $wpdb;
-
-      $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_type = 'product' AND post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
-      $results = $wpdb->get_results($prepare);
       if (count($results) >= 1) {
         foreach ($results as $result) {
           if ((int) $result->ID != $post_ID) {
@@ -639,6 +641,15 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'post_title' => $title
       ]);
       add_action('save_post', array($this, 'save_post'), 99, 2);
+    }
+
+    public function product_title_equals($title)
+    {
+
+      global $wpdb;
+
+      $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_type = 'product' AND post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
+      return $wpdb->get_results($prepare);
     }
 
     public function prevent_metadata_update($data, $id, $meta_key, $meta_value)
@@ -978,7 +989,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function filter_exclusive_label_terms($terms)
     {
-    
+
       $exclusive_labels = array(
         array(
           'neuwertig',
