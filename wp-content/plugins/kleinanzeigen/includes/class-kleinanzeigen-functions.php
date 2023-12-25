@@ -1228,6 +1228,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'neufahrzeug'         => 'Neu',
         'neues modell'        => 'Neues Modell',
         'top modell'          => 'Top Modell',
+        'von privat'          => 'von privat',
         'neuwertig'           => array('Neuwertig', 'match_type' => 'like'),
       );
 
