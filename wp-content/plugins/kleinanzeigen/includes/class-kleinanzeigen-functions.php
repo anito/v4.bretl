@@ -1229,8 +1229,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'neues modell'        => 'Neues Modell',
         'top modell'          => 'Top Modell',
         'von privat'          => 'Von Privat',
-        'im Kundenauftrag'    => 'Von Privat',
-        'Privatauftrag'       => 'Von Privat',
+        'im kundenauftrag'    => 'Von Privat',
+        'privatauftrag'       => 'Von Privat',
         'neuwertig'           => array('Neuwertig', 'match_type' => 'like'),
       );
 
