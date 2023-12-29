@@ -1211,6 +1211,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'guter zustand'       => 'Guter Zustand',
         'topausstattung'      => 'Top',
         'top ausstattung'     => 'Top',
+        'sonderpreis'         => 'Sonderpreis',
         'aktion'              => array('Aktion', 'fn' => array('aktion', 'default')),
         'aktionswochen'       => array('Aktionswochen', 'fn' => array('aktionswochen', 'default')),
         'aktionsmodell'       => 'Aktion',
