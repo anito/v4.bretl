@@ -29,17 +29,30 @@
 
       const {
         jobs,
-        jobResults
+        todos,
+        completed
       } = JSON.parse(await getCronJobs()).data;
 
-      init(jobs, jobResults);
+      init(jobs, todos, completed);
     }
 
     let intervalId;
     let intervalId_wait;
     const el = () => $('#wbp-timestamp');
 
-    const init = (jobs, jobResults) => {
+    const init = (jobs, todos, completed) => {
+
+      // console.log('jobs', jobs);
+      // console.log('todos', todos);
+      // console.log('completed', completed);
+
+      /**
+       * Refresh table list only if any jobs have been done
+       * Not available on kleinanzeigen-settings view
+       */
+      if (completed.length) {
+        display?.();
+      }
 
       const sortByNext = (a, b) => a.timestamp < b.timestamp;
       jobs = jobs.sort(sortByNext);
@@ -52,7 +65,6 @@
         } = job;
 
         const remaining = timestamp - new Date().getTime();
-
 
         remaining > 0 && renderQueue.push({
           job,
@@ -70,15 +82,6 @@
 
         // Add to schedule (to be rendered as count down)
         scheduledJobs.add(job, remaining);
-
-        /**
-         * Refresh table list only if any jobs have been done
-         * Not available on kleinanzeigen-settings view
-         */
-        const counts = jobResults.filter(jr => parseInt(jr.count) !== 0)
-        if (counts.length) {
-          display?.();
-        }
 
         clearInterval(intervalId);
         intervalId = setInterval(render, 1000, el(), {
@@ -164,7 +167,7 @@
     white-space: nowrap;
     width: auto;
   }
-  
+
   #wbp-timestamp .value {
     font-weight: 500;
     margin-right: 20px;

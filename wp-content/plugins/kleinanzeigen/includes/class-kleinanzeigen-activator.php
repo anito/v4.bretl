@@ -121,11 +121,14 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
     $charset_collate = $wpdb->get_charset_collate();
 
     $sql = "CREATE TABLE $table_name (
-  slug varchar(100) NOT NULL,
-	count mediumint(9) DEFAULT 0,
-  created datetime NOT NULL,
-  PRIMARY KEY  (slug)
-) $charset_collate;";
+      id int(255) AUTO_INCREMENT,
+      slug varchar(100) NOT NULL,
+      type varchar(100) NOT NULL,
+      uid varchar(100) NOT NULL,
+      done tinyint(1) DEFAULT 0,
+      created datetime NOT NULL,
+      PRIMARY KEY  (id)
+      ) $charset_collate;";
 
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);

@@ -354,7 +354,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }, $products);
 
         $diffs = array_diff($records, $skus);
-        $diffs = array_filter($diffs, function($val) use($ads, $_records) {
+        $diffs = array_filter($diffs, function ($val) use ($ads, $_records) {
           $title = $ads[$_records[$val]]->title;
           $identical_products = $this->product_title_equals($title);
           return 0 === count($identical_products);
@@ -1212,8 +1212,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'topausstattung'      => 'Top',
         'top ausstattung'     => 'Top',
         'sonderpreis'         => 'Sonderpreis',
-        'aktion'              => array('Aktion', 'fn' => array('aktion', 'default')),
-        'aktionswochen'       => array('Aktionswochen', 'fn' => array('aktionswochen', 'default')),
+        'aktion'              => array('Aktion', 'fn' => 'aktion'),
+        'aktionswochen'       => array('Aktionswochen', 'fn' => 'aktionswochen'),
         'aktionsmodell'       => 'Aktion',
         'klima'               => 'Klima',
         'am lager'            => 'Sofort lieferbar',
@@ -1223,7 +1223,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'leicht gebraucht'    => 'Leicht Gebraucht',
         'limited edition'     => 'Limited Edition',
         'lim. edition'        => 'Limited Edition',
-        'mietmaschine'        => array('Mieten', 'fn' => array('rent', 'default')),
+        'mietmaschine'        => array('Mieten', 'fn' => 'rent'),
         'neu'                 => 'Neu',
         'neumaschine'         => 'Neu',
         'neufahrzeug'         => 'Neu',
@@ -1240,8 +1240,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
         if ($this->text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
 
-          $fns = isset($val['fn']) ? $val['fn'] : 'default';
-          $fns = !is_array($fns) ? array($fns) : $fns;
+          $defaults = array('default');
+          $fns = isset($val['fn']) ? $val['fn'] : $defaults;
+          $fns = !is_array($fns) ? array_merge(array($fns), $defaults) : $fns;
+          $fns = array_unique($fns);
 
           foreach ($fns as $fn) {
             if (is_callable(array($this, 'handle_product_contents_' . $fn), false, $callable_name)) {
@@ -1293,30 +1295,59 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     {
       $job = isset($_POST['job']) ? json_decode(wp_unslash($_POST['job'])) : null;
 
-      $job_results = wbp_db()->get_jobs();
-
       $get_jobs = function () {
+        $jobs = [];
         $cron_list = _get_cron_array();
-        $jobs = array_filter($cron_list, function ($cron) {
-          return 0 === strpos(key($cron), 'kleinanzeigen');
+        array_walk($cron_list, function ($cronjobs, $timestamp) use (&$jobs) {
+          if (is_array($cronjobs)) {
+            foreach ($cronjobs as $key => $cron) {
+              if (0 === strpos($key, 'kleinanzeigen')) {
+                
+                $jobs[] = array_merge(
+                  array(
+                    'slug'      => $key,
+                    'timestamp' => $timestamp * 1000
+                  ),
+                  $cron[array_key_first($cron)]
+                );
+              }
+
+            }
+          }
         });
-        return array_map(function ($job, $key) {
-          $timestamp = $key;
-          $slug = key($job);
-          $uid = key($job[$slug]);
-          return array(
-            'slug'      => $slug,
-            'timestamp' => $timestamp * 1000,
-            'schedule'  => $job[$slug][$uid]['schedule'],
-            'interval'  => $job[$slug][$uid]['interval'],
-          );
-        }, $jobs, array_keys($jobs));
+
+        return $jobs;
       };
+
+      $get_todos = function()
+      {
+        return wbp_db()->get_todos(0);
+      };
+      $get_completed = function()
+      {
+        return wbp_db()->get_todos();
+      };
+
       $jobs = $get_jobs();
+      $todos = $get_todos();
+      $completed = $get_completed();
+
+      while(count($completed) < count($todos)) {
+        sleep(1);
+        $completed = array_merge($completed, $get_completed());
+      }
+
+      $ids = wp_list_pluck($completed, 'id');
+      foreach ($ids as $id) {
+        wbp_db()->remove_job($id);
+      }
+
       $data = array(
-        'jobs'        => $jobs,
-        'jobResults'  => $job_results
+        'jobs'      => $jobs,
+        'todos'     => $todos,
+        'completed' => $completed
       );
+
       die(json_encode(compact('data')));
     }
 

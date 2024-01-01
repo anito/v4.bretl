@@ -35,7 +35,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_sync_price', array($this, 'job_sync_price'));
     add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
     add_action('kleinanzeigen_remove_url_invalid_sku', array($this, 'job_remove_url_invalid_sku'));
-    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_product'));
+    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_products'));
     add_filter('pre_update_option', array($this, 'pre_update_option'), 10, 3);
     add_action('init', array($this, 'register_jobs'));
 
@@ -225,13 +225,16 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       return !empty(get_metadata('post', $id, 'kleinanzeigen_url'));
     });
 
-    wbp_db()->insert_job(array(
-      'slug'  => 'kleinanzeigen_remove_url_invalid_sku',
-      'count' => count($ids)
-    ));
-
     foreach ($ids as $id) {
+      $job_id = wbp_db()->insert_job(array(
+        'slug'  => 'kleinanzeigen_remove_url_invalid_sku',
+        'type'  => 'product',
+        'uid' => $id
+      ));
+
       wbp_fn()->disable_sku_url($id);
+
+      wbp_db()->job_done($job_id);
     }
   }
 
@@ -239,34 +242,40 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     $items = wbp_fn()->build_tasks('invalid-price')['items'];
 
-    wbp_db()->insert_job(array(
-      'slug'  => 'kleinanzeigen_sync_price',
-      'count' => count($items)
-    ));
-
     foreach ($items as $item) {
+
+      $job_id = wbp_db()->insert_job(array(
+        'slug'  => 'kleinanzeigen_sync_price',
+        'type'  => 'record',
+        'uid' => $item['record']->id
+      ));
+
       $price = Utils::extract_kleinanzeigen_price($item['record']->price);
       wbp_fn()->fix_price($item['product_id'], $price);
+
+      wbp_db()->job_done($job_id);
     }
   }
 
-  public function job_create_product()
+  public function job_create_products()
   {
     $items = wbp_fn()->build_tasks('new-product')['items'];
 
-    wbp_db()->insert_job(array(
-      'slug'  => 'kleinanzeigen_create_new_products',
-      'count' => count($items)
-    ));
-
     foreach ($items as $item) {
-      libxml_use_internal_errors(true);
 
       $record = (object) $item['record'];
+
+      $job_id = wbp_db()->insert_job(array(
+        'slug'  => 'kleinanzeigen_create_new_products',
+        'type'  => 'record',
+        'uid' => $record->id
+      ));
+
       $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
 
       $contents = file_get_contents($remoteUrl);
 
+      libxml_use_internal_errors(true);
       $doc = new DOMDocument();
       $doc->loadHTML($contents);
 
@@ -277,6 +286,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       wbp_fn()->sendMail($post_ID, $record);
 
       update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
+
+      wbp_db()->job_done($job_id);
     }
   }
 
@@ -285,13 +296,14 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     $action = get_option('kleinanzeigen_schedule_invalid_ads');
     $items = wbp_fn()->build_tasks('invalid-ad')['items'];
 
-    wbp_db()->insert_job(array(
-      'slug'  => 'kleinanzeigen_invalid_ad_action',
-      'count' => count($items)
-    ));
-
     foreach ($items as $item) {
       $post_ID = $item['product_id'];
+
+      $job_id = wbp_db()->insert_job(array(
+        'slug'  => 'kleinanzeigen_invalid_ad_action',
+        'type'  => 'product',
+        'uid' => $post_ID
+      ));
 
       unset($args);
       switch ($action) {
@@ -320,6 +332,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           wbp_fn()->delete_product($post_ID, true);
         }
       }
+
+      wbp_db()->job_done($job_id);
     }
   }
 

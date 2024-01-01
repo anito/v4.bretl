@@ -98,7 +98,7 @@ jQuery(document).ready(function ($) {
 
     getIds = () => this.scheduled.map((job) => job.intervalId);
     add = (job, remaining) => {
-      job.intervalId = setInterval(this.callback, remaining + 0, job); // add some delay to give cronjob time to execute before next check
+      job.intervalId = setInterval(this.callback, remaining, job);
       this.scheduled.push(job);
       return this.scheduled;
     };

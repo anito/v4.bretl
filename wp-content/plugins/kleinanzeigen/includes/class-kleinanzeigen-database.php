@@ -17,6 +17,65 @@ class Kleinanzeigen_Database
   {
   }
 
+  public function remove_job($id)
+  {
+
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
+
+    $query = "DELETE FROM {$table_name} WHERE id = {$id}";
+    $success = $wpdb->query($query);
+    if ($success) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public function job_done($id)
+  {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
+
+    $query = "UPDATE {$table_name} SET done = 1 WHERE id = {$id}";
+    $success = $wpdb->query($query);
+    if ($success) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public function get_todos($done = 1)
+  {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
+
+    $todos = $wpdb->get_results(
+      $wpdb->prepare("SELECT * FROM %1s WHERE done = %2d", $table_name, $done)
+    );
+
+    return $todos;
+  }
+
+  public function remove_jobs($ids)
+  {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
+
+    foreach ($ids as $id) {
+
+      $wpdb->delete($table_name, array(
+        'id' => $id
+      ), array(
+        '%d',
+      ));
+    }
+  }
   public function insert_job($data)
   {
 
@@ -24,10 +83,8 @@ class Kleinanzeigen_Database
 
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
     $data = wp_parse_args($data, array('created' => current_time('mysql')));
-    
-    $update = "count = VALUES (count);";
-    $query = '';
 
+    $query = '';
     $query .= "INSERT INTO {$table_name} (";
 
     $c = 0;
@@ -52,30 +109,31 @@ class Kleinanzeigen_Database
       $c++;
     }
 
-    $query .= ") ON DUPLICATE KEY UPDATE ";
-    $query .= $update;
+    $query .= ")";
 
     $success = $wpdb->query($query);
     if ($success) {
-      return true;
+      return $wpdb->insert_id;
     } else {
       return false;
     }
   }
 
-  public function get_job($slug = '') {
+  public function get_job($slug = '')
+  {
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
 
     $results = $wpdb->get_results(
-      $wpdb->prepare("SELECT * FROM %1s WHERE name = %2s", $table_name, $slug)
+      $wpdb->prepare("SELECT * FROM %1s WHERE slug = %2s", $table_name, $slug)
     );
 
     return $results;
   }
 
-  public function get_jobs() {
+  public function get_jobs()
+  {
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
