@@ -1293,8 +1293,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function ajax_cron()
     {
-      $job = isset($_POST['job']) ? json_decode(wp_unslash($_POST['job'])) : null;
 
+      wp_remote_get(home_url('wp-cron.php'));
+      
       $get_jobs = function () {
         $jobs = [];
         $cron_list = _get_cron_array();

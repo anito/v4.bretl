@@ -42,9 +42,9 @@
 
     const init = (jobs, todos, completed) => {
 
-      // console.log('jobs', jobs);
-      // console.log('todos', todos);
-      // console.log('completed', completed);
+      console.log('jobs', jobs);
+      console.log('todos', todos);
+      console.log('completed', completed);
 
       /**
        * Refresh table list only if any jobs have been done
