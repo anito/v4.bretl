@@ -110,10 +110,9 @@ if (!class_exists('Utils')) {
       if (!$data) {
         $data = new WP_Error(403, __('No account data found', 'kleinanzeigen'));
       }
-      if (is_wp_error($data)) {
+      if (wp_doing_ajax() && is_wp_error($data)) {
         die(json_encode(array(
           "head" => wbp_ka()->include_template($error_template, true, array('message' => $data->get_error_message()))
-
         )));
       }
       return $data;

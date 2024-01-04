@@ -247,7 +247,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $job_id = wbp_db()->insert_job(array(
         'slug'  => 'kleinanzeigen_sync_price',
         'type'  => 'record',
-        'uid' => $item['record']->id
+        'uid'   => $item['record']->id
       ));
 
       $price = Utils::extract_kleinanzeigen_price($item['record']->price);
@@ -259,16 +259,27 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   public function job_create_products()
   {
+
+    set_time_limit(300);
+
     $items = wbp_fn()->build_tasks('new-product')['items'];
 
     foreach ($items as $item) {
 
       $record = (object) $item['record'];
 
+      if (!ALLOW_DUPLICATE_TITLES && wbp_fn()->product_title_exists($record->title)) {
+        continue;
+      }
+
+      if(wbp_db()->get_job_by_uid($record->id, 'record')) {
+        continue;
+      };
+
       $job_id = wbp_db()->insert_job(array(
         'slug'  => 'kleinanzeigen_create_new_products',
         'type'  => 'record',
-        'uid' => $record->id
+        'uid'   => $record->id
       ));
 
       $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
@@ -279,15 +290,23 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $doc = new DOMDocument();
       $doc->loadHTML($contents);
 
-      $post_ID = wbp_fn()->create_product($record, $doc);
+      $post_ID = wbp_fn()->create_ad_product($record, $doc);
 
-      wbp_fn()->create_product_images($post_ID, $doc);
+      if (!is_wp_error($post_ID)) {
 
-      wbp_fn()->sendMail($post_ID, $record);
+        wbp_fn()->create_product_images($post_ID, $doc);
 
-      update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
+        wbp_fn()->sendMail($post_ID, $record);
 
-      wbp_db()->job_done($job_id);
+        update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
+      } else {
+        $error_data = $post_ID->get_error_data();
+        $error_message = $post_ID->get_error_message();
+      }
+
+      if($job_id) {
+        wbp_db()->job_done($job_id);
+      }
     }
   }
 

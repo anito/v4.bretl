@@ -151,7 +151,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       for ($paged = 2; $paged <= $num_pages; $paged++) {
         $page_data = Utils::get_json_data(array('paged' => $paged));
         $page_data  = Utils::account_error_check($page_data, 'error-message.php');
-        $ads = array_merge($ads, $page_data->ads);
+        $ads = !is_wp_error($page_data) ? array_merge($ads, $page_data->ads) : $ads;
       }
       return $ads;
     }
@@ -244,9 +244,44 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }, $posts);
     }
 
-    public function get_product_by_title($title)
+    public function get_product_from_ad($ad)
     {
       global $wpdb;
+
+      $product = false;
+      $found_by = '';
+      $posts_table = $wpdb->posts;
+      $postmeta_table = $wpdb->postmeta;
+
+      // By sku
+      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $postmeta_table WHERE $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", '_sku', $ad->id));
+
+      if ($post_ID) {
+        $product = wc_get_product($post_ID);
+        $found_by = 'sku';
+      }
+
+      // By $title AND $price
+      if (!$product) {
+        $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE $posts_table.post_title='%s' AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $ad->title, 'product', '_price', Utils::extract_kleinanzeigen_price($ad->price)));
+        if ($post_ID) {
+          $product = wc_get_product($post_ID);
+          $found_by = 'title';
+        }
+      }
+
+      return compact('product', 'found_by');
+    }
+
+    public function get_no_sku_product_by_title($title)
+    {
+      global $wpdb;
+
+      $posts_table = $wpdb->posts;
+      $postmeta_table = $wpdb->postmeta;
+
+      $prepare = $wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE $posts_table.post_title='%s' AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $title, 'product', '_sku', '');
+      $products = $wpdb->get_var($prepare);
 
       // $sql = $wpdb->prepare(
       //   "
@@ -258,7 +293,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       //   $title,
       //   'product'
       // );
-      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_title='%s' AND post_type LIKE '%s' LIMIT 1", $title, 'product'));
+      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_title='%s' AND post_type='%s' LIMIT 1", $title, 'product'));
 
       if (isset($post_ID)) {
         return wc_get_product($post_ID);
@@ -546,7 +581,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $product = wc_get_product($post_ID);
       $title = $product->get_name();
       $content = $product->get_description();
-      $sku_errors = [];
+      $errors = [];
       $ad = null;
 
       if (!empty($kleinanzeigen_id)) {
@@ -596,20 +631,23 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           $success = $this->enable_sku($product, $ad);
           if (is_wp_error($success)) {
             $error = new WP_Error(400, __('A Product with the same Ad ID already exists. Delete this draft or enter a different Ad ID.', 'kleinanzeigen'));
-            $sku_errors[] = $error;
+            $errors[] = $error;
           }
         }
       } else {
         $this->disable_sku($product);
       }
 
-      // Check for duplicate titles
-      $results = $this->product_title_equals($title);
 
-      if (count($results) >= 1) {
+
+      if (!ALLOW_DUPLICATE_TITLES) {
+
+        // Check for duplicate titles
+        $results = $this->product_title_equals($title);
+
         foreach ($results as $result) {
           if ((int) $result->ID != $post_ID) {
-            $sku_errors[] = new WP_Error(400, __('A product with the same title already exists. Delete this draft or enter a different title.', 'kleinanzeigen'));
+            $errors[] = new WP_Error(400, __('A product with the same title already exists. Delete this draft or enter a different title.', 'kleinanzeigen'));
           }
         }
       }
@@ -617,13 +655,13 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       // Cleanup comments
       $content = preg_replace('/(?:' . $comment(1) . ')\s*(.|\r|\n)*(?:' . $comment(2) . ')/', '', $content);
 
-      if (!empty($sku_errors)) {
+      if (!empty($errors)) {
         $title = wp_strip_all_tags(Utils::sanitize_dup_title($title . " [ DUPLIKAT " . 0 . " ]"));
         $before_content = $comment(1, '<div style="max-width: 100%;">');
         $inner_content = '';
         $after_content = $comment(2, '</div>');
-        foreach ($sku_errors as $sku_error) {
-          $inner_content .= '<div style="display: inline-block; border: 1px solid red; border-radius: 5px; border-left: 5px solid red; margin-bottom: 5px; padding: 5px 10px; color: #f44;"><b style="font-size: 14px;">' . $sku_error->get_error_message() . '</div>';
+        foreach ($errors as $error) {
+          $inner_content .= '<div style="display: inline-block; border: 1px solid red; border-radius: 5px; border-left: 5px solid red; margin-bottom: 5px; padding: 5px 10px; color: #f44;"><b style="font-size: 14px;">' . $error->get_error_message() . '</div>';
         }
         $content = sprintf('%1$s' . $inner_content . '%2$s' . '%3$s', $before_content, $after_content, $content);
       } else {
@@ -635,12 +673,17 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       wp_insert_post([
         'ID' => $post_ID,
         'post_type' => 'product',
-        'post_status' => !empty($sku_errors) ? 'draft' : (isset($_POST['post_status']) ? $_POST['post_status'] : $product->get_status()),
+        'post_status' => !empty($errors) ? 'draft' : (isset($_POST['post_status']) ? $_POST['post_status'] : $product->get_status()),
         'post_content' => $content,
         'post_excerpt' => $product->get_short_description(),
         'post_title' => $title
       ]);
       add_action('save_post', array($this, 'save_post'), 99, 2);
+    }
+
+    public function product_title_exists($title)
+    {
+      return count($this->product_title_equals($title)) >= 1;
     }
 
     public function product_title_equals($title)
@@ -709,13 +752,26 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     public function has_price_diff($record, $product)
     {
       $kleinanzeigen_price = Utils::extract_kleinanzeigen_price($record->price);
-      $woo_price = $product->get_price($record);
+      $woo_price = $product->get_price();
 
       return $kleinanzeigen_price !== $woo_price;
     }
 
-    public function create_product($record, $doc)
+    public function create_ad_product($record, $doc)
     {
+
+      // Only create product if sku will be unique
+      $products = wc_get_products(array('sku' => $record->id, 'limit' => 1));
+      if (!empty($products)) {
+        $ids = array_map(function ($product) {
+          return $product->get_id();
+        }, $products);
+        return new WP_Error('400', __('Artikelnummer existiert bereits.', 'kleinanzeigen'), array(
+          'data' => array(
+            'product_ids' => $ids
+          )
+        ));
+      }
 
       $el = $doc->getElementById('viewad-description-text');
       $content = $doc->saveHTML($el);
@@ -736,7 +792,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
       ), true);
 
-      $this->enable_sku($product, $record);
+      $maybe_duplicate_sku = $this->enable_sku($product, $record);
+      if (is_wp_error($maybe_duplicate_sku)) {
+        return $maybe_duplicate_sku;
+      }
 
       return $post_ID;
     }
@@ -759,13 +818,16 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $ids = [];
         for ($i = 0; $i < count($images); $i++) {
           $url = $images[$i];
-          $ids[] = Utils::upload_image($url, $post_ID);
-          if ($i === 0) {
-            set_post_thumbnail((int) $post_ID, $ids[0]);
+          $attachment_id = Utils::upload_image($url, $post_ID);
+          if ($attachment_id) {
+            $ids[] = $attachment_id;
+            if ($i === 0) {
+              set_post_thumbnail((int) $post_ID, $ids[0]);
+            }
           }
         }
 
-        unset($ids[0]); // remove main image from gallery
+        if (count($ids)) unset($ids[0]); // remove main image from gallery
         if (count($ids)) {
           update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
         }
@@ -1087,7 +1149,15 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $product->set_sku($ad->id);
         $product->save();
       } catch (WC_Data_Exception $e) {
-        return new WP_Error($e->getErrorCode(), $e->getMessage(), array_merge($e->getErrorData(), array('product' => $product)));
+        return new WP_Error($e->getErrorCode(), $e->getMessage(), array_merge(
+          $e->getErrorData(),
+          array(
+            'data' => array(
+              'product' => $product,
+              'message' => $e->getMessage()
+            )
+          )
+        ));
       }
       $post_ID = (int) $product->get_id();
       update_post_meta($post_ID, 'kleinanzeigen_id', $ad->id);
@@ -1273,6 +1343,12 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         } elseif ($this->text_contains(esc_html($brand->name), esc_html($searchable_content))) {
           $exists = true;
         }
+        if (
+          true === $exists &&
+          $this->text_contains(esc_html('kein ' . $brand->name), esc_html($searchable_content))
+        ) {
+          $exists = false;
+        }
         if (true === $exists) {
           wbp_th()->set_product_term($product, $brand->term_id, 'brand', true);
         }
@@ -1295,7 +1371,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     {
 
       wp_remote_get(home_url('wp-cron.php'));
-      
+
       $get_jobs = function () {
         $jobs = [];
         $cron_list = _get_cron_array();
@@ -1303,7 +1379,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           if (is_array($cronjobs)) {
             foreach ($cronjobs as $key => $cron) {
               if (0 === strpos($key, 'kleinanzeigen')) {
-                
+
                 $jobs[] = array_merge(
                   array(
                     'slug'      => $key,
@@ -1312,7 +1388,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
                   $cron[array_key_first($cron)]
                 );
               }
-
             }
           }
         });
@@ -1320,12 +1395,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         return $jobs;
       };
 
-      $get_todos = function()
-      {
+      $get_todos = function () {
         return wbp_db()->get_todos(0);
       };
-      $get_completed = function()
-      {
+      $get_completed = function () {
         return wbp_db()->get_todos();
       };
 
@@ -1333,7 +1406,13 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $todos = $get_todos();
       $completed = $get_completed();
 
-      while(count($completed) < count($todos)) {
+      $max_execution_time = (int) ini_get('max_execution_time');
+      $started = time();
+      $is_within_met = function () use ($started, $max_execution_time) {
+        return time() < $max_execution_time + $started - 5;
+      };
+
+      while (count($completed) < count($todos) && $is_within_met()) {
         sleep(1);
         $completed = array_merge($completed, $get_completed());
       }

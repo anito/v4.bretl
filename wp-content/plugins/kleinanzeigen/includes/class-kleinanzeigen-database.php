@@ -40,7 +40,9 @@ class Kleinanzeigen_Database
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
 
     $query = "UPDATE {$table_name} SET done = 1 WHERE id = {$id}";
+
     $success = $wpdb->query($query);
+
     if ($success) {
       return true;
     } else {
@@ -55,7 +57,7 @@ class Kleinanzeigen_Database
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
 
     $todos = $wpdb->get_results(
-      $wpdb->prepare("SELECT * FROM %1s WHERE done = %2d", $table_name, $done)
+      $wpdb->prepare("SELECT * FROM $table_name WHERE done = %d", $done)
     );
 
     return $todos;
@@ -76,6 +78,7 @@ class Kleinanzeigen_Database
       ));
     }
   }
+
   public function insert_job($data)
   {
 
@@ -84,6 +87,7 @@ class Kleinanzeigen_Database
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
     $data = wp_parse_args($data, array('created' => current_time('mysql')));
 
+    $update = "uid = VALUES (uid);";
     $query = '';
     $query .= "INSERT INTO {$table_name} (";
 
@@ -109,10 +113,10 @@ class Kleinanzeigen_Database
       $c++;
     }
 
-    $query .= ")";
+    $query .= ") ON DUPLICATE KEY UPDATE ";
+    $query .= $update;
 
-    $success = $wpdb->query($query);
-    if ($success) {
+    if ($wpdb->query($query)) {
       return $wpdb->insert_id;
     } else {
       return false;
@@ -126,7 +130,7 @@ class Kleinanzeigen_Database
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
 
     $results = $wpdb->get_results(
-      $wpdb->prepare("SELECT * FROM %1s WHERE slug = %2s", $table_name, $slug)
+      $wpdb->prepare("SELECT * FROM $table_name WHERE slug = %s", $slug)
     );
 
     return $results;
@@ -141,6 +145,17 @@ class Kleinanzeigen_Database
     $results = $wpdb->get_results("SELECT * FROM {$table_name}");
 
     return $results;
+  }
+
+  public function get_job_by_uid($uid, $type = '')
+  {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
+
+    $id = $wpdb->get_var($wpdb->prepare("SELECT id FROM $table_name WHERE type='%s' AND uid='%s'", $type, $uid));
+
+    return $id;
   }
 
   public static function get_instance()

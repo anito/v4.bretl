@@ -76,16 +76,11 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array(), 'todos' => array());
     foreach ($this->items as $item) {
 
-      $product_by_sku = wbp_fn()->get_product_by_sku($item->id) ?? null;
-      if (!$product_by_sku) {
-        $product_by_title = wbp_fn()->get_product_by_title($item->title);
-      }
-
-      $product = $product_by_sku ?? ($product_by_title ?? false);
+      list('product' => $product, 'found_by' => $found_by) = wbp_fn()->get_product_from_ad($item);
 
       if ($product) {
 
-        !$product_by_sku && $products['no-sku'][] = $item->id;
+        'sku' !== $found_by && $products['no-sku'][] = $item->id;
         wbp_fn()->has_price_diff($item, $product) && $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$PRICE_DIFF);
 
         switch ($product->get_status()) {
@@ -315,11 +310,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     list($columns, $hidden) = $this->get_column_info();
 
-    $product_by_sku = wbp_fn()->get_product_by_sku($record->id);
-    if (!$product_by_sku) {
-      $product_by_title = wbp_fn()->get_product_by_title($record->title);
-    }
-    $product = $product_by_sku ?? $product_by_title ?? null;
+    list('product' => $product, 'found_by' => $found_by) = wbp_fn()->get_product_from_ad($record);
 
     $diff_classes = array();
     $product_labels = array();
@@ -378,7 +369,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           $permalink = get_permalink($post_ID);
           $classes = "";
 
-          if (!$product_by_sku) {
+          if ('sku' !== $found_by) {
             $label = __('Connect', 'kleinanzeigen');
             $action = 'connect-' . $post_ID;
             $icon = 'admin-links';
@@ -391,13 +382,13 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           }
           $kleinanzeigen_actions =
             '<div>' .
-            wbp_ka()->include_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_ID', 'record', 'post_status', 'classes'), array('connected' => $product_by_sku))) .
+            wbp_ka()->include_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_ID', 'record', 'post_status', 'classes'), array('connected' => 'sku' === $found_by))) .
             wbp_ka()->include_template('dashboard/kleinanzeigen-toggle-link-control.php', true, compact('post_ID', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
             '</div>';
         }
 
         // Setup Shop actions
-        if ($product_by_sku) {
+        if ('sku' === $found_by) {
 
           $status = $post_status === 'publish' ? 'connected-publish' : ($post_status === 'draft' ? 'connected-draft' : 'connected-unknown');
           $shop_actions =

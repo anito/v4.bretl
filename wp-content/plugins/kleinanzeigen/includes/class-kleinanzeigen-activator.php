@@ -124,7 +124,7 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
       id int(255) AUTO_INCREMENT,
       slug varchar(100) NOT NULL,
       type varchar(100) NOT NULL,
-      uid varchar(100) NOT NULL,
+      uid varchar(100) UNIQUE NOT NULL,
       done tinyint(1) DEFAULT 0,
       created datetime NOT NULL,
       PRIMARY KEY  (id)
