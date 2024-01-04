@@ -1338,17 +1338,17 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       foreach ($brands as $brand) {
         $exists = false;
-        if ($this->text_contains('(?:Motorenhersteller:?\s*(' . $brand->name . '))', $content, 'raw')) {
+        if ($this->text_contains('(?:Motorenhersteller:?\s*(' . preg_quote($brand->name) . '))', $content, 'raw')) {
           $exists = true;
-        } elseif ($this->text_contains(esc_html($brand->name), esc_html($searchable_content))) {
+        } elseif ($this->text_contains('(?<!kein )' . preg_quote($brand->name), esc_html($searchable_content), 'raw')) {
           $exists = true;
         }
-        if (
-          true === $exists &&
-          $this->text_contains(esc_html('kein ' . $brand->name), esc_html($searchable_content))
-        ) {
-          $exists = false;
-        }
+        // if (
+        //   true === $exists &&
+        //   $this->text_contains(esc_html('kein ' . $brand->name), esc_html($searchable_content))
+        // ) {
+        //   $exists = false;
+        // }
         if (true === $exists) {
           wbp_th()->set_product_term($product, $brand->term_id, 'brand', true);
         }
