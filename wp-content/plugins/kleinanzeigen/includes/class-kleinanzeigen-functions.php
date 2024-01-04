@@ -1343,12 +1343,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         } elseif ($this->text_contains('(?<!kein )' . preg_quote($brand->name), esc_html($searchable_content), 'raw')) {
           $exists = true;
         }
-        // if (
-        //   true === $exists &&
-        //   $this->text_contains(esc_html('kein ' . $brand->name), esc_html($searchable_content))
-        // ) {
-        //   $exists = false;
-        // }
         if (true === $exists) {
           wbp_th()->set_product_term($product, $brand->term_id, 'brand', true);
         }
