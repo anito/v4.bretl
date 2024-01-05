@@ -218,7 +218,9 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
   function setData($data)
   {
-    $this->items = $data->ads;
+    if($data) {
+      $this->items = $data->ads;
+    }
     $this->prepare_items();
   }
 

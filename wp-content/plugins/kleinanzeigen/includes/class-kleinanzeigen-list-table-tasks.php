@@ -209,6 +209,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $task_type = isset($_GET['task_type']) ? $_GET['task_type'] : '';
 
     $ads = wbp_fn()->get_transient_data();
+
     $args = array(
       'status' => 'publish',
       'limit' => -1
@@ -298,7 +299,9 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
   function setData($data)
   {
-    $this->items = $data;
+    if ($data) {
+      $this->items = $data->ads;
+    }
     $this->prepare_items();
   }
 
