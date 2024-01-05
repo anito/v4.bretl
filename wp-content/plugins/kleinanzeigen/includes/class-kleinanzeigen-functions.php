@@ -145,8 +145,14 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       if (false === ($data = get_transient('kleinanzeigen_data'))) {
 
         Utils::write_log('Fetching data...');
+
         $time = time();
         $data = $this->get_all_ads();
+
+        if (is_wp_error($data)) {
+          wp_die();
+        }
+
         Utils::write_log('Done in ' . time() - $time . 's');
 
         // Set transient expiration to cron interval
@@ -167,6 +173,11 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       // Get first set of data to discover page count
       $data = Utils::account_error_check(Utils::get_json_data(), 'error-message.php');
+
+      if(is_wp_error($data)) {
+        return $data;
+      }
+
       $ads = $data->ads;
       $categories = $data->categoriesSearchData;
       $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
@@ -179,6 +190,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $ads = !is_wp_error($page_data) ? array_merge($ads, $page_data->ads) : $ads;
       }
       return $ads;
+    }
+
+    public function verify_account() {
+      return is_wp_error(Utils::get_json_data()) ? false : true;
     }
 
     public function get_schedule_by_slug($slug)
