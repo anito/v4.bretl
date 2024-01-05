@@ -50,7 +50,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
       check_ajax_referer('ajax-custom-task-list-nonce', '_ajax_custom_task_list_nonce', true);
       $task_type = isset($_COOKIE['kleinanzeigen-task-type']) ? $_COOKIE['kleinanzeigen-task-type'] : '';
 
-      $ads = wbp_fn()->get_all_ads();
+      $ads = wbp_fn()->get_transient_data();
       $args = array(
         'status' => 'publish',
         'limit' => -1

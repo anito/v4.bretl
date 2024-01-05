@@ -51,6 +51,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       add_action("save_post", array($this, "save_post"), 99, 2);
       add_action("save_post", array($this, "quick_edit_product_save"), 10, 1);
       add_filter("update_post_metadata", array($this, 'prevent_metadata_update'), 10, 4);
+      add_action('before_delete_post', array('Utils', 'remove_attachments'));
 
       add_action("wp_insert_post_data", array($this, "publish_guard"), 99, 3);
       add_filter('wp_insert_post_empty_content', array($this, 'return_false'));
@@ -137,9 +138,33 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       new Kleinanzeigen_Ajax_Action_Handler();
     }
 
-    public function get_all_ads()
+    public function get_transient_data()
     {
-      require_once wbp_ka()->plugin_path('includes/class-utils.php');
+      require_once wbp_ka()->plugin_path('includes/class-utils.php');;
+
+      if (false === ($data = get_transient('kleinanzeigen_data'))) {
+
+        Utils::write_log('Fetching data...');
+        $time = time();
+        $data = $this->get_all_ads();
+        Utils::write_log('Done in ' . time() - $time . 's');
+
+        // Set transient expiration to cron interval
+        $interval_option = get_option('kleinanzeigen_crawl_interval');
+        $schedule = $this->get_schedule_by_slug($interval_option);
+        $expires = $schedule['interval'];
+
+        set_transient('kleinanzeigen_data', $data, $expires);
+        
+      } else {
+        Utils::write_log('Using transient data...');
+      }
+      return $data;
+    }
+
+    private function get_all_ads()
+    {
+
       // Get first set of data to discover page count
       $data = Utils::account_error_check(Utils::get_json_data(), 'error-message.php');
       $ads = $data->ads;
@@ -154,6 +179,19 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $ads = !is_wp_error($page_data) ? array_merge($ads, $page_data->ads) : $ads;
       }
       return $ads;
+    }
+
+    public function get_schedule_by_slug($slug)
+    {
+      $schedule = null;
+      $schedules = Kleinanzeigen_Admin::get_schedule();
+      foreach ($schedules as $key => $val) {
+        if ($key === $slug) {
+          $schedule = $schedules[$key];
+          break;
+        }
+      };
+      return $schedule;
     }
 
     function build_tasks($name = '', $status = array('publish'))
@@ -187,7 +225,11 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'new-product' => array(
           'priority' => 3,
           'items' => array()
-        )
+        ),
+        'repair_url' => array(
+          'priority' => 3,
+          'items' => array()
+        ),
       );
 
       if ($name && isset($tasks[$name])) {
@@ -199,7 +241,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         });
       }
 
-      $ads = $this->get_all_ads();
+      $ads = $this->get_transient_data();
+
       $args = array(
         'status' => $status,
         'limit' => -1
@@ -342,7 +385,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $records = wp_list_pluck((array) $ads, 'id');
       $_records = array_flip($records);
       $items = array();
-      if ($task_type === 'no-sku') {
+      if ('no-sku' === $task_type) {
         $products = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'NOT EXISTS'));
         $record = null;
         foreach ($products as $product) {
@@ -350,7 +393,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
-      if ($task_type === 'invalid-cat') {
+      if ('invalid-cat' === $task_type) {
         $products = $this->get_invalid_cat_products();
         foreach ($products as $product) {
           $sku = $product->get_sku();
@@ -359,7 +402,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
-      if ($task_type === 'has-sku') {
+      if ('has-sku' === $task_type) {
         $record = null;
         $products = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'EXISTS'));
         foreach ($products as $product) {
@@ -369,7 +412,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
-      if ($task_type === 'featured') {
+      if ('featured' === $task_type) {
         $record = null;
         $featured_posts = $this->get_featured_products();
         foreach ($featured_posts as $post) {
@@ -380,7 +423,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
-      if ($task_type === 'new-product') {
+      if ('new-product' === $task_type) {
         $product = null;
         $products = wc_get_products(array('status' => array('publish', 'draft', 'trash'), 'limit' => -1, 'sku_compare' => 'EXISTS'));
 
@@ -402,6 +445,17 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
+      // if('repair_url' === $task_type) {
+      //   $products = wc_get_products(array('status' => array('publish', 'draft', 'trash'), 'limit' => -1, 'sku_compare' => 'EXISTS'));
+
+      //   $items = array();
+      //   foreach ($diffs as $key => $sku) {
+      //     $record = $ads[$_records[$sku]];
+      //     $items[] = compact('product', 'task_type', 'record');
+      //   }
+      //   return $items;
+      // }
+
       foreach ($products as $product) {
         $post_ID = $product->get_id();
         $sku = (int) $product->get_sku();
@@ -751,6 +805,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function has_price_diff($record, $product)
     {
+
       $kleinanzeigen_price = Utils::extract_kleinanzeigen_price($record->price);
       $woo_price = $product->get_price();
 
@@ -1145,6 +1200,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function enable_sku(&$product, $ad)
     {
+      if (is_int($product)) {
+        $product = wc_get_product($product);
+      }
       try {
         $product->set_sku($ad->id);
         $product->save();
@@ -1159,11 +1217,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           )
         ));
       }
-      $post_ID = (int) $product->get_id();
-      update_post_meta($post_ID, 'kleinanzeigen_id', $ad->id);
-      update_post_meta($post_ID, 'kleinanzeigen_url', $this->get_kleinanzeigen_url($ad->url));
-      update_post_meta($post_ID, 'kleinanzeigen_search_url', $this->get_kleinanzeigen_search_url($ad->id));
-      update_post_meta($post_ID, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
+      $id = (int) $product->get_id();
+      $this->set_sku($id, $ad);
       return $product;
     }
 
@@ -1171,6 +1226,14 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     {
       delete_post_meta($id, 'kleinanzeigen_url');
       delete_post_meta($id, 'kleinanzeigen_search_url');
+    }
+
+    private function set_sku($id, $ad)
+    {
+      update_post_meta($id, 'kleinanzeigen_id', $ad->id);
+      update_post_meta($id, 'kleinanzeigen_url', $this->get_kleinanzeigen_url($ad->url));
+      update_post_meta($id, 'kleinanzeigen_search_url', $this->get_kleinanzeigen_search_url($ad->id));
+      update_post_meta($id, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
     }
 
     public function disable_sku(WC_Product &$product)
@@ -1242,9 +1305,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'timeout' => 10
       ));
 
-      if (is_callable('write_log')) {
-        // write_log($response);
-      }
+      Utils::write_log($response);
 
       if (!is_wp_error($response) && ($response['response']['code'] === 200)) {
         return $response;
@@ -1377,6 +1438,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
                 $jobs[] = array_merge(
                   array(
                     'slug'      => $key,
+                    'name'      => str_replace('_', ' ', preg_replace('/(kleinanzeigen_)(\w*)/', '<span style="font-size: 1.5em;">&#x27B8;&nbsp;</span><span>$2</span>', $key)),
                     'timestamp' => $timestamp * 1000
                   ),
                   $cron[array_key_first($cron)]

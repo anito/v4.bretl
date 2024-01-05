@@ -685,7 +685,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function get_record($id)
     {
-      $ads = wbp_fn()->get_all_ads();
+      $ads = wbp_fn()->get_transient_data();
       $ids = array_column($ads, 'id');
       $record_key = array_search($id, $ids);
       return is_int($record_key) ? $ads[$record_key] : null;

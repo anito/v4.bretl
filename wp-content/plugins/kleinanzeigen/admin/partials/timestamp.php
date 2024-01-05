@@ -1,6 +1,6 @@
 <div class="timestamp-wrap">
   <div class="timestamp" id="wbp-timestamp">
-    <span><?php echo __('Loading', 'kleinanzeigen') ?> ...</span>
+    <span><?php echo __('Loading', 'kleinanzeigen') ?>...</span>
   </div>
 </div>
 
@@ -47,7 +47,7 @@
       console.log('completed', completed);
 
       /**
-       * Refresh table list only if any jobs have been done
+       * Refresh table list if any jobs have been done
        * Not available on kleinanzeigen-settings view
        */
       if (completed.length) {
@@ -86,12 +86,12 @@
         clearInterval(intervalId);
         intervalId = setInterval(render, 1000, el(), {
           job,
-          template: templates('timer') // Template for displaying remaining
+          template: templates('timer') // Template for displaying remaining time and job name
         })
 
       } else {
         render(el(), {
-          template: templates('ntodo') // Template "Nothing to do"
+          template: templates('bored') // Template "Bored"
         })
         intervalId_wait = setInterval(cronlistCallback, 5000, () => clearInterval(intervalId_wait));
       }
@@ -102,9 +102,9 @@
       const tmpl = {
         timer: (job) => {
           const delta = job.timestamp - new Date().getTime();
-          return delta >= 0 ? `<span class="value">${displayTime(delta)}</span><span class="label">${job.slug}</span>` : `<span>busy...</span>`;
+          return delta >= 0 ? `<span class="value">${displayTime(delta)}</span><span class="label">${job.name}</span>` : `<span>Busy...</span>`;
         },
-        ntodo: `<span class="label">Nothing to do</span>`,
+        bored: `<span class="label">Boring...</span>`,
         stop: `<span class="label">Cron stopped</span>`
       }
       return tmpl[id];
@@ -150,7 +150,6 @@
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.8em;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     background: #3c434a;
     color: #ddd;
@@ -162,14 +161,16 @@
   }
 
   #wbp-timestamp .label {
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: auto;
+    width: 80%;
   }
 
   #wbp-timestamp .value {
-    font-weight: 500;
-    margin-right: 20px;
+    margin-right: 10px;
   }
 </style>

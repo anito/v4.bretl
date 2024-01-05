@@ -61,6 +61,12 @@ if (!class_exists('Utils')) {
       return $remote_url;
     }
 
+    static function write_log($vars) {
+      if(! IS_PRODUCTION && is_callable('write_log')) {
+        write_log($vars);
+      }
+    }
+
     static function read($file)
     {
       if (!file_exists($file)) {
@@ -157,6 +163,7 @@ if (!class_exists('Utils')) {
 
     static function remove_attachments($post_ID)
     {
+
       $product = wc_get_product($post_ID);
       if ($product) {
         $attachment_ids[] = $product->get_image_id();
