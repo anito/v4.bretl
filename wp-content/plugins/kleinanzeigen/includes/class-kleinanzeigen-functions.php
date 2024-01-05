@@ -45,15 +45,16 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       add_filter('get_the_terms', array($this, 'get_the_terms'), 10, 3);
       add_filter('get_the_terms', array($this, 'label_filter'), 20, 3);
 
-      add_action("woocommerce_before_product_object_save", array($this, "product_before_save"), 99, 2);
+      add_action('woocommerce_before_product_object_save', array($this, 'product_before_save'), 99, 2);
       add_filter('woocommerce_product_data_store_cpt_get_products_query', array($this, 'handle_cpt_get_products_query'), 10, 2);
 
-      add_action("save_post", array($this, "save_post"), 99, 2);
-      add_action("save_post", array($this, "quick_edit_product_save"), 10, 1);
-      add_filter("update_post_metadata", array($this, 'prevent_metadata_update'), 10, 4);
+      add_filter('wp_insert_post_data', array($this, 'before_save_post'), 99, 2);
+      add_action('save_post', array($this, 'save_post'), 99, 2);
+      add_action('save_post', array($this, 'quick_edit_product_save'), 10, 1);
+      add_filter('update_post_metadata', array($this, 'prevent_metadata_update'), 10, 4);
       add_action('before_delete_post', array('Utils', 'remove_attachments'));
 
-      add_action("wp_insert_post_data", array($this, "publish_guard"), 99, 3);
+      add_action('wp_insert_post_data', array($this, 'publish_guard'), 99, 3);
       add_filter('wp_insert_post_empty_content', array($this, 'return_false'));
     }
 
@@ -174,7 +175,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       // Get first set of data to discover page count
       $data = Utils::account_error_check(Utils::get_json_data(), 'error-message.php');
 
-      if(is_wp_error($data)) {
+      if (is_wp_error($data)) {
         return $data;
       }
 
@@ -192,7 +193,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $ads;
     }
 
-    public function verify_account() {
+    public function verify_account()
+    {
       return is_wp_error(Utils::get_json_data()) ? false : true;
     }
 
@@ -285,13 +287,14 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
 
       $args = array(
-        'post_type' => 'product',
-        'post_status' => array('publish'),
-        'tax_query' => array(
+        'post_type'       => 'product',
+        'post_status'     => array('publish'),
+        'posts_per_page'  => -1,
+        'tax_query'       => array(
           array(
-            'taxonomy'  => 'product_cat',
-            'field'     => 'slug',
-            'terms' => array($default_cat->slug),
+            'taxonomy'    => 'product_cat',
+            'field'       => 'slug',
+            'terms'       => array($default_cat->slug),
           ),
         ),
       );
@@ -321,7 +324,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       // By $title AND $price
       if (!$product) {
-        $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE $posts_table.post_title='%s' AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $ad->title, 'product', '_price', Utils::extract_kleinanzeigen_price($ad->price)));
+        // Taking into account both a previously htmlentity encoded title and the decoded title version
+        $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE ($posts_table.post_title='%s' OR $posts_table.post_title='%s') AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $ad->title, htmlentities($ad->title), 'product', '_price', Utils::extract_kleinanzeigen_price($ad->price)));
         if ($post_ID) {
           $product = wc_get_product($post_ID);
           $found_by = 'title';
@@ -590,10 +594,21 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $ad ?? null;
     }
 
+    public function before_save_post($data, $postarr)
+    {
+
+      if ("product" != $data['post_type']) return $data;
+
+      // Decode auto-encoded htmlentities in title e.g. &gt;Aktion&lt => >Aktion<
+      $data['post_title'] = html_entity_decode($data['post_title']);
+
+      return $data;
+    }
+
     public function save_post($post_ID, $post)
     {
       if (!class_exists('WooCommerce', false)) return 0;
-      if ($post->post_type != "product" || $post->post_status == 'trash') return 0;
+      if ("product" != $post->post_type || "trash" == $post->post_status) return 0;
 
       $product = wc_get_product($post_ID);
       if (!$product) return 0;
@@ -745,7 +760,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'post_status' => !empty($errors) ? 'draft' : (isset($_POST['post_status']) ? $_POST['post_status'] : $product->get_status()),
         'post_content' => $content,
         'post_excerpt' => $product->get_short_description(),
-        'post_title' => $title
+        'post_title' => html_entity_decode($title) // Eventhough this will be encoded during save, however we catch this up again in wp_insert_post_data filter
       ]);
       add_action('save_post', array($this, 'save_post'), 99, 2);
     }
@@ -1320,8 +1335,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'timeout' => 10
       ));
 
-      Utils::write_log($response);
-
       if (!is_wp_error($response) && ($response['response']['code'] === 200)) {
         return $response;
       } elseif ($retry++ < $tries) {
@@ -1342,6 +1355,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $product_id = $product->get_id();
 
       $product->set_regular_price($price);
+
       $product->save();
 
       $parts = array(
@@ -1405,6 +1419,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           }
         }
       }
+
 
       // Handle brands
       $brands = get_terms([

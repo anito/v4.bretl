@@ -90,6 +90,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
 
             display: function() {
 
+              // No need to fetch fresh data if modal isn't visible
+              if(!$('body').hasClass('show-modal')) return;
+
               $('.wp-list-kleinanzeigen-tasks').addClass('loading');
 
               $.ajax({
@@ -101,8 +104,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
                   action: '_ajax_fetch_kleinanzeigen_task_display'
                 },
                 success: function(response) {
-
-                  console.log(response);
 
                   $('.wp-list-kleinanzeigen-tasks').removeClass('loading');
 
@@ -230,6 +231,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
 
           // list.display();
           list.init();
+
+          KleinanzeigenAjax.displayModal = list.display;
 
         })(jQuery);
       </script>

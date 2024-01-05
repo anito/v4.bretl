@@ -13,7 +13,8 @@
     </div>
   </div>
   <div>
+    <div style="font-size: .7em;"><?php echo sprintf(__('Version %s', 'kleinanzeigen'), wbp_ka()->get_version()) ?></div>
     <h5 style=" margin: 0;"><?php echo __('Ad import from Kleinanzeigen.de', 'kleinanzeigen') ?></h5>
-        <div style="font-size: 0.8em;">&copy; Axel Nitzschner</div>
-    </div>
+    <div style="font-size: 0.8em;">&copy; Axel Nitzschner</div>
+  </div>
 </header>

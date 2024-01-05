@@ -21,9 +21,9 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
     <div class="left-top-section">
       <section style="display: flex; justify-content: space-between; padding-bottom: 0;">
         <span>
-          <h2 style="margin: 0;"><?php echo sprintf(__('Page: %s', 'kleinanzeigen'), $paged) ?></h2>
+          <h2 style="margin: 0;"><?php echo sprintf(__('Page:', 'kleinanzeigen') . ' %s', $paged) ?></h2>
         </span>
-        <small><?php echo sprintf(__('Ads: %s', 'kleinanzeigen'), count($items)); ?></small>
+        <small><?php echo sprintf(__('Ads:', 'kleinanzeigen') . ' %s', count($items)); ?></small>
       </section>
     </div>
     <div class="left-middle-section">

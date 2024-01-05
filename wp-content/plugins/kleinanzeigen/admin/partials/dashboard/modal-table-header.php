@@ -3,7 +3,7 @@
     <i class="dashicons dashicons-admin-generic" style="align-self: center; margin-right: 10px;"></i>
     <h2><?php echo $header ?></h2>
   </div>
-  <div class="second-section section" style="margin-bottom: -30px; text-align: center;">
+  <div class="second-section section">
     <h5><?php echo $subheader ?></h5>
   </div>
 </div>

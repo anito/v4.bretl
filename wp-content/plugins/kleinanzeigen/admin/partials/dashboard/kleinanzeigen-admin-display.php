@@ -44,7 +44,7 @@
   jQuery(document).ready(($) => {
 
     const resize = function() {
-      root.style.setProperty('--modal-height', window.innerHeight - 550 + 'px');
+      root.style.setProperty('--modal-height', window.innerHeight - 450 + 'px');
     }
 
     const root = document.querySelector(':root');
@@ -86,7 +86,7 @@
   }
 
   .ka-list-modal form {
-    margin-bottom: 50px;
+    margin-bottom: 0px;
   }
 
   body.show-modal .ka-list-modal {
@@ -108,10 +108,10 @@
   }
 
   .ka-list-modal-body {
-    width: 80%;
+    --modal-padding: 20px;
+    height: calc(100vh - var(--admin-topbar) - calc(2 * var(--modal-padding)));
     background-color: white;
-    border-radius: 8px;
-    padding: 20px;
+    padding: var(--modal-padding);
     position: relative;
   }
 
@@ -128,6 +128,11 @@
   .ka-list-header>.section {
     display: flex;
     justify-content: center;
+  }
+
+  .ka-list-header>.section.second-section {
+    width: 70%;
+    align-self: center;
   }
 
   .ka-list-header h2 {
@@ -160,8 +165,7 @@
   }
 
   .ka-list-modal .footer {
-    position: absolute;
-    bottom: 20px;
+    margin: 20px 0;
   }
 
   .action-button.disabled {

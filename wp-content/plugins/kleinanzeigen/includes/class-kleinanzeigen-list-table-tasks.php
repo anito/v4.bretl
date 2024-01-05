@@ -98,8 +98,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         $default_cat_id = get_option('default_product_cat');
         $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
         $subheader = '';
-        $subheader .= __('It should be generally avoided to assign the default category to products.', 'kleinanzeigen') . '<br />';
-        $subheader .= __('Please assign a different category in order to allow visitors to find them.', 'kleinanzeigen');
+        $subheader .= __('Please assign the below listed products an appropriate category in order to get located by your visitors.', 'kleinanzeigen');
         $vars = array(
           'header-template' => array(
             'template' => 'modal-table-header',

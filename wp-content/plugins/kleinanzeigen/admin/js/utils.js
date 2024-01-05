@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-  const { screen, poll, cron, display } = {
+  const { screen, poll, cron, display, displayModal } = {
     ...KleinanzeigenAjax,
     ...KleinanzeigenUtils,
   };
@@ -128,6 +128,7 @@ jQuery(document).ready(function ($) {
   function handle_visibility_change(e) {
     if (!e.target.hidden) {
       display();
+      displayModal();
     }
   }
 
