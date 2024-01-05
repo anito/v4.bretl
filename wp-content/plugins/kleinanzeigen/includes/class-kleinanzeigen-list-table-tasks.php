@@ -299,9 +299,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
   function setData($data)
   {
-    if ($data) {
-      $this->items = $data->ads;
-    }
+    $this->items = $data;
     $this->prepare_items();
   }
 
@@ -347,7 +345,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $this->set_pagination_args(
       array(
         'total_items'  => $total_items,
-        'per_page'      => $per_page,
+        'per_page'     => $per_page,
         'total_pages'  => ceil($total_items / $per_page),
         'orderby'      => !empty($_REQUEST['orderby']) && '' != $_REQUEST['orderby'] ? $_REQUEST['orderby'] : 'title',
         'order'        => !empty($_REQUEST['order']) && '' != $_REQUEST['order'] ? $_REQUEST['order'] : 'asc'
