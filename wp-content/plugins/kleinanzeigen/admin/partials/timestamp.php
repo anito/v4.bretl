@@ -14,6 +14,7 @@
       getCronJobs,
       getCookie,
       display,
+      displayModal,
       CreateScheduledJobs,
     } = {
       ...KleinanzeigenUtils,
@@ -52,6 +53,7 @@
        */
       if (completed.length) {
         display?.();
+        displayModal?.();
       }
 
       const sortByNext = (a, b) => a.timestamp < b.timestamp;
