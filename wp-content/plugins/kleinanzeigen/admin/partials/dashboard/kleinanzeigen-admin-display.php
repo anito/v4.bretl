@@ -20,6 +20,9 @@
   <div class="ka-list-modal">
     <div class="ka-list-modal-background close">
       <div class="ka-list-modal-body">
+        <div class="button-controls right">
+          <a href="#" type="button" class="button button-primary close"><?php echo __('Close', 'kleinanzeigen') ?></a>
+        </div>
         <div id="ka-list-modal-content" class="ka-list-modal-inner">
           <div class="header"></div>
           <form action="" name="kleinanzeigen-task-list" id="kleinanzeigen-task-list" method="get">
@@ -31,7 +34,7 @@
           <div class="footer"></div>
           <div class="script"></div>
         </div>
-        <div class="button-controls right">
+        <div class="button-controls bottom right">
           <a href="#" type="button" class="button button-primary close"><?php echo __('Close', 'kleinanzeigen') ?></a>
         </div>
       </div>
@@ -146,7 +149,12 @@
 
   .ka-list-modal .button-controls {
     position: absolute;
+    top: 20px;
+  }
+
+  .ka-list-modal .button-controls.bottom {
     bottom: 10px;
+    top: initial;
   }
 
   .ka-list-modal .button-controls.right {
