@@ -1,6 +1,5 @@
 <?php
 
-use Elementor\Core\Files\CSS\Post_Preview;
 use Pelago\Emogrifier\CssInliner;
 
 // If this file is called directly, abort.
