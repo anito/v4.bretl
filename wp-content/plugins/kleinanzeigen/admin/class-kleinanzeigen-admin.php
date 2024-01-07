@@ -415,7 +415,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function displayPluginAdminDashboard()
   {
     $this->include_template(self::$plugin_name . '-page-header.php');
-    $this->include_template('dashboard/' . self::$plugin_name . '-admin-display.php');
+    $this->include_template(self::$plugin_name . '-admin-display.php');
   }
 
   public function displayPluginAdminSettings()
