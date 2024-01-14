@@ -79,7 +79,7 @@ class Kleinanzeigen_Database
     }
   }
 
-  public function insert_job($data)
+  public function register_active_job($data)
   {
 
     global $wpdb;

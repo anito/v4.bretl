@@ -17,6 +17,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   private static $schedule;
 
+  public static $events;
+
   /**
    * Initialize the class and set its properties.
    *
@@ -28,6 +30,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
 
     add_action('init', array($this, 'loadFiles'), -999);
+    add_action('init', array($this, 'register_event_names'), -998);
     add_action('admin_menu', array($this, 'addPluginAdminMenu'), 9);
     add_filter('pre_option_kleinanzeigen_send_mail_on_new_ad', array($this, 'option_kleinanzeigen_send_mail_on_new_ad'));
     add_filter("option_page_capability_kleinanzeigen_account_settings", array($this, 'get_capability'));
@@ -38,6 +41,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
     add_action('kleinanzeigen_activate_url', array($this, 'job_activate_url'));
     add_action('kleinanzeigen_deactivate_url', array($this, 'job_deactivate_url'));
+    add_action('kleinanzeigen_renamed_ads', array($this, 'job_renamed_ads'));
     add_action('kleinanzeigen_create_new_products', array($this, 'job_create_products'));
     add_filter('pre_update_option', array($this, 'pre_update_option'), 10, 3);
     add_action('init', array($this, 'register_jobs'));
@@ -118,6 +122,23 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     ));
   }
 
+  public function register_event_names()
+  {
+
+    self::$events = array(
+      'mandatory' => array(
+        'kleinanzeigen_activate_url',
+        'kleinanzeigen_deactivate_url',
+        'kleinanzeigen_renamed_ads'
+      ),
+      'optional' => array(
+        'kleinanzeigen_sync_price',
+        'kleinanzeigen_invalid_ad_action',
+        'kleinanzeigen_create_new_products'
+      )
+    );
+  }
+
   public function get_capability($capabilities)
   {
     return self::$capability;
@@ -131,6 +152,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public static function get_schedule()
   {
     return (self::$schedule = array(
+      'never' => array(
+        'interval' => 60,
+        'display'  => __('Never', 'kleinanzeigen'),
+      ),
       'every_minute' => array(
         'default'  => true,
         'interval' => 60,
@@ -171,85 +196,116 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function pre_update_option($value, $option, $old_value)
   {
 
-    if ('kleinanzeigen_crawl_interval' === $option && $old_value !== $value) {
+    if (0 === strpos($option, 'kleinanzeigen_') && $old_value !== $value) {
 
-      wp_unschedule_hook('kleinanzeigen_sync_price');
-      wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
-      wp_unschedule_hook('kleinanzeigen_create_new_products');
-      wp_unschedule_hook('kleinanzeigen_deactivate_url');
+      if (in_array($option, array('kleinanzeigen_account_name', 'kleinanzeigen_crawl_interval'))) {
+
+        setcookie('ka-paged', 1);
+        delete_transient('kleinanzeigen_data');
+        $this->unschedule_events('mandatory');
+
+      }
+
+      $this->unschedule_events('optional');
     }
 
     return $value;
+  }
+
+  private function unschedule_events($types)
+  {
+    $event_names = [];
+    $types = !is_array($types) ? array($types) : $types;
+    foreach ($types as $type) {
+      if (!array_key_exists($type, self::$events)) continue;
+      foreach (self::$events[$type] as $name) {
+        $event_names[] = $name;
+      }
+    }
+
+    foreach ($event_names as $name) {
+      if (wp_next_scheduled($name)) {
+        wp_unschedule_hook($name);
+      }
+    }
   }
 
   public function register_jobs()
   {
 
     $interval = get_option('kleinanzeigen_crawl_interval');
-    
-    // Repair url
+    if ('never' === $interval) {
+      $this->unschedule_events('optional');
+    }
+
+    $i = 0;
+    $time = function ($offset = 15) use (&$i) {
+      $time = time() + $i++ * $offset;
+      return $time;
+    };
+
+    /*
+     * Repair url
+     * Mandatory, no option available
+    */
     if (!wp_next_scheduled('kleinanzeigen_activate_url')) {
-      wp_schedule_event(time(), $interval, 'kleinanzeigen_activate_url');
+      wp_schedule_event($time(), $interval, 'kleinanzeigen_activate_url');
     }
 
-    // Remove ophaned links from product
-    if ("1" === get_option('kleinanzeigen_schedule_remove_orphaned_links')) {
-      if (!wp_next_scheduled('kleinanzeigen_deactivate_url')) {
-        wp_schedule_event(time(), $interval, 'kleinanzeigen_deactivate_url');
-      }
-    } else {
-      wp_unschedule_hook('kleinanzeigen_deactivate_url');
+    /*
+     * Remove ophaned links from product
+     * Mandatory, no option available
+    */
+    if (!wp_next_scheduled('kleinanzeigen_deactivate_url')) {
+      wp_schedule_event($time(), $interval, 'kleinanzeigen_deactivate_url');
     }
 
-    // Sync price
+    /*
+     * Repair changed title
+     * Mandatory, no option available
+    */
+    if (!wp_next_scheduled('kleinanzeigen_renamed_ads')) {
+      wp_schedule_event($time(), $interval, 'kleinanzeigen_renamed_ads');
+    }
+
+    if ('never' === $interval) {
+      return;
+    }
+
+    /*
+     * Sync price
+     * Optional, option available
+    */
     if ("1" === get_option('kleinanzeigen_schedule_invalid_prices')) {
       if (!wp_next_scheduled('kleinanzeigen_sync_price')) {
-        wp_schedule_event(time(), $interval, 'kleinanzeigen_sync_price');
+        wp_schedule_event($time(), $interval, 'kleinanzeigen_sync_price');
       }
     } else {
       wp_unschedule_hook('kleinanzeigen_sync_price');
     }
 
-    // Sync invalid ads
+    /*
+     * Sync invalid ads
+     * Optional, option available
+    */
     if ("0" !== get_option('kleinanzeigen_schedule_invalid_ads', '0')) {
       if (!wp_next_scheduled('kleinanzeigen_invalid_ad_action')) {
-        wp_schedule_event(time(), $interval, 'kleinanzeigen_invalid_ad_action');
+        wp_schedule_event($time(), $interval, 'kleinanzeigen_invalid_ad_action');
       }
     } else {
       wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
     }
 
-    // Sync create new products
+    /*
+     * Sync create new products
+     * Optional, option availabele
+    */
     if ("1" === get_option('kleinanzeigen_schedule_new_ads', '0')) {
       if (!wp_next_scheduled('kleinanzeigen_create_new_products')) {
-        wp_schedule_event(time(), $interval, 'kleinanzeigen_create_new_products');
+        wp_schedule_event($time(), $interval, 'kleinanzeigen_create_new_products');
       }
     } else {
       wp_unschedule_hook('kleinanzeigen_create_new_products');
-    }
-  }
-
-  public function job_deactivate_url()
-  {
-    $items = wbp_fn()->build_tasks('invalid-ad')['items'];
-    $product_ids = wp_list_pluck($items, 'product_id');
-
-    $ids = array_filter($product_ids, function ($id) {
-      return !empty(get_metadata('post', $id, 'kleinanzeigen_url'));
-    });
-
-    foreach ($ids as $id) {
-      $job_id = wbp_db()->insert_job(array(
-        'slug'  => 'kleinanzeigen_deactivate_url',
-        'type'  => 'product',
-        'uid' => $id
-      ));
-
-      wbp_fn()->disable_sku_url($id);
-
-      if ($job_id) {
-        wbp_db()->job_done($job_id);
-      }
     }
   }
 
@@ -259,7 +315,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     foreach ($items as $item) {
 
-      $job_id = wbp_db()->insert_job(array(
+      $job_id = wbp_db()->register_active_job(array(
         'slug'  => 'kleinanzeigen_sync_price',
         'type'  => 'record',
         'uid'   => $item['record']->id
@@ -272,6 +328,13 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         wbp_db()->job_done($job_id);
       }
     }
+  }
+
+  public function job_renamed_ads()
+  {
+
+    // This job doesn't require to be registered in the active jobs db table
+    wbp_fn()->build_tasks('renamed-product')['items'];
   }
 
   public function job_create_products()
@@ -293,25 +356,24 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         continue;
       };
 
-      $job_id = wbp_db()->insert_job(array(
+      $job_id = wbp_db()->register_active_job(array(
         'slug'  => 'kleinanzeigen_create_new_products',
         'type'  => 'record',
         'uid'   => $record->id
       ));
 
-      $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
+      $doc = wbp_fn()->get_dom_document($record);
 
-      $contents = file_get_contents($remoteUrl);
+      $el = $doc->getElementById('viewad-description-text');
+      $content = $doc->saveHTML($el);
 
-      libxml_use_internal_errors(true);
-      $doc = new DOMDocument();
-      $doc->loadHTML($contents);
-
-      $post_ID = wbp_fn()->create_ad_product($record, $doc);
+      $post_ID = wbp_fn()->create_ad_product($record, $content);
 
       if (!is_wp_error($post_ID)) {
 
-        wbp_fn()->create_product_images($post_ID, $doc);
+        $images = wbp_fn()->get_document_images($doc);
+
+        wbp_fn()->create_product_images($post_ID, $images);
 
         wbp_fn()->sendMail($post_ID, $record);
 
@@ -342,7 +404,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
       if (!$urls_valid && $record_exists) {
 
-        $job_id = wbp_db()->insert_job(array(
+        $job_id = wbp_db()->register_active_job(array(
           'slug'  => 'kleinanzeigen_activate_url',
           'type'  => 'product',
           'uid' => $post_ID
@@ -357,6 +419,30 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
   }
 
+  public function job_deactivate_url()
+  {
+    $items = wbp_fn()->build_tasks('invalid-ad')['items'];
+    $product_ids = wp_list_pluck($items, 'product_id');
+
+    $ids = array_filter($product_ids, function ($id) {
+      return !empty(get_metadata('post', $id, 'kleinanzeigen_url'));
+    });
+
+    foreach ($ids as $id) {
+      $job_id = wbp_db()->register_active_job(array(
+        'slug'  => 'kleinanzeigen_deactivate_url',
+        'type'  => 'product',
+        'uid' => $id
+      ));
+
+      wbp_fn()->disable_sku_url($id);
+
+      if ($job_id) {
+        wbp_db()->job_done($job_id);
+      }
+    }
+  }
+
   public function job_invalid_ad_action()
   {
     $action = get_option('kleinanzeigen_schedule_invalid_ads');
@@ -365,7 +451,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     foreach ($items as $item) {
       $post_ID = $item['product_id'];
 
-      $job_id = wbp_db()->insert_job(array(
+      $job_id = wbp_db()->register_active_job(array(
         'slug'  => 'kleinanzeigen_invalid_ad_action',
         'type'  => 'product',
         'uid' => $post_ID
@@ -578,6 +664,42 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_account_settings' // Page on which to add this section of options
     );
 
+    // Cron Job Interval
+    unset($args);
+    $default_interval = function ($default) {
+      $schedules = $this->schedules();
+      foreach ($schedules as $key => $val) {
+        if (isset($val['default']) && true === $val['default']) {
+          $default = $key;
+          break;
+        }
+      };
+      return $default;
+    };
+
+    $args = array(
+      'type'              => 'select',
+      'subtype'           => 'checkbox',
+      'id'                => 'kleinanzeigen_crawl_interval',
+      'name'              => 'kleinanzeigen_crawl_interval',
+      'required'          => '',
+      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval', $default_interval('every_minute')), $this->schedules()),
+      'value_type'        => 'normal',
+      'wp_data'           => 'option',
+      'label'             => __('Select the interval at which Kleinanzeigen.de should be crawled for changes', 'kleinanzeigen'),
+    );
+    add_settings_field(
+      $args['id'],
+      __('Crawl interval', 'kleinanzeigen'),
+      array($this, 'kleinanzeigen_render_settings_field'),
+      'kleinanzeigen_account_settings',
+      'kleinanzeigen_background_tasks_section',
+      $args
+    );
+    $register($args['id'], array($this, 'sanitize_option'));
+
+    if ('never' === get_option('kleinanzeigen_crawl_interval')) return;
+
     // Schedule invalid prices
     unset($args);
     $args = array(
@@ -589,56 +711,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => __('Accept price changes', 'kleinanzeigen'),
+      'label'             => __('Automatically accept price changes', 'kleinanzeigen'),
     );
     add_settings_field(
       $args['id'],
       __('Prices', 'kleinanzeigen'),
-      array($this, 'kleinanzeigen_render_settings_field'),
-      'kleinanzeigen_account_settings',
-      'kleinanzeigen_background_tasks_section',
-      $args
-    );
-    $register($args['id'], array($this, 'sanitize_option'));
-
-    // Schedule orphaned links
-    unset($args);
-    $args = array(
-      'type'              => 'input',
-      'subtype'           => 'checkbox',
-      'id'                => 'kleinanzeigen_schedule_remove_orphaned_links',
-      'name'              => 'kleinanzeigen_schedule_remove_orphaned_links',
-      'required'          => '',
-      'get_options_list'  => '',
-      'value_type'        => 'normal',
-      'wp_data'           => 'option',
-      'label'             => __('Remove orphaned Kleinanzeigen links on products', 'kleinanzeigen'),
-    );
-    add_settings_field(
-      $args['id'],
-      __('Orphaned links', 'kleinanzeigen'),
-      array($this, 'kleinanzeigen_render_settings_field'),
-      'kleinanzeigen_account_settings',
-      'kleinanzeigen_background_tasks_section',
-      $args
-    );
-    $register($args['id'], array($this, 'sanitize_option'));
-
-    // Schedule invalid ad action
-    unset($args);
-    $args = array(
-      'type'              => 'select',
-      'id'                => 'kleinanzeigen_schedule_invalid_ads',
-      'name'              => 'kleinanzeigen_schedule_invalid_ads',
-      'required'          => '',
-      'get_options_list'  => wbp_fn()->dropdown_invalid_ads(get_option('kleinanzeigen_schedule_invalid_ads', '0')),
-      'value_type'        => 'normal',
-      'wp_data'           => 'option',
-      'description'       => __('Determine how to proceed with the product when its ad has become invalid due to reservation, deactivation or deletion', 'kleinanzeigen'),
-    );
-    add_settings_field(
-      $args['id'],
-      __('Orphaned ad action', 'kleinanzeigen'),
       array($this, 'kleinanzeigen_render_settings_field'),
       'kleinanzeigen_account_settings',
       'kleinanzeigen_background_tasks_section',
@@ -680,7 +757,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => __('Send email when product was automatically created', 'kleinanzeigen'),
+      'label'             => sprintf(__('Send email to shop operator %s after a product has been created', 'kleinanzeigen'), '<span style="font-weight: 300;">(' . get_bloginfo('admin_email') . ')</span>'),
     );
     add_settings_field(
       $args['id'],
@@ -705,11 +782,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'get_options_list'  => '',
         'value_type'        => 'normal',
         'wp_data'           => 'option',
-        'label'             => __('Send CC during test phase', 'kleinanzeigen'),
       );
       add_settings_field(
         $args['id'],
-        __('CC during development', 'kleinanzeigen'),
+        sprintf(__('Additional Mail %s', 'kleinanzeigen'), '<br /><small style="font-weight: 300;">(' . __('During development only', 'kleinanzeigen') . ')</small>'),
         array($this, 'kleinanzeigen_render_settings_field'),
         'kleinanzeigen_account_settings',
         'kleinanzeigen_background_tasks_section',
@@ -718,33 +794,21 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $register($args['id'], array($this, 'sanitize_option'), true);
     }
 
-    // Cron Job Interval
+    // Schedule invalid ad action
     unset($args);
-    $default_interval = function ($default) {
-      $schedules = $this->schedules();
-      foreach ($schedules as $key => $val) {
-        if (isset($val['default']) && true === $val['default']) {
-          $default = $key;
-          break;
-        }
-      };
-      return $default;
-    };
-
     $args = array(
       'type'              => 'select',
-      'subtype'           => 'checkbox',
-      'id'                => 'kleinanzeigen_crawl_interval',
-      'name'              => 'kleinanzeigen_crawl_interval',
+      'id'                => 'kleinanzeigen_schedule_invalid_ads',
+      'name'              => 'kleinanzeigen_schedule_invalid_ads',
       'required'          => '',
-      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval', $default_interval('every_minute')), $this->schedules()),
+      'get_options_list'  => wbp_fn()->dropdown_invalid_ads(get_option('kleinanzeigen_schedule_invalid_ads', '0')),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => __('Select the interval at which Kleinanzeigen.de should be crawled for changes', 'kleinanzeigen'),
+      'description'       => __('Determine how to proceed with the product when its ad has become invalid due to reservation, deactivation or deletion', 'kleinanzeigen'),
     );
     add_settings_field(
       $args['id'],
-      __('Crawl interval', 'kleinanzeigen'),
+      __('Orphaned ad action', 'kleinanzeigen'),
       array($this, 'kleinanzeigen_render_settings_field'),
       'kleinanzeigen_account_settings',
       'kleinanzeigen_background_tasks_section',
@@ -765,7 +829,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   public function kleinanzeigen_background_tasks_section()
   {
-    echo '<em>' . __('Ads on Kleinanzeigen.de will be periodically evaluated. Perform the following if an ad has been altered:', 'kleinanzeigen') . '</em>';
+    echo '<em>' . __('Ads on Kleinanzeigen.de may periodically be evaluated. Select the interval and tasks to be performed.', 'kleinanzeigen') . '</em>';
   }
 
   public function kleinanzeigen_render_settings_field($args)

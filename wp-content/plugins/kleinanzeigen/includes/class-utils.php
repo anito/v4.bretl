@@ -200,7 +200,7 @@ if (!class_exists('Utils')) {
     {
       $content = preg_replace('/<[^>]*>/', ' ', $content); //clear html tags
       $content = preg_replace('/[\s+\n]/', ' ', $content); // clear multiple whitespace
-      return substr($content, 0, $count);
+      return substr($content, 0, $count) . '...';
     }
 
     static function is_valid_title($val)

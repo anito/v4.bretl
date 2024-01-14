@@ -548,6 +548,17 @@ function wbp_return_theme_author($author)
 }
 add_filter('astra_theme_author', 'wbp_return_theme_author');
 
+function wbp_short_description($excerpt) {
+
+  $max_length = 150;
+  if(strlen($excerpt) > $max_length && function_exists('wbp_ka')) {
+    require_once wbp_ka()->plugin_path('includes/class-utils.php');
+    return  Utils::sanitize_excerpt($excerpt, $max_length);
+  }
+  return $excerpt;
+}
+add_filter('woocommerce_short_description', 'wbp_short_description', 10, 1);
+
 /**
  * Change Variable Price Range Html
  */

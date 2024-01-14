@@ -35,8 +35,31 @@ class Kleinanzeigen_Deactivator extends Kleinanzeigen_Installer
   public static function deactivate()
   {
 
-    self::remove_job_db();
     self::user_caps();
+    self::remove_job_db();
+    self::delete_options();
+    self::unschedule_cron_jobs();
+  }
+
+  private static function delete_options()
+  {
+    delete_option('kleinanzeigen_account_name');
+    delete_option('kleinanzeigen_items_per_page');
+    delete_option('kleinanzeigen_crawl_interval');
+    delete_option('kleinanzeigen_schedule_new_ads');
+    delete_option('kleinanzeigen_schedule_invalid_ads');
+    delete_option('kleinanzeigen_send_cc_mail_on_new_ad');
+    delete_option('kleinanzeigen_schedule_invalid_prices');
+  }
+
+  private static function unschedule_cron_jobs()
+  {
+    wp_unschedule_hook('kleinanzeigen_sync_price');
+    wp_unschedule_hook('kleinanzeigen_activate_url');
+    wp_unschedule_hook('kleinanzeigen_deactivate_url');
+    wp_unschedule_hook('kleinanzeigen_renamed_ads');
+    wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
+    wp_unschedule_hook('kleinanzeigen_create_new_products');
   }
 
   private static function user_caps()

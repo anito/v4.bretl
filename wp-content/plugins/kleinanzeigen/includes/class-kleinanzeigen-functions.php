@@ -140,7 +140,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function get_transient_data()
     {
-      require_once wbp_ka()->plugin_path('includes/class-utils.php');;
+      require_once wbp_ka()->plugin_path('includes/class-utils.php');
 
       if (false === ($data = get_transient('kleinanzeigen_data'))) {
 
@@ -161,7 +161,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $expires = $schedule['interval'];
 
         set_transient('kleinanzeigen_data', $data, $expires);
-        
       } else {
         Utils::write_log('Using transient data...');
       }
@@ -242,6 +241,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           'priority' => 3,
           'items' => array()
         ),
+        'renamed-product' => array(
+          'priority' => 3,
+          'items' => array()
+        ),
         'repair_url' => array(
           'priority' => 3,
           'items' => array()
@@ -317,7 +320,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $postmeta_table WHERE $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", '_sku', $ad->id));
 
       if ($post_ID) {
-        $product = wc_get_product($post_ID);
+        $product = $this->get_ad_product($post_ID, $ad);
         $found_by = 'sku';
       }
 
@@ -332,6 +335,42 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       return compact('product', 'found_by');
+    }
+
+    public function get_ad_product($post_ID, $record)
+    {
+      $product = wc_get_product($post_ID);
+
+      if ($product && ($name = html_entity_decode($product->get_name())) !== $record->title) {
+        Utils::write_log('##### ' . $record->id . ' #####');
+        Utils::write_log('"' . $name . '" <- IS NOT -> "' . $record->title . '"');
+
+        /*
+         * Fetch new content
+         * Assuming that when title has changed, the ad has been edited so that the content also might be affected
+        */
+        $doc = wbp_fn()->get_dom_document($record);
+        $el = $doc->getElementById('viewad-description-text');
+        $content = $doc->saveHTML($el);
+
+        // Update metadata from new title & content
+        $this->set_product_data($product, $record, $content);
+
+        remove_action('save_post', array($this, 'save_post'), 99);
+        wp_insert_post(
+          array(
+            'ID' => $post_ID,
+            'post_type' => 'product',
+            'post_status' => $product->get_status(),
+            'post_title' => $record->title,
+            'post_content' => $content,
+            'post_excerpt' => $record->description
+          )
+        );
+        add_action('save_post', array($this, 'save_post'), 99, 2);
+      }
+
+      return $product;
     }
 
     public function get_no_sku_product_by_title($title)
@@ -441,6 +480,18 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
+      if ('renamed-product' === $task_type) {
+        $products = wc_get_products(array('status' => array('publish'), 'limit' => -1, 'sku_compare' => 'EXISTS'));
+        foreach ($products as $product) {
+          $sku = (int) $product->get_sku();
+          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
+          if ($record) {
+            $this->get_ad_product($product->get_id(), $record);
+          }
+        }
+        // Return empty array since all product implicitly should have been repaired
+        return $items;
+      }
       if ('new-product' === $task_type) {
         $product = null;
         $products = wc_get_products(array('status' => array('publish', 'draft', 'trash'), 'limit' => -1, 'sku_compare' => 'EXISTS'));
@@ -463,16 +514,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
-      // if('repair_url' === $task_type) {
-      //   $products = wc_get_products(array('status' => array('publish', 'draft', 'trash'), 'limit' => -1, 'sku_compare' => 'EXISTS'));
-
-      //   $items = array();
-      //   foreach ($diffs as $key => $sku) {
-      //     $record = $ads[$_records[$sku]];
-      //     $items[] = compact('product', 'task_type', 'record');
-      //   }
-      //   return $items;
-      // }
 
       foreach ($products as $product) {
         $post_ID = $product->get_id();
@@ -841,7 +882,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $kleinanzeigen_price !== $woo_price;
     }
 
-    public function create_ad_product($record, $doc)
+    public function create_ad_product($record, $content)
     {
 
       // Only create product if sku will be unique
@@ -856,9 +897,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           )
         ));
       }
-
-      $el = $doc->getElementById('viewad-description-text');
-      $content = $doc->saveHTML($el);
 
       $product = new WC_Product();
       $product->set_name($record->title);
@@ -884,9 +922,19 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $post_ID;
     }
 
-    public function create_product_images($post_ID, $doc)
+    public function get_dom_document($record)
     {
 
+      $remoteUrl = wbp_fn()->get_kleinanzeigen_search_url($record->id);
+      $contents = file_get_contents($remoteUrl);
+      libxml_use_internal_errors(true);
+      $doc = new DOMDocument();
+      $doc->loadHTML($contents);
+      return $doc;
+    }
+
+    public function get_document_images($doc)
+    {
       $images = array();
       $xpath = new DOMXpath($doc);
       $items = $xpath->query("//*[@id='viewad-product']//*[@data-ix]//img/@data-imgsrc");
@@ -894,7 +942,11 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       foreach ($items as $item) {
         $images[] = $item->value;
       }
-      $images = array_unique($images);
+      return array_unique($images);
+    }
+
+    public function create_product_images($post_ID, $images = array())
+    {
 
       if (count($images)) {
         Utils::remove_attachments($post_ID);
@@ -1353,9 +1405,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $searchable_content = $title . ' ' . $excerpt;
       $product_id = $product->get_id();
 
-      $product->set_regular_price($price);
-
-      $product->save();
+      if($product->get_price() !== $price) {
+        $product->set_regular_price($price);
+        $product->save();
+      }
 
       $parts = array(
         'aktionspreis' => array(
@@ -1365,6 +1418,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         ),
         'allrad'              => array('Allrad', 'match_type' => 'like'),
         'vorführ'             => array('Vorführmaschine', 'match_type' => 'like'),
+        'vfm'                 => 'Vorführmaschine',
         'topzustand'          => 'Top',
         'top zustand'         => 'Top',
         'guter zustand'       => 'Guter Zustand',
