@@ -1,5 +1,5 @@
 <header class="kleinanzeigen-page-header">
-  <div style="display: flex; align-items: center; margin-right: 20px;">
+  <div class="kleinanzeigen-logo-type">
     <div style="display: flex; flex-direction: column; width: 240px;">
       <span style="padding: 5px 10px; border-radius: 8px 8px 8px 0; background: rgb(181, 233, 65);">
         <svg width="200" viewBox="0 0 787 132" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,3 +18,12 @@
     <div style="font-size: 0.8em;">&copy; Axel Nitzschner</div>
   </div>
 </header>
+
+<style>
+  .kleinanzeigen-logo-type {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    z-index: 200;
+  }
+</style>
