@@ -166,6 +166,7 @@
 
   .ka-list-header h5 {
     font-size: 1em;
+    font-weight: 300;
     margin: 0.3em 0;
   }
 
@@ -204,12 +205,12 @@
 
   .loading-splash::after {
     content: '';
-    position: absolute;
+    position: fixed;
     display: block;
-    top: 0;
+    top: var(--admin-topbar);
     right: 0;
-    bottom: 0;
-    left: -20px;
+    width: calc(100vw - var(--admin-sidebar));
+    height: calc(100vh - var(--admin-topbar));
     visibility: hidden;
     transition: all .5s 0.01s ease-out;
     background: rgb(255 255 255 / 43%);
@@ -224,9 +225,9 @@
   }
 
   .splash-inner {
-    position: absolute;
+    position: fixed;
     top: calc(50vh - 50px);
-    left: calc(50% - 125px);
+    left: calc(50vw - 180px + var(--admin-sidebar));
     z-index: 101;
     width: 180px;
     height: 80px;
