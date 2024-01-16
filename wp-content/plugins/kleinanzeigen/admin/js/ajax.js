@@ -612,7 +612,7 @@ jQuery(document).ready(function ($) {
       case "toplevel_page_kleinanzeigen":
       case "modal":
         if (head) {
-          $("#kleinanzeigen-head-wrap").html(head);
+          $("#kleinanzeigen-head-wrap .summary-content").html(head);
         }
 
         if (row) {

@@ -18,7 +18,13 @@
   <div id="icon-themes" class="icon32"></div>
   <h2><?php echo __('Overview', 'kleinanzeigen') ?></h2>
   <header id="kleinanzeigen-head-wrap">
-    <h2><span class="spinner is-active" style="float: left; margin: 0 7px 0;"></span><?php echo __('Loading data', 'kleinanzeigen') ?>...</h2>
+    <div class="summary-content"></div>
+    <div class="loading-splash">
+      <div class="splash-inner">
+        <h2><span class="spinner is-active" style="float: left; margin: 0 7px 0;"></span><?php echo __('Loading data', 'kleinanzeigen') ?></h2>
+        <div class="disclaimer">Kleinanzeigen Import &copy; Axel Nitzschner</div>
+      </div>
+    </div>
   </header>
   <form name="kleinanzeigen-list" id="kleinanzeigen-list" method="get">
 
@@ -194,5 +200,67 @@
 
   .action-button.disabled {
     pointer-events: none;
+  }
+
+  .loading-splash::after {
+    content: '';
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: -20px;
+    visibility: hidden;
+    transition: all .5s 0.01s ease-out;
+    background: rgb(255 255 255 / 43%);
+    z-index: 0;
+    opacity: 0;
+  }
+
+  .loading .loading-splash::after {
+    visibility: visible;
+    opacity: 0.8;
+    z-index: 100;
+  }
+
+  .splash-inner {
+    position: absolute;
+    top: calc(50vh - 50px);
+    left: calc(50% - 125px);
+    z-index: 101;
+    width: 180px;
+    height: 80px;
+    border-radius: 10px;
+    border: 1px solid #b4b4b4;
+    background: #fff;
+    opacity: 0;
+    vertical-align: middle;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(-70px);
+    transition: all .5s .2s ease-out;
+  }
+
+  .loading .splash-inner {
+    transform: translateY(-40px);
+    opacity: 1;
+    z-index: 101;
+  }
+
+  .splash-inner h2 {
+    transform: translateY(-10px);
+  }
+
+  .splash-inner .disclaimer {
+    position: absolute;
+    bottom: 0;
+    font-size: 0.5em;
+    font-style: italic;
+    color: #888;
+    padding: 8px;
+    text-align: center;
+    line-height: 1.2em;
   }
 </style>

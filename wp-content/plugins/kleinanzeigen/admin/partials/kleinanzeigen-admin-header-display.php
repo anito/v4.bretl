@@ -244,7 +244,6 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
       ...KleinanzeigenUtils
     };
 
-    init_head();
     render_tasks(_tasks);
 
     $('.trigger', '.right-sections').click(function() {

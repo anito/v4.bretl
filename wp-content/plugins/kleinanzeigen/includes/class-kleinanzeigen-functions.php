@@ -316,6 +316,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $posts_table = $wpdb->posts;
       $postmeta_table = $wpdb->postmeta;
 
+      $prepare = $wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE ($posts_table.post_title='%s' OR $posts_table.post_title='%s') AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $ad->title, htmlentities($ad->title), 'product', '_price', Utils::extract_kleinanzeigen_price($ad->price));
+      
       // By sku
       $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $postmeta_table WHERE $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", '_sku', $ad->id));
 

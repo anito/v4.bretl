@@ -143,7 +143,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
     }
 
     /**
-     * fetch_ka_script function based from Charlie's original function
+     * fetch_script function based from Charlie's original function
      */
 
     public function fetch_script()
@@ -168,7 +168,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
             display: function() {
 
-              $('.wp-list-kleinanzeigen').addClass('loading');
+              $('body').addClass('loading');
 
               $.ajax({
 
@@ -179,9 +179,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                   action: '_ajax_fetch_kleinanzeigen_display',
                 },
                 success: function(response) {
-                  $('.wp-list-kleinanzeigen').removeClass('loading');
+                  $("body").removeClass('loading');
 
-                  $("#kleinanzeigen-head-wrap").html(response.head);
+                  $("#kleinanzeigen-head-wrap .summary-content").html(response.head);
 
                   $("#kleinanzeigen-list-display").html(response.display);
 
@@ -190,32 +190,20 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                     $(this).closest("tr").toggleClass("is-expanded")
                   });
 
-                  $('#kleinanzeigen-head-wrap .pagination a').on('click', function(e) {
-                    e.preventDefault();
-
-                    const query = this.search.substring(1);
-
-                    const data = {
-                      paged: list.__query(query, 'paged') || '1',
-                    };
-                    list.update(data);
-                  })
-
                   list.init();
                 },
                 error: function(ajax, error, message) {
-                  $("#kleinanzeigen-head-wrap").html(message);
+                  $("#kleinanzeigen-head-wrap .summary-content").html(message);
+                  $("body").removeClass('loading');
                 }
               });
 
             },
 
             init: function() {
-
               let timeoutId;
-              const delay = 500;
 
-              $('#kleinanzeigen-list-display .tablenav-pages a, #kleinanzeigen-list-display .manage-column.sortable a, #kleinanzeigen-list-display .manage-column.sorted a').on('click', function(e) {
+              $('#kleinanzeigen-head-wrap .pagination a, #kleinanzeigen-list-display .tablenav-pages a, #kleinanzeigen-list-display .manage-column.sortable a, #kleinanzeigen-list-display .manage-column.sorted a').on('click', function(e) {
                 e.preventDefault();
                 const query = this.search.substring(1);
 
@@ -238,34 +226,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                   orderby: $('#kleinanzeigen-list-display input[name=orderby]').val() || 'title'
                 };
 
-                window.clearTimeout(timeoutId);
-                timeoutId = window.setTimeout(function() {
-                  list.update(data);
-                }, delay);
-              });
-
-              $('#kleinanzeigen-list-display form').on('submit', function(e) {
-
-                e.preventDefault();
-
-              });
-
-              $('.wp-list-kleinanzeigen').removeClass('loading');
-
-            },
-
-            init_head: function() {
-
-              $('#kleinanzeigen-head-wrap .pagination a').on('click', function(e) {
-                e.preventDefault();
-
-                const query = this.search.substring(1);
-
-                const data = {
-                  paged: list.__query(query, 'paged') || '1',
-                };
                 list.update(data);
-              })
+              });
 
               $('#kleinanzeigen-head-wrap .task a.start-task').on('click', function(e) {
                 e.preventDefault();
@@ -304,6 +266,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                 })
 
               })
+
+              $('#kleinanzeigen-list-display form').on('submit', (e) => e.preventDefault);
+
             },
 
             /** AJAX call
@@ -314,10 +279,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
              */
             update: function(data) {
 
-              $('.wp-list-kleinanzeigen').addClass('loading');
+              $('body').addClass('loading');
 
               $.ajax({
-
                 url: ajaxurl,
                 data: $.extend({
                     _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
@@ -326,7 +290,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                   data
                 ),
                 success: function(response) {
-
                   const {
                     head,
                     rows,
@@ -336,7 +299,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                   } = $.parseJSON(response);
 
                   if (head)
-                    $("#kleinanzeigen-head-wrap").html(head);
+                    $("#kleinanzeigen-head-wrap .summary-content").html(head);
 
                   if (tasks)
                     list.render_tasks(tasks);
@@ -350,13 +313,12 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                   if (pagination.bottom.length)
                     $('#kleinanzeigen-list-display .tablenav.bottom .tablenav-pages').html($(pagination.bottom).html());
 
-                  $('.wp-list-kleinanzeigen').removeClass('loading');
+                  $('body').removeClass('loading');
 
-                  setTimeout(list.init, 100);
+                  setTimeout(list.init, 1000);
                 }
               });
             },
-
             render_tasks: function(tasks) {
 
               const inconsistencies = Object.entries(tasks).filter((task) => {
