@@ -113,8 +113,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'plugin_name' => self::$plugin_name,
       'home_url'    => home_url(),
       'screen'      => wbp_fn()->screen_id,
-      'edit_link'   => admin_url('post.php?action=edit&post='),
-      'nonce'       => wp_create_nonce()
+      'edit_link'   => admin_url('post.php?action=edit&post=')
     ));
     wp_localize_script(self::$plugin_name . '-utils', 'KleinanzeigenUtils', array(
       'admin_ajax'  => admin_url('admin-ajax.php'),

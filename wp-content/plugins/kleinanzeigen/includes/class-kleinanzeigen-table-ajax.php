@@ -32,10 +32,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
       add_action('wp_ajax__ajax_fetch_kleinanzeigen_history', array($this, '_ajax_fetch_kleinanzeigen_history'));
       add_action('wp_ajax__ajax_fetch_kleinanzeigen_display', array($this, '_ajax_fetch_kleinanzeigen_display'));
 
-      add_action('wp_ajax_nopriv__ajax_kleinanzeigen_task', array($this, '_ajax_kleinanzeigen_task'));
-      add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_history', array($this, '_ajax_fetch_kleinanzeigen_history'));
-      add_action('wp_ajax_nopriv__ajax_fetch_kleinanzeigen_display', array($this, '_ajax_fetch_kleinanzeigen_display'));
-
       add_action('admin_footer', array($this, 'fetch_script'));
     }
 
@@ -55,6 +51,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
     {
       global $wp_list_table;
 
+      check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
+
       if (isset($_REQUEST['paged'])) {
         setcookie('ka-paged', $_REQUEST['paged']);
       }
@@ -68,7 +66,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
     {
       global $wp_list_table;
 
-      check_ajax_referer('ajax-custom-list-nonce', '_ajax_custom_list_nonce', true);
+      check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
 
       if (!isset($_COOKIE['ka-paged'])) {
         setcookie('ka-paged', 1);
@@ -103,6 +101,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
     {
       global $wp_tasks_list_table;
       global $ajax_modal_handler;
+
+      check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
 
       // Keep in mind Utils::get_json_data will alter the page_number cookie, so save it and reset it later if required
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
@@ -157,29 +157,47 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
       <script type="text/javascript">
         (function($) {
 
-          const nonce = <?php echo json_encode(wp_create_nonce('_ajax_custom_list_nonce')) ?>
+          let nonce = <?php echo json_encode(wp_create_nonce('ajax-nonce-custom-list')) ?>;
+          let prevented = false;
 
           const list = {
+
+            prepare: () => {
+              $('body').addClass('loading');
+              $('#kleinanzeigen-list-display').removeClass('pointer-ready');
+            },
+            /**
+             * method create:
+             * get nonce
+             */
+            createNonce: async () => await KleinanzeigenAjax.getNonce?.('custom-list')
+              .then(res => JSON.parse(res))
+              .then(res => nonce = res),
 
             /**
              * method display:
              * get first sets of data
-             **/
+             */
+            display: async function(cb) {
 
-            display: function() {
+              if (prevented) return;
+              prevented = true;
 
-              $('body').addClass('loading');
+              if (cb && 'function' === typeof cb) cb();
+
+              const _nonce = nonce || await list.createNonce()
 
               $.ajax({
 
-                url: ajaxurl,
-                dataType: 'json',
-                data: {
-                  _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
-                  action: '_ajax_fetch_kleinanzeigen_display',
-                },
-                success: function(response) {
-                  $("body").removeClass('loading');
+                  url: ajaxurl,
+                  dataType: 'json',
+                  data: {
+                    _ajax_nonce_custom_list: _nonce,
+                    action: '_ajax_fetch_kleinanzeigen_display',
+                  },
+                  beforeSend: () => list.prepare()
+                })
+                .done((response) => {
 
                   $("#kleinanzeigen-head-wrap .summary-content").html(response.head);
 
@@ -191,20 +209,29 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                   });
 
                   list.init();
-                },
-                error: function(ajax, error, message) {
-                  $("#kleinanzeigen-head-wrap .summary-content").html(message);
+
+                })
+                .fail((response, status, message) => {
+
+                  nonce = null; // Force display to refetch nonce
+                  $("#kleinanzeigen-head-wrap .summary-content").html(`<div class="notice notice-error is-dismissible"><p>${response.status}: ${message}</p></div>`);
+                  $("#kleinanzeigen-list-display").empty();
+
+                })
+                .always(() => {
+
                   $("body").removeClass('loading');
-                }
-              });
+                  setTimeout(() => prevented = false, 5000)
+
+                });
 
             },
 
             init: function() {
-              let timeoutId;
 
               $('#kleinanzeigen-head-wrap .pagination a, #kleinanzeigen-list-display .tablenav-pages a, #kleinanzeigen-list-display .manage-column.sortable a, #kleinanzeigen-list-display .manage-column.sorted a').on('click', function(e) {
                 e.preventDefault();
+
                 const query = this.search.substring(1);
 
                 const data = {
@@ -212,6 +239,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                   order: list.__query(query, 'order') || 'asc',
                   orderby: list.__query(query, 'orderby') || 'title'
                 };
+
                 list.update(data);
               });
 
@@ -241,34 +269,39 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
                 $.ajax({
 
-                  url: ajaxurl,
-                  dataType: 'json',
-                  data: {
-                    _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
-                    action: '_ajax_kleinanzeigen_task',
-                    task_type,
-                    product_ids
-                  },
-                  beforeSend: function(data) {
-                    $(el).html('Einen Moment...');
-                  },
-                  success: function(response) {
+                    url: ajaxurl,
+                    dataType: 'json',
+                    data: {
+                      _ajax_nonce_custom_list: nonce,
+                      action: '_ajax_kleinanzeigen_task',
+                      task_type,
+                      product_ids
+                    },
+                    beforeSend: function(data) {
+                      $(el).html('Einen Moment...');
+                    },
+                  })
+                  .done((response) => {
+
                     $('#ka-list-modal-content .header').html(response['header']);
                     $('#ka-list-modal-content .body').html(response['body']);
                     $('#ka-list-modal-content .footer').html(response['footer']);
                     $('#ka-list-modal-content .script').html(response['script']);
                     $('body').addClass('show-modal');
                     $(el).html(restored_text);
-                  },
-                  error: function(ajax, error, message) {
-                    console.log(message)
-                  },
-                })
+
+                  })
+                  .fail((response, status, message) => {})
+                  .always(() => {
+
+                    $(el).html(restored_text);
+
+                  })
 
               })
 
               $('#kleinanzeigen-list-display form').on('submit', (e) => e.preventDefault);
-
+              $('#kleinanzeigen-list-display').addClass('pointer-ready');
             },
 
             /** AJAX call
@@ -279,17 +312,17 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
              */
             update: function(data) {
 
-              $('body').addClass('loading');
-
               $.ajax({
-                url: ajaxurl,
-                data: $.extend({
-                    _ajax_custom_list_nonce: $('#_ajax_custom_list_nonce').val(),
-                    action: '_ajax_fetch_kleinanzeigen_history',
-                  },
-                  data
-                ),
-                success: function(response) {
+                  url: ajaxurl,
+                  data: $.extend({
+                      _ajax_nonce_custom_list: nonce,
+                      action: '_ajax_fetch_kleinanzeigen_history',
+                    },
+                    data
+                  ),
+                  beforeSend: list.prepare()
+                })
+                .done((response) => {
                   const {
                     head,
                     rows,
@@ -315,11 +348,12 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
                   $('body').removeClass('loading');
 
-                  setTimeout(list.init, 1000);
-                }
-              });
+                  list.init();
+
+                })
+                .fail((response, status, message) => list.display())
             },
-            render_tasks: function(tasks) {
+            render_tasks: (tasks) => {
 
               const inconsistencies = Object.entries(tasks).filter((task) => {
                 return task[1].priority === 1 && task[1]['items'].length
@@ -360,7 +394,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
              *
              * @return   string|boolean The variable value if available, false else.
              */
-            __query: function(query, variable) {
+            __query: (query, variable) => {
 
               const vars = query.split("&");
               for (let i = 0; i < vars.length; i++) {
@@ -372,7 +406,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
             }
           }
 
-          list.display()
+          list.display();
 
           KleinanzeigenAjax.init_head = list.init_head;
           KleinanzeigenAjax.render_tasks = list.render_tasks;

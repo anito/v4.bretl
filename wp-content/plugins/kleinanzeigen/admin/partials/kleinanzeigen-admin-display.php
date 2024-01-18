@@ -34,7 +34,7 @@
 
     <div id="kleinanzeigen-list-display">
       <?php
-      wp_nonce_field('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
+      wp_nonce_field('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
       ?>
     </div>
 
@@ -203,6 +203,14 @@
     pointer-events: none;
   }
 
+  #kleinanzeigen-list-display a {
+    pointer-events: none;
+  }
+
+  #kleinanzeigen-list-display.pointer-ready a {
+    pointer-events: all;
+  }
+
   .loading-splash::after {
     content: '';
     position: fixed;
@@ -213,14 +221,13 @@
     height: calc(100vh - var(--admin-topbar));
     visibility: hidden;
     transition: all .5s 0.01s ease-out;
-    background: rgb(255 255 255 / 43%);
-    z-index: 0;
+    background: rgb(255 255 255);
     opacity: 0;
   }
 
   .loading .loading-splash::after {
     visibility: visible;
-    opacity: 0.8;
+    opacity: .3;
     z-index: 100;
   }
 

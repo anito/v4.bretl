@@ -83,6 +83,10 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
 
           const list = {
 
+            prepare: () => {
+              $('body').addClass('loading');
+              $('#kleinanzeigen-list-display').removeClass('pointer-ready');
+            },
             /**
              * method display:
              * get first sets of data
@@ -93,19 +97,18 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
               // No need to fetch fresh data if modal isn't visible
               if (!$('body').hasClass('show-modal')) return;
 
-              $('body').addClass('loading');
-
               $.ajax({
 
-                url: ajaxurl,
-                dataType: 'json',
-                data: {
-                  _ajax_custom_task_list_nonce: $('#_ajax_custom_task_list_nonce').val(),
-                  action: '_ajax_fetch_kleinanzeigen_task_display'
-                },
-                success: function(response) {
+                  url: ajaxurl,
+                  dataType: 'json',
+                  data: {
+                    _ajax_custom_task_list_nonce: $('#_ajax_custom_task_list_nonce').val(),
+                    action: '_ajax_fetch_kleinanzeigen_task_display'
+                  },
 
-                  $('body').removeClass('loading');
+                  beforeSend: () => list.prepare()
+                })
+                .done((response) => {
 
                   $("#kleinanzeigen-task-list-display").html(response.display);
 
@@ -114,12 +117,16 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
                     $(this).closest("tr").toggleClass("is-expanded")
                   });
 
-                  // list.init();
-                },
-                error: function(ajax, error, message) {
+                })
+                .fail((response, status, message) => {
+
                   $("#kleinanzeigen-head-wrap .summary-content").html(message);
-                }
-              });
+
+                }).always(() => {
+
+                  $('body').removeClass('loading');
+
+                });
 
             },
 
@@ -169,18 +176,18 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
              */
             update: function(data) {
 
-              $('body').addClass('loading');
-
               $.ajax({
 
-                url: ajaxurl,
-                data: $.extend({
-                    _ajax_custom_task_list_nonce: $('#_ajax_custom_task_list_nonce').val(),
-                    action: '_ajax_fetch_kleinanzeigen_task_history',
-                  },
-                  data
-                ),
-                success: function(response) {
+                  url: ajaxurl,
+                  data: $.extend({
+                      _ajax_custom_task_list_nonce: $('#_ajax_custom_task_list_nonce').val(),
+                      action: '_ajax_fetch_kleinanzeigen_task_history',
+                    },
+                    data
+                  ),
+                  beforeSend: () => list.prepare()
+                })
+                .done((response) => {
 
                   response = $.parseJSON(response);
 
@@ -193,11 +200,13 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
                   if (response.pagination.bottom.length)
                     $('#kleinanzeigen-task-list-display .tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
 
+                  setTimeout(list.init, 100);
+                })
+                .always(() => {
+
                   $('body').removeClass('loading');
 
-                  setTimeout(list.init, 100);
-                }
-              });
+                });
             },
 
             /**
@@ -222,7 +231,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
             }
           }
 
-          // list.display();
           list.init();
 
           KleinanzeigenAjax.displayModal = list.display;

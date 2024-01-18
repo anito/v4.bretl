@@ -1563,13 +1563,14 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         wbp_db()->remove_job($id);
       }
 
+      $success = true;
       $data = array(
         'jobs'      => $jobs,
         'todos'     => $todos,
         'completed' => $completed
       );
 
-      die(json_encode(compact('data')));
+      die(json_encode(compact('data', 'success')));
     }
 
     public function return_false()

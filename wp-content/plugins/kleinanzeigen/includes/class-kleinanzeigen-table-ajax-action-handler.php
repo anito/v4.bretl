@@ -18,9 +18,14 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function register_ajax_handler()
     {
+      // Catch ajax referer for cron
+      add_action('check_ajax_referer', array($this, 'check_ajax_referer'), 10, 2);
+
+      // Ajax actions
       add_action('wp_ajax__ajax_poll', array($this, '_ajax_poll'));
       add_action('wp_ajax__ajax_cron', array($this, '_ajax_cron'));
       add_action('wp_ajax__ajax_connect', array($this, '_ajax_connect'));
+      add_action('wp_ajax__ajax_get_nonce', array($this, '_ajax_get_nonce'));
       add_action('wp_ajax__ajax_fix_price', array($this, '_ajax_fix_price'));
       add_action('wp_ajax__ajax_disconnect', array($this, '_ajax_disconnect'));
       add_action('wp_ajax__ajax_get_remote', array($this, '_ajax_get_remote'));
@@ -35,8 +40,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
 
       add_action('wp_ajax_nopriv__ajax_poll', array($this, '_ajax_poll'));
-      add_action('wp_ajax_nopriv__ajax_cron', array($this, '_ajax_cron'));
+      // add_action('wp_ajax_nopriv__ajax_cron', array($this, '_ajax_cron'));
       add_action('wp_ajax_nopriv__ajax_connect', array($this, '_ajax_connect'));
+      add_action('wp_ajax_nopriv__ajax_get_nonce', array($this, '_ajax_get_nonce'));
       add_action('wp_ajax_nopriv__ajax_fix_price', array($this, '_ajax_fix_price'));
       add_action('wp_ajax_nopriv__ajax_disconnect', array($this, '_ajax_disconnect'));
       add_action('wp_ajax_nopriv__ajax_get_remote', array($this, '_ajax_get_remote'));
@@ -49,6 +55,24 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_data', array($this, '_ajax_import_kleinanzeigen_data'));
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_images', array($this, '_ajax_import_kleinanzeigen_images'));
       add_action('wp_ajax_nopriv__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
+    }
+
+    public function check_ajax_referer($action, $result)
+    {
+      if ('ajax-nonce-cron' === $action) {
+        if (!$result) {
+          die(json_encode(array(
+            'success' => false,
+            'data' => array()
+          )));
+        }
+      }
+    }
+
+    public function _ajax_get_nonce()
+    {
+      $action = !empty($_REQUEST['_ajax_action_name']) ? $_REQUEST['_ajax_action_name'] : false;
+      $this->get_nonce($action);
     }
 
     public function _ajax_get_remote()
@@ -123,7 +147,14 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function _ajax_cron()
     {
+      check_ajax_referer('ajax-nonce-cron', '_ajax_nonce_cron');
       wbp_fn()->ajax_cron();
+    }
+
+    public function get_nonce($action) {
+      if(!$action) wp_die(-1, 400);
+      $nonce = wp_create_nonce("ajax-nonce-{$action}");
+      die(json_encode($nonce));
     }
 
     public function get_remote()
@@ -192,22 +223,11 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $post_ID = isset($_REQUEST['post_ID']) ? (int) $_REQUEST['post_ID'] : null;
       $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
-      $disconnect = isset($_REQUEST['disconnect']) ? $_REQUEST['disconnect'] === '__disconnect__' : null;
       $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : null;
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-      // Maybe remove sku from product
-      if (is_null($disconnect)) {
-        $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
-      } else {
-        $product = wc_get_product($post_ID);
-        if ($product) {
-          wbp_fn()->disable_sku($product);
-          $product->save();
-        }
-        $post_status = 'draft';
-      }
+      $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
 
       if ($post_ID) {
         wp_update_post(array(

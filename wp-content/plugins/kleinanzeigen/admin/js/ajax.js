@@ -69,10 +69,10 @@ jQuery(document).ready(function ($) {
         post_ID,
         post_status,
       },
-      success: function (response, status, options) {
+      success: (response, status, options) => {
         if (status === "success") ajax_ad_callback(status, that);
       },
-      error: function (response, status, text) {
+      error: (response, status, message) => {
         if (status === "error") ajax_ad_callback(status, that);
       },
     });
@@ -90,12 +90,10 @@ jQuery(document).ready(function ($) {
         action: "_ajax_get_post",
         post_ID,
       },
-      success: function (response, status, options) {
+      success: (response, status, options) => {
         if (status === "success") ajax_ad_callback(status, that);
       },
-      error: function (response, status, text) {
-        if (status === "error") ajax_ad_callback(status, that);
-      },
+      error: defaultErrorHandler,
     });
     return false;
   });
@@ -136,8 +134,8 @@ jQuery(document).ready(function ($) {
         action: "_ajax_get_remote",
         formdata,
       },
-      success: (data) =>
-        ajax_ad_callback(data, () => {
+      success: (response) =>
+        ajax_ad_callback(response, () => {
           removeSpinner();
           finish();
         }),
@@ -174,25 +172,25 @@ jQuery(document).ready(function ($) {
       beforeSend: () => {
         $(el).html("Verknüpfe...");
       },
-      success: (data) => {
+      success: (response) => {
         $(el).html("Fertig");
 
         removeSpinner();
 
         setTimeout(() => {
-          parseResponse(data, el);
+          parseResponse(response, el);
         }, 500);
       },
-      error: (error) => {
+      error: (response, status, message) => {
         $(el).parents("td").removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
-          detail: { success: false, error },
+          detail: { success: false, message },
         });
 
         removeSpinner();
-        console.log(error);
+        console.log(message);
       },
     });
   }
@@ -228,25 +226,25 @@ jQuery(document).ready(function ($) {
       beforeSend: () => {
         $(el).html("Verknüpfung lösen...");
       },
-      success: (data) => {
+      success: (response) => {
         $(el).html("Fertig");
 
         removeSpinner();
 
         setTimeout(() => {
-          parseResponse(data, el);
+          parseResponse(response, el);
         }, 500);
       },
-      error: (error) => {
+      error: (response, status, message) => {
         $(el).parents("td").removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
-          detail: { success: false, error },
+          detail: { success: false, message },
         });
 
         removeSpinner();
-        console.log(error);
+        console.log(message);
       },
     });
   }
@@ -296,8 +294,8 @@ jQuery(document).ready(function ($) {
         $(el).parents("td").addClass("busy");
         $(el).html("Hole Daten...");
       },
-      success: (data) => {
-        const json = JSON.parse(data);
+      success: (response) => {
+        const json = JSON.parse(response);
         if (json.content.response?.code === 200) {
           $(el).html("Verarbeite...");
           setTimeout(() => {
@@ -309,18 +307,17 @@ jQuery(document).ready(function ($) {
           removeSpinner();
         }
       },
-      error: (error) => {
+      error: (response, status, message) => {
         $(el).parents("td").removeClass("busy");
         $(el).html("Fehler");
 
         el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
-          detail: { success: false, error },
+          detail: { success: false, message },
         });
 
         removeSpinner();
 
-        const { responseText } = error;
-        console.log(responseText);
+        console.log(response.responseText);
       },
     });
   }
@@ -366,8 +363,8 @@ jQuery(document).ready(function ($) {
         $(el).parents("td").addClass("busy");
         $(el).html("Hole Fotos...");
       },
-      success: (data) => {
-        const json = JSON.parse(data);
+      success: (response) => {
+        const json = JSON.parse(response);
         if (json.content.response?.code === 200) {
           $(el).html("Verarbeite...");
 
@@ -380,9 +377,9 @@ jQuery(document).ready(function ($) {
           removeSpinner();
         }
       },
-      error: (error) => {
+      error: (response, status, message) => {
         spinner?.classList.remove("is-active");
-        console.log(error);
+        console.log(message);
       },
     });
   }
@@ -410,12 +407,6 @@ jQuery(document).ready(function ($) {
     const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
     spinner?.classList.add("is-active");
 
-    const error_callback = () => {
-      el.innerHTML = "Fehler";
-      $(el).parents("td").removeClass("busy");
-      spinner?.classList.remove("is-active");
-    };
-
     $.post({
       url: admin_ajax,
       data: {
@@ -423,8 +414,12 @@ jQuery(document).ready(function ($) {
         screen: _screen,
         post_ID,
       },
-      success: (data) => parseResponse(data, el),
-      error: error_callback,
+      success: (response) => parseResponse(response, el),
+      error: (response, status, message) => {
+        el.innerHTML = "Fehler";
+        $(el).parents("td").removeClass("busy");
+        spinner?.classList.remove("is-active");
+      },
     });
   }
 
@@ -457,14 +452,14 @@ jQuery(document).ready(function ($) {
         $(el).parents("td").addClass("busy");
         $(el).html("Einen Moment...");
       },
-      success: (data) => {
+      success: (response) => {
         $(el).html("Fertig");
 
         setTimeout(() => {
-          parseResponse(data, el);
+          parseResponse(response, el);
         }, 500);
       },
-      error: (error) => console.log(error),
+      error: defaultErrorHandler,
     });
   }
 
@@ -487,12 +482,12 @@ jQuery(document).ready(function ($) {
         task_type,
         screen: _screen,
       },
-      success: (data) => {
+      success: (response) => {
         setTimeout(() => {
-          parseResponse(data, el);
+          parseResponse(response, el);
         }, 500);
       },
-      error: (error) => console.log(error),
+      error: defaultErrorHandler,
     });
   }
 
@@ -523,14 +518,14 @@ jQuery(document).ready(function ($) {
         $(el).parents("td").addClass("busy");
         $(el).html("Einen Moment...");
       },
-      success: (data) => {
+      success: (response) => {
         $(el).html("Fertig");
 
         setTimeout(() => {
-          parseResponse(data, el);
+          parseResponse(response, el);
         }, 500);
       },
-      error: (error) => console.log(error),
+      error: defaultErrorHandler,
     });
   }
 
@@ -563,14 +558,14 @@ jQuery(document).ready(function ($) {
         $(el).parents("td").addClass("busy");
         $(el).html("Einen Moment...");
       },
-      success: (data) => {
+      success: (response) => {
         $(el).html("Fertig");
 
         setTimeout(() => {
-          parseResponse(data, el);
+          parseResponse(response, el);
         }, 500);
       },
-      error: (error) => console.log(error),
+      error: defaultErrorHandler,
     });
   }
 
@@ -586,15 +581,15 @@ jQuery(document).ready(function ($) {
         post_ID,
         kleinanzeigen_id,
       },
-      success: (data) => parseResponse(data, el),
-      error: (error) => console.log(error),
+      success: (response) => parseResponse(response, el),
+      error: defaultErrorHandler,
     });
   }
 
-  function parseResponse(data, el, callback) {
+  function parseResponse(response, el, callback) {
     const {
       data: { row, modal_row, head, post_ID, kleinanzeigen_id },
-    } = JSON.parse(data);
+    } = JSON.parse(response);
 
     const _screen = el.dataset.screen || screen;
     let rowEl;
@@ -654,25 +649,42 @@ jQuery(document).ready(function ($) {
       data: {
         action: "_ajax_poll",
       },
-      success: (data) => console.log(data),
-      error: (error) => console.log(error),
+      success: (response) => console.log(response),
+      error: defaultErrorHandler,
     });
-  }
+  };
 
-  const cron = (data) => {
+  const cron = (nonce) => {
     return $.post({
       url: admin_ajax,
       data: {
         action: "_ajax_cron",
-        crondata: data || {},
+        _ajax_nonce_cron: nonce,
       },
-      success: (data) => {
-        return data;
+      success: (response) => response,
+      error: (response, status, message) => {
+        return {
+          data: {
+            success: false,
+            message,
+          },
+        };
       },
-      error: (error) => console.log(error),
     });
-  }
+  };
 
+  const getNonce = (action) => {
+    return $.post({
+      url: admin_ajax,
+      data: {
+        action: "_ajax_get_nonce",
+        _ajax_action_name: action,
+      },
+      success: (response) => response,
+      error: defaultErrorHandler,
+    });
+  };
+  const defaultErrorHandler = (response, status, message) => console.error(message);
 
   const MSG_MISSING_KLEINANZEIGEN_ID = "Keine Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
@@ -699,6 +711,7 @@ jQuery(document).ready(function ($) {
         processDataImport,
         poll,
         cron,
+        getNonce
       };
       break;
     case "product":
@@ -783,20 +796,19 @@ jQuery(document).ready(function ($) {
         record,
         screen,
       },
-      success: (data) => {
+      success: (response) => {
         el.dispatchEvent(
           new CustomEvent("kleinanzeigen:data-import", {
-            detail: { success: true, data },
+            detail: { success: true, response },
           })
         );
         $(el).html("Fertig");
-        setTimeout(() => parseResponse(data, el, callback), 2000);
+        setTimeout(() => parseResponse(response, el, callback), 2000);
       },
-      error: (data) => {
-        console.log(data);
+      error: (response, status, message) => {
         el.dispatchEvent(
           new CustomEvent("kleinanzeigen:data-import", {
-            detail: { success: false },
+            detail: { success: false, message },
           })
         );
         callback?.();
@@ -841,14 +853,12 @@ jQuery(document).ready(function ($) {
         images,
         screen,
       },
-      success: (data) => {
+      success: (response) => {
         $(el).html("Fertig");
         alert(msg);
-        setTimeout(() => parseResponse(data, el, callback), 2000);
+        setTimeout(() => parseResponse(response, el, callback), 2000);
       },
-      error: (error) => {
-        console.log(error);
-      },
+      error: defaultErrorHandler,
     });
   }
 });

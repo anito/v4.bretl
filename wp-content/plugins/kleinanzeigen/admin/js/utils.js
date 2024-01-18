@@ -81,9 +81,6 @@ jQuery(document).ready(function ($) {
     }).format(ms);
   };
 
-  const getCronJobs = () =>
-    cron().then((res) => res);
-
   class CreateScheduledJobs {
     static instance;
     scheduled = [];
@@ -139,7 +136,6 @@ jQuery(document).ready(function ($) {
         ...KleinanzeigenUtils,
         getCookie,
         setCookie,
-        getCronJobs,
         displayTime,
         CreateScheduledJobs,
         createOrientation,

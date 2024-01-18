@@ -8,10 +8,13 @@
 <script>
   jQuery(document).ready(async ($) => {
 
+    let nonce = <?php echo json_encode(wp_create_nonce('ajax-nonce-cron')) ?>;
+
     const {
       admin_ajax,
       displayTime,
-      getCronJobs,
+      cron,
+      getNonce,
       getCookie,
       display,
       displayModal,
@@ -28,17 +31,37 @@
       // clear all scheduled jobs
       scheduledJobs.clear();
 
-      const {
-        jobs,
-        todos,
-        completed
-      } = JSON.parse(await getCronJobs()).data;
+      let response;
+      try {
+        response = await cron(nonce);
+      } catch (err) {
+        // Auto retrieve nonce
+        nonce = JSON.parse(await getNonce('cron'));
+        cron_error(`${err.status}: ${err.statusText}`);
+        return;
+      }
 
-      init(jobs, todos, completed);
+      const {
+        success,
+        data
+      } = JSON.parse(response);
+
+      if (success) {
+        const {
+          jobs,
+          todos,
+          completed
+        } = data;
+
+        init(jobs, todos, completed);
+      } else {
+        nonce = JSON.parse(await getNonce('cron'));
+        cron_error('An error has  occured');
+      }
+
     }
 
     let intervalId;
-    let intervalId_wait;
     const el = () => $('#wbp-timestamp');
 
     const init = (jobs, todos, completed) => {
@@ -56,8 +79,8 @@
         displayModal?.();
       }
 
-      const sortByNext = (a, b) => a.timestamp < b.timestamp;
-      jobs = jobs.sort(sortByNext);
+      const sortByTime = (a, b) => a.timestamp < b.timestamp;
+      jobs = jobs.sort(sortByTime);
 
       const renderQueue = [];
       jobs.forEach((job) => {
@@ -95,11 +118,12 @@
         render(el(), {
           template: templates('bored') // Template "Bored"
         })
-        intervalId_wait = setInterval(cronlistCallback, 5000, () => clearInterval(intervalId_wait));
+        clearInterval(intervalId)
+        intervalId = setInterval(cronlistCallback, 5000, () => clearInterval(intervalId));
       }
     }
 
-    const templates = (id) => {
+    const templates = (id, message) => {
 
       const tmpl = {
         timer: (job) => {
@@ -107,7 +131,8 @@
           return delta >= 0 ? `<span class="value">${displayTime(delta)}</span><span class="label">${job.name}</span>` : `<span>Busy...</span>`;
         },
         bored: `<span class="label">Boring...</span>`,
-        stop: `<span class="label">Cron stopped</span>`
+        stop: `<span class="label">Cron stopped</span>`,
+        error: `<span class="label">${message}</span>`
       }
       return tmpl[id];
     }
@@ -132,8 +157,18 @@
       cronlistCallback();
     }
 
+    function cron_error(message = 'Error') {
+      render(el(), {
+        template: templates('error', message) // Template "Cron error"
+      })
+      clearInterval(intervalId);
+      intervalId = setInterval(cronlistCallback, 5000, () => {
+        display();
+        clearInterval(intervalId)
+      });
+    }
+
     function cron_stop() {
-      clearInterval(intervalId_wait);
       clearInterval(intervalId);
 
       render(el(), {

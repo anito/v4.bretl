@@ -38,7 +38,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     /**
      * Adds a nonce field
      */
-    wp_nonce_field('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
+    wp_nonce_field('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
 
     /**
      * Adds field order and orderby
@@ -123,7 +123,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   function ajax_response()
   {
 
-    check_ajax_referer('ajax-custom-list-nonce', '_ajax_custom_list_nonce');
+    check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
 
     $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
     $data = Utils::get_json_data(array('paged' => $paged));
