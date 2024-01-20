@@ -1446,8 +1446,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'top modell'          => 'Top Modell',
         'von privat'          => 'Von Privat',
         'aus privater hand'   => 'Von Privat',
+        'privatbesitzer'      => 'Von Privat',
         'im kundenauftrag'    => 'Von Privat',
         'privatauftrag'       => 'Von Privat',
+        'kommission'          => array('Von Privat', 'match_type' => 'like'),
         'neuwertig'           => array('Neuwertig', 'match_type' => 'like'),
       );
 
