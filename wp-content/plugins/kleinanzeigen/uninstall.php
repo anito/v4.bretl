@@ -29,3 +29,30 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+function kleinanzeigen_delete_options()
+  {
+    delete_option('kleinanzeigen_account_name');
+    delete_option('kleinanzeigen_items_per_page');
+    delete_option('kleinanzeigen_crawl_interval');
+    delete_option('kleinanzeigen_schedule_new_ads');
+    delete_option('kleinanzeigen_schedule_invalid_ads');
+    delete_option('kleinanzeigen_send_cc_mail_on_new_ad');
+    delete_option('kleinanzeigen_schedule_invalid_prices');
+  }
+
+ function kleinanzeigen_uninstall_table()
+  {
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    $wpdb->query("DROP TABLE IF EXISTS $table_name;");
+
+    delete_option('kleinanzeigen_db_version');
+  }
+
+
+kleinanzeigen_uninstall_table();
+kleinanzeigen_delete_options();

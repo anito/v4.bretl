@@ -1,26 +1,16 @@
 <?php
 
-/**
- * Fired during plugin deactivation
- *
- * @link       https://www.wplauncher.com
- * @since      1.0.0
- *
- * @package    Kleinanzeigen
- * @subpackage Kleinanzeigen/includes
- */
-
 require_once plugin_dir_path(__FILE__) . 'class-kleinanzeigen-installer.php';
 
 /**
- * Fired during plugin deactivation.
+ * Fired during plugin deactivation
  *
  * This class defines all code necessary to run during the plugin's deactivation.
- *
+ * 
  * @since      1.0.0
  * @package    Kleinanzeigen
  * @subpackage Kleinanzeigen/includes
- * @author     Ben Shadle <benshadle@gmail.com>
+ * @author     Axel Nitzschner <axelnitzschner@gmail.com>
  */
 class Kleinanzeigen_Deactivator extends Kleinanzeigen_Installer
 {
@@ -36,30 +26,7 @@ class Kleinanzeigen_Deactivator extends Kleinanzeigen_Installer
   {
 
     self::user_caps();
-    self::remove_job_db();
-    self::delete_options();
     self::unschedule_cron_jobs();
-  }
-
-  private static function delete_options()
-  {
-    delete_option('kleinanzeigen_account_name');
-    delete_option('kleinanzeigen_items_per_page');
-    delete_option('kleinanzeigen_crawl_interval');
-    delete_option('kleinanzeigen_schedule_new_ads');
-    delete_option('kleinanzeigen_schedule_invalid_ads');
-    delete_option('kleinanzeigen_send_cc_mail_on_new_ad');
-    delete_option('kleinanzeigen_schedule_invalid_prices');
-  }
-
-  private static function unschedule_cron_jobs()
-  {
-    wp_unschedule_hook('kleinanzeigen_sync_price');
-    wp_unschedule_hook('kleinanzeigen_activate_url');
-    wp_unschedule_hook('kleinanzeigen_deactivate_url');
-    wp_unschedule_hook('kleinanzeigen_renamed_ads');
-    wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
-    wp_unschedule_hook('kleinanzeigen_create_new_products');
   }
 
   private static function user_caps()
@@ -125,15 +92,14 @@ class Kleinanzeigen_Deactivator extends Kleinanzeigen_Installer
     }
   }
 
-  private static function remove_job_db()
+  private static function unschedule_cron_jobs()
   {
-    global $wpdb;
 
-    $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    $wpdb->query("DROP TABLE IF EXISTS $table_name;");
-
-    delete_option('kleinanzeigen_db_version');
+    wp_unschedule_hook('kleinanzeigen_sync_price');
+    wp_unschedule_hook('kleinanzeigen_activate_url');
+    wp_unschedule_hook('kleinanzeigen_deactivate_url');
+    wp_unschedule_hook('kleinanzeigen_renamed_ads');
+    wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
+    wp_unschedule_hook('kleinanzeigen_create_products');
   }
 }

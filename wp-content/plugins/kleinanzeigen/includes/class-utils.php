@@ -67,6 +67,10 @@ if (!class_exists('Utils')) {
       }
     }
 
+    static function foo() {
+      self::write_log('foo succeeded...');
+    }
+
     static function read($file)
     {
       if (!file_exists($file)) {
@@ -201,6 +205,14 @@ if (!class_exists('Utils')) {
       $content = preg_replace('/<[^>]*>/', ' ', $content); //clear html tags
       $content = preg_replace('/[\s+\n]/', ' ', $content); // clear multiple whitespace
       return substr($content, 0, $count) . '...';
+    }
+
+    static function base_64_encode($val) {
+      return base64_encode(json_encode($val));
+    }
+
+    static function base_64_decode($val) {
+      return (array) json_decode(base64_decode($val));
     }
 
     static function is_valid_title($val)

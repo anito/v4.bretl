@@ -1,15 +1,5 @@
 <?php
 
-/**
- * Fired during plugin activation
- *
- * @link       https://www.wplauncher.com
- * @since      1.0.0
- *
- * @package    Kleinanzeigen
- * @subpackage Kleinanzeigen/includes
- */
-
 require_once plugin_dir_path(__FILE__) . 'class-kleinanzeigen-installer.php';
 
 /**
@@ -20,7 +10,7 @@ require_once plugin_dir_path(__FILE__) . 'class-kleinanzeigen-installer.php';
  * @since      1.0.0
  * @package    Kleinanzeigen
  * @subpackage Kleinanzeigen/includes
- * @author     Ben Shadle <benshadle@gmail.com>
+ * @author     Axel Nitzschner <axelnitzschner@gmail.com>
  */
 class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
 {
@@ -34,11 +24,10 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
    */
   public static function activate()
   {
-    global $wpdb;
 
-    self::add_job_db();
+    self::install_table();
     self::user_caps();
-    // self::setup_environment(); // TODO
+    self::register_taxonomies();
   }
 
   private static function user_caps()
@@ -105,22 +94,17 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
     }
   }
 
-  private static function setup_environment()
-  {
-
-    self::register_taxonomies();
-  }
-
-  private static function add_job_db()
+  private static function install_table()
   {
 
     global $wpdb;
     global $kleinanzeigen_db_version;
-
+    
     $table_name = $wpdb->prefix . 'kleinanzeigen_jobs';
     $charset_collate = $wpdb->get_charset_collate();
 
-    $sql = "CREATE TABLE $table_name (
+    $sql = "SET sql_notes = 0;";
+    $sql .= "CREATE TABLE IF NOT EXISTS $table_name (
       id int(255) AUTO_INCREMENT,
       slug varchar(100) NOT NULL,
       type varchar(100) NOT NULL,
@@ -139,7 +123,7 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
   private static function register_taxonomies()
   {
 
-    $s = register_taxonomy(
+    register_taxonomy(
       'product_lapel',
       'product',
       array(

@@ -18,12 +18,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function register_ajax_handler()
     {
-      // Catch ajax referer for cron
-      add_action('check_ajax_referer', array($this, 'check_ajax_referer'), 10, 2);
 
-      // Ajax actions
-      add_action('wp_ajax__ajax_poll', array($this, '_ajax_poll'));
-      add_action('wp_ajax__ajax_cron', array($this, '_ajax_cron'));
       add_action('wp_ajax__ajax_connect', array($this, '_ajax_connect'));
       add_action('wp_ajax__ajax_get_nonce', array($this, '_ajax_get_nonce'));
       add_action('wp_ajax__ajax_fix_price', array($this, '_ajax_fix_price'));
@@ -39,8 +34,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax__ajax_import_kleinanzeigen_images', array($this, '_ajax_import_kleinanzeigen_images'));
       add_action('wp_ajax__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
 
-      add_action('wp_ajax_nopriv__ajax_poll', array($this, '_ajax_poll'));
-      // add_action('wp_ajax_nopriv__ajax_cron', array($this, '_ajax_cron'));
       add_action('wp_ajax_nopriv__ajax_connect', array($this, '_ajax_connect'));
       add_action('wp_ajax_nopriv__ajax_get_nonce', array($this, '_ajax_get_nonce'));
       add_action('wp_ajax_nopriv__ajax_fix_price', array($this, '_ajax_fix_price'));
@@ -55,18 +48,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_data', array($this, '_ajax_import_kleinanzeigen_data'));
       add_action('wp_ajax_nopriv__ajax_import_kleinanzeigen_images', array($this, '_ajax_import_kleinanzeigen_images'));
       add_action('wp_ajax_nopriv__ajax_get_product_categories', array($this, '_ajax_get_product_categories'));
-    }
-
-    public function check_ajax_referer($action, $result)
-    {
-      if ('ajax-nonce-cron' === $action) {
-        if (!$result) {
-          die(json_encode(array(
-            'success' => false,
-            'data' => array()
-          )));
-        }
-      }
     }
 
     public function _ajax_get_nonce()
@@ -138,17 +119,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
     public function _ajax_get_brands()
     {
       $this->ajax_get_brand_images();
-    }
-
-    public function _ajax_poll()
-    {
-      wbp_fn()->ajax_poll();
-    }
-
-    public function _ajax_cron()
-    {
-      check_ajax_referer('ajax-nonce-cron', '_ajax_nonce_cron');
-      wbp_fn()->ajax_cron();
     }
 
     public function get_nonce($action) {

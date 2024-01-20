@@ -643,19 +643,19 @@ jQuery(document).ready(function ($) {
     finish();
   }
 
-  const poll = () => {
+  const poll = (args = "") =>
     $.post({
       url: admin_ajax,
       data: {
         action: "_ajax_poll",
+        _poll_action: args,
       },
-      success: (response) => console.log(response),
+      success: (response) => response,
       error: defaultErrorHandler,
     });
-  };
 
-  const cron = (nonce) => {
-    return $.post({
+  const cron = (nonce) =>
+    $.ajax({
       url: admin_ajax,
       data: {
         action: "_ajax_cron",
@@ -671,10 +671,9 @@ jQuery(document).ready(function ($) {
         };
       },
     });
-  };
 
-  const getNonce = (action) => {
-    return $.post({
+  const getNonce = (action) =>
+    $.ajax({
       url: admin_ajax,
       data: {
         action: "_ajax_get_nonce",
@@ -683,8 +682,9 @@ jQuery(document).ready(function ($) {
       success: (response) => response,
       error: defaultErrorHandler,
     });
-  };
-  const defaultErrorHandler = (response, status, message) => console.error(message);
+  
+  const defaultErrorHandler = (response, status, message) =>
+    console.error(message);
 
   const MSG_MISSING_KLEINANZEIGEN_ID = "Keine Kleinanzeigen ID gefunden.";
   const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
@@ -711,7 +711,7 @@ jQuery(document).ready(function ($) {
         processDataImport,
         poll,
         cron,
-        getNonce
+        getNonce,
       };
       break;
     case "product":

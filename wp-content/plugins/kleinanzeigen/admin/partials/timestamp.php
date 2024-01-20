@@ -9,11 +9,13 @@
   jQuery(document).ready(async ($) => {
 
     let nonce = <?php echo json_encode(wp_create_nonce('ajax-nonce-cron')) ?>;
+    let encoded_action = "<?php echo Utils::base_64_encode('Foo', 'Bar') ?>";
 
     const {
       admin_ajax,
       displayTime,
       cron,
+      poll,
       getNonce,
       getCookie,
       display,

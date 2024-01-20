@@ -194,7 +194,7 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
 
     $plugin_i18n = new Kleinanzeigen_i18n();
 
-    $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
+    $this->loader->add_action('plugins_loaded', array($plugin_i18n, 'load_plugin_textdomain'));
   }
 
   /**
@@ -208,12 +208,22 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
   {
 
     $admin = new Kleinanzeigen_Admin();
+    $fns = wbp_fn();
 
-    $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_styles');
-    $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_scripts');
-    $this->loader->add_action('admin_init', wbp_fn(), 'table_ajax_handler', -888);
+    $this->loader->add_action('admin_enqueue_scripts', array($admin, 'enqueue_styles'));
+    $this->loader->add_action('admin_enqueue_scripts', array($admin, 'enqueue_scripts'));
+    $this->loader->add_action('admin_init', array($fns, 'table_ajax_handler'), -888);
 
-    $this->loader->add_filter('kleinanzeigen/template-path', $admin, 'template_path');
+    // Catch ajax referer for cron
+    $this->loader->add_action('check_ajax_referer', array($fns, 'check_ajax_referer'), 10, 2);
+
+    // Ajax actions
+    $this->loader->add_action('wp_ajax__ajax_poll', array($fns, '_ajax_poll'));
+    $this->loader->add_action('wp_ajax__ajax_cron', array($fns, '_ajax_cron'));
+    
+    $this->loader->add_action('wp_ajax_nopriv__ajax_poll', array($fns, '_ajax_poll'));
+
+    $this->loader->add_filter('kleinanzeigen/template-path', array($admin, 'template_path'));
   }
 
   /**
@@ -230,12 +240,12 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
 
     $plugin_public = new Kleinanzeigen_Public();
 
-    $this->loader->add_action('init', $plugin_public, 'register_shortcodes');
-    $this->loader->add_action('init', $plugin_public, 'register_and_build');
-    $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-    $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+    $this->loader->add_action('init', array($plugin_public, 'register_shortcodes'));
+    $this->loader->add_action('init', array($plugin_public, 'register_and_build'));
+    $this->loader->add_action('wp_enqueue_scripts', array($plugin_public, 'enqueue_scripts'));
+    $this->loader->add_action('wp_enqueue_scripts', array($plugin_public, 'enqueue_styles'));
 
-    $this->loader->add_filter('kleinanzeigen/template-path', $plugin_public, 'template_path');
+    $this->loader->add_filter('kleinanzeigen/template-path', array($plugin_public, 'template_path'));
   }
 
 

@@ -42,7 +42,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_activate_url', array($this, 'job_activate_url'));
     add_action('kleinanzeigen_deactivate_url', array($this, 'job_deactivate_url'));
     add_action('kleinanzeigen_renamed_ads', array($this, 'job_renamed_ads'));
-    add_action('kleinanzeigen_create_new_products', array($this, 'job_create_products'));
+    add_action('kleinanzeigen_create_products', array($this, 'job_create_products'));
     add_filter('pre_update_option', array($this, 'pre_update_option'), 10, 3);
     add_action('init', array($this, 'register_jobs'));
 
@@ -133,7 +133,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'optional' => array(
         'kleinanzeigen_sync_price',
         'kleinanzeigen_invalid_ad_action',
-        'kleinanzeigen_create_new_products'
+        'kleinanzeigen_create_products'
       )
     );
   }
@@ -197,15 +197,17 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     if (0 === strpos($option, 'kleinanzeigen_') && $old_value !== $value) {
 
-      if (in_array($option, array('kleinanzeigen_account_name', 'kleinanzeigen_crawl_interval'))) {
+      if (in_array($option, array(
+        'kleinanzeigen_account_name',
+        'kleinanzeigen_crawl_interval',
+        'kleinanzeigen_is_pro_account'
+        ))) {
 
         setcookie('ka-paged', 1);
         delete_transient('kleinanzeigen_data');
-        $this->unschedule_events('mandatory');
-
       }
 
-      $this->unschedule_events('optional');
+      $this->unschedule_events(array('mandatory', 'optional'));
     }
 
     return $value;
@@ -248,7 +250,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * Mandatory, no option available
     */
     if (!wp_next_scheduled('kleinanzeigen_activate_url')) {
-      wp_schedule_event($time(), $interval, 'kleinanzeigen_activate_url');
+      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_activate_url');
     }
 
     /*
@@ -256,7 +258,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * Mandatory, no option available
     */
     if (!wp_next_scheduled('kleinanzeigen_deactivate_url')) {
-      wp_schedule_event($time(), $interval, 'kleinanzeigen_deactivate_url');
+      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_deactivate_url');
     }
 
     /*
@@ -264,7 +266,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * Mandatory, no option available
     */
     if (!wp_next_scheduled('kleinanzeigen_renamed_ads')) {
-      wp_schedule_event($time(), $interval, 'kleinanzeigen_renamed_ads');
+      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_renamed_ads');
     }
 
     if ('never' === $interval) {
@@ -300,12 +302,13 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * Optional, option availabele
     */
     if ("1" === get_option('kleinanzeigen_schedule_new_ads', '0')) {
-      if (!wp_next_scheduled('kleinanzeigen_create_new_products')) {
-        wp_schedule_event($time(), $interval, 'kleinanzeigen_create_new_products');
+      if (!wp_next_scheduled('kleinanzeigen_create_products')) {
+        wp_schedule_event($time(), $interval, 'kleinanzeigen_create_products');
       }
     } else {
-      wp_unschedule_hook('kleinanzeigen_create_new_products');
+      wp_unschedule_hook('kleinanzeigen_create_products');
     }
+    wp_unschedule_hook('kleinanzeigen_create_new_products');
   }
 
   public function job_sync_price()
@@ -331,7 +334,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   public function job_renamed_ads()
   {
-
     // This job doesn't require to be registered in the active jobs db table
     wbp_fn()->build_tasks('renamed-product')['items'];
   }
@@ -356,7 +358,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       };
 
       $job_id = wbp_db()->register_active_job(array(
-        'slug'  => 'kleinanzeigen_create_new_products',
+        'slug'  => 'kleinanzeigen_create_products',
         'type'  => 'record',
         'uid'   => $record->id
       ));

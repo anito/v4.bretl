@@ -1445,6 +1445,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'neues modell'        => 'Neues Modell',
         'top modell'          => 'Top Modell',
         'von privat'          => 'Von Privat',
+        'aus privater hand'   => 'Von Privat',
         'im kundenauftrag'    => 'Von Privat',
         'privatauftrag'       => 'Von Privat',
         'neuwertig'           => array('Neuwertig', 'match_type' => 'like'),
@@ -1504,11 +1505,44 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     public function ajax_poll()
     {
-      die(json_encode(array()));
+      $action = isset($_REQUEST['_poll_action']) ? $_REQUEST['_poll_action'] : false;
+
+      if($action) {
+        $action = Utils::base_64_decode($action);
+        if(is_callable($action)) {
+          call_user_func($action);
+        }
+      }
+      die("0");
+
     }
 
-    public function ajax_cron()
+    public function return_false()
     {
+      return false;
+    }
+
+
+    public function check_ajax_referer($action, $result)
+    {
+      if ('ajax-nonce-cron' === $action) {
+        if (!$result) {
+          die(json_encode(array(
+            'success' => false,
+            'data' => array()
+          )));
+        }
+      }
+    }
+
+    public function _ajax_poll()
+    {
+      $this->ajax_poll();
+    }
+
+    public function _ajax_cron()
+    {
+      check_ajax_referer('ajax-nonce-cron', '_ajax_nonce_cron');
 
       wp_remote_get(home_url('wp-cron.php'));
 
@@ -1571,20 +1605,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       );
 
       die(json_encode(compact('data', 'success')));
-    }
-
-    public function return_false()
-    {
-      return false;
-    }
-
-    public static function get_instance($file = null): Kleinanzeigen_Functions
-    {
-      // If the single instance hasn't been set, set it now.
-      if (null == self::$instance) {
-        self::$instance = new self;
-      }
-      return self::$instance;
     }
 
     public function dropdown_invalid_ads($selected)
@@ -1737,6 +1757,16 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       return $content;
+    }
+
+    public static function get_instance($file = null): Kleinanzeigen_Functions
+    {
+
+      // If the single instance hasn't been set, set it now.
+      if (null == self::$instance) {
+        self::$instance = new self;
+      }
+      return self::$instance;
     }
   }
 }
