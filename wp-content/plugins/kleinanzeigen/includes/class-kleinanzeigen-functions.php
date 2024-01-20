@@ -1404,7 +1404,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $excerpt = $record->description;
       $tags = !empty($record->tags) ? $record->tags : [];
       $url = $record->url;
-      $searchable_content = $title . ' ' . $excerpt;
+      $searchable_content = $title . ' ' . $content;
       $product_id = $product->get_id();
 
       if($product->get_price() !== $price) {
@@ -1443,6 +1443,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'neumaschine'         => 'Neu',
         'neufahrzeug'         => 'Neu',
         'neues modell'        => 'Neues Modell',
+        'topmodell'           => 'Top Modell',
         'top modell'          => 'Top Modell',
         'von privat'          => 'Von Privat',
         'aus privater hand'   => 'Von Privat',
@@ -1450,6 +1451,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'im kundenauftrag'    => 'Von Privat',
         'privatauftrag'       => 'Von Privat',
         'kommission'          => array('Von Privat', 'match_type' => 'like'),
+        'kommision'           => array('Von Privat', 'match_type' => 'like'),
         'neuwertig'           => array('Neuwertig', 'match_type' => 'like'),
       );
 
