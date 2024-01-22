@@ -33,7 +33,7 @@ do_action('kleinanzeigen_email_header', $email_heading); ?>
   <span><?php echo '<a href="' . esc_html($edit_link) . '" class="button button-primary">' . esc_html__('Edit', 'kleinanzeigen') . '</a>'; ?></span>
 </p>
 <?php if ('publish' !== $post_status) { ?>
-  <p class="small"><?php _e('☞ This product isn\'t published yet. Only administrators and shopmanagers may view or edit unpublished products.', 'kleinanzeigen'); ?></p>
+  <p class="small"><?php _e('☞ This product hasn\'t been published yet. Only administrators and shopmanagers may view or edit unpublished products.', 'kleinanzeigen'); ?></p>
 <?php
 } ?>
 <p class="small"><?php printf(esc_html__('Manage your Kleinanzeigen.de products in your online store here: %1$s', 'kleinanzeigen'), esc_html($plugin_link)); ?></p>
