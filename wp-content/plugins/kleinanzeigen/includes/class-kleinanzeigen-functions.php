@@ -1048,24 +1048,30 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $product->save();
     }
 
-    public function text_contains($needle, $haystack, $searchtype = '')
+    public function text_contains($needles, $haystack, $searchtype = '')
     {
-      $needle = preg_quote($needle);
-      switch ($searchtype) {
-        case 'raw':
-          preg_match('/' . wp_unslash($needle) . '/i', $haystack, $matches);
-          break;
-        case 'like':
-          preg_match('/' . wp_unslash($needle) . '/i', $haystack, $matches);
-          break;
-        default:
-          preg_match('/(?:^|\b)' . $needle . '(?!\w)/i', $haystack, $matches);
-      }
+      $needles = explode(',', $needles);
+      $ret = false;
+      foreach($needles as $needle) {
 
-      if (!empty($matches[0])) {
-        return true;
+        $needle = preg_quote(trim($needle));
+        switch ($searchtype) {
+          case 'raw':
+            preg_match('/' . wp_unslash($needle) . '/i', $haystack, $matches);
+            break;
+          case 'like':
+            preg_match('/' . wp_unslash($needle) . '/i', $haystack, $matches);
+            break;
+          default:
+            preg_match('/(?:^|\b)' . $needle . '(?!\w)/i', $haystack, $matches);
+        }
+  
+        if (!empty($matches[0])) {
+          $ret = true;
+          break;
+        }
       }
-      return false;
+      return $ret;
     }
 
     // Callable product contents functions
@@ -1412,68 +1418,59 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $product->save();
       }
 
-      $parts = array(
-        'aktionspreis' => array(
-          'Aktionspreis',
-          'match_type' => 'like',
-          'fn' => 'sale',
+      $definitions = array(
+        'Aktionspreis'        => array('aktionspreis', 'match_type' => 'like', 'fn' => 'sale'),
+        'Allrad'              => array('allrad', 'match_type' => 'like'),
+        'Vorführmaschine'     => array(
+          array('vorführ', 'match_type' =>'like'),
+          array('vfm'),
         ),
-        'allrad'              => array('Allrad', 'match_type' => 'like'),
-        'vorführ'             => array('Vorführmaschine', 'match_type' => 'like'),
-        'vfm'                 => 'Vorführmaschine',
-        'topzustand'          => 'Top',
-        'top zustand'         => 'Top',
-        'guter zustand'       => 'Guter Zustand',
-        'topausstattung'      => 'Top',
-        'top ausstattung'     => 'Top',
-        'sonderpreis'         => 'Sonderpreis',
-        'aktion'              => array('Aktion', 'fn' => 'aktion'),
-        'aktionswochen'       => array('Aktionswochen', 'fn' => 'aktionswochen'),
-        'aktionsmodell'       => 'Aktion',
-        'klima'               => 'Klima',
-        'am lager'            => 'Sofort lieferbar',
-        'sofort verfügbar'    => 'Sofort lieferbar',
-        'sofort lieferbar'    => 'Sofort lieferbar',
-        'lagermaschine'       => 'Sofort lieferbar',
-        'leicht gebraucht'    => 'Leicht Gebraucht',
-        'limited edition'     => 'Limited Edition',
-        'lim. edition'        => 'Limited Edition',
-        'mietmaschine'        => array('Mieten', 'fn' => 'rent'),
-        'neu'                 => 'Neu',
-        'neumaschine'         => 'Neu',
-        'neufahrzeug'         => 'Neu',
-        'neues modell'        => 'Neues Modell',
-        'top modell'          => 'Top Modell',
-        'topmodell'           => 'Top Modell',
-        'von privat'          => 'Von Privat',
-        'rein privat'         => 'Von Privat',
-        'aus privater hand'   => 'Von Privat',
-        'privatbesitzer'      => 'Von Privat',
-        'im kundenauftrag'    => 'Von Privat',
-        'privatauftrag'       => 'Von Privat',
-        'kommission'          => array('Von Privat', 'match_type' => 'like'),
-        'kommision'           => array('Von Privat', 'match_type' => 'like'),
-        'neuwertig'           => array('Neuwertig', 'match_type' => 'like'),
+        'Top'                 => array('topzustand, top zustand, topausstattung, top ausstattung'),
+        'Guter Zustand'       => array('guter zustand'),
+        'Sonderpreis'         => array('sonderpreis'),
+        'Aktion'              => array('aktion, aktionsmodell', 'fn' => 'aktion'),
+        'Aktionswochen'       => array('aktionswochen', 'fn' => 'aktionswochen'),
+        'klima'               => array('klima'),
+        'Sofort lieferbar'    => array('am lager, sofort verfügbar, sofort lieferbar, lagermaschine'),
+        'Leicht Gebraucht'    => array('leicht gebraucht'),
+        'Limited Edition'     => array('limited edition, lim. edition'),
+        'Mieten'              => array('mietmaschine', 'fn' => 'rent'),
+        'Neu'                 => array('neu, neumaschine, neufahrzeug'),
+        'Neues Modell'        => array('neues modell'),
+        'Top Modell'          => array('top modell, topmodell'),
+        'Von Privat'          => array(
+          array('von privat, rein privat, aus privater hand, privatbesitzer, im kundenauftrag, privatauftrag'),
+          array('kommission, kommision', 'match_type' => 'like')
+        ),
+        'Neuwertig'           => array('neuwertig', 'match_type' => 'like'),
       );
 
       // Handle contents
-      foreach ($parts as $key => $val) {
+      $parts = [];
+      array_walk($definitions, function($part, $k) use(&$parts) {
+        if(is_array($part[0])) {
+          $i = 0;
+          while(isset($part[$i]) && is_array($part[$i])) {
+            $parts[] = array_merge(array('term_name' => $k, 'needles' => array_shift($part[$i])), $part[$i]);
+            $i++;
+          }
+        } else {
+          $parts[] = array_merge(array('term_name' => $k, 'needles' => array_shift($part)), $part);
+        }
+      });
+      
+      foreach ($parts as $part) {
 
-        if ($this->text_contains($key, $searchable_content, isset($val['match_type']) ? $val['match_type'] : null)) {
+        if ($this->text_contains($part['needles'], $searchable_content, isset($part['match_type']) ? $part['match_type'] : null)) {
 
-          $defaults = array('default');
-          $fns = isset($val['fn']) ? $val['fn'] : $defaults;
-          $fns = !is_array($fns) ? array_merge(array($fns), $defaults) : $fns;
-          $fns = array_unique($fns);
+          $fns = isset($part['fn']) ? $part['fn'] : array();
+          $fns = !is_array($fns) ? array($fns) : $fns;
+          $fns = array_merge($fns, array('default'));
 
           foreach ($fns as $fn) {
             if (is_callable(array($this, 'handle_product_contents_' . $fn), false, $callable_name)) {
 
-              if (!is_array($val)) {
-                $term_name = $val;
-              } elseif (isset($val[0])) {
-                $term_name = $val[0];
-              }
+              $term_name = $part['term_name'];
 
               $product = call_user_func(array($this, 'handle_product_contents_' . $fn), compact('product_id', 'price', 'title', 'content', 'term_name'));
             }
