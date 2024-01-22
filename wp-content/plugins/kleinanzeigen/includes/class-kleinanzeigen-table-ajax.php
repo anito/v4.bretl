@@ -68,10 +68,11 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
       check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
 
+      $paged = 1;
       if (!isset($_COOKIE['ka-paged'])) {
-        setcookie('ka-paged', 1);
+        setcookie('ka-paged', $paged);
       }
-      $paged = $_COOKIE['ka-paged'];
+      $paged = isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : $paged;
       $data = Utils::get_json_data(array('paged' => $paged));
 
       if (is_wp_error($data)) {

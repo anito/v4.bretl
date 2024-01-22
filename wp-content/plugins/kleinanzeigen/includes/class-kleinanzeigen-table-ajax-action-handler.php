@@ -139,7 +139,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $kleinanzeigen_id_raw = $formdata['kleinanzeigen_id'];
       $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id_raw);
 
-      $screen = $_REQUEST['screen'];
+      $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
 
       $remoteUrl  = wbp_fn()->get_kleinanzeigen_search_url($kleinanzeigen_id);
       $response   = wbp_fn()->remote_call($remoteUrl, 5);
