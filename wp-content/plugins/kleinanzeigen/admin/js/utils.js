@@ -39,10 +39,7 @@ jQuery(document).ready(function ($) {
         localStorage.setItem(cookie_key, cookie_val);
 
         setCookie(cookie_key, cookie_val, 365);
-        poll({
-          cookie_key,
-          cookie_val,
-        });
+        poll();
         if (typeof cb === "function") cb(cookie_val);
         return cookie_val;
       },
