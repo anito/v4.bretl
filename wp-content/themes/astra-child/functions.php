@@ -63,9 +63,10 @@ function wbp_doing_login_ajax()
 function add_allowed_origins($origins)
 {
   return array_merge($origins, [
+    'http://localhost:5173',
+    'https://dev.bretl.webpremiere.de',
     'https://dev.auto-traktor-bretschneider.de',
     'https://dev.auto-traktor-bretschneider.mbp',
-    'http://localhost:5173'
   ]);
 }
 add_filter('allowed_http_origins', 'add_allowed_origins');
