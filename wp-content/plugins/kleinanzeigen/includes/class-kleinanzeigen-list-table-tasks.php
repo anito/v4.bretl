@@ -113,6 +113,21 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           )
         );
         break;
+      case 'drafts':
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-table-header',
+            'args' => array(
+              'header' => __('Drafts', 'kleinanzeigen'),
+              'subheader' => __('List of non published products', 'kleinanzeigen')
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+        break;
       case 'has-sku':
         $vars = array(
           'header-template' => array(
@@ -413,6 +428,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           $label = __('Edit', 'kleinanzeigen');
           $actions = wbp_ka()->include_template('/dashboard/invalid-cat-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
           break;
+        case 'drafts':
         case 'has-sku':
         case 'no-sku':
         case 'featured':

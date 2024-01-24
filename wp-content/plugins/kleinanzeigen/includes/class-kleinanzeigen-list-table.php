@@ -71,6 +71,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     );
     $published_no_sku = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
     $published_has_sku = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
+    $drafts_has_sku = wc_get_products(array_merge($args, array('status' => 'draft'), array('sku_compare' => 'EXISTS')));
     $featured_products = wbp_fn()->get_featured_products();
 
     $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array(), 'todos' => array());
@@ -113,7 +114,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     $items = $this->items;
     $tasks = wbp_fn()->build_tasks();
-    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'featured_products', 'tasks'));
+    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'drafts_has_sku', 'featured_products', 'tasks'));
   }
 
   /**

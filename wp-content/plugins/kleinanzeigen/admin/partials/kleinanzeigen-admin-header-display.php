@@ -30,10 +30,10 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 
       <section class="wbp-kleinanzeigen">
         <div class="section-inner">
-          <div style="display: flex; flex-direction: column;">
+          <div class="flex flex-vertical">
             <div class="overview-wrap">
               <fieldset class="fieldset tasks">
-                <legend><?php echo __('Total published', 'kleinanzeigen') ?></legend>
+                <legend><?php echo __('Publishings', 'kleinanzeigen') ?></legend>
                 <div class="tasks">
                   <div class="task">
                     <div class="task-name">
@@ -61,6 +61,22 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
                   <div class="task">
                     <div class="task-name"><a href="#" class="start-task" data-task-type="featured"><?php echo __('Featured products', 'kleinanzeigen'); ?></a></div>
                     <div class="task-value"><?php echo count($featured_products); ?></div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+
+          <div id="drafts" class="flex flex-vertical hidden">
+            <div class="overview-wrap">
+              <fieldset class="fieldset tasks">
+                <legend><?php echo __('Drafts', 'kleinanzeigen') ?></legend>
+                <div class="tasks">
+                  <div class="task">
+                    <div class="task-name">
+                      <a href="#" class="start-task" data-task-type="drafts"><?php echo __('Non published products', 'kleinanzeigen'); ?></a>
+                    </div>
+                    <div class="task-value"><?php echo count($drafts_has_sku); ?></div>
                   </div>
                 </div>
               </fieldset>
@@ -320,5 +336,13 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 
   #kleinanzeigen-head-wrap .section-inner .warning {
     color: red !important;
+  }
+
+  #kleinanzeigen-head-wrap .flex {
+    display: flex;
+  }
+
+  #kleinanzeigen-head-wrap .flex.flex-vertical {
+    flex-direction: column;
   }
 </style>

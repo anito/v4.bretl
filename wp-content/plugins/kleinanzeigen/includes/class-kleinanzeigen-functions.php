@@ -225,6 +225,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           'priority' => 1,
           'items' => array()
         ),
+        'drafts' => array(
+          'priority' => 2,
+          'items' => array()
+        ),
         'has-sku' => array(
           'priority' => 2,
           'items' => array()
@@ -464,6 +468,16 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       if ('has-sku' === $task_type) {
         $record = null;
         $products = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'EXISTS'));
+        foreach ($products as $product) {
+          $sku = (int) $product->get_sku();
+          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
+          $items[] = compact('product', 'task_type', 'record');
+        }
+        return $items;
+      }
+      if ('drafts' === $task_type) {
+        $record = null;
+        $products = wc_get_products(array('status' => 'draft', 'limit' => -1, 'sku_compare' => 'EXISTS'));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
           $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;

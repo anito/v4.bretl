@@ -5,7 +5,7 @@
 }
 
 #kleinanzeigen-admin-display .hidden {
-  display: none;
+  display: none !important;
 }
 
 .kleinanzeigen-page-header {
@@ -35,7 +35,7 @@
   flex-direction: column;
   border-radius: 5px;
   border: 1px solid #ddd;
-  width: 700px;
+  width: 790px;
   background-image: linear-gradient(263deg, rgb(181 234 64 / 85%) 10% 0% , #fff 60% 80%);
 }
 
@@ -123,8 +123,8 @@ section.wbp-kleinanzeigen .section-inner {
 }
 
 section.wbp-kleinanzeigen {
-  max-width: 490px;
-  width: 450px;
+  max-width: 510px;
+  width: 510px;
 }
 
 section.wbp-shop {

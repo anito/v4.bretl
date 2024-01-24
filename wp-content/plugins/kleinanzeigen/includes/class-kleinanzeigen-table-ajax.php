@@ -356,32 +356,37 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
             },
             render_tasks: (tasks) => {
 
-              const inconsistencies = Object.entries(tasks).filter((task) => {
-                return task[1].priority === 1 && task[1]['items'].length
+              const drafts = Object.entries(tasks).filter((task) => {
+                return 'drafts' === task[0] && task[1]['items'].length;
               })
 
-              if (!inconsistencies.length) {
-                $("#inconsistencies").addClass('hidden');
-                return;
+              $("#drafts").toggleClass('hidden', drafts.length === 0);
+
+              const inconsistencies = Object.entries(tasks).filter((task) => {
+                return 1 === task[1].priority && task[1]['items'].length;
+              })
+
+              $("#inconsistencies").toggleClass('hidden', inconsistencies.length === 0);
+
+              if (inconsistencies.length) {
+
+                Object.entries(tasks).forEach((task) => {
+                  const name = task[0];
+                  const items = task[1]['items'];
+                  const product_ids = items.map(item => item.product_id)
+
+                  const count = items.length;
+                  if (count) {
+                    $(`#kleinanzeigen-head-wrap .task.${name} .task-value`).html(count);
+                    $(`#kleinanzeigen-head-wrap .task.${name} a`).data('product-ids', product_ids);
+                  } else {
+                    $(`#kleinanzeigen-head-wrap .task.${name}`).addClass('hidden');
+                    $(`#kleinanzeigen-head-wrap .task.${name} a`).addClass('disabled');
+                  }
+
+                })
               }
 
-              $("#inconsistencies").removeClass('hidden');
-
-              Object.entries(tasks).forEach((task) => {
-                const name = task[0];
-                const items = task[1]['items'];
-                const product_ids = items.map(item => item.product_id)
-
-                const count = items.length;
-                if (count) {
-                  $(`#kleinanzeigen-head-wrap .task.${name} .task-value`).html(count);
-                  $(`#kleinanzeigen-head-wrap .task.${name} a`).data('product-ids', product_ids);
-                } else {
-                  $(`#kleinanzeigen-head-wrap .task.${name}`).addClass('hidden');
-                  $(`#kleinanzeigen-head-wrap .task.${name} a`).addClass('disabled');
-                }
-
-              })
 
             },
 
