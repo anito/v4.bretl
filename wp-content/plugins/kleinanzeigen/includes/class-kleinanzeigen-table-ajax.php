@@ -111,15 +111,13 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
       $product_ids = isset($_REQUEST['product_ids']) ? $_REQUEST['product_ids'] : array();
 
       $wp_tasks_list_table->set_vars($task_type);
-      $ads = wbp_fn()->get_transient_data();
 
       $args = array(
-        'status' => 'publish',
+        'status' => array('publish'),
         'include' => $product_ids,
         'limit' => -1
       );
-      $products = wc_get_products($args);
-      $items = wbp_fn()->get_task_list_items($products, $ads, $task_type);
+      $items = wbp_fn()->build_tasks($task_type, $args)['items'];
 
       setcookie('kleinanzeigen-task-type', $task_type);
 
@@ -355,6 +353,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                 .fail((response, status, message) => list.display())
             },
             render_tasks: (tasks) => {
+
+              console.log(tasks);
 
               const drafts = Object.entries(tasks).filter((task) => {
                 return 'drafts' === task[0] && task[1]['items'].length;

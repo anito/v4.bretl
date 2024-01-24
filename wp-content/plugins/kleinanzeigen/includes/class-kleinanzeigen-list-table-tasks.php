@@ -70,7 +70,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Orphaned products', 'kleinanzeigen'),
-              'subheader' => sprintf(__('The following published products are based on ads that can no longer be traced. Please select an appropriate action. Products will remain listet here (and remain published) until an action has been taken. You can also automate this process in %s.', 'kleinanzeigen'), '<a href="' . admin_url('/admin.php?page=' . wbp_ka()->get_plugin_name() . '-settings'). '" target="_blank">' . __('Settings', 'kleinanzeigen') . '</a>')
+              'subheader' => sprintf(__('The following products are based on ads that can no longer be traced. Please select an appropriate action. Products will remain listet here (and remain in current state) until an action has been taken. You can also automate this process in %s.', 'kleinanzeigen'), '<a href="' . admin_url('/admin.php?page=' . wbp_ka()->get_plugin_name() . '-settings') . '" target="_blank">' . __('Settings', 'kleinanzeigen') . '</a>')
             )
           ),
           'footer-template' => array(
@@ -222,15 +222,12 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
     $task_type = isset($_GET['task_type']) ? $_GET['task_type'] : '';
 
-    $ads = wbp_fn()->get_transient_data();
-
     $args = array(
-      'status' => 'publish',
+      'status' => array('publish'),
       'limit' => -1
     );
-    $products = wc_get_products($args);
-    $data = wbp_fn()->get_task_list_items($products, $ads, $task_type);
-    $this->setData($data);
+    $items = wbp_fn()->build_tasks($task_type, $args)['items'];
+    $this->setData($items);
 
     extract($this->_args);
     extract($this->_pagination_args, EXTR_SKIP);
@@ -407,13 +404,13 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       switch ($task_type) {
         case 'invalid-ad':
           $published = 'publish' === $product->get_status();
-          $disabled['deactivate'] = !$sku && !$published;
           $disabled['disconnect'] = !$sku;
+          $disabled['deactivate'] = !$sku || !$published;
           $disabled['delete'] = !$post_ID;
           $label = array(
-            'disconnect' => $product->get_sku() ? __('Keep', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
-            'deactivate' => (!$disabled['deactivate']) ? __('Hide', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
-            'delete' => (!$disabled['delete']) ? __('Delete', 'kleinanzeigen') : __('Deleted', 'kleinanzeigen')
+            'disconnect'  => $product->get_sku() ? __('Keep', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+            'deactivate'  => $product->get_sku() ? __('Hide', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+            'delete'      => (!$disabled['delete']) ? __('Delete', 'kleinanzeigen') : __('Deleted', 'kleinanzeigen')
           );
           $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled'));
           break;

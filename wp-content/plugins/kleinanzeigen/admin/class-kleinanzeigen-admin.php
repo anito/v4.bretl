@@ -324,7 +324,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       ));
 
       $price = Utils::extract_kleinanzeigen_price($item['record']->price);
-      wbp_fn()->fix_price($item['product_id'], $price);
+      wbp_fn()->fix_price($item['product']->get_ID(), $price);
 
       if ($job_id) {
         wbp_db()->job_done($job_id);
@@ -335,7 +335,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function job_renamed_ads()
   {
     // This job doesn't require to be registered in the active jobs db table
-    wbp_fn()->build_tasks('renamed-product')['items'];
+    wbp_fn()->build_tasks('renamed-product');
   }
 
   public function job_create_products()
@@ -396,7 +396,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     foreach ($items as $item) {
 
-      $post_ID = $item['product_id'];
+      $post_ID = $item['product']->get_ID();
       $record = $item['record'];
 
       $urls_valid = get_post_meta($post_ID, 'kleinanzeigen_url', true) &&
@@ -423,17 +423,17 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function job_deactivate_url()
   {
     $items = wbp_fn()->build_tasks('invalid-ad')['items'];
-    $product_ids = wp_list_pluck($items, 'product_id');
+    $products = wp_list_pluck($items, 'product');
 
-    $ids = array_filter($product_ids, function ($id) {
-      return !empty(get_metadata('post', $id, 'kleinanzeigen_url'));
+    $ids = array_filter($products, function ($product) {
+      return !empty(get_metadata('post', $product->get_ID(), 'kleinanzeigen_url'));
     });
 
     foreach ($ids as $id) {
       $job_id = wbp_db()->register_active_job(array(
         'slug'  => 'kleinanzeigen_deactivate_url',
         'type'  => 'product',
-        'uid' => $id
+        'uid'   => $id
       ));
 
       wbp_fn()->disable_sku_url($id);
@@ -450,7 +450,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     $items = wbp_fn()->build_tasks('invalid-ad')['items'];
 
     foreach ($items as $item) {
-      $post_ID = $item['product_id'];
+      $post_ID = $item['product']->get_ID();
 
       $job_id = wbp_db()->register_active_job(array(
         'slug'  => 'kleinanzeigen_invalid_ad_action',

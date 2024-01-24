@@ -209,37 +209,39 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $schedule;
     }
 
-    function build_tasks($name = '', $status = array('publish'))
+    function build_tasks($name = '', $args = array())
     {
       // All inconsistency relevant tasks should be set to priority => 1
       $tasks = array(
         'invalid-ad' => array(
           'priority' => 1,
-          'items' => array()
+          'items' => array(),
+          'status' => array('publish', 'draft')
         ),
         'invalid-price' => array(
           'priority' => 1,
-          'items' => array()
+          'items' => array(),
         ),
         'invalid-cat' => array(
           'priority' => 1,
-          'items' => array()
+          'items' => array(),
         ),
         'drafts' => array(
           'priority' => 2,
-          'items' => array()
+          'items' => array(),
+          'status' => array('draft')
         ),
         'has-sku' => array(
           'priority' => 2,
-          'items' => array()
+          'items' => array(),
         ),
         'no-sku' => array(
           'priority' => 2,
-          'items' => array()
+          'items' => array(),
         ),
         'featured' => array(
           'priority' => 2,
-          'items' => array()
+          'items' => array(),
         ),
         'new-product' => array(
           'priority' => 3,
@@ -266,19 +268,24 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       $ads = $this->get_transient_data();
 
-      $args = array(
-        'status' => $status,
-        'limit' => -1
-      );
-      $products = wc_get_products($args);
+      $args = array_merge(array('status' => array('publish'), $args));
+
+      $get_query_args = function($task_name, $args) use($tasks) {
+        return array(
+          'status' => isset($tasks[$task_name]['status']) ? $tasks[$task_name]['status'] : $args['status'],
+          'limit' => -1
+        );
+      };
 
       foreach ($tasks as $task_name => $task) {
-        $items = $this->get_task_list_items($products, $ads, $task_name);
+        
+        $items = $this->get_task_list_items($ads, $task_name, $get_query_args($task_name, $args));
+
         foreach ($items as $item) {
-          $id = $item['product'] ? $item['product']->get_ID() : null;
           $tasks[$task_name]['items'][] = array(
-            'record' => $item['record'],
-            'product_id' => $id
+            'task_type'   => $task_name,  
+            'record'      => $item['record'],
+            'product'     => $item['product'],
           );
         }
       }
@@ -321,7 +328,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $postmeta_table = $wpdb->postmeta;
 
       $prepare = $wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE ($posts_table.post_title='%s' OR $posts_table.post_title='%s') AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $ad->title, htmlentities($ad->title), 'product', '_price', Utils::extract_kleinanzeigen_price($ad->price));
-      
+
       // By sku
       $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $postmeta_table WHERE $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", '_sku', $ad->id));
 
@@ -442,14 +449,14 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $result;
     }
 
-    public function get_task_list_items($products, $ads, $task_type)
+    protected function get_task_list_items($ads, $task_type, $args = array('status' => 'publish'))
     {
       $ad_ids = wp_list_pluck($ads, 'id');
       $records = wp_list_pluck((array) $ads, 'id');
       $_records = array_flip($records);
       $items = array();
       if ('no-sku' === $task_type) {
-        $products = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'NOT EXISTS'));
+        $products = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
         $record = null;
         foreach ($products as $product) {
           $items[] = compact('product', 'task_type', 'record');
@@ -467,7 +474,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
       if ('has-sku' === $task_type) {
         $record = null;
-        $products = wc_get_products(array('status' => 'publish', 'limit' => -1, 'sku_compare' => 'EXISTS'));
+        $products = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
           $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
@@ -477,7 +484,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
       if ('drafts' === $task_type) {
         $record = null;
-        $products = wc_get_products(array('status' => 'draft', 'limit' => -1, 'sku_compare' => 'EXISTS'));
+        $products = wc_get_products(array_merge($args , array('sku_compare' => 'EXISTS')));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
           $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
@@ -497,7 +504,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         return $items;
       }
       if ('renamed-product' === $task_type) {
-        $products = wc_get_products(array('status' => array('publish'), 'limit' => -1, 'sku_compare' => 'EXISTS'));
+        $products = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
           $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
@@ -530,6 +537,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
+
+      $products = wc_get_products($args);
 
       foreach ($products as $product) {
         $post_ID = $product->get_id();
@@ -1066,7 +1075,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     {
       $needles = explode(',', $needles);
       $ret = false;
-      foreach($needles as $needle) {
+      foreach ($needles as $needle) {
 
         $needle = preg_quote(trim($needle));
         switch ($searchtype) {
@@ -1079,7 +1088,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           default:
             preg_match('/(?:^|\b)' . $needle . '(?!\w)/i', $haystack, $matches);
         }
-  
+
         if (!empty($matches[0])) {
           $ret = true;
           break;
@@ -1427,7 +1436,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $searchable_content = $title . ' ' . $content;
       $product_id = $product->get_id();
 
-      if($product->get_price() !== $price) {
+      if ($product->get_price() !== $price) {
         $product->set_regular_price($price);
         $product->save();
       }
@@ -1436,7 +1445,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'Aktionspreis'        => array('aktionspreis', 'match_type' => 'like', 'fn' => 'sale'),
         'Allrad'              => array('allrad', 'match_type' => 'like'),
         'Vorführmaschine'     => array(
-          array('vorführ', 'match_type' =>'like'),
+          array('vorführ', 'match_type' => 'like'),
           array('vfm'),
         ),
         'Top'                 => array('topzustand, top zustand, topausstattung, top ausstattung'),
@@ -1461,10 +1470,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       // Handle contents
       $parts = [];
-      array_walk($definitions, function($part, $k) use(&$parts) {
-        if(is_array($part[0])) {
+      array_walk($definitions, function ($part, $k) use (&$parts) {
+        if (is_array($part[0])) {
           $i = 0;
-          while(isset($part[$i]) && is_array($part[$i])) {
+          while (isset($part[$i]) && is_array($part[$i])) {
             $parts[] = array_merge(array('term_name' => $k, 'needles' => array_shift($part[$i])), $part[$i]);
             $i++;
           }
@@ -1472,7 +1481,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           $parts[] = array_merge(array('term_name' => $k, 'needles' => array_shift($part)), $part);
         }
       });
-      
+
       foreach ($parts as $part) {
 
         if ($this->text_contains($part['needles'], $searchable_content, isset($part['match_type']) ? $part['match_type'] : null)) {
@@ -1523,14 +1532,13 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     {
       $action = isset($_REQUEST['_poll_action']) ? $_REQUEST['_poll_action'] : false;
 
-      if($action) {
+      if ($action) {
         $action = Utils::base_64_decode($action);
-        if(is_callable($action)) {
+        if (is_callable($action)) {
           call_user_func($action);
         }
       }
       die("0");
-
     }
 
     public function return_false()

@@ -50,14 +50,12 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
       check_ajax_referer('ajax-custom-task-list-nonce', '_ajax_custom_task_list_nonce', true);
       $task_type = isset($_COOKIE['kleinanzeigen-task-type']) ? $_COOKIE['kleinanzeigen-task-type'] : '';
 
-      $ads = wbp_fn()->get_transient_data();
       $args = array(
-        'status' => 'publish',
+        'status' => array('publish'),
         'limit' => -1
       );
-      $products = wc_get_products($args);
-      $data = wbp_fn()->get_task_list_items($products, $ads, $task_type);
-      $wp_tasks_list_table->setData($data);
+      $items = wbp_fn()->build_tasks($task_type, $args)['items'];
+      $wp_tasks_list_table->setData($items);
 
       ob_start();
       $wp_tasks_list_table->display();
