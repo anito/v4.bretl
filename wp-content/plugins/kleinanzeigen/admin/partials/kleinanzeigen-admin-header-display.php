@@ -306,9 +306,14 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
     box-shadow: -29px 30px 78px 12px rgb(0 134 255 / 15%);
   }
 
+  #kleinanzeigen-head-wrap #drafts .fieldset {
+    background-color: #fffbf0;
+    border-color: #f6ead6;
+  }
+
   #kleinanzeigen-head-wrap #inconsistencies .fieldset {
     background-color: #fff0f0;
-    border-color: #f6d6d6;
+    border-color: #f6e0d6;
   }
 
   #kleinanzeigen-head-wrap .fieldset legend {
