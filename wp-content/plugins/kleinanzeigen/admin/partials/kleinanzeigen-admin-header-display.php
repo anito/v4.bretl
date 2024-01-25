@@ -107,7 +107,7 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
                 <div class="task invalid-cat">
                   <div class="task-name">
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                    <a href="#" class="start-task" data-task-type="invalid-cat"><?php echo __('Category issues', 'kleinanzeigen'); ?></a>
+                    <a href="#" class="start-task" data-task-type="invalid-cat"><?php echo __('Default category', 'kleinanzeigen'); ?></a>
                   </div>
                   <div class="task-value">0</div>
                 </div>
