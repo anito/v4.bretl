@@ -424,9 +424,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     $items = wbp_fn()->build_tasks('invalid-ad')['items'];
     $products = wp_list_pluck($items, 'product');
+    $ids = array_map(function($product) {
+      return $product->get_ID();
+    }, $products);
 
-    $ids = array_filter($products, function ($product) {
-      return !empty(get_metadata('post', $product->get_ID(), 'kleinanzeigen_url'));
+    $ids = array_filter($ids, function ($id) {
+      return !empty(get_metadata('post', $id, 'kleinanzeigen_url'));
     });
 
     foreach ($ids as $id) {

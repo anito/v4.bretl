@@ -1,6 +1,6 @@
 <?php
 $cats = array_map(function ($category) {
-  return sprintf(__('%s (%s)', 'kleinanzeigen'), $category->title, $category->totalAds);
+  return "{$category->title} ({$category->totalAds})";
 }, $categories);
 $ad_cats = implode(', ', $cats);
 $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
@@ -252,14 +252,13 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
     const _tasks = <?php echo json_encode($tasks) ?>;
     const _orientation_obj = <?php echo json_encode($orientation_arr) ?>;
     const {
-      init_head,
       render_tasks,
       createOrientation
     } = {
       ...KleinanzeigenAjax,
       ...KleinanzeigenUtils
     };
-
+    
     render_tasks(_tasks);
 
     $('.trigger', '.right-sections').click(function() {
@@ -297,7 +296,8 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
   }
 
   #kleinanzeigen-head-wrap .fieldset {
-    border: 1px solid #d3ebff;
+    border: 1px solid #b0b0b0;
+    border-radius: 6px;
     background-color: #f8fbff;
     padding: 10px;
     margin-bottom: 10px;
@@ -306,21 +306,13 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
     box-shadow: -29px 30px 78px 12px rgb(0 134 255 / 15%);
   }
 
-  #kleinanzeigen-head-wrap #drafts .fieldset {
-    background-color: #fffbf0;
-    border-color: #f6ead6;
-  }
-
-  #kleinanzeigen-head-wrap #inconsistencies .fieldset {
-    background-color: #fff0f0;
-    border-color: #f6e0d6;
-  }
-
   #kleinanzeigen-head-wrap .fieldset legend {
-    padding: 2px 5px;
-    background-color: #ffffff;
+    color: #ffffff;
+    background-color: #516329;
     font-size: 10px;
-    border: 1px solid #eee;
+    border: 0 none;
+    border-radius: 99px;
+    padding: 0 10px;
   }
 
   #kleinanzeigen-head-wrap .info-box li .dashicons {

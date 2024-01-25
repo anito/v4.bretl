@@ -608,6 +608,9 @@ jQuery(document).ready(function ($) {
       case "modal":
         if (head) {
           $("#kleinanzeigen-head-wrap .summary-content").html(head);
+          document.dispatchEvent(
+            new CustomEvent("init:head")
+          );
         }
 
         if (row) {

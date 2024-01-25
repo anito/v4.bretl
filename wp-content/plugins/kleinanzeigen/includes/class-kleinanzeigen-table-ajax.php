@@ -330,20 +330,24 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                     tasks
                   } = $.parseJSON(response);
 
-                  if (head)
+                  if (head) {
                     $("#kleinanzeigen-head-wrap .summary-content").html(head);
-
-                  if (tasks)
+                  }
+                  if (tasks) {
                     list.render_tasks(tasks);
-
-                  if (rows.length)
+                  }
+                  if (rows.length) {
                     $('.wp-list-kleinanzeigen tbody').html(rows);
-                  if (column_headers.length)
+                  }
+                  if (column_headers.length) {
                     $('.wp-list-kleinanzeigen thead tr, tfoot tr').html(column_headers);
-                  if (pagination.top.length)
+                  }
+                  if (pagination.top.length) {
                     $('#kleinanzeigen-list-display .tablenav.top .tablenav-pages').html($(pagination.top).html());
-                  if (pagination.bottom.length)
+                  }
+                  if (pagination.bottom.length) {
                     $('#kleinanzeigen-list-display .tablenav.bottom .tablenav-pages').html($(pagination.bottom).html());
+                  }
 
                   $('body').removeClass('loading');
 
@@ -353,8 +357,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                 .fail((response, status, message) => list.display())
             },
             render_tasks: (tasks) => {
-
-              console.log(tasks);
 
               const drafts = Object.entries(tasks).filter((task) => {
                 return 'drafts' === task[0] && task[1]['items'].length;
@@ -414,7 +416,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
           list.display();
 
-          KleinanzeigenAjax.init_head = list.init_head;
+          KleinanzeigenAjax.init = list.init;
           KleinanzeigenAjax.render_tasks = list.render_tasks;
           KleinanzeigenAjax.display = list.display;
 

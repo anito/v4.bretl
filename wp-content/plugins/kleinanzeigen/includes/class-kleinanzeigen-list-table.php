@@ -13,6 +13,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   private static $PRICE_DIFF;
   private static $CONTAINS_DEFAULT_CAT;
   private static $DEFAULT_CAT;
+  private static $DEFAULT_CAT_ID;
 
   function __construct()
   {
@@ -26,6 +27,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     self::$PRICE_DIFF = __('Price deviation', 'kleinanzeigen');
     self::$CONTAINS_DEFAULT_CAT = __('Contains Default Category', 'kleinanzeigen');
     self::$DEFAULT_CAT = __('Default Category', 'kleinanzeigen');
+    self::$DEFAULT_CAT_ID = (int) get_option('default_product_cat');
   }
 
   /**
@@ -95,11 +97,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           default:
             $products['other'][] = $product;
         }
-        $default_cat_id = get_option('default_product_cat');
         $cat_terms = wbp_th()->get_product_cats($product->get_id());
         $ids = wp_list_pluck($cat_terms, 'term_id');
-        if (in_array($default_cat_id, $ids)) {
-          $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
+        if (in_array(self::$DEFAULT_CAT_ID, $ids)) {
+          $default_cat = get_term_by('id', self::$DEFAULT_CAT_ID, 'product_cat');
           if (1 === count($ids)) {
             $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$DEFAULT_CAT . ' (' . $default_cat->name . ')');
           } else {
@@ -219,7 +220,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
   function setData($data)
   {
-    if($data) {
+    if ($data) {
       $this->items = $data->ads;
     }
     $this->prepare_items();
@@ -291,6 +292,17 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     );
   }
 
+  function render_terms($terms)
+  {
+    echo implode(', ', array_map(function ($term) {
+      $classes = array();
+      if ('product_cat' === $term->taxonomy && self::$DEFAULT_CAT_ID === $term->term_id) {
+          $classes[] = 'todo';
+      }
+      return '<a class="' . implode(' ', $classes) . '" href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
+    }, $terms !== false ? $terms : []));
+  }
+
   function render_featured_column($product, $record)
   {
     if ($product) {
@@ -324,7 +336,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
       $post_ID = $product->get_id();
       if (wbp_fn()->has_price_diff($record, $product)) {
-        $diff_classes[] = 'diff price-diff';
+        $diff_classes[] = 'diff';
+        $diff_classes[] = 'price-diff';
       }
 
       $label_terms = wbp_th()->get_product_labels($post_ID);
@@ -463,7 +476,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "price": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content "><?php echo $record->price ?></div>
+                <div class="column-content"><?php echo $record->price ?></div>
               </td>
             <?php
               break;
@@ -471,7 +484,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "shop-price": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content "><?php echo $price ?></div>
+                <div class="column-content"><?php echo $price ?></div>
               </td>
             <?php
               break;
@@ -479,9 +492,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "shop-categories": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
-                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
-                                            }, $cat_terms !== false ? $cat_terms : [])); ?></div>
+                <div class="column-content"><?php $this->render_terms($cat_terms); ?></div>
               </td>
             <?php
               break;
@@ -489,9 +500,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           case "shop-brands": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
-                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
-                                            }, $brand_terms !== false ? $brand_terms : [])); ?></div>
+                <div class="column-content"><?php $this->render_terms($brand_terms); ?></div>
               </td>
             <?php
               break;
@@ -505,7 +514,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             }
           case "shop-featured": { ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo $this->render_featured_column($product, $record) ?></div>
+                <div class="column-content"><?php $this->render_featured_column($product, $record) ?></div>
               </td>
             <?php
               break;

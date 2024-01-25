@@ -189,16 +189,20 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
 
                   response = $.parseJSON(response);
 
-                  if (response.rows.length)
+                  if (response.rows.length) {
                     $('.wp-list-kleinanzeigen-tasks tbody').html(response.rows);
-                  if (response.column_headers.length)
+                  }
+                  if (response.column_headers.length) {
                     $('.wp-list-kleinanzeigen-tasks thead tr, .wp-list-kleinanzeigen tfoot tr').html(response.column_headers);
-                  if (response.pagination.top.length)
+                  }
+                  if (response.pagination.top.length) {
                     $('#kleinanzeigen-task-list-display .tablenav.top .tablenav-pages').html($(response.pagination.top).html());
-                  if (response.pagination.bottom.length)
+                  }
+                  if (response.pagination.bottom.length) {
                     $('#kleinanzeigen-task-list-display .tablenav.bottom .tablenav-pages').html($(response.pagination.bottom).html());
+                  }
 
-                  setTimeout(list.init, 100);
+                  list.init();
                 })
                 .always(() => {
 

@@ -425,10 +425,11 @@ section .color-box.invalid {
 .wp-list-kleinanzeigen [id*="-wbp-action"] {
   position: relative;
 }
-.wp-list-kleinanzeigen tr[class*="diff"] {
+.wp-list-table tr[class*="diff"] {
   background-color: #ff00001e;
 }
-.wp-list-kleinanzeigen .diff.price-diff .column[class*="-price"] {
+.wp-list-table .diff.price-diff .column[class*="-price"],
+.wp-list-table .column a.todo {
   text-decoration: underline;
   text-decoration-style: wavy;
   text-decoration-thickness: 0.06em;

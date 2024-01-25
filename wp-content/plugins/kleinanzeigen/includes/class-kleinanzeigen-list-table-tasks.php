@@ -7,7 +7,7 @@ if (!class_exists('WP_List_Table')) {
 class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 {
   private $vars;
-
+  private static $DEFAULT_CAT_ID;
   private $hidden_columns = array(
     'id'
   );
@@ -19,6 +19,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       'plural'    => 'wp-list-kleinanzeigen-tasks',
       'ajax'      => true
     ));
+    self::$DEFAULT_CAT_ID = (int) get_option('default_product_cat');
   }
 
   /**
@@ -95,8 +96,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         );
         break;
       case 'invalid-cat':
-        $default_cat_id = get_option('default_product_cat');
-        $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
+        $default_cat = get_term_by('id', self::$DEFAULT_CAT_ID, 'product_cat');
         $subheader = '';
         $subheader .= __('Please assign the below listed products an appropriate category in order to get located by your visitors.', 'kleinanzeigen');
         $vars = array(
@@ -369,6 +369,17 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     echo '<tr style="display: none;"></tr>';
   }
 
+  function render_terms($terms)
+  {
+    echo implode(', ', array_map(function ($term) {
+      $classes = array();
+      if ('product_cat' === $term->taxonomy && self::$DEFAULT_CAT_ID === $term->term_id) {
+        $classes[] = 'todo';
+      }
+      return '<a class="' . implode(' ', $classes) . '" href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
+    }, $terms !== false ? $terms : []));
+  }
+
   function render_row($item)
   {
     // Extracts $products | $task_type | $record
@@ -385,9 +396,14 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $product_by_sku = $this->get_product_by_sku($sku);
     $shop_price_html = wp_kses_post($product->get_price_html());
     $ka_price = isset($record) ? $record->price : '-';
+    $diff_classes = array();
+    if (!is_null($record) && wbp_fn()->has_price_diff($record, $product)) {
+      $diff_classes[] = 'diff';
+      $diff_classes[] = 'price-diff';
+    }
 
 ?>
-    <tr id="<?php echo $post_ID ?>">
+    <tr id="<?php echo $post_ID ?>" <?php if (!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes) ?>" <?php } ?>>
       <?php
 
       // Setup Actions
@@ -492,9 +508,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           case "shop-categories": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php echo implode(', ', array_map(function ($term) use ($column_name) {
-                                              return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
-                                            }, $cat_terms !== false ? $cat_terms : [])); ?></a></div>
+                <div class="column-content"><?php $this->render_terms($cat_terms); ?></a></div>
               </td>
             <?php
               break;
@@ -502,7 +516,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           case "featured": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content "><?php echo $this->render_featured_column($product, $task_type) ?></div>
+                <div class="column-content "><?php $this->render_featured_column($product, $task_type) ?></div>
               </td>
             <?php
               break;

@@ -82,6 +82,8 @@
       }
     })
 
+    $(document).on('init:head', KleinanzeigenAjax?.init)
+
   })
 </script>
 

@@ -221,10 +221,12 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'invalid-price' => array(
           'priority' => 1,
           'items' => array(),
+          'status' => array('publish', 'draft')
         ),
         'invalid-cat' => array(
           'priority' => 1,
           'items' => array(),
+          'status' => array('publish', 'draft')
         ),
         'drafts' => array(
           'priority' => 2,
@@ -268,9 +270,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       $ads = $this->get_transient_data();
 
-      $args = array_merge(array('status' => array('publish'), $args));
+      $args = wp_parse_args($args, array('status' => array('publish')));
 
-      $get_query_args = function($task_name, $args) use($tasks) {
+      $get_query_args = function($task_name) use($tasks, $args) {
         return array(
           'status' => isset($tasks[$task_name]['status']) ? $tasks[$task_name]['status'] : $args['status'],
           'limit' => -1
@@ -279,7 +281,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       foreach ($tasks as $task_name => $task) {
         
-        $items = $this->get_task_list_items($ads, $task_name, $get_query_args($task_name, $args));
+        $items = $this->get_task_list_items($ads, $task_name, $get_query_args($task_name));
 
         foreach ($items as $item) {
           $tasks[$task_name]['items'][] = array(
@@ -293,13 +295,13 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return isset($tasks[$name]) ? $tasks[$name] : $tasks;
     }
 
-    public function get_invalid_cat_products()
+    public function get_invalid_cat_products($args = array())
     {
 
       $default_cat_id = get_option('default_product_cat');
       $default_cat = get_term_by('id', $default_cat_id, 'product_cat');
 
-      $args = array(
+      $defaults = array(
         'post_type'       => 'product',
         'post_status'     => array('publish'),
         'posts_per_page'  => -1,
@@ -311,7 +313,16 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           ),
         ),
       );
-      $query = new WP_Query($args);
+      
+      $options = array();
+      $args = wp_parse_args($args, $defaults);
+
+      array_walk($args, function ($arg, $k) use (&$options) {
+        if('status' === $k) $options['post_status'] = $arg;
+        else $options[$k] = $arg;
+      });
+
+      $query = new WP_Query($options);
       $posts = $query->get_posts();
       return array_map(function ($post) {
         return wc_get_product($post->ID);
@@ -464,7 +475,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         return $items;
       }
       if ('invalid-cat' === $task_type) {
-        $products = $this->get_invalid_cat_products();
+        $products = $this->get_invalid_cat_products($args);
         foreach ($products as $product) {
           $sku = $product->get_sku();
           $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
