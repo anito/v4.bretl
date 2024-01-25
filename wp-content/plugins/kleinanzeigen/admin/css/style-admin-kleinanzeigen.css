@@ -435,6 +435,12 @@ section .color-box.invalid {
   text-decoration-thickness: 0.06em;
   text-decoration-color: red;
 }
+.wp-list-table tr.broken:nth-child(even) {
+  background: repeating-linear-gradient(45deg, rgb(250 250 250 /1), rgb(250 250 250 /1) 20px, #fff 20px, #fff 40px);
+}
+.wp-list-table tr.broken:nth-child(odd) {
+  background: repeating-linear-gradient(135deg, rgb(252 252 252 /1), rgb(252 252 252 /1) 20px, #fff 20px, #fff 40px);
+}
 .wp-list-kleinanzeigen .column-content .spinner {
   position: absolute;
   left: -25px;

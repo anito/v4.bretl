@@ -401,6 +401,9 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       $diff_classes[] = 'diff';
       $diff_classes[] = 'price-diff';
     }
+    if (is_null($record)) {
+      $diff_classes[] = 'broken';
+    }
 
 ?>
     <tr id="<?php echo $post_ID ?>" <?php if (!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes) ?>" <?php } ?>>

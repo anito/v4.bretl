@@ -347,6 +347,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       $brand_terms = wbp_th()->get_product_brands($post_ID);
       $cat_terms = wbp_th()->get_product_cats($post_ID);
 
+      if(is_null($record)) {
+        $diff_classes[] = 'broken';
+      }
+
       $price = wp_kses_post($product->get_price_html());
       $post_status = $product->get_status();
       switch ($post_status) {
