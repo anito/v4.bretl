@@ -445,7 +445,10 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         case 'has-sku':
         case 'no-sku':
         case 'featured':
-          $label = $post_status === 'publish' ? __('Hide', 'kleinanzeigen') : __('Publish');
+          $label = array(
+            'publish' => $post_status === 'publish' ? __('Hide', 'kleinanzeigen') : __('Publish'),
+            'edit'    => __('Edit', 'kleinanzeigen')
+          );
           $actions = wbp_ka()->include_template('/dashboard/toggle-publish-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
           break;
         default:
