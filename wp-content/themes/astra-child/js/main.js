@@ -60,9 +60,10 @@ jQuery.noConflict();
     function copyToTarget(count) {
       const targetEls = document.querySelectorAll(targetSelector);
       targetEls.forEach((el) => {
+        const ankerEl = el.querySelector("a");
+        if (ankerEl) ankerEl.style.paddingLeft = "40px";
         let targetEl = el.querySelector(".wishlist-widget");
         if (!targetEl) {
-          el.style.display = "inline-block";
           targetEl = document.createElement("span");
           targetEl.classList.add("wishlist-widget");
           el.append(targetEl);
