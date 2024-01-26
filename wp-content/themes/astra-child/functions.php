@@ -31,6 +31,18 @@ function wbp_register_ajax()
 }
 add_filter('init', 'wbp_register_ajax');
 
+/**
+ * Change the breakpoint for Astra
+ * 
+ * @return int Screen width when the header should change to the mobile header.
+ */
+add_filter('astra_mobile_breakpoint', function () {
+  return 544;
+});
+add_filter('astra_tablet_breakpoint', function () {
+  return 921;
+});
+
 function wbp_get_current_user()
 {
   $cur_user = wp_get_current_user();
@@ -96,11 +108,6 @@ function add_scripts()
       color: var(--ast-global-color-2);
       line-height: 1.4;
       font-size: 14px;
-    }
-
-    .login .login-form.loading::after {
-      background-image: url("<?php echo get_stylesheet_directory_uri(); ?>/images/pulse-2.svg");
-      background-size: 100px 100px;
     }
 
     .login .login-form .login-body {

@@ -98,8 +98,7 @@
 
       if (success) {
         KleinanzeigenAjaxFront.wbp_hide();
-          -
-          1 !== location.pathname.indexOf("/login") ?
+        1 !== location.pathname.indexOf("/login") ?
           (window.location = "/") :
           window.location.reload();
       } else {
@@ -260,6 +259,10 @@
     text-align: center;
   }
 
+  #wbp-login .login-form.loading {
+    color: var(--ast-global-color-5);
+  }
+
   #wbp-login .login-form.loading::before {
     content: '';
     position: absolute;
@@ -281,5 +284,7 @@
     margin-left: -50px;
     margin-top: -50px;
     z-index: 2;
+    background-image: url("<?php echo get_stylesheet_directory_uri(); ?>/images/pulse-2.svg");
+    background-size: 100px 100px;
   }
 </style>
