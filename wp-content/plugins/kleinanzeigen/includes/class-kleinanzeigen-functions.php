@@ -1467,6 +1467,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'klima'               => array('klima'),
         'Sofort lieferbar'    => array('am lager, sofort verfügbar, sofort lieferbar, lagermaschine'),
         'Leicht Gebraucht'    => array('leicht gebraucht'),
+        'Gebraucht'           => array('gebrauchtmaschine'),
         'Limited Edition'     => array('limited edition, lim. edition'),
         'Mieten'              => array('mietmaschine', 'fn' => 'rent'),
         'Neu'                 => array('neu, neumaschine, neufahrzeug'),
