@@ -1459,7 +1459,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           array('vorführ', 'match_type' => 'like'),
           array('vfm'),
         ),
-        'Top'                 => array('topzustand, top zustand, topausstattung, top ausstattung'),
+        'Top'                 => array('topzust, top zust, topausstat, top ausstat', array('match_type' => 'like')),
         'Guter Zustand'       => array('guter zustand'),
         'Sonderpreis'         => array('sonderpreis'),
         'Aktion'              => array('aktion, aktionsmodell', 'fn' => 'aktion'),
