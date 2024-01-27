@@ -54,7 +54,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       add_action('before_delete_post', array('Utils', 'remove_attachments'));
 
       add_action('wp_insert_post_data', array($this, 'publish_guard'), 99, 3);
-      add_filter('wp_insert_post_empty_content', array($this, 'return_false'));
+      add_filter('wp_insert_post_empty_content', '__return_false');
     }
 
     // Woo internal product save
@@ -1236,6 +1236,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           'neu'
         ),
         array(
+          'leicht gebraucht',
+          'gebraucht'
+        ),
+        array(
           'guter zustand',
           'neu'
         ),
@@ -1470,7 +1474,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'Gebraucht'           => array('gebrauchtmaschine'),
         'Limited Edition'     => array('limited edition, lim. edition'),
         'Mieten'              => array('mietmaschine', 'fn' => 'rent'),
-        'Neu'                 => array('neu, neumaschine, neufahrzeug'),
+        'Neu'                 => array('neumaschine, neufahrzeug'),
         'Neues Modell'        => array('neues modell'),
         'Top Modell'          => array('top modell, topmodell'),
         'Von Privat'          => array(

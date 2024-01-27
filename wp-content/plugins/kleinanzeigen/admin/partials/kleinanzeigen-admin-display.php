@@ -16,7 +16,6 @@
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 <div class="wrap" id="kleinanzeigen-admin-display">
   <div id="icon-themes" class="icon32"></div>
-  <h2><?php echo __('Overview', 'kleinanzeigen') ?></h2>
   <header id="kleinanzeigen-head-wrap">
     <div class="summary-content"></div>
     <div class="loading-splash">

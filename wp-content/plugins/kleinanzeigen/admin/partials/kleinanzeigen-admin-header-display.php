@@ -19,11 +19,16 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 <div class="section-wrapper">
   <div class="left-sections sections">
     <div class="left-top-section">
-      <section style="display: flex; justify-content: space-between; padding-bottom: 0;">
-        <span>
-          <h2 style="margin: 0;"><?php echo sprintf(__('Page:', 'kleinanzeigen') . ' %s', $paged) ?></h2>
-        </span>
-        <small><?php echo sprintf(__('Ads:', 'kleinanzeigen') . ' %s', count($items)); ?></small>
+      <section class="section-inner" style="display: flex; justify-content: space-between; padding-bottom: 0;">
+        <div style="flex: 1 0 60%; ">
+          <h2><?php echo __('Dashboard', 'kleinanzeigen'); ?></h2>
+        </div>
+        <div class="" style="display: flex; flex: 1 0 auto; align-items: center;">
+          <h2 style="display: flex; justify-content: space-between; align-items: baseline; flex: 1 0 auto; padding: 0 20px; font-weight: 400;">
+            <span><small><?php echo sprintf(__('Page:', 'kleinanzeigen') . ' %s', $paged) ?></small></span>
+            <span><small><?php echo sprintf(__('%s out of %s ads', 'kleinanzeigen'), count($items), $total_ads); ?></small></span>
+          </h2>
+        </div>
       </section>
     </div>
     <div class="left-middle-section">
@@ -258,7 +263,7 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
       ...KleinanzeigenAjax,
       ...KleinanzeigenUtils
     };
-    
+
     render_tasks(_tasks);
 
     $('.trigger', '.right-sections').click(function() {
