@@ -149,7 +149,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Autonomous products', 'kleinanzeigen'),
-              'subheader' => __('List of autonomous Products', 'kleinanzeigen')
+              'subheader' => __('List of published products not related to an ad', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
