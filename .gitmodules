@@ -5,3 +5,6 @@
 [submodule "wp-content/plugins/kleinanzeigen"]
 	path = wp-content/plugins/kleinanzeigen
 	url = https://github.com/anito/kleinanzeigen.git
+[submodule "wp-content/plugins/open-maps"]
+	path = wp-content/plugins/open-maps
+	url = https://github.com/anito/open-maps.git
