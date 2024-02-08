@@ -441,9 +441,6 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           $actions = wbp_ka()->include_template('/dashboard/invalid-price-result-row.php', true, compact('post_ID', 'sku', 'price', 'label', 'task_type', 'disabled'));
           break;
         case 'invalid-cat':
-          $label = __('Edit', 'kleinanzeigen');
-          $actions = wbp_ka()->include_template('/dashboard/invalid-cat-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));
-          break;
         case 'drafts':
         case 'has-sku':
         case 'no-sku':
