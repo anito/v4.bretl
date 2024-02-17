@@ -15,6 +15,10 @@ $getOrientationCookie = function ($val) {
 };
 $orientation = $getOrientationCookie('horizontal');
 $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' => $orientation);
+
+$ids = wp_list_pluck((array) $items, 'id');
+$keyed_items = array_combine($ids, $items);
+
 ?>
 <div class="section-wrapper">
   <div class="left-sections sections">
@@ -218,14 +222,9 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
           <?php if (!empty($todos)) : ?>
             <div class="trigger chip">
               <span class="text-wrapper">
-                <i class="dashicons dashicons-bell"></i>
-                <span class="text">
-                  <?php if (1 === count($todos)) :
-                    echo sprintf(__('%d'), count($todos));
-                  else :
-                    echo sprintf(__('%d'), count($todos)); ?>
-
-                  <?php endif ?>
+                <i class="dashicons dashicons-bell rise-shake"></i>
+                <span class="text" style="padding: 0 5px;">
+                  <?php echo sprintf('%d ' . _n('Product', 'Products', 1 === count($todos), 'kleinanzeigen'), count($todos)); ?>
                 </span>
               </span>
               <i class="dashicons dashicons-arrow-right"></i>
@@ -233,10 +232,14 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
             <div class="outer">
               <div class="content">
                 <ul>
-                  <?php foreach ($todos as $todo) { ?>
+                  <?php foreach ($todos as $id => $todo) {
+                    $reasons = implode(', ', $todo['reason']);
+                    $title = $keyed_items[$id]->title;
+                  ?>
                     <li class="todo">
-                      <span class="title"><a href="#ad-id-<?php echo $todo['id'] ?>"><?php echo $todo['title'] ?></a>:</span>
-                      <span class="reason"><?php echo $todo['reason'] ?></span>
+                      <span class="count"><?php echo count($todo['reason']); ?></span>
+                      <span class="title"><a href="#ad-id-<?php echo $id ?>"><?php echo $keyed_items[$id]->title ?></a>:</span>
+                      <span class="reason"><?php echo $reasons ?></span>
                     </li>
                   <?php } ?>
                 </ul class="todos">

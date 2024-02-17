@@ -463,8 +463,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     protected function get_task_list_items($ads, $task_type, $args = array('status' => 'publish'))
     {
       $ad_ids = wp_list_pluck($ads, 'id');
-      $records = wp_list_pluck((array) $ads, 'id');
-      $_records = array_flip($records);
+      $ids = wp_list_pluck((array) $ads, 'id');
+      $keyed_records = array_combine($ids, $ads);
       $items = array();
       if ('no-sku' === $task_type) {
         $products = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
@@ -478,7 +478,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $products = $this->get_invalid_cat_products($args);
         foreach ($products as $product) {
           $sku = $product->get_sku();
-          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
+          $record = isset($keyed_records[$sku]) ? $keyed_records[$sku] : null;
           $items[] = compact('product', 'task_type', 'record');
         }
         return $items;
@@ -488,7 +488,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $products = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
-          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
+          $record = isset($keyed_records[$sku]) ? $keyed_records[$sku] : null;
           $items[] = compact('product', 'task_type', 'record');
         }
         return $items;
@@ -498,7 +498,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $products = wc_get_products(array_merge($args , array('sku_compare' => 'EXISTS')));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
-          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
+          $record = isset($keyed_records[$sku]) ? $keyed_records[$sku] : null;
           $items[] = compact('product', 'task_type', 'record');
         }
         return $items;
@@ -509,7 +509,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         foreach ($featured_posts as $post) {
           $product = new WC_Product($post->ID);
           $sku = (int) $product->get_sku();
-          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
+          $record = isset($keyed_records[$sku]) ? $keyed_records[$sku] : null;
           $items[] = compact('product', 'task_type', 'record');
         }
         return $items;
@@ -518,7 +518,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $products = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
-          $record = isset($_records[$sku]) ? $ads[$_records[$sku]] : null;
+          $record = isset($keyed_records[$sku]) ? $keyed_records[$sku] : null;
           if ($record) {
             $this->get_ad_product($product->get_id(), $record);
           }
@@ -534,16 +534,16 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           return (int) $product->get_sku();
         }, $products);
 
-        $diffs = array_diff($records, $skus);
-        $diffs = array_filter($diffs, function ($val) use ($ads, $_records) {
-          $title = $ads[$_records[$val]]->title;
+        $diffs = array_diff($ids, $skus);
+        $diffs = array_filter($diffs, function ($val) use ($keyed_records) {
+          $title = $keyed_records[$val]->title;
           $identical_products = $this->product_title_equals($title);
           return 0 === count($identical_products);
         }, ARRAY_FILTER_USE_BOTH);
 
         $items = array();
         foreach ($diffs as $key => $sku) {
-          $record = $ads[$_records[$sku]];
+          $record = $keyed_records[$sku];
           $items[] = compact('product', 'task_type', 'record');
         }
         return $items;
@@ -571,7 +571,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
               break;
             case 'invalid-price':
               if (in_array($sku, $ad_ids)) {
-                $record = $ads[$_records[$sku]];
+                $record = $keyed_records[$sku];
                 if ($this->has_price_diff($record, $product)) {
                   $items[] = compact('product', 'task_type', 'record');
                 }

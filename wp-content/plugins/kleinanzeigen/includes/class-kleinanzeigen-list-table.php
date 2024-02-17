@@ -84,7 +84,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       if ($product) {
 
         'sku' !== $found_by && $products['no-sku'][] = $item->id;
-        wbp_fn()->has_price_diff($item, $product) && $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$PRICE_DIFF);
+        wbp_fn()->has_price_diff($item, $product) && $products['todos'][$item->id]['reason'][] = self::$PRICE_DIFF;
 
         switch ($product->get_status()) {
           case 'publish':
@@ -92,7 +92,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             break;
           case 'draft':
             $products['draft'][] = $product;
-            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$INVISIBLE);
+            $products['todos'][$item->id]['reason'][] = self::$INVISIBLE;
             break;
           default:
             $products['other'][] = $product;
@@ -102,14 +102,14 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         if (in_array(self::$DEFAULT_CAT_ID, $ids)) {
           $default_cat = get_term_by('id', self::$DEFAULT_CAT_ID, 'product_cat');
           if (1 === count($ids)) {
-            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$DEFAULT_CAT . ' (' . $default_cat->name . ')');
+            $products['todos'][$item->id]['reason'][] = self::$DEFAULT_CAT . ' (' . $default_cat->name . ')';
           } else {
-            $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')');
+            $products['todos'][$item->id]['reason'][] = self::$CONTAINS_DEFAULT_CAT . ' (' . $default_cat->name . ')';
           }
         }
       } else {
         $products['unknown'][] = $item->id;
-        $products['todos'][] = array('title' => $item->title, 'id' => $item->id, 'reason' => self::$INVISIBLE);
+        $products['todos'][$item->id]['reason'][] = self::$INVISIBLE;
       }
     }
 
