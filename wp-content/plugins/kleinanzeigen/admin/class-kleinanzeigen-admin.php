@@ -32,7 +32,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('init', array($this, 'loadFiles'), -999);
     add_action('init', array($this, 'register_event_names'), -998);
     add_action('admin_menu', array($this, 'addPluginAdminMenu'), 9);
-    add_filter('pre_option_kleinanzeigen_send_mail_on_new_ad', array($this, 'option_kleinanzeigen_send_mail_on_new_ad'));
     add_filter("option_page_capability_kleinanzeigen_account_settings", array($this, 'get_capability'));
     add_action('admin_init', array($this, 'registerAndBuildFields'));
 
@@ -43,7 +42,18 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_deactivate_url', array($this, 'job_deactivate_url'));
     add_action('kleinanzeigen_renamed_ads', array($this, 'job_renamed_ads'));
     add_action('kleinanzeigen_create_products', array($this, 'job_create_products'));
-    add_filter('pre_update_option', array($this, 'pre_update_option'), 10, 3);
+
+    // User sepecific options
+    add_filter('pre_update_option_kleinanzeigen_send_mail_on_new_ad', array($this, 'update_user_meta_callback'), 10, 3);
+    add_filter('option_kleinanzeigen_send_mail_on_new_ad', array($this, 'get_user_meta_callback'), 10, 2);
+
+    // Cron specific options
+    add_action('update_option_kleinanzeigen_account_name', array($this, 'invalidate_cron_callback'));
+    add_action('update_option_kleinanzeigen_crawl_interval', array($this, 'invalidate_cron_callback'));
+    add_action('update_option_kleinanzeigen_is_pro_account', array($this, 'invalidate_cron_callback'));
+    add_action('update_option', array($this, 'unschedule_events_callback'), 10, 3);
+
+
     add_action('init', array($this, 'register_jobs'));
 
     add_filter('cron_schedules', array($this, 'schedules'));
@@ -192,25 +202,20 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     return array_merge($schedules, self::get_schedule());
   }
 
-  public function pre_update_option($value, $option, $old_value)
+  public function invalidate_cron_callback()
   {
 
-    if (0 === strpos($option, 'kleinanzeigen_') && $old_value !== $value) {
+    setcookie('ka-paged', 1);
+    delete_transient('kleinanzeigen_data');
+  }
 
-      if (in_array($option, array(
-        'kleinanzeigen_account_name',
-        'kleinanzeigen_crawl_interval',
-        'kleinanzeigen_is_pro_account'
-        ))) {
+  public function unschedule_events_callback($option, $new_value, $old_value)
+  {
 
-        setcookie('ka-paged', 1);
-        delete_transient('kleinanzeigen_data');
-      }
+    if (0 === strpos($option, 'kleinanzeigen_') && $old_value !== $new_value) {
 
       $this->unschedule_events(array('mandatory', 'optional'));
     }
-
-    return $value;
   }
 
   private function unschedule_events($types)
@@ -376,7 +381,31 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
         wbp_fn()->create_product_images($post_ID, $images);
 
-        wbp_fn()->sendMail($post_ID, $record);
+        $get_users = function () {
+
+          // Get authorized users
+          $query = wbp_fn()->get_users_by_capabilty(array('administrator', 'shop_manager'), array('fields' => array('ID', 'user_email')));
+          $users = $query->get_results();
+
+          // Filter users that have opt in
+          return array_filter($users, function ($user) {
+            return true;//'1' == get_user_meta($user->ID, 'kleinanzeigen_send_mail_on_new_ad', true);
+          });
+        };
+
+        $users = $get_users();
+        $user_mails = wp_list_pluck($users, 'user_email');
+        $to_email = array_intersect($user_mails, array(get_bloginfo('admin_email')));
+        $bcc_emails = array_diff($user_mails, $to_email);
+        $to_email = empty($to_email) ? (!empty($bcc_emails) ? array_splice($bcc_emails, 0, 1) : array()) : $to_email;
+
+        $receipients = array(
+          'to_email'  => implode(',', $to_email),
+          'bcc'       => implode(',', $bcc_emails),
+          'cc'        => implode(',', IS_SUBDOMAIN_DEV ? array(get_option('kleinanzeigen_send_cc_mail_on_new_ad')) : array())
+        );
+
+        wbp_fn()->sendMail($post_ID, $record, $receipients);
 
         update_post_meta((int) $post_ID, 'kleinanzeigen_id', $record->id);
       } else {
@@ -424,7 +453,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     $items = wbp_fn()->build_tasks('invalid-ad')['items'];
     $products = wp_list_pluck($items, 'product');
-    $ids = array_map(function($product) {
+    $ids = array_map(function ($product) {
       return $product->get_ID();
     }, $products);
 
@@ -547,17 +576,24 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   }
 
   // User specific option
-  public function option_kleinanzeigen_send_mail_on_new_ad($value)
+  public function get_user_meta_callback($value, $option)
   {
 
     $user_id = wp_get_current_user()->ID;
-    return get_user_meta($user_id, 'kleinanzeigen_send_mail_on_new_ad', true);
+    return get_user_meta($user_id, $option, true);
+  }
+
+  public function update_user_meta_callback($new, $old, $option)
+  {
+
+    $user_id = wp_get_current_user()->ID;
+    update_user_meta($user_id, $option, $new);
   }
 
   public function registerAndBuildFields()
   {
 
-    $register = function ($id, $callback = '', $is_user_setting = false) {
+    $register = function ($id, $callback = '') {
 
       register_setting(
         'kleinanzeigen_account_settings',
@@ -568,18 +604,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           'default'           => '0'
         )
       );
-
-      if (true === $is_user_setting) {
-
-        if (!empty($_POST['action']) && 'update' === $_POST['action']) {
-
-          $user_id = wp_get_current_user()->ID;
-
-          // unchecked checkboxes are not in `$_POST`s array, specify `0` in that case
-          $value = !empty($_POST[$id]) ? $_POST[$id] : '0';
-          update_user_meta($user_id, $id, $value);
-        }
-      }
     };
 
     /**
@@ -748,7 +772,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'), true);
+    $register($args['id'], array($this, 'sanitize_option'));
 
     // Send email new ads
     unset($args);
@@ -771,7 +795,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'), true);
+    $register($args['id'], array($this, 'sanitize_option'));
 
     if (IS_SUBDOMAIN_DEV) {
       // Send CC to-email new ads
@@ -782,7 +806,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'id'                => 'kleinanzeigen_send_cc_mail_on_new_ad',
         'name'              => 'kleinanzeigen_send_cc_mail_on_new_ad',
         'required'          => '',
-        'disabled'          => '',
+        'disabled'          => false,
         'get_options_list'  => '',
         'value_type'        => 'normal',
         'wp_data'           => 'option',
@@ -795,7 +819,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'kleinanzeigen_background_tasks_section',
         $args
       );
-      $register($args['id'], array($this, 'sanitize_option'), true);
+      $register($args['id'], array($this, 'sanitize_option'));
     }
 
     // Schedule invalid ad action
@@ -833,7 +857,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   public function kleinanzeigen_background_tasks_section()
   {
-    echo '<em>' . __('Ads on Kleinanzeigen.de may periodically be evaluated. Select the interval and tasks to be performed.', 'kleinanzeigen') . '</em>';
+    echo '<em>' . __('Ads on Kleinanzeigen.de may get evaluated on a regular base. Select the interval and tasks to be performed.', 'kleinanzeigen') . '</em>';
   }
 
   public function kleinanzeigen_render_settings_field($args)
@@ -845,7 +869,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * 'id'               => self::$plugin_name.'_example_setting',
      * 'name'             => self::$plugin_name.'_example_setting',
      * 'required'         => 'required="required"',
-     * 'disabled'         => 'true | false',
+     * 'disabled'         => true | false,
      * 'get_option_list'  => "",
      * 'value_type' = serialized OR normal,
      * 'wp_data'=>(option or post_meta),
@@ -867,7 +891,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           $step = (isset($args['step'])) ? 'step="' . $args['step'] . '"' : '';
           $min = (isset($args['min'])) ? 'min="' . $args['min'] . '"' : '';
           $max = (isset($args['max'])) ? 'max="' . $args['max'] . '"' : '';
-          if (isset($args['disabled'])) {
+          if (isset(($args['disabled'])) && true === $args['disabled']) {
             // hide the actual input bc if it was just a disabled input the info saved in the database would be wrong - bc it would pass empty values and wipe the actual information
             echo $prependStart . '<input type="' . $args['subtype'] . '" id="' . $args['id'] . '_disabled" ' . $step . ' ' . $max . ' ' . $min . ' name="' . $args['name'] . '_disabled" size="40" disabled value="' . esc_attr($value) . '" /><input type="hidden" id="' . $args['id'] . '" ' . $step . ' ' . $max . ' ' . $min . ' name="' . $args['name'] . '" size="40" value="' . esc_attr($value) . '" />' . $prependEnd;
           } else {
@@ -893,7 +917,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       echo '<label for="' . $args['id'] . '" class="description">&nbsp;' . $args['label'] . '</label>';
     }
     if (isset($args['description'])) {
-      echo '<p class="description">' . $args['description'] . '</p>';
+      echo '<p class="description"><i><small>' . $args['description'] . '</small></i></p>';
     }
   }
 
