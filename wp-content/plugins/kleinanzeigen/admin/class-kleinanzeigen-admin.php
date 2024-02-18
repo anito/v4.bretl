@@ -806,7 +806,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'id'                => 'kleinanzeigen_send_cc_mail_on_new_ad',
         'name'              => 'kleinanzeigen_send_cc_mail_on_new_ad',
         'required'          => '',
-        'disabled'          => false,
+        'disabled'          => true,
         'get_options_list'  => '',
         'value_type'        => 'normal',
         'wp_data'           => 'option',
