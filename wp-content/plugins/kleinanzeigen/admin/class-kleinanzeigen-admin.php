@@ -785,7 +785,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => sprintf(__('Send email to shop operator %s after a product has been created', 'kleinanzeigen'), '<span style="font-weight: 300;">(' . get_bloginfo('admin_email') . ')</span>'),
+      'label'             => sprintf(__('Send me an email (%s) after a product has been created', 'kleinanzeigen'), '<span style="font-weight: 100; font-family: sans-serif; background: #dedede; color: #828282; padding: 3px 5px; border-radius: 3px;">(' . wp_get_current_user()->user_email . ')</span>'),
     );
     add_settings_field(
       $args['id'],
