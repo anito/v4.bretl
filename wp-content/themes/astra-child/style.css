@@ -48,6 +48,12 @@ ol[type="i"] {
 .overflow-hidden {
   overflow: hidden;
 }
+.flex {
+  display: flex;
+}
+.flex-center {
+  justify-content: center;
+}
 .bold h1,
 .bold h2,
 .bold h3,

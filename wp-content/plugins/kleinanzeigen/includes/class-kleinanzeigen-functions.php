@@ -1589,7 +1589,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'fields' => $options['fields'],
         'meta_query' => $meta_query
       ));
-      return $query;
+      return $query->get_results();
     }
 
 

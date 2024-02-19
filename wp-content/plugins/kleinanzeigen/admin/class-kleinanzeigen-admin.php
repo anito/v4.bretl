@@ -384,12 +384,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         $get_users = function () {
 
           // Get authorized users
-          $query = wbp_fn()->get_users_by_capabilty(array('administrator', 'shop_manager'), array('fields' => array('ID', 'user_email')));
-          $users = $query->get_results();
+          $users = wbp_fn()->get_users_by_capabilty(array('administrator', 'shop_manager'), array('fields' => array('ID', 'user_email')));
 
-          // Filter users that have opt in
+          // Filter for users that have opt in
           return array_filter($users, function ($user) {
-            return true;//'1' == get_user_meta($user->ID, 'kleinanzeigen_send_mail_on_new_ad', true);
+            return '1' == get_user_meta($user->ID, 'kleinanzeigen_send_mail_on_new_ad', true);
           });
         };
 
@@ -785,7 +784,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => sprintf(__('Send me an email (%s) after a product has been created', 'kleinanzeigen'), '<span style="font-weight: 100; font-family: sans-serif; background: #dedede; color: #828282; padding: 3px 5px; border-radius: 3px;">(' . wp_get_current_user()->user_email . ')</span>'),
+      'label'             => sprintf(__('Send me an email (%s) after a product has been created', 'kleinanzeigen'), '<span style="font-weight: 100; font-family: sans-serif; background: #dedede; color: #828282; padding: 3px 5px; border-radius: 3px;">' . wp_get_current_user()->user_email . '</span>'),
     );
     add_settings_field(
       $args['id'],
