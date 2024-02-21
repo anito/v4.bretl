@@ -51,7 +51,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('update_option_kleinanzeigen_account_name', array($this, 'invalidate_cron_callback'));
     add_action('update_option_kleinanzeigen_crawl_interval', array($this, 'invalidate_cron_callback'));
     add_action('update_option_kleinanzeigen_is_pro_account', array($this, 'invalidate_cron_callback'));
-    add_action('update_option', array($this, 'unschedule_events_callback'), 10, 3);
+    add_action('update_option', array($this, 'unschedule_events_callback'), 1, 3);
 
 
     add_action('init', array($this, 'register_jobs'));
