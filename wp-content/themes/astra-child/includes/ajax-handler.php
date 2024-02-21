@@ -52,9 +52,7 @@ function wbp_submit_form()
       $credentials = array(
         'user_login'    => $formdata['log'],
         'user_password' => $formdata['pwd'],
-        'remember'      => $formdata['rememberme'],
-        'remember'      => $formdata['wp-submit'],
-        'testcookie'    => $formdata['testcookie'],
+        'remember'      => isset($formdata['rememberme']) ? $formdata['rememberme'] : '',
       );
       $user = wp_signon($credentials, false);
 

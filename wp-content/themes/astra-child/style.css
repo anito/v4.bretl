@@ -228,6 +228,9 @@ li.quotes a.menu-link.top-level-link::after {
   padding: 0 5px;
   line-height: 1.2em;
 }
+.iubenda-embed {
+  width: auto !important;
+}
 #iubenda-pp {
   z-index: 10000011 !important;
 }

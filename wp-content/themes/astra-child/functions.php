@@ -193,17 +193,15 @@ function add_login_scripts()
 }
 add_action('login_enqueue_scripts', 'add_login_scripts');
 
-add_filter('logout_redirect', function () {
+add_filter('logout_redirect', function ($redirect_url) {
   return esc_url(home_url());
 });
 
-// Privacy policy link filter
-function wbp_privacy_policy_link()
-{
-
-  return '<a class="iubenda-black iubenda-noiframe iubenda-embed iubenda-noiframe" title="Datenschutzerklärung " href="https://www.iubenda.com/privacy-policy/28713011">' . __('Privacy policy', 'astra-child') . '</a>';
-}
-add_filter('the_privacy_policy_link', 'wbp_privacy_policy_link');
+add_filter('logout_url', function ($logout_url) {
+  $logout_url = $logout_url . '&amp;redirect_to=' . get_permalink();
+  write_log('logout_url: ' . $logout_url);
+  return $logout_url;
+}, 9999);
 
 
 // Logo link url
