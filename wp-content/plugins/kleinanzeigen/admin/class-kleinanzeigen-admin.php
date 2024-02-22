@@ -162,7 +162,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     return (self::$schedule = array(
       'never' => array(
-        'interval' => 0,
+        'interval' => null,
         'display'  => __('Never', 'kleinanzeigen'),
       ),
       'every_minute' => array(
