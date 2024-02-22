@@ -16,7 +16,7 @@
  * Plugin Name:       Kleinanzeigen
  * Plugin URI:        https://www.wplauncher.com
  * Description:       Synchronize Kleinanzeigen to your Woocommerce Shop
- * Version:           0.3.6
+ * Version:           0.3.7
  * Author:            Axel Nitzschner
  * Author URI:        https://webpremiere.de
  * License:           GPL-2.0+
@@ -35,9 +35,6 @@ if (!defined('WPINC')) {
  * 
  */
 define('KLEINANZEIGEN_URL', 'https://www.kleinanzeigen.de');
-
-define('USE_AD_DUMMY_DATA', 0);
-
 define('WC_TERMS', [
   'rent' => array('miete', 'mieten')
 ]);
@@ -56,6 +53,9 @@ define('WC_CUSTOM_PRODUCT_ATTRIBUTES', [
   'rent' => 'Mietdauer',
 ]);
 define('ALLOW_DUPLICATE_TITLES', true);
+define('USE_AD_DUMMY_DATA', 0);
+define('EMPTY_ACCOUNT_NAME', '__empty_account_name__');
+define('DUMMY_ACCOUNT_DATA', '__dummy_account_data__');
 
 global $kleinanzeigen_db_version;
 $kleinanzeigen_db_version = '1.0';

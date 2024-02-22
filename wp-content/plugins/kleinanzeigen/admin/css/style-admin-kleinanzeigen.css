@@ -575,7 +575,6 @@ section .color-box.invalid {
 /**
 * Styles for imported templates
 */
-.wp-list-kleinanzeigen tbody tr.no-items,
 .wp-list-kleinanzeigen-tasks tbody tr.no-items {
   display: flex;
   justify-content: center;

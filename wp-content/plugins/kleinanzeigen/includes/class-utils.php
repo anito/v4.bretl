@@ -23,25 +23,39 @@ if (!class_exists('Utils')) {
       $remote_url = self::parse_remote_url();
 
       if (!$remote_url) {
-        $admin_url = admin_url('/admin.php?page=' . wbp_ka()->get_plugin_name() . '-settings');
-        return new WP_Error(403, sprintf(__('Please ensure you have entered a valid account name in %s.', 'kleinanzeigen'), "<a href={$admin_url}>" . __('Settings', 'kleinanzeigen') . '</a>'));
+        $fetch_type = 'emptydata';
+      } else {
+        $fetch_type = USE_AD_DUMMY_DATA ? 'dummydata' : '';
       }
 
-      $remote_url = $remote_url . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
+      switch($fetch_type) {
+        case 'emptydata':
+          $dir = 'empty-data';
+          $fn = 'page.json';
+          $file = wbp_ka()->plugin_path(trailingslashit($dir) . $fn);
 
-      if (USE_AD_DUMMY_DATA) {
-        $dir = 'sample-data';
-        $fn = 'page-' . $paged . '.json';
-        $file = wbp_ka()->plugin_path($dir . '/' . $fn);
+          if (!file_exists($file)) {
+            $response = new WP_Error(403, __('Could not fetch empty dataset.', 'kleinanzeigen'));
+          } else {
+            $response['body'] = self::read($file);
+          }
 
-        if (!file_exists($file)) {
+          break;
+        case 'dummydata':
+          $dir = 'sample-data';
+          $fn = 'page-' . $paged . '.json';
+          $file = wbp_ka()->plugin_path(trailingslashit($dir) . $fn);
+
+          if (!file_exists($file)) {
+            $response = wp_remote_get($remote_url);
+            self::write($fn, $response['body'], $dir);
+          }
+
+          $response['body'] = self::read($file);
+          break;
+        default:
+          $remote_url = $remote_url . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
           $response = wp_remote_get($remote_url);
-          self::write($fn, $response['body'], $dir);
-        }
-
-        $response['body'] = self::read($file);
-      } else {
-        $response = wp_remote_get($remote_url);
       }
 
       if (!is_wp_error($response)) {
@@ -57,8 +71,7 @@ if (!class_exists('Utils')) {
       $url = trailingslashit(KLEINANZEIGEN_URL);
       $pro_account = get_option('kleinanzeigen_is_pro_account', '') === "1" ? 'pro/' : '';
       $account_name = get_option('kleinanzeigen_account_name', '');
-      $remote_url = !empty($account_name) ? sanitize_url("{$url}{$pro_account}{$account_name}/ads", array('http', 'https')) : null;
-      return $remote_url;
+      return !empty($account_name) ? sanitize_url("{$url}{$pro_account}{$account_name}/ads", array('http', 'https')) : null;
     }
 
     static function write_log($vars) {

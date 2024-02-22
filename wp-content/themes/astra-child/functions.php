@@ -198,9 +198,7 @@ add_filter('logout_redirect', function ($redirect_url) {
 });
 
 add_filter('logout_url', function ($logout_url) {
-  $logout_url = $logout_url . '&amp;redirect_to=' . get_permalink();
-  write_log('logout_url: ' . $logout_url);
-  return $logout_url;
+  return $logout_url . '&amp;redirect_to=' . get_permalink();
 }, 9999);
 
 
