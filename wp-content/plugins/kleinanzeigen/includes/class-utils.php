@@ -30,7 +30,7 @@ if (!class_exists('Utils')) {
 
       switch($fetch_type) {
         case 'emptydata':
-          $dir = 'empty-data';
+          $dir = 'data/empty';
           $fn = 'page.json';
           $file = wbp_ka()->plugin_path(trailingslashit($dir) . $fn);
 
@@ -42,7 +42,7 @@ if (!class_exists('Utils')) {
 
           break;
         case 'dummydata':
-          $dir = 'sample-data';
+          $dir = 'data/samples';
           $fn = 'page-' . $paged . '.json';
           $file = wbp_ka()->plugin_path(trailingslashit($dir) . $fn);
 
@@ -80,10 +80,6 @@ if (!class_exists('Utils')) {
       }
     }
 
-    static function foo() {
-      self::write_log('foo succeeded...');
-    }
-
     static function read($file)
     {
       if (!file_exists($file)) {
@@ -94,12 +90,17 @@ if (!class_exists('Utils')) {
 
     static function write($fn, $data, $dir = 'tmp',)
     {
-      $dir = wbp_ka()->plugin_path($dir);
-      if (!file_exists($dir)) {
-        mkdir($dir);
-      }
+      $paths = array_filter(explode('/', $dir));
+      $dir = array_reduce($paths, function($cum, $cur) {
+        $path = ($cum ? trailingslashit($cum) : '') . $cur;
+        $dir = wbp_ka()->plugin_path($path);
+        if (!file_exists($dir)) {
+          mkdir($dir);
+        }
+        return $path;
+      });
 
-      $file = $dir . '/' . $fn;
+      $file = wbp_ka()->plugin_path($dir . '/' . $fn);
 
       $changePerms = function ($path) {
         $currentPerms = fileperms($path) & 0777;
@@ -108,12 +109,13 @@ if (!class_exists('Utils')) {
           return;
         }
 
-        $res = chmod($path, $worldWritable);
+        chmod($path, $worldWritable);
       };
 
       $changePerms($file);
       file_put_contents($file, $data);
     }
+
     static function toggle_array_item($ids, $id, $bool = null)
     {
       if (!isset($bool)) {

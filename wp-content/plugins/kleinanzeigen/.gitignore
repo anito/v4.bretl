@@ -21,4 +21,4 @@ CVS
 /node_modules/*
 /languages/*backup*
 /vendor/*
-/sample-data
+/data/samples

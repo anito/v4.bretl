@@ -53,9 +53,7 @@ define('WC_CUSTOM_PRODUCT_ATTRIBUTES', [
   'rent' => 'Mietdauer',
 ]);
 define('ALLOW_DUPLICATE_TITLES', true);
-define('USE_AD_DUMMY_DATA', 0);
-define('EMPTY_ACCOUNT_NAME', '__empty_account_name__');
-define('DUMMY_ACCOUNT_DATA', '__dummy_account_data__');
+define('USE_AD_DUMMY_DATA', 1);
 
 global $kleinanzeigen_db_version;
 $kleinanzeigen_db_version = '1.0';
