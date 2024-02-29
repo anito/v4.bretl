@@ -317,9 +317,12 @@ function wbp_detectTrident($current_theme)
 }
 function unsupported_browsers_template()
 {
-  get_template_part('custom-templates/custom', 'unsupported-browser');
+  get_template_part('templates/misc/unsupported', 'browser', array(
+    'blogname'  => wp_specialchars_decode(get_option('blogname'), ENT_QUOTES),
+    'email'     => get_bloginfo('admin_email')
+  ));
 }
-// add_action('wp_enqueue_scripts', 'wbp_detectTrident');
+add_action('wp_enqueue_scripts', 'wbp_detectTrident');
 
 function get_certificate()
 {
