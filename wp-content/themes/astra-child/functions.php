@@ -16,6 +16,10 @@ function wbp_init()
     'home_url'    => home_url(),
     'nonce'       => wp_create_nonce()
   ));
+  define('IUBENDA_VARS', array(
+    'siteId' => 3304971,
+    'cookiePolicyId' => 28713011
+  ));
 }
 add_filter('init', 'wbp_init');
 
@@ -136,12 +140,15 @@ function add_scripts()
 
   wp_localize_script('ajax-front', 'KleinanzeigenAjaxFront', AJAX_FRONT_VARS);
 
-
+  // Iubenda
+  if(!current_user_can('manage_product_terms')) {
+    wp_enqueue_script('iubenda', get_stylesheet_directory_uri() . '/js/iubenda.js', array(), false, false);
+    wp_enqueue_script('iubenda-autoblocking', 'https://cs.iubenda.com/autoblocking/' . IUBENDA_VARS['siteId'] . '.js', array('iubenda'), false, false);
+    wp_enqueue_script('iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array('iubenda'), false, false);
+    wp_localize_script('iubenda', 'Iubenda', IUBENDA_VARS);
+  }
 
   if (!IS_DEV_MODE) {
-
-    // Vendor scripts
-
   }
 
   if (wbp_doing_login_ajax()) {
@@ -555,10 +562,11 @@ function wbp_return_theme_author($author)
 }
 add_filter('astra_theme_author', 'wbp_return_theme_author');
 
-function wbp_short_description($excerpt) {
+function wbp_short_description($excerpt)
+{
 
   $max_length = 150;
-  if(strlen($excerpt) > $max_length && function_exists('wbp_ka')) {
+  if (strlen($excerpt) > $max_length && function_exists('wbp_ka')) {
     require_once wbp_ka()->plugin_path('includes/class-utils.php');
     return  Utils::sanitize_excerpt($excerpt, $max_length);
   }

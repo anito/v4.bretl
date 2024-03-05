@@ -1463,7 +1463,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           array('vorführ', 'match_type' => 'like'),
           array('vfm'),
         ),
-        'Top'                 => array('topzust, top zust, topausstat, top ausstat', array('match_type' => 'like')),
         'Guter Zustand'       => array('guter zustand'),
         'Sonderpreis'         => array('sonderpreis'),
         'Aktion'              => array('aktion, aktionsmodell', 'fn' => 'aktion'),
@@ -1477,6 +1476,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'Neu'                 => array('neumaschine, neufahrzeug'),
         'Neues Modell'        => array('neues modell'),
         'Top Modell'          => array('top modell, topmodell'),
+        'Top Zustand'         => array('topzust, top zust', 'match_type' => 'like'),
+        'Top Ausstattung'     => array('topausst, top ausstat', 'match_type' => 'like'),
         'Von Privat'          => array(
           array('von privat, rein privat, aus privater hand, privatbesitzer, im kundenauftrag, privatauftrag'),
           array('kommission, kommision', 'match_type' => 'like')
