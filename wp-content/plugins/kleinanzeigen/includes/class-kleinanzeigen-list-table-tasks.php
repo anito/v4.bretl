@@ -71,7 +71,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             'template' => 'modal-table-header',
             'args' => array(
               'header' => __('Orphaned products', 'kleinanzeigen'),
-              'subheader' => sprintf(__('The following products are based on ads that can no longer be traced. Please select an appropriate action. Products will remain listet here (and remain in current state) until an action has been taken. You can also automate this process in %s.', 'kleinanzeigen'), '<a href="' . admin_url('/admin.php?page=' . wbp_ka()->get_plugin_name() . '-settings') . '" target="_blank">' . __('Settings', 'kleinanzeigen') . '</a>')
+              'subheader' => sprintf(__('For the following products the ad on which they where based on can no longer be traced and must therefore be manually disconnected. To do so choose on of the given actions. After an action has been taken the product will no longer be listetd here. You can also automate this process in %s.', 'kleinanzeigen'), '<a href="' . admin_url('/admin.php?page=' . wbp_ka()->get_plugin_name() . '-settings') . '" target="_blank">' . __('Settings', 'kleinanzeigen') . '</a>')
             )
           ),
           'footer-template' => array(
