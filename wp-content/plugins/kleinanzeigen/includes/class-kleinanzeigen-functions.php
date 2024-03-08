@@ -389,14 +389,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       };
       if ($product && ($diff_title() || $diff_date())) {
         remove_action('save_post_product', array($this, 'save_post_product'), 99);
-        $a = array_merge(array(
-          'ID'            => $post_ID,
-          'post_type'     => 'product',
-          'post_status'   => $product->get_status(),
-          'post_title'    => $record->title,
-          'post_excerpt'  => $record->description
-        ), $args);
-        Utils::write_log($a);
         wp_update_post(
           array_merge(array(
             'ID'            => $post_ID,

@@ -273,7 +273,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     if (!wp_next_scheduled('kleinanzeigen_updated_ads')) {
       wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_updated_ads');
     }
-    wp_unschedule_hook('kleinanzeigen_reordered_ads');
 
     if ('never' === $interval) {
       return;
