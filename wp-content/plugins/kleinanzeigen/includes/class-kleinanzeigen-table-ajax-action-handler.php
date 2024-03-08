@@ -199,10 +199,15 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
       $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
 
+      
       if ($post_ID) {
+        $date = get_the_date('Y-m-d H:i:s', $post_ID);
+        $gmt = get_gmt_from_date( $date );
         wp_update_post(array(
-          'ID' => $post_ID,
-          'post_status' => $post_status
+          'ID'            => $post_ID,
+          'post_status'   => $post_status,
+          'post_date'     => $date,
+          'post_date_gmt' => $gmt,
         ));
       }
 
@@ -417,6 +422,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       if ($product) {
         wbp_fn()->set_product_data($product, $record, $content);
         $product = wbp_fn()->enable_sku($product, $record);
+        $date = wbp_fn()->ka_formatted_date($record->date);
+        $gmt = get_gmt_from_date($date);
 
         if (is_wp_error($product)) {
           $error_data = $product->get_error_data();
@@ -427,13 +434,16 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         };
       }
 
-      wp_insert_post(array(
-        'ID' => $post_ID,
-        'post_title' => $record->title,
-        'post_type' => 'product',
-        'post_status' => 'draft',
-        'post_content' => $content,
-        'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
+      wp_update_post(array(
+        'ID'            => $post_ID,
+        'post_title'    => $record->title,
+        'post_type'     => 'product',
+        'post_status'   => 'draft',
+        'post_date'     => $date,
+        'post_date_gmt' => $gmt,
+        'edit_date'     => true,
+        'post_content'  => $content,
+        'post_excerpt'  => $record->description // Utils::sanitize_excerpt($content, 300)
       ), true);
 
       switch ($screen) {
@@ -475,11 +485,19 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       Utils::remove_attachments($post_ID);
 
       $ids = [];
+      $count = 0;
+      $errors = 0;
       for ($i = 0; $i < count($kleinanzeigen_images); $i++) {
         $url = $kleinanzeigen_images[$i];
-        $ids[] = Utils::upload_image($url, $post_ID);
-        if ($i === 0) {
-          set_post_thumbnail((int) $post_ID, $ids[0]);
+        $image_id = Utils::upload_image($url, $post_ID);
+        if(!is_wp_error($image_id)) {
+          $ids[] = $image_id;
+          $count++;
+          if ($i === 0) {
+            set_post_thumbnail((int) $post_ID, $ids[0]);
+          }
+        } else {
+          $errors++;
         }
       }
 
@@ -498,7 +516,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       echo json_encode([
-        'data' => compact(['row', 'post_ID', 'kleinanzeigen_id'])
+        'data' => compact(['row', 'post_ID', 'kleinanzeigen_id', 'count', 'errors'])
       ]);
       wp_die();
     }
@@ -620,7 +638,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
     {
       global $wp_list_table;
 
-      $data = Utils::get_json_data(array('paged' => $paged));
+      $data = Utils::get_page_data(array('paged' => $paged));
       $wp_list_table->setData($data);
       return $data;
     }
@@ -675,10 +693,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function get_record($id)
     {
-      $ads = wbp_fn()->get_transient_data();
-      $ids = array_column($ads, 'id');
-      $record_key = array_search($id, $ids);
-      return is_int($record_key) ? $ads[$record_key] : null;
+      return wbp_fn()->get_record($id);
     }
   }
 }

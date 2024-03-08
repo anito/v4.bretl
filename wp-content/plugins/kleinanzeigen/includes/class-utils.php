@@ -11,7 +11,16 @@ if (!class_exists('Utils')) {
 
   class Utils
   {
-    static function get_json_data($args = array())
+    static function get_page_data($args = array())
+    {
+      if (USE_AD_DUMMY_DATA) {
+        return self::get_static_page_data($args);
+      } else {
+        return self::get_remote_page_data($args);
+      }
+    }
+
+    private static function get_remote_page_data($args = array())
     {
       $defaults = array(
         'pageSize' => get_option('kleinanzeigen_items_per_page', 25),
@@ -20,42 +29,21 @@ if (!class_exists('Utils')) {
       $options = wp_parse_args($args, $defaults);
       extract($options);
 
-      $remote_url = self::parse_remote_url();
+      $base_url = self::parse_remote_url();
 
-      if (!$remote_url) {
-        $fetch_type = 'emptydata';
-      } else {
-        $fetch_type = USE_AD_DUMMY_DATA ? 'dummydata' : '';
-      }
+      if (!$base_url) {
+        $dir = 'data/empty';
+        $fn = 'page.json';
+        $file = wbp_ka()->plugin_path(trailingslashit($dir) . $fn);
 
-      switch($fetch_type) {
-        case 'emptydata':
-          $dir = 'data/empty';
-          $fn = 'page.json';
-          $file = wbp_ka()->plugin_path(trailingslashit($dir) . $fn);
-
-          if (!file_exists($file)) {
-            $response = new WP_Error(403, __('Could not fetch empty dataset.', 'kleinanzeigen'));
-          } else {
-            $response['body'] = self::read($file);
-          }
-
-          break;
-        case 'dummydata':
-          $dir = 'data/samples';
-          $fn = 'page-' . $paged . '.json';
-          $file = wbp_ka()->plugin_path(trailingslashit($dir) . $fn);
-
-          if (!file_exists($file)) {
-            $response = wp_remote_get($remote_url);
-            self::write($fn, $response['body'], $dir);
-          }
-
+        if (!file_exists($file)) {
+          $response = new WP_Error(403, __('Could not fetch empty dataset.', 'kleinanzeigen'));
+        } else {
           $response['body'] = self::read($file);
-          break;
-        default:
-          $remote_url = $remote_url . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
-          $response = wp_remote_get($remote_url);
+        }
+      } else {
+        $remote_url = $base_url . '?pageNum=' . $paged . '&pageSize=' . $pageSize;
+        $response = wp_remote_get($remote_url);
       }
 
       if (!is_wp_error($response)) {
@@ -66,6 +54,61 @@ if (!class_exists('Utils')) {
       }
     }
 
+    private static function get_static_page_data($args = array())
+    {
+      $defaults = array(
+        'pageSize' => get_option('kleinanzeigen_items_per_page', 25),
+        'paged' => 1
+      );
+      $options = wp_parse_args($args, $defaults);
+      extract($options);
+
+      $base_url = self::parse_remote_url();
+      $dir = wbp_ka()->plugin_path('data/samples');
+
+      $create_file = function ($page) use ($dir, $base_url, $pageSize) {
+        $fn = 'page-' . $page . '.json';
+        $remote_url = $base_url . '?pageNum=' . $page . '&pageSize=' . $pageSize;
+        $response = wp_remote_get($remote_url);
+        self::write($fn, $response['body'], $dir);
+      };
+
+      $file = trailingslashit($dir) . 'page-' . $paged . '.json';
+      if (!file_exists($file)) $create_file($paged);
+      $response['body'] = self::read($file);
+
+      if (!is_wp_error($response)) {
+        $data = $response['body'];
+        return json_decode($data);
+      } else {
+        return $response;
+      }
+    }
+
+    public static function get_all_ads()
+    {
+
+      // Get first set of data to discover page count
+      $data = Utils::account_error_check(Utils::get_remote_page_data(), 'error-message.php');
+
+      if (is_wp_error($data)) {
+        return $data;
+      }
+
+      $ads[] = $data->ads;
+      $categories = $data->categoriesSearchData;
+      $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
+      $num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', 25));
+
+      // Get remaining pages
+      for ($paged = 2; $paged <= $num_pages; $paged++) {
+        $page_data = Utils::get_remote_page_data(array('paged' => $paged));
+        $page_data  = Utils::account_error_check($page_data, 'error-message.php');
+        if (!is_wp_error($page_data)) $ads[] = $page_data->ads;
+      }
+      return array('pages' => $num_pages, 'data' => $ads);
+    }
+
     public static function parse_remote_url()
     {
       $url = trailingslashit(KLEINANZEIGEN_URL);
@@ -74,8 +117,9 @@ if (!class_exists('Utils')) {
       return !empty($account_name) ? sanitize_url("{$url}{$pro_account}{$account_name}/ads", array('http', 'https')) : null;
     }
 
-    static function write_log($vars) {
-      if(! IS_PRODUCTION && is_callable('write_log')) {
+    static function write_log($vars)
+    {
+      if (is_callable('write_log')) {
         write_log($vars);
       }
     }
@@ -91,16 +135,20 @@ if (!class_exists('Utils')) {
     static function write($fn, $data, $dir = 'tmp',)
     {
       $paths = array_filter(explode('/', $dir));
-      $dir = array_reduce($paths, function($cum, $cur) {
-        $path = ($cum ? trailingslashit($cum) : '') . $cur;
-        $dir = wbp_ka()->plugin_path($path);
-        if (!file_exists($dir)) {
-          mkdir($dir);
-        }
-        return $path;
-      });
 
-      $file = wbp_ka()->plugin_path($dir . '/' . $fn);
+      if (!file_exists($dir)) {
+        mkdir($dir);
+      };
+      // array_reduce($paths, function ($cum, $cur) {
+      //   $path = ($cum ? trailingslashit($cum) : '') . $cur;
+      //   $d = wbp_ka()->plugin_path($path);
+      //   if (!file_exists($dir)) {
+      //     mkdir($dir);
+      //   }
+      //   return $path;
+      // });
+
+      $file = trailingslashit($dir) . $fn;
 
       $changePerms = function ($path) {
         $currentPerms = fileperms($path) & 0777;
@@ -112,7 +160,7 @@ if (!class_exists('Utils')) {
         chmod($path, $worldWritable);
       };
 
-      $changePerms($file);
+      // $changePerms($file);
       file_put_contents($file, $data);
     }
 
@@ -174,7 +222,8 @@ if (!class_exists('Utils')) {
             $url = wp_get_attachment_url($attachmentId);
           }
         } else {
-          // @unlink($file['tmp_name']);
+          // The error
+          $attachmentId = $file['tmp_name'];
         }
       }
       return $attachmentId;
@@ -222,11 +271,13 @@ if (!class_exists('Utils')) {
       return substr($content, 0, $count) . '...';
     }
 
-    static function base_64_encode($val) {
+    static function base_64_encode($val)
+    {
       return base64_encode(json_encode($val));
     }
 
-    static function base_64_decode($val) {
+    static function base_64_decode($val)
+    {
       return (array) json_decode(base64_decode($val));
     }
 

@@ -33,7 +33,7 @@ class Kleinanzeigen_Database
     }
   }
 
-  public function job_done($id)
+  public function unregister_job($id)
   {
     global $wpdb;
 
@@ -79,7 +79,7 @@ class Kleinanzeigen_Database
     }
   }
 
-  public function register_active_job($data)
+  public function register_job($data)
   {
 
     global $wpdb;

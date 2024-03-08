@@ -40,7 +40,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
     add_action('kleinanzeigen_activate_url', array($this, 'job_activate_url'));
     add_action('kleinanzeigen_deactivate_url', array($this, 'job_deactivate_url'));
-    add_action('kleinanzeigen_renamed_ads', array($this, 'job_renamed_ads'));
+    add_action('kleinanzeigen_updated_ads', array($this, 'job_updated_ads'));
     add_action('kleinanzeigen_create_products', array($this, 'job_create_products'));
 
     // User sepecific options
@@ -138,7 +138,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'mandatory' => array(
         'kleinanzeigen_activate_url',
         'kleinanzeigen_deactivate_url',
-        'kleinanzeigen_renamed_ads'
+        'kleinanzeigen_updated_ads',
       ),
       'optional' => array(
         'kleinanzeigen_sync_price',
@@ -270,9 +270,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * Repair changed title
      * Mandatory, no option available
     */
-    if (!wp_next_scheduled('kleinanzeigen_renamed_ads')) {
-      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_renamed_ads');
+    if (!wp_next_scheduled('kleinanzeigen_updated_ads')) {
+      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_updated_ads');
     }
+    wp_unschedule_hook('kleinanzeigen_reordered_ads');
 
     if ('never' === $interval) {
       return;
@@ -322,7 +323,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     foreach ($items as $item) {
 
-      $job_id = wbp_db()->register_active_job(array(
+      $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_sync_price',
         'type'  => 'record',
         'uid'   => $item['record']->id
@@ -332,15 +333,16 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       wbp_fn()->fix_price($item['product']->get_ID(), $price);
 
       if ($job_id) {
-        wbp_db()->job_done($job_id);
+        wbp_db()->unregister_job($job_id);
       }
     }
   }
 
-  public function job_renamed_ads()
+  public function job_updated_ads()
   {
     // This job doesn't require to be registered in the active jobs db table
-    wbp_fn()->build_tasks('renamed-product');
+    // since it only rarily occures
+    wbp_fn()->build_tasks('updated-product');
   }
 
   public function job_create_products()
@@ -362,7 +364,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         continue;
       };
 
-      $job_id = wbp_db()->register_active_job(array(
+      $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_create_products',
         'type'  => 'record',
         'uid'   => $record->id
@@ -413,7 +415,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       }
 
       if ($job_id) {
-        wbp_db()->job_done($job_id);
+        wbp_db()->unregister_job($job_id);
       }
     }
   }
@@ -433,7 +435,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
       if (!$urls_valid && $record_exists) {
 
-        $job_id = wbp_db()->register_active_job(array(
+        $job_id = wbp_db()->register_job(array(
           'slug'  => 'kleinanzeigen_activate_url',
           'type'  => 'product',
           'uid' => $post_ID
@@ -442,7 +444,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         wbp_fn()->enable_sku($post_ID, $record);
 
         if ($job_id) {
-          wbp_db()->job_done($job_id);
+          wbp_db()->unregister_job($job_id);
         }
       }
     }
@@ -461,7 +463,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     });
 
     foreach ($ids as $id) {
-      $job_id = wbp_db()->register_active_job(array(
+      $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_deactivate_url',
         'type'  => 'product',
         'uid'   => $id
@@ -470,7 +472,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       wbp_fn()->disable_sku_url($id);
 
       if ($job_id) {
-        wbp_db()->job_done($job_id);
+        wbp_db()->unregister_job($job_id);
       }
     }
   }
@@ -483,7 +485,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     foreach ($items as $item) {
       $post_ID = $item['product']->get_ID();
 
-      $job_id = wbp_db()->register_active_job(array(
+      $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_invalid_ad_action',
         'type'  => 'product',
         'uid' => $post_ID
@@ -518,7 +520,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       }
 
       if ($job_id) {
-        wbp_db()->job_done($job_id);
+        wbp_db()->unregister_job($job_id);
       }
     }
   }
@@ -548,7 +550,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     if (isset($_GET['settings-updated'])) {
     }
 
-    if (!Utils::get_json_data()) {
+    if (is_wp_error(Utils::get_page_data())) {
       add_settings_error('kleinanzeigen_account_name', 403, sprintf(__('The account %1$s could not be found', 'kleinanzeigen'), '<em class="">"' . get_option('kleinanzeigen_account_name') . '"</em>'), 'error');
     }
 

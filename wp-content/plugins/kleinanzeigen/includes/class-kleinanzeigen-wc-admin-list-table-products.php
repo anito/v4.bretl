@@ -65,8 +65,8 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     $columns['product_brand'] = 'Hersteller';
     $columns['product_cat'] = $cat;
     $columns['date'] = $date;
-    $columns['ka_sku'] = 'KA';
-    $columns['sync'] = 'KA Aktionen';
+    $columns['ka_sku'] = 'Anzeige';
+    $columns['sync'] = 'Aktionen';
 
     return $columns;
   }
@@ -86,6 +86,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_ID);
       $sku = is_numeric($sku) ? $sku : false;
+      $ka_url = get_post_meta($post_ID, 'kleinanzeigen_url', true);
       $brands = wbp_th()->get_product_terms($post_ID, 'brand');
       $product_labels = wp_list_pluck(wbp_th()->get_product_terms($post_ID, 'label'), 'name');
     } else return 0;
@@ -96,7 +97,9 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
           break;
         }
       case 'ka_sku': {
-          echo '<a href="' . esc_html(get_post_meta($post_ID, 'kleinanzeigen_url', true)) . '" target="_blank">' . $sku . '</a>';
+          if($ka_url) {
+            echo '<a href="' . esc_html($ka_url) . '" target="_blank">' . $sku . '</a>';
+          }
           break;
         }
       case 'product_brand': {
@@ -141,14 +144,15 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
               } = KleinanzeigenAjax;
 
               const sku = '<?php echo $sku; ?>';
-              const post_status = '<?php echo $post_status ?>';
+              const ka_url = '<?php echo $ka_url; ?>';
+              const post_status = '<?php echo $post_status; ?>';
 
-              const tr = document.getElementById('post-<?php echo $post_ID ?>');
-              const publishButton = tr?.querySelector('#publish-post-<?php echo $post_ID ?>');
-              const importDataButton = tr?.querySelector('#import-kleinanzeigen-data-<?php echo $post_ID ?>');
-              const importImagesButton = tr?.querySelector('#import-kleinanzeigen-images-<?php echo $post_ID ?>');
-              const deleteImagesButton = tr?.querySelector('#delete-kleinanzeigen-images-<?php echo $post_ID ?>');
-              const disconnectButton = tr?.querySelector('#disconnect-kleinanzeigen-<?php echo $sku ?>');
+              const tr = document.getElementById('post-<?php echo $post_ID; ?>');
+              const publishButton = tr?.querySelector('#publish-post-<?php echo $post_ID; ?>');
+              const importDataButton = tr?.querySelector('#import-kleinanzeigen-data-<?php echo $post_ID; ?>');
+              const importImagesButton = tr?.querySelector('#import-kleinanzeigen-images-<?php echo $post_ID; ?>');
+              const deleteImagesButton = tr?.querySelector('#delete-kleinanzeigen-images-<?php echo $post_ID; ?>');
+              const disconnectButton = tr?.querySelector('#disconnect-kleinanzeigen-<?php echo $sku; ?>');
 
               setTimeout(() => {
                 publishButton?.addEventListener("click", publishPost);
@@ -156,7 +160,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
 
                 post_status == 'draft' && publishButton?.removeAttribute('disabled');
 
-                if (sku) {
+                if (ka_url) {
                   importDataButton?.addEventListener("click", importData);
                   importImagesButton?.addEventListener("click", importImages);
                   disconnectButton?.addEventListener("click", disconnect);

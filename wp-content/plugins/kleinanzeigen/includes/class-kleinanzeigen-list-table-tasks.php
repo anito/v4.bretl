@@ -396,6 +396,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $product_by_sku = $this->get_product_by_sku($sku);
     $shop_price_html = wp_kses_post($product->get_price_html());
     $ka_price = isset($record) ? $record->price : '-';
+    // $date = isset($record) ? $record->date : '';
     $diff_classes = array();
     if (!is_null($record) && wbp_fn()->has_price_diff($record, $product)) {
       $diff_classes[] = 'diff';
@@ -424,14 +425,14 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         case 'invalid-ad':
           $published = 'publish' === $product->get_status();
           $disabled['disconnect'] = !$sku;
-          $disabled['deactivate'] = !$sku || !$published;
+          $disabled['activate-deactivate'] = !$sku;
           $disabled['delete'] = !$post_ID;
           $label = array(
             'disconnect'  => $product->get_sku() ? __('Keep', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
-            'deactivate'  => $product->get_sku() ? __('Hide', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+            'activate-deactivate'  => $product->get_sku() ? ($published ? __('Hide', 'kleinanzeigen') : __('Publish', 'kleinanzeigen')) : __('Disconnected', 'kleinanzeigen'),
             'delete'      => (!$disabled['delete']) ? __('Delete', 'kleinanzeigen') : __('Deleted', 'kleinanzeigen')
           );
-          $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled'));
+          $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled', 'published'));
           break;
         case 'invalid-price':
           $price = Utils::extract_kleinanzeigen_price($ka_price);

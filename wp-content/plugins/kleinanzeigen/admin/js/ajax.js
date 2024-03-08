@@ -2,13 +2,13 @@ jQuery(document).ready(function ($) {
   const { admin_ajax, plugin_name, screen, edit_link } = KleinanzeigenAjax;
 
   // hide controls if sku is not available
-  const sku = document.getElementById("kleinanzeigen_id");
+  const sku = document.getElementById('kleinanzeigen_id');
 
-  if (sku?.getAttribute("value")) {
+  if (sku?.getAttribute('value')) {
     const sku_metabox = document
-      .getElementById("kleinanzeigen_id")
-      ?.closest(".postbox");
-    sku_metabox?.classList.add("sku");
+      .getElementById('kleinanzeigen_id')
+      ?.closest('.postbox');
+    sku_metabox?.classList.add('sku');
   }
 
   const delayed_item_click = async (arr, selector, eventType) => {
@@ -17,7 +17,7 @@ jQuery(document).ready(function ($) {
         await a;
         await new Promise((resolve) => {
           const el = $(`tr#${item.post_ID} ${selector}`);
-          $(el).on("data:parsed", function (e) {
+          $(el).on('data:parsed', function (e) {
             return resolve(e.detail);
           });
           $(el).click();
@@ -28,70 +28,70 @@ jQuery(document).ready(function ($) {
       });
   };
 
-  window.addEventListener("toggle-publish:item", function (e) {
+  window.addEventListener('toggle-publish:item', function (e) {
     publishPost(e.detail.e);
   });
-  window.addEventListener("deactivate:item", function (e) {
+  window.addEventListener('deactivate:item', function (e) {
     publishPost(e.detail.e);
   });
-  window.addEventListener("disconnect:item", function (e) {
+  window.addEventListener('disconnect:item', function (e) {
     disconnect(e.detail.e);
   });
-  window.addEventListener("save:item", function (e) {
+  window.addEventListener('save:item', function (e) {
     savePost(e.detail.e);
   });
-  window.addEventListener("fixprice:item", function (e) {
+  window.addEventListener('fixprice:item', function (e) {
     fixPrice(e.detail.e);
   });
-  window.addEventListener("deactivate:all", async function (e) {
+  window.addEventListener('deactivate:all', async function (e) {
     const { products } = e.detail.data;
-    delayed_item_click(products, ".deactivate", "deactivated:all");
+    delayed_item_click(products, '.deactivate', 'deactivated:all');
   });
-  window.addEventListener("disconnect:all", async function (e) {
+  window.addEventListener('disconnect:all', async function (e) {
     const { products } = e.detail.data;
-    delayed_item_click(products, ".disconnect", "disconnected:all");
+    delayed_item_click(products, '.disconnect', 'disconnected:all');
   });
-  window.addEventListener("fixprice:all", async function (e) {
+  window.addEventListener('fixprice:all', async function (e) {
     const { products } = e.detail.data;
-    delayed_item_click(products, ".fix-price", "fixed-price:all");
+    delayed_item_click(products, '.fix-price', 'fixed-price:all');
   });
 
   // Set Status
-  $("#change-post-status").on("click", function () {
-    let post_ID = $(this).attr("id");
-    let post_status = $(this).data("post-status");
+  $('#change-post-status').on('click', function () {
+    let post_ID = $(this).attr('id');
+    let post_status = $(this).data('post-status');
     let that = this;
     $.ajax({
-      method: "POST",
+      method: 'POST',
       url: admin_ajax,
       data: {
-        action: "_ajax_update_post",
+        action: '_ajax_update_post',
         post_ID,
         post_status,
       },
       success: (response, status, options) => {
-        if (status === "success") ajax_ad_callback(status, that);
+        if (status === 'success') ajax_ad_callback(status, that);
       },
       error: (response, status, message) => {
-        if (status === "error") ajax_ad_callback(status, that);
+        if (status === 'error') ajax_ad_callback(status, that);
       },
     });
     return false;
   });
 
   // Get Status
-  $("#get-status").on("click", function () {
-    let post_ID = $(this).attr("id");
+  $('#get-status').on('click', function () {
+    let post_ID = $(this).attr('id');
     let that = this;
     $.ajax({
-      type: "POST",
+      type: 'POST',
       url: admin_ajax,
       data: {
-        action: "_ajax_get_post",
+        action: '_ajax_get_post',
         post_ID,
       },
       success: (response, status, options) => {
-        if (status === "success") ajax_ad_callback(status, that);
+        if (status === 'success') ajax_ad_callback(status, that);
       },
       error: defaultErrorHandler,
     });
@@ -99,11 +99,11 @@ jQuery(document).ready(function ($) {
   });
 
   function start() {
-    document.body.classList.add("kleinanzeigen-sync-active");
+    document.body.classList.add('kleinanzeigen-sync-active');
   }
 
   function finish() {
-    document.body.classList.remove("kleinanzeigen-sync-active");
+    document.body.classList.remove('kleinanzeigen-sync-active');
   }
 
   function getAd(e) {
@@ -117,12 +117,12 @@ jQuery(document).ready(function ($) {
     }
 
     const el = e.target;
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
     const addSpinner = () => {
-      spinner?.classList.add("is-active");
+      spinner?.classList.add('is-active');
     };
     const removeSpinner = () => {
-      spinner?.classList.remove("is-active");
+      spinner?.classList.remove('is-active');
     };
 
     start();
@@ -131,7 +131,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_get_remote",
+        action: '_ajax_get_remote',
         formdata,
       },
       success: (response) =>
@@ -149,14 +149,14 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const action = el.dataset.action;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
-    const post_ID = action.replace("connect-", "");
+    const post_ID = action.replace('connect-', '');
 
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
     const addSpinner = () => {
-      spinner?.classList.add("is-active");
+      spinner?.classList.add('is-active');
     };
     const removeSpinner = () => {
-      spinner?.classList.remove("is-active");
+      spinner?.classList.remove('is-active');
     };
 
     addSpinner();
@@ -164,16 +164,16 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_connect",
+        action: '_ajax_connect',
         post_ID,
         kleinanzeigen_id,
         screen,
       },
       beforeSend: () => {
-        $(el).html("Verknüpfe...");
+        $(el).html('Verknüpfe...');
       },
       success: (response) => {
-        $(el).html("Fertig");
+        $(el).html('Fertig');
 
         removeSpinner();
 
@@ -182,10 +182,10 @@ jQuery(document).ready(function ($) {
         }, 500);
       },
       error: (response, status, message) => {
-        $(el).parents("td").removeClass("busy");
-        $(el).html("Fehler");
+        $(el).parents('td').removeClass('busy');
+        $(el).html('Fehler');
 
-        el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
+        el.dispatchEvent(new CustomEvent('kleinanzeigen:data-import'), {
           detail: { success: false, message },
         });
 
@@ -204,12 +204,12 @@ jQuery(document).ready(function ($) {
     const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen || screen;
 
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
     const addSpinner = () => {
-      spinner?.classList.add("is-active");
+      spinner?.classList.add('is-active');
     };
     const removeSpinner = () => {
-      spinner?.classList.remove("is-active");
+      spinner?.classList.remove('is-active');
     };
 
     addSpinner();
@@ -217,17 +217,17 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_disconnect",
+        action: '_ajax_disconnect',
         post_ID,
         kleinanzeigen_id,
         task_type,
         screen: _screen,
       },
       beforeSend: () => {
-        $(el).html("Verknüpfung lösen...");
+        $(el).html('Verknüpfung lösen...');
       },
       success: (response) => {
-        $(el).html("Fertig");
+        $(el).html('Fertig');
 
         removeSpinner();
 
@@ -236,10 +236,10 @@ jQuery(document).ready(function ($) {
         }, 500);
       },
       error: (response, status, message) => {
-        $(el).parents("td").removeClass("busy");
-        $(el).html("Fehler");
+        $(el).parents('td').removeClass('busy');
+        $(el).html('Fehler');
 
-        el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
+        el.dispatchEvent(new CustomEvent('kleinanzeigen:data-import'), {
           detail: { success: false, message },
         });
 
@@ -256,12 +256,13 @@ jQuery(document).ready(function ($) {
   function importData(e) {
     e.preventDefault();
 
+    let formdata;
     if (form) {
       formdata = $(form).serializeJSON();
     } else {
       const target = e.target;
-      const post_ID = target.dataset.postId || "";
-      const kleinanzeigen_id = target.dataset.kleinanzeigenId || "";
+      const post_ID = target.dataset.postId || '';
+      const kleinanzeigen_id = target.dataset.kleinanzeigenId || '';
       formdata = { post_ID, kleinanzeigen_id };
     }
 
@@ -271,13 +272,13 @@ jQuery(document).ready(function ($) {
     }
 
     const el = e.target;
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
 
     const addSpinner = () => {
-      spinner?.classList.add("is-active");
+      spinner?.classList.add('is-active');
     };
     const removeSpinner = () => {
-      spinner?.classList.remove("is-active");
+      spinner?.classList.remove('is-active');
     };
 
     start();
@@ -286,32 +287,32 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_get_remote",
+        action: '_ajax_get_remote',
         formdata,
         screen,
       },
       beforeSend: () => {
-        $(el).parents("td").addClass("busy");
-        $(el).html("Hole Daten...");
+        $(el).parents('td').addClass('busy');
+        $(el).html('Hole Daten...');
       },
       success: (response) => {
         const json = JSON.parse(response);
         if (json.content.response?.code === 200) {
-          $(el).html("Verarbeite...");
+          $(el).html('Verarbeite...');
           setTimeout(() => {
             processDataImport(json, el, removeSpinner);
           }, 500);
         } else {
-          $(el).parents("td").removeClass("busy");
-          $(el).html("Fehler");
+          $(el).parents('td').removeClass('busy');
+          $(el).html('Fehler');
           removeSpinner();
         }
       },
       error: (response, status, message) => {
-        $(el).parents("td").removeClass("busy");
-        $(el).html("Fehler");
+        $(el).parents('td').removeClass('busy');
+        $(el).html('Fehler');
 
-        el.dispatchEvent(new CustomEvent("kleinanzeigen:data-import"), {
+        el.dispatchEvent(new CustomEvent('kleinanzeigen:data-import'), {
           detail: { success: false, message },
         });
 
@@ -329,8 +330,8 @@ jQuery(document).ready(function ($) {
       formdata = $(form).serializeJSON();
     } else {
       const el = e.target;
-      const post_ID = el.dataset.postId || "";
-      const kleinanzeigen_id = el.dataset.kleinanzeigenId || "";
+      const post_ID = el.dataset.postId || '';
+      const kleinanzeigen_id = el.dataset.kleinanzeigenId || '';
       formdata = { post_ID, kleinanzeigen_id };
     }
 
@@ -340,13 +341,13 @@ jQuery(document).ready(function ($) {
     }
 
     const el = e.target;
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
 
     const addSpinner = () => {
-      spinner?.classList.add("is-active");
+      spinner?.classList.add('is-active');
     };
     const removeSpinner = () => {
-      spinner?.classList.remove("is-active");
+      spinner?.classList.remove('is-active');
     };
 
     start();
@@ -355,30 +356,30 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_get_remote",
+        action: '_ajax_get_remote',
         formdata,
         screen,
       },
       beforeSend: () => {
-        $(el).parents("td").addClass("busy");
-        $(el).html("Hole Fotos...");
+        $(el).parents('td').addClass('busy');
+        $(el).html('Hole Fotos...');
       },
       success: (response) => {
         const json = JSON.parse(response);
         if (json.content.response?.code === 200) {
-          $(el).html("Verarbeite...");
+          $(el).html('Verarbeite...');
 
           setTimeout(() => {
             processImageImport(json, el, removeSpinner);
           }, 500);
         } else {
-          $(el).parents("td").removeClass("busy");
-          $(el).html("Fehler");
+          $(el).parents('td').removeClass('busy');
+          $(el).html('Fehler');
           removeSpinner();
         }
       },
       error: (response, status, message) => {
-        spinner?.classList.remove("is-active");
+        spinner?.classList.remove('is-active');
         console.log(message);
       },
     });
@@ -404,21 +405,21 @@ jQuery(document).ready(function ($) {
       return;
     }
 
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
+    spinner?.classList.add('is-active');
 
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_delete_images",
+        action: '_ajax_delete_images',
         screen: _screen,
         post_ID,
       },
       success: (response) => parseResponse(response, el),
       error: (response, status, message) => {
-        el.innerHTML = "Fehler";
-        $(el).parents("td").removeClass("busy");
-        spinner?.classList.remove("is-active");
+        el.innerHTML = 'Fehler';
+        $(el).parents('td').removeClass('busy');
+        spinner?.classList.remove('is-active');
       },
     });
   }
@@ -435,13 +436,13 @@ jQuery(document).ready(function ($) {
     const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen || screen;
 
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
+    spinner?.classList.add('is-active');
 
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_toggle_publish_post",
+        action: '_ajax_toggle_publish_post',
         post_ID,
         kleinanzeigen_id,
         disconnect,
@@ -449,11 +450,11 @@ jQuery(document).ready(function ($) {
         screen: _screen,
       },
       beforeSend: () => {
-        $(el).parents("td").addClass("busy");
-        $(el).html("Einen Moment...");
+        $(el).parents('td').addClass('busy');
+        $(el).html('Einen Moment...');
       },
       success: (response) => {
-        $(el).html("Fertig");
+        $(el).html('Fertig');
 
         setTimeout(() => {
           parseResponse(response, el);
@@ -467,7 +468,7 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
     e.stopPropagation();
 
-    const el = e.target.closest("a");
+    const el = e.target.closest('a');
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
     const task_type = el.dataset.taskType;
@@ -476,7 +477,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_feature_post",
+        action: '_ajax_feature_post',
         post_ID,
         kleinanzeigen_id,
         task_type,
@@ -502,24 +503,24 @@ jQuery(document).ready(function ($) {
     const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen || screen;
 
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
+    spinner?.classList.add('is-active');
 
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_save_post",
+        action: '_ajax_save_post',
         post_ID,
         args,
         task_type,
         screen: _screen,
       },
       beforeSend: () => {
-        $(el).parents("td").addClass("busy");
-        $(el).html("Einen Moment...");
+        $(el).parents('td').addClass('busy');
+        $(el).html('Einen Moment...');
       },
       success: (response) => {
-        $(el).html("Fertig");
+        $(el).html('Fertig');
 
         setTimeout(() => {
           parseResponse(response, el);
@@ -541,13 +542,13 @@ jQuery(document).ready(function ($) {
     const price = el.dataset.price;
     const _screen = el.dataset.screen || screen;
 
-    const spinner = el.closest("[id*=-action]")?.querySelector(".spinner");
-    spinner?.classList.add("is-active");
+    const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
+    spinner?.classList.add('is-active');
 
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_fix_price",
+        action: '_ajax_fix_price',
         post_ID,
         kleinanzeigen_id,
         price,
@@ -555,11 +556,11 @@ jQuery(document).ready(function ($) {
         screen: _screen,
       },
       beforeSend: () => {
-        $(el).parents("td").addClass("busy");
-        $(el).html("Einen Moment...");
+        $(el).parents('td').addClass('busy');
+        $(el).html('Einen Moment...');
       },
       success: (response) => {
-        $(el).html("Fertig");
+        $(el).html('Fertig');
 
         setTimeout(() => {
           parseResponse(response, el);
@@ -577,7 +578,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_delete_post",
+        action: '_ajax_delete_post',
         post_ID,
         kleinanzeigen_id,
       },
@@ -595,22 +596,20 @@ jQuery(document).ready(function ($) {
     let rowEl;
     let modalRowEl;
     switch (_screen) {
-      case "product":
+      case 'product':
         location = `${edit_link}${post_ID}`;
         break;
 
-      case "edit-product":
+      case 'edit-product':
         rowEl = el.closest(`#post-${post_ID}`);
         $(rowEl)?.replaceWith(row);
         break;
 
-      case "toplevel_page_kleinanzeigen":
-      case "modal":
+      case 'toplevel_page_kleinanzeigen':
+      case 'modal':
         if (head) {
-          $("#kleinanzeigen-head-wrap .summary-content").html(head);
-          document.dispatchEvent(
-            new CustomEvent("init:head")
-          );
+          $('#kleinanzeigen-head-wrap .summary-content').html(head);
+          document.dispatchEvent(new CustomEvent('init:head'));
         }
 
         if (row) {
@@ -625,17 +624,17 @@ jQuery(document).ready(function ($) {
 
         const data = $(el).data();
         el.dispatchEvent(
-          new CustomEvent("data:parsed", {
+          new CustomEvent('data:parsed', {
             detail: data,
           })
         );
 
-        if ("create" === el.dataset.action) {
+        if ('create' === el.dataset.action) {
           rowEl = document.querySelector(`tr#ad-id-${kleinanzeigen_id}`);
 
           setTimeout(() => {
             rowEl.dispatchEvent(
-              new CustomEvent("data:parsed", {
+              new CustomEvent('data:parsed', {
                 detail: { action: el.dataset.action },
               })
             );
@@ -646,11 +645,11 @@ jQuery(document).ready(function ($) {
     finish();
   }
 
-  const poll = (args = "") =>
+  const poll = (args = '') =>
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_poll",
+        action: '_ajax_poll',
         _poll_action: args,
       },
       success: (response) => response,
@@ -661,7 +660,7 @@ jQuery(document).ready(function ($) {
     $.ajax({
       url: admin_ajax,
       data: {
-        action: "_ajax_cron",
+        action: '_ajax_cron',
         _ajax_nonce_cron: nonce,
       },
       success: (response) => response,
@@ -679,26 +678,26 @@ jQuery(document).ready(function ($) {
     $.ajax({
       url: admin_ajax,
       data: {
-        action: "_ajax_get_nonce",
+        action: '_ajax_get_nonce',
         _ajax_action_name: action,
       },
       success: (response) => response,
       error: defaultErrorHandler,
     });
-  
+
   const defaultErrorHandler = (response, status, message) =>
     console.error(message);
 
-  const MSG_MISSING_KLEINANZEIGEN_ID = "Keine Kleinanzeigen ID gefunden.";
-  const MSG_MISSING_POST_ID = "Keine Post ID gefunden.";
+  const MSG_MISSING_KLEINANZEIGEN_ID = 'Keine Kleinanzeigen ID gefunden.';
+  const MSG_MISSING_POST_ID = 'Keine Post ID gefunden.';
   const MSG_ERROR =
-    "Arrgh🥶, etwas scheint schiefgegangen zu sein. Bitte noch einmal versuchen.";
+    'Arrgh🥶, etwas scheint schiefgegangen zu sein. Bitte noch einmal versuchen.';
 
   let form;
   switch (screen) {
-    case "kleinanzeigen_page_kleinanzeigen-settings":
-    case "toplevel_page_kleinanzeigen":
-    case "edit-product":
+    case 'kleinanzeigen_page_kleinanzeigen-settings':
+    case 'toplevel_page_kleinanzeigen':
+    case 'edit-product':
       KleinanzeigenAjax = {
         ...KleinanzeigenAjax,
         createPost,
@@ -717,39 +716,39 @@ jQuery(document).ready(function ($) {
         getNonce,
       };
       break;
-    case "product":
-      form = document.getElementById("post");
+    case 'product':
+      form = document.getElementById('post');
 
-      const getAdButton = document.getElementById("get-kleinanzeigen-ad");
+      const getAdButton = document.getElementById('get-kleinanzeigen-ad');
       const importDataButton = document.getElementById(
-        "import-kleinanzeigen-data"
+        'import-kleinanzeigen-data'
       );
       const importImagesButton = document.getElementById(
-        "import-kleinanzeigen-images"
+        'import-kleinanzeigen-images'
       );
-      const delImagesButton = document.getElementById("del-images");
+      const delImagesButton = document.getElementById('del-images');
 
-      importDataButton?.addEventListener("click", importData);
-      importImagesButton?.addEventListener("click", importImages);
-      getAdButton?.addEventListener("click", getAd);
-      delImagesButton?.addEventListener("click", deleteImages);
+      importDataButton?.addEventListener('click', importData);
+      importImagesButton?.addEventListener('click', importImages);
+      getAdButton?.addEventListener('click', getAd);
+      delImagesButton?.addEventListener('click', deleteImages);
 
-      getAdButton?.removeAttribute("disabled");
-      importDataButton?.removeAttribute("disabled");
-      importImagesButton?.removeAttribute("disabled");
-      delImagesButton?.removeAttribute("disabled");
+      getAdButton?.removeAttribute('disabled');
+      importDataButton?.removeAttribute('disabled');
+      importImagesButton?.removeAttribute('disabled');
+      delImagesButton?.removeAttribute('disabled');
       break;
   }
 
   function ajax_ad_callback(data, callback) {
     const response = JSON.parse(data);
 
-    const wrapper = document.getElementById("kleinanzeigen-ad-wrapper");
+    const wrapper = document.getElementById('kleinanzeigen-ad-wrapper');
     if (wrapper) {
       const iframe =
-        wrapper.querySelector("iframe") || document.createElement("iframe");
-      iframe.src = "";
-      wrapper.innerHTML = "";
+        wrapper.querySelector('iframe') || document.createElement('iframe');
+      iframe.src = '';
+      wrapper.innerHTML = '';
       wrapper.appendChild(iframe);
       iframe.contentWindow.document.open();
       if (iframe.contentWindow.document) {
@@ -760,8 +759,8 @@ jQuery(document).ready(function ($) {
         } catch (err) {}
       }
       iframe.contentWindow.document.close();
-      wrapper.setAttribute("style", "height:400px;");
-      iframe.setAttribute("style", "height:100%; width:100%;");
+      wrapper.setAttribute('style', 'height:400px;');
+      iframe.setAttribute('style', 'height:100%; width:100%;');
       callback?.();
     }
   }
@@ -779,8 +778,8 @@ jQuery(document).ready(function ($) {
     let doc, content;
     try {
       const parser = new DOMParser();
-      doc = parser.parseFromString(description.body, "text/html");
-      content = doc.getElementById("viewad-description-text")?.outerHTML;
+      doc = parser.parseFromString(description.body, 'text/html');
+      content = doc.getElementById('viewad-description-text')?.outerHTML;
     } catch (err) {
       content = null;
     }
@@ -791,7 +790,7 @@ jQuery(document).ready(function ($) {
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_import_kleinanzeigen_data",
+        action: '_ajax_import_kleinanzeigen_data',
         post_ID,
         kleinanzeigen_id,
         post_status,
@@ -801,16 +800,16 @@ jQuery(document).ready(function ($) {
       },
       success: (response) => {
         el.dispatchEvent(
-          new CustomEvent("kleinanzeigen:data-import", {
+          new CustomEvent('kleinanzeigen:data-import', {
             detail: { success: true, response },
           })
         );
-        $(el).html("Fertig");
+        $(el).html('Fertig');
         setTimeout(() => parseResponse(response, el, callback), 2000);
       },
       error: (response, status, message) => {
         el.dispatchEvent(
-          new CustomEvent("kleinanzeigen:data-import", {
+          new CustomEvent('kleinanzeigen:data-import', {
             detail: { success: false, message },
           })
         );
@@ -825,7 +824,7 @@ jQuery(document).ready(function ($) {
     let doc;
     try {
       const parser = new DOMParser();
-      doc = parser.parseFromString(content.body, "text/html");
+      doc = parser.parseFromString(content.body, 'text/html');
     } catch (err) {
       console.error(err);
       return;
@@ -833,23 +832,30 @@ jQuery(document).ready(function ($) {
 
     let images = [];
     doc.documentElement
-      .querySelectorAll("#viewad-product .galleryimage-large img[data-imgsrc]")
+      .querySelectorAll('#viewad-product .galleryimage-large img[data-imgsrc]')
       .forEach((image) => {
         images.push(image.dataset.imgsrc);
       });
 
-    if (images.length) {
-      msg = `${images.length} Foto${1 === images.length ? "" : "s"} wurde${
-        1 === images.length ? "" : "n"
-      } importiert.`;
-    } else {
-      msg = "Es konnten keine Fotos gefunden werden.";
-    }
+    const message = (count, errors) => {
+      if (!images.length) {
+        msg = `Es konnten keine Fotos gefunden werden`;
+      } else {
+        if (!errors) {
+          msg = `${count} Foto${1 === count ? '' : 's'} wurde${
+            1 === count ? '' : 'n'
+          } importiert`;
+        } else {
+          msg = `${errors} von ${images.length} Foto${1 === count ? '' : 's'} konnten nicht importiert werden!`;
+        }
+      }
+      alert(msg);
+    };
 
     $.post({
       url: admin_ajax,
       data: {
-        action: "_ajax_import_kleinanzeigen_images",
+        action: '_ajax_import_kleinanzeigen_images',
         post_ID,
         kleinanzeigen_id,
         post_status,
@@ -857,8 +863,10 @@ jQuery(document).ready(function ($) {
         screen,
       },
       success: (response) => {
-        $(el).html("Fertig");
-        alert(msg);
+        $(el).html('Fertig');
+        const json = JSON.parse(response);
+        const { count, errors } = json.data;
+        message(count, errors);
         setTimeout(() => parseResponse(response, el, callback), 2000);
       },
       error: defaultErrorHandler,

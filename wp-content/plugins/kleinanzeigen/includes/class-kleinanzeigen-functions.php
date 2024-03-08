@@ -47,9 +47,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       add_action('woocommerce_before_product_object_save', array($this, 'product_before_save'), 99, 2);
       add_filter('woocommerce_product_data_store_cpt_get_products_query', array($this, 'handle_cpt_get_products_query'), 10, 2);
 
-      add_filter('wp_insert_post_data', array($this, 'before_save_post'), 99, 2);
-      add_action('save_post', array($this, 'save_post'), 99, 2);
-      add_action('save_post', array($this, 'quick_edit_product_save'), 10, 1);
+      add_filter('wp_insert_post_data', array($this, 'before_insert_post'), 99, 2);
+      add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
+      add_action('save_post_product', array($this, 'quick_edit_product_save'), 10, 1);
       add_filter('update_post_metadata', array($this, 'prevent_metadata_update'), 10, 4);
       add_action('before_delete_post', array('Utils', 'remove_attachments'));
 
@@ -147,7 +147,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         Utils::write_log('Fetching data...');
 
         $time = time();
-        $data = $this->get_all_ads();
+        $ads =  Utils::get_all_ads();
+        $data = array();
+        array_walk_recursive($ads['data'], function($a) use (&$data) { $data[] = $a; });
 
         if (is_wp_error($data)) {
           wp_die();
@@ -167,33 +169,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $data;
     }
 
-    private function get_all_ads()
-    {
-
-      // Get first set of data to discover page count
-      $data = Utils::account_error_check(Utils::get_json_data(), 'error-message.php');
-
-      if (is_wp_error($data)) {
-        return $data;
-      }
-
-      $ads = $data->ads;
-      $categories = $data->categoriesSearchData;
-      $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
-      $num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', 25));
-
-      // Get remaining pages
-      for ($paged = 2; $paged <= $num_pages; $paged++) {
-        $page_data = Utils::get_json_data(array('paged' => $paged));
-        $page_data  = Utils::account_error_check($page_data, 'error-message.php');
-        $ads = !is_wp_error($page_data) ? array_merge($ads, $page_data->ads) : $ads;
-      }
-      return $ads;
-    }
-
     public function verify_account()
     {
-      return is_wp_error(Utils::get_json_data()) ? false : true;
+      return is_wp_error(Utils::get_page_data()) ? false : true;
     }
 
     public function get_schedule_by_slug($slug)
@@ -229,32 +207,32 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           'status' => array('publish', 'draft')
         ),
         'drafts' => array(
-          'priority' => 2,
+          'priority' => 1,
           'items' => array(),
           'status' => array('draft')
         ),
         'has-sku' => array(
-          'priority' => 2,
+          'priority' => 1,
           'items' => array(),
+          'status' => array('publish', 'draft')
         ),
         'no-sku' => array(
-          'priority' => 2,
+          'priority' => 1,
           'items' => array(),
         ),
         'featured' => array(
-          'priority' => 2,
+          'priority' => 1,
           'items' => array(),
         ),
         'new-product' => array(
-          'priority' => 3,
+          'priority' => 1,
           'items' => array()
         ),
-        'renamed-product' => array(
-          'priority' => 3,
-          'items' => array()
+        'updated-product' => array(
+          'items' => array(),
+          'status' => array('publish', 'draft')
         ),
         'repair_url' => array(
-          'priority' => 3,
           'items' => array()
         ),
       );
@@ -262,9 +240,9 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       if ($name && isset($tasks[$name])) {
         $tasks = array($name => $tasks[$name]);
       } else {
-        // Remove high workload tasks (priority === 3)
+        // Remove non pageload tasks (priority !== 1)
         $tasks = array_filter($tasks, function ($task) {
-          return 3 !== $task['priority'];
+          return isset($task['priority']) && $task['priority'] === 1;
         });
       }
 
@@ -344,7 +322,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $postmeta_table WHERE $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", '_sku', $ad->id));
 
       if ($post_ID) {
-        $product = $this->get_ad_product($post_ID, $ad);
+        $product = $this->update_ad_product($post_ID, $ad);
         $found_by = 'sku';
       }
 
@@ -361,37 +339,74 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return compact('product', 'found_by');
     }
 
-    public function get_ad_product($post_ID, $record)
+    public function update_ad_product($post_ID, $record)
     {
+      $args = array();
       $product = wc_get_product($post_ID);
 
-      if ($product && ($name = html_entity_decode($product->get_name())) !== $record->title) {
-        Utils::write_log('##### ' . $record->id . ' #####');
-        Utils::write_log('"' . $name . '" <- IS NOT -> "' . $record->title . '"');
+      $diff_title = function () use ($product, $record, &$args) {
+        $diff = ($name = html_entity_decode($product->get_name())) !== $record->title ? $name : false;
+        if ($diff) {
+          $title = substr($record->title, 0, 15);
+          Utils::write_log("##### {$title} #####");
+          Utils::write_log("{$name} => {$record->title}");
 
-        /*
-         * Fetch new content
-         * Assuming that when title has changed, the ad has been edited so that the content also might be affected
-        */
-        $doc = wbp_fn()->get_dom_document($record);
-        $el = $doc->getElementById('viewad-description-text');
-        $content = $doc->saveHTML($el);
+          /**
+           * Fetch new content
+           * Assuming that when title has changed, the ad has been edited so that the content also might be affected
+           */
+          $doc = wbp_fn()->get_dom_document($record);
+          $el = $doc->getElementById('viewad-description-text');
+          $content = $doc->saveHTML($el);
+          $args['post_content'] = $content;
 
-        // Update metadata from new title & content
-        $this->set_product_data($product, $record, $content);
+          // Update metadata from new title & content
+          $this->set_product_data($product, $record, $content);
+        }
+        return $diff;
+      };
+      $diff_date = function () use ($product, $record, &$args) {
+        $record_date = $this->ka_formatted_date($record->date, 'Y-m-d');
+        $date = get_the_date('Y-m-d', $product->get_id());
+        
+        $diff = false;
+        if($record_date !== $date) {
+          $diff = true;
+          $record_datetime = $this->ka_formatted_date($record->date, 'Y-m-d H:i:s');
+        }
 
-        remove_action('save_post', array($this, 'save_post'), 99);
-        wp_insert_post(
-          array(
-            'ID' => $post_ID,
-            'post_type' => 'product',
-            'post_status' => $product->get_status(),
-            'post_title' => $record->title,
-            'post_content' => $content,
-            'post_excerpt' => $record->description
-          )
+        if ($diff) {
+          $title = substr($record->title, 0, 15);
+          Utils::write_log("##### {$title} #####");
+          Utils::write_log("{$date} => {$record_datetime}");
+
+          $args['post_date'] = $record_datetime;
+          $args['post_date_gmt'] = get_gmt_from_date($record_datetime);
+          $args['edit_date'] = true;
+        }
+
+        return $diff;
+      };
+      if ($product && ($diff_title() || $diff_date())) {
+        remove_action('save_post_product', array($this, 'save_post_product'), 99);
+        $a = array_merge(array(
+          'ID'            => $post_ID,
+          'post_type'     => 'product',
+          'post_status'   => $product->get_status(),
+          'post_title'    => $record->title,
+          'post_excerpt'  => $record->description
+        ), $args);
+        Utils::write_log($a);
+        wp_update_post(
+          array_merge(array(
+            'ID'            => $post_ID,
+            'post_type'     => 'product',
+            'post_status'   => $product->get_status(),
+            'post_title'    => $record->title,
+            'post_excerpt'  => $record->description
+          ), $args)
         );
-        add_action('save_post', array($this, 'save_post'), 99, 2);
+        add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
       }
 
       return $product;
@@ -462,7 +477,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
     protected function get_task_list_items($ads, $task_type, $args = array('status' => 'publish'))
     {
-      $ad_ids = wp_list_pluck($ads, 'id');
       $ids = wp_list_pluck((array) $ads, 'id');
       $keyed_records = array_combine($ids, $ads);
       $items = array();
@@ -514,14 +528,12 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $items;
       }
-      if ('renamed-product' === $task_type) {
+      if ('updated-product' === $task_type) {
         $products = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
         foreach ($products as $product) {
           $sku = (int) $product->get_sku();
           $record = isset($keyed_records[$sku]) ? $keyed_records[$sku] : null;
-          if ($record) {
-            $this->get_ad_product($product->get_id(), $record);
-          }
+          if(!is_null($record)) $this->update_ad_product($product->get_id(), $record);
         }
         // Return empty array since all product implicitly should have been repaired
         return $items;
@@ -565,12 +577,12 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           switch ($task_type) {
             case 'invalid-ad':
               $record = null;
-              if (!in_array($sku, $ad_ids)) {
+              if (!in_array($sku, $ids)) {
                 $items[] = compact('product', 'task_type', 'record');
               }
               break;
             case 'invalid-price':
-              if (in_array($sku, $ad_ids)) {
+              if (in_array($sku, $ids)) {
                 $record = $keyed_records[$sku];
                 if ($this->has_price_diff($record, $product)) {
                   $items[] = compact('product', 'task_type', 'record');
@@ -600,7 +612,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     public function quick_edit_product_save($data)
     {
       if (is_int($data)) return $data;
-      if ('product' !== $data['post_type']) return $data;
 
       // Check for a quick editsave action
       if (wp_doing_ajax() && isset($_POST['ID'])) {
@@ -649,7 +660,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $paged = 1;
       $num_pages = 1;
       while ($paged <= $num_pages) {
-        $data = Utils::get_json_data(array('paged' => $paged));
+        $data = Utils::get_page_data(array('paged' => $paged));
         if (1 === $num_pages) {
           $categories = $data->categoriesSearchData;
           $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
@@ -670,7 +681,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $ad ?? null;
     }
 
-    public function before_save_post($data, $postarr)
+    public function before_insert_post($data, $postarr)
     {
 
       if ("product" != $data['post_type']) return $data;
@@ -681,11 +692,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $data;
     }
 
-    public function save_post($post_ID, $post)
+    public function save_post_product($post_ID, $post, $update)
     {
-      if (!class_exists('WooCommerce', false)) return 0;
-      if ("product" != $post->post_type || "trash" == $post->post_status) return 0;
-
       $product = wc_get_product($post_ID);
       if (!$product) return 0;
 
@@ -700,7 +708,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       wbp_th()->maybe_remove_default_cat($post_ID);
 
       if (!wp_doing_ajax()) {
-        $this->process_kleinanzeigen($post_ID, $post);
+        $this->process_kleinanzeigen($post_ID, $post, $update);
       } else {
         $ad = isset($_POST['kleinanzeigendata']['record']) ? (object) $_POST['kleinanzeigendata']['record'] : null;
         $ad = is_null($ad) ? (isset($_POST['kleinanzeigen_id']) ? $this->find_kleinanzeige((int) $_POST['kleinanzeigen_id']) : null) : $ad;
@@ -713,7 +721,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
     }
 
-    public function process_kleinanzeigen($post_ID, $post)
+    public function process_kleinanzeigen($post_ID, $post, $update)
     {
       // If this is an autosave, our form has not been submitted, so we don't want to do anything.
       if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -732,17 +740,19 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
       }
 
-      if (isset($_POST['kleinanzeigen_id'])) {
-        $kleinanzeigen_id = sanitize_text_field($_POST['kleinanzeigen_id']);
-      } else {
-        $kleinanzeigen_id = '';
-      }
-
       $product = wc_get_product($post_ID);
       $title = $product->get_name();
       $content = $product->get_description();
       $errors = [];
       $ad = null;
+      $kleinanzeigen_id = '';
+      $date = '';
+
+      if (isset($_POST['kleinanzeigen_id'])) {
+        $kleinanzeigen_id = sanitize_text_field($_POST['kleinanzeigen_id']);
+      } elseif ($sku = $product->get_sku()) {
+        $kleinanzeigen_id = $sku;
+      }
 
       if (!empty($kleinanzeigen_id)) {
         $ad = $this->find_kleinanzeige($kleinanzeigen_id);
@@ -781,6 +791,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       if ($ad) {
         $ad_title = $ad->title;
         $title = $ad_title;
+        $date = $ad->date;
 
         $sku = (string) $is_recovered ? $ad->id : $product->get_sku();
         $sku_needs_update = $is_recovered || $sku !== $kleinanzeigen_id;
@@ -798,6 +809,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         $this->disable_sku($product);
       }
 
+      $date = wbp_fn()->ka_formatted_date($date);
+      $gmt = get_gmt_from_date($date);
 
 
       if (!ALLOW_DUPLICATE_TITLES) {
@@ -829,16 +842,19 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       // Avoid recursion
-      remove_action('save_post', array($this, 'save_post'), 99);
-      wp_insert_post([
-        'ID' => $post_ID,
-        'post_type' => 'product',
-        'post_status' => !empty($errors) ? 'draft' : (isset($_POST['post_status']) ? $_POST['post_status'] : $product->get_status()),
-        'post_content' => $content,
-        'post_excerpt' => $product->get_short_description(),
-        'post_title' => html_entity_decode($title) // Eventhough this will be encoded during save, however we catch this up again in wp_insert_post_data filter
+      remove_action('save_post_product', array($this, 'save_post_product'), 99);
+      wp_update_post([
+        'ID'            => $post_ID,
+        'post_type'     => 'product',
+        'post_status'   => !empty($errors) ? 'draft' : (isset($_POST['post_status']) ? $_POST['post_status'] : $product->get_status()),
+        'post_date'     => $date,
+        'post_date_gmt' => $gmt,
+        'edit_date'     => true,
+        'post_content'  => $content,
+        'post_excerpt'  => $product->get_short_description(),
+        'post_title'    => html_entity_decode($title) // Eventhough this will be encoded during save, however we catch this up again in wp_insert_post_data filter
       ]);
-      add_action('save_post', array($this, 'save_post'), 99, 2);
+      add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
     }
 
     public function product_title_exists($title)
@@ -936,18 +952,20 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
       $product = new WC_Product();
       $product->set_name($record->title);
+      $product->set_sku($record->id);
       $product->set_status('draft');
       $post_ID = $product->save();
 
       $this->set_product_data($product, $record, $content);
 
-      wp_insert_post(array(
+      wp_update_post(array(
         'ID' => $post_ID,
-        'post_title' => $record->title,
-        'post_type' => 'product',
-        'post_status' => $product->get_status(),
-        'post_content' => $content,
-        'post_excerpt' => $record->description // Utils::sanitize_excerpt($content, 300)
+        'post_title'    => $record->title,
+        'post_type'     => 'product',
+        'post_status'   => $product->get_status(),
+        'post_content'  => $content,
+        'post_excerpt'  => $record->description, // Utils::sanitize_excerpt($content, 300)
+        'post_foo'      => 'Foo Bar'
       ), true);
 
       $maybe_duplicate_sku = $this->enable_sku($product, $record);
@@ -1004,6 +1022,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
           update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
         }
       }
+      return $ids;
     }
 
     public function get_product_variation($product, $term_name, $taxonomy)
@@ -1827,6 +1846,30 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       }
 
       return $content;
+    }
+
+    public function ka_formatted_date($date = '', $format = '')
+    {
+      $_format = ! empty( $format ) ? $format : get_option( 'date_format' );
+      if (is_null($date) || empty($date)) {
+        $timestamp = time();
+      } else {
+        $timestamp = 0 === strpos($date, 'Heute')
+          ? strtotime(str_replace('Heute', 'Today', $date))
+          : (0 === strpos($date, 'Gestern')
+            ? strtotime(str_replace('Gestern', 'Yesterday', $date))
+            : strtotime($date)
+          );
+      }
+      return date($_format, $timestamp);
+    }
+
+    public function get_record($id)
+    {
+      $ads = $this->get_transient_data();
+      $ids = array_column($ads, 'id');
+      $record_key = array_search($id, $ids);
+      return is_int($record_key) ? $ads[$record_key] : null;
     }
 
     public static function get_instance($file = null): Kleinanzeigen_Functions

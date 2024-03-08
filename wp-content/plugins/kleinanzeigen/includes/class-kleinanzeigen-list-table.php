@@ -60,7 +60,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
   {
 
     $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-    $data = Utils::account_error_check(Utils::get_json_data(), 'error-message.php');
+    $data = Utils::account_error_check(Utils::get_page_data(), 'error-message.php');
 
     if (isset($data)) {
       $categories = $data->categoriesSearchData;
@@ -128,7 +128,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
 
     $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-    $data = Utils::get_json_data(array('paged' => $paged));
+    $data = Utils::get_page_data(array('paged' => $paged));
     $this->setData($data);
 
     extract($this->_args);
@@ -297,7 +297,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     echo implode(', ', array_map(function ($term) {
       $classes = array();
       if ('product_cat' === $term->taxonomy && self::$DEFAULT_CAT_ID === $term->term_id) {
-          $classes[] = 'todo';
+        $classes[] = 'todo';
       }
       return '<a class="' . implode(' ', $classes) . '" href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
     }, $terms !== false ? $terms : []));
@@ -331,7 +331,8 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $product_labels = array();
     $cat_terms = array();
     $brand_terms = array();
-
+    $date = wbp_fn()->ka_formatted_date($record->date);
+    
     if ($product) {
 
       $post_ID = $product->get_id();
@@ -347,7 +348,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       $brand_terms = wbp_th()->get_product_brands($post_ID);
       $cat_terms = wbp_th()->get_product_cats($post_ID);
 
-      if(is_null($record)) {
+      if (is_null($record)) {
         $diff_classes[] = 'broken';
       }
 
@@ -367,6 +368,12 @@ class Kleinanzeigen_List_Table extends WP_List_Table
         case 'publish':
           $status_name = __("Published");
           break;
+        case 'future':
+          $status_name = __("Future");
+          break;
+        default:
+          $status_name = __("Unknown");
+          
       }
     } else {
 
