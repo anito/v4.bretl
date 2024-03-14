@@ -27,6 +27,8 @@ class Kleinanzeigen_Deactivator extends Kleinanzeigen_Installer
 
     self::user_caps();
     self::unschedule_cron_jobs();
+    delete_transient('kleinanzeigen_data');
+    wbp_db()->clear_jobs();
   }
 
   private static function user_caps()
