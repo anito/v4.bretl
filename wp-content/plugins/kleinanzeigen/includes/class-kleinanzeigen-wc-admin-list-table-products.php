@@ -130,7 +130,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
             </div>
             <div id="publish-post-wbp-action-<?php echo $post_ID ?>" class="publish-column-content">
               <span class="spinner"></span>
-              <a id="publish-post-<?php echo $post_ID ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Hide', 'kleinanzeigen') : __('Publish') ?></a>
+              <a id="publish-post-<?php echo $post_ID ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Deactivate', 'kleinanzeigen') : __('Publish') ?></a>
             </div>
           </div>
           <script>

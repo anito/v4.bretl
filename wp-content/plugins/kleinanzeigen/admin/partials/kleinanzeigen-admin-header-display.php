@@ -4,7 +4,7 @@ $cats = array_map(function ($category) {
 }, $categories);
 $ad_cats = implode(', ', $cats);
 $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
-$num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', 25));
+$num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', ITEMS_PER_PAGE));
 $todos = $products['todos'];
 
 define('ORIENTATION_COOKIE_KEY', 'kleinanzeigen-view-o');

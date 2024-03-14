@@ -659,7 +659,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         if (1 === $num_pages) {
           $categories = $data->categoriesSearchData;
           $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
-          $num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', 25));
+          $num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', ITEMS_PER_PAGE));
         }
         if (!is_wp_error($data)) {
           $ads = $data->ads;
@@ -1696,19 +1696,15 @@ if (!class_exists('Kleinanzeigen_Functions')) {
     {
       $r = '';
 
-      $actions = array(
-        'keep' => __('Keep state', 'kleinanzeigen'),
-        'deactivate' => __('Deactivate', 'kleinanzeigen'),
-        'delete' => __('Delete', 'kleinanzeigen'),
-      );
+      $actions = $this->get_invalid_ad_actions();
 
       $r .= "\n\t<option value=0>" . __('No action', 'kleinanzeigen') . "</option>";
-      foreach ($actions as $action => $name) {
+      foreach ($actions as $action => $val) {
         // Preselect specified action.
         if ($selected === $action) {
-          $r .= "\n\t<option selected='selected' value='" . esc_attr($action) . "'>$name</option>";
+          $r .= "\n\t<option selected='selected' value='" . esc_attr($action) . "'>" . $val['name'] . "</option>";
         } else {
-          $r .= "\n\t<option value='" . esc_attr($action) . "'>$name</option>";
+          $r .= "\n\t<option value='" . esc_attr($action) . "'>" . $val['name'] . "</option>";
         }
       }
 
@@ -1864,6 +1860,23 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $ids = array_column($ads, 'id');
       $record_key = array_search($id, $ids);
       return is_int($record_key) ? $ads[$record_key] : null;
+    }
+
+    public function get_invalid_ad_actions() {
+      return array(
+        'publish' => array(
+          'name' => __('Publish', 'kleinanzeigen'),
+          'postarr' => array('post_status' => 'publish')
+      ),
+        'deactivate' => array(
+          'name' => __('Deactivate', 'kleinanzeigen'),
+          'postarr' => array('post_status' => 'draft')
+        ),
+        'delete' => array(
+          'name' => __('Delete', 'kleinanzeigen'),
+          'postarr' => array('post_status' => 'trash')
+        ),
+      );
     }
 
     public static function get_instance($file = null): Kleinanzeigen_Functions

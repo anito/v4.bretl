@@ -427,13 +427,11 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           $disabled['disconnect'] = !$sku;
           $disabled['activate-deactivate'] = !$sku;
           $disabled['delete'] = !$post_ID;
+          $actions = wbp_fn()->get_invalid_ad_actions();
           $label = array(
             'disconnect'  => $product->get_sku() ? __('Disconnect', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
-            'publish'     => __('Publish', 'kleinanzeigen'),
-            'deactivate'  => __('Hide', 'kleinanzeigen'),
-            'delete'      => __('Delete', 'kleinanzeigen')
           );
-          $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled', 'published'));
+          $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled', 'published', 'actions'));
           break;
         case 'invalid-price':
           $price = Utils::extract_kleinanzeigen_price($ka_price);
@@ -448,7 +446,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         case 'no-sku':
         case 'featured':
           $label = array(
-            'publish' => $post_status === 'publish' ? __('Hide', 'kleinanzeigen') : __('Publish'),
+            'publish' => $post_status === 'publish' ? __('Deactivate', 'kleinanzeigen') : __('Publish'),
             'edit'    => __('Edit', 'kleinanzeigen')
           );
           $actions = wbp_ka()->include_template('/dashboard/toggle-publish-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type'));

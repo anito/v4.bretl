@@ -212,6 +212,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     setcookie('ka-paged', 1);
     delete_transient('kleinanzeigen_data');
+    wbp_db()->clear_jobs();
   }
 
   public function unschedule_events_callback($option, $new_value, $old_value)
@@ -505,10 +506,9 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'uid' => $post_ID
       ));
 
-      unset($args);
       switch ($action) {
-        case 'keep':
-          $args = array();
+        case 'publish':
+          $args = array('post_status' => 'publish');
           break;
         case 'deactivate':
           $args = array('post_status' => 'draft');
@@ -518,14 +518,15 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           break;
         default:
       }
+      $actions = wbp_fn()->get_invalid_ad_actions();
 
-      if (isset($args)) {
-
+      if (isset($actions[$action]['postarr'])) {
+        $args = $actions[$action]['postarr'];
         $postarr = array_merge(array(
           'ID' => $post_ID
         ), $args);
 
-        wp_update_post($postarr);
+        // wp_update_post($postarr);
         $product = wc_get_product($post_ID);
 
         if ("trash" === $product->get_status()) {
@@ -608,7 +609,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function registerAndBuildFields()
   {
 
-    $register = function ($id, $callback = '') {
+    $register = function ($id, $callback = '', $default = '') {
 
       register_setting(
         'kleinanzeigen_account_settings',
@@ -616,9 +617,25 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         array(
           'sanitize_callback' => $callback,
           'show_in_rest'      => true,
-          'default'           => '0'
+          'default'           => $default
         )
       );
+    };
+
+    $get_default = function($args) {
+      $args = wp_parse_args($args, array('subtype' => ''));
+      switch($args['subtype']) {
+        case 'text':
+          $default = '';
+          break;
+        case 'number':
+        case 'checkbox':
+          $default = 0;
+          break;
+        default:
+          $default = '';
+      }
+      return $default;
     };
 
     /**
@@ -652,7 +669,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_account_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
     // Pro account
     unset($args);
@@ -674,7 +691,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_account_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
     // Ads per page
     unset($args);
@@ -697,7 +714,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_account_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), ITEMS_PER_PAGE);
 
     // Section Scheduling
     add_settings_section(
@@ -739,7 +756,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
     if ('never' === get_option('kleinanzeigen_crawl_interval')) return;
 
@@ -764,7 +781,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
     // Schedule new ads
     unset($args);
@@ -787,7 +804,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
     // Send email new ads
     unset($args);
@@ -810,7 +827,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
     if (IS_SUBDOMAIN_DEV) {
       // Send CC to-email new ads
@@ -821,7 +838,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'id'                => 'kleinanzeigen_send_cc_mail_on_new_ad',
         'name'              => 'kleinanzeigen_send_cc_mail_on_new_ad',
         'required'          => '',
-        'disabled'          => true,
+        'disabled'          => current_user_can('edit_posts') ? false : true,
         'get_options_list'  => '',
         'value_type'        => 'normal',
         'wp_data'           => 'option',
@@ -834,7 +851,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'kleinanzeigen_background_tasks_section',
         $args
       );
-      $register($args['id'], array($this, 'sanitize_option'));
+      $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
     }
 
     // Schedule invalid ad action
@@ -857,7 +874,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'kleinanzeigen_background_tasks_section',
       $args
     );
-    $register($args['id'], array($this, 'sanitize_option'));
+    $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
   }
 
   public function sanitize_option($data)

@@ -234,7 +234,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     /**
      * How many records for page do you want to show?
      */
-    $per_page = get_option('kleinanzeigen_items_per_page', 25);
+    $per_page = get_option('kleinanzeigen_items_per_page', ITEMS_PER_PAGE);
 
     /**
      * Define of column_headers. It's an array that contains:

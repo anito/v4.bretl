@@ -63,6 +63,13 @@ class Kleinanzeigen_Database
     return $todos;
   }
 
+  public function clear_jobs() {
+    $jobs = $this->get_jobs();
+    foreach($jobs as $job) {
+      $this->remove_job($job->id);
+    }
+  }
+
   public function remove_jobs($ids)
   {
     global $wpdb;

@@ -23,7 +23,7 @@ if (!class_exists('Utils')) {
     private static function get_remote_page_data($args = array())
     {
       $defaults = array(
-        'pageSize' => get_option('kleinanzeigen_items_per_page', 25),
+        'pageSize' => get_option('kleinanzeigen_items_per_page', ITEMS_PER_PAGE),
         'paged' => 1
       );
       $options = wp_parse_args($args, $defaults);
@@ -57,7 +57,7 @@ if (!class_exists('Utils')) {
     private static function get_static_page_data($args = array())
     {
       $defaults = array(
-        'pageSize' => get_option('kleinanzeigen_items_per_page', 25),
+        'pageSize' => get_option('kleinanzeigen_items_per_page', ITEMS_PER_PAGE),
         'paged' => 1
       );
       $options = wp_parse_args($args, $defaults);
@@ -98,7 +98,7 @@ if (!class_exists('Utils')) {
       $ads[] = $data->ads;
       $categories = $data->categoriesSearchData;
       $total_ads = array_sum(wp_list_pluck($categories, 'totalAds'));
-      $num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', 25));
+      $num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', ITEMS_PER_PAGE));
 
       // Get remaining pages
       for ($paged = 2; $paged <= $num_pages; $paged++) {

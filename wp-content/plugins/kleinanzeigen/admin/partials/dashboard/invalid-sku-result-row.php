@@ -1,17 +1,11 @@
 <div class="actions" data-id="<?php echo $post_ID ?>">
   <fieldset class="radio-fieldset hcenter">
-    <span>
-      <input type="radio" name="disconnect-type-<?php echo $post_ID ?>" id="disconnect-publish-<?php echo $post_ID ?>" value="<?php echo base64_encode(json_encode(array('post_status' => 'publish'))); ?>">
-      <label for="disconnect-publish-<?php echo $post_ID ?>"><?php echo $label['publish'] ?></label>
-    </span>
-    <span>
-      <input type="radio" name="disconnect-type-<?php echo $post_ID ?>" id="disconnect-deactivate-<?php echo $post_ID ?>" value="<?php echo base64_encode(json_encode(array('post_status' => 'draft'))); ?>">
-      <label for="disconnect-deactivate-<?php echo $post_ID ?>"><?php echo $label['deactivate'] ?></label>
-    </span>
-    <span>
-      <input type="radio" name="disconnect-type-<?php echo $post_ID ?>" id="disconnect-delete-<?php echo $post_ID ?>" value="<?php echo base64_encode(json_encode(array('post_status' => 'trash'))); ?>">
-      <label for="disconnect-delete-<?php echo $post_ID ?>"><?php echo $label['delete'] ?></label>
-    </span>
+    <?php foreach($actions as $key => $val) : ?>
+      <span>
+        <input type="radio" name="disconnect-type-<?php echo $post_ID ?>" id="disconnect-<?php echo "{$key}-{$post_ID}"; ?>" value="<?php echo base64_encode(json_encode($val['postarr'])); ?>">
+        <label for="disconnect-<?php echo "{$key}-{$post_ID}"; ?>"><?php echo $val['name']; ?></label>
+      </span>
+    <?php endforeach ?>
     <a href="#" type="button" class="button button-primary button-small action-button disconnect <?php echo $disabled['disconnect'] ? 'disabled' : '' ?>" data-task-type="<?php echo $task_type ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal"><?php echo $label['disconnect'] ?></a>
   </fieldset>
 </div>
