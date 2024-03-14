@@ -294,7 +294,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
           'ID' => $post_ID
         ), $args);
 
-        // wp_update_post($postarr);
+        wp_update_post($postarr);
         $product = wc_get_product($post_ID);
         if ("trash" === $product->get_status()) {
           wbp_fn()->delete_product($post_ID, true);
