@@ -555,6 +555,32 @@ section .color-box.invalid {
   cursor: pointer;
 }
 
+fieldset.radio-fieldset {
+  display: flex;
+  align-items: center;
+}
+
+fieldset.radio-fieldset.hcenter {
+  flex-direction: row;
+  justify-content: center;
+}
+
+fieldset.radio-fieldset span {
+  display: flex;
+  align-items: center;
+  margin-right: 0.6em;
+}
+
+fieldset.radio-fieldset span input[type=radio] {
+  margin-left: 0.8em;
+  margin-bottom: -0.2em;
+  margin-right: 0.5em;
+}
+
+fieldset.radio-fieldset span input[type=radio]:first-child {
+  margin-left: 0;
+}
+
 /**
  * Animations
  */

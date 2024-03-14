@@ -54,6 +54,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('update_option', array($this, 'unschedule_events_callback'), 1, 3);
 
 
+    // add_action('init', array($this, 'unregister_jobs'));
     add_action('init', array($this, 'register_jobs'));
 
     add_filter('cron_schedules', array($this, 'schedules'));
@@ -93,6 +94,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         wp_enqueue_style(self::$plugin_name, plugin_dir_url(__FILE__) . "css/style-admin-{$screen_id}.css", array(), self::$version, 'all');
         break;
     }
+  }
+
+  public function admin_dir_url() {
+    return plugin_dir_url(__FILE__);
   }
 
   /**
@@ -236,6 +241,16 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
   }
 
+  public function unregister_jobs() {
+    wp_unschedule_hook('kleinanzeigen_sync_price');
+    wp_unschedule_hook('kleinanzeigen_activate_url');
+    wp_unschedule_hook('kleinanzeigen_deactivate_url');
+    wp_unschedule_hook('kleinanzeigen_updated_ads');
+    wp_unschedule_hook('kleinanzeigen_sync_price');
+    wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
+    wp_unschedule_hook('kleinanzeigen_create_products');
+  }
+  
   public function register_jobs()
   {
 

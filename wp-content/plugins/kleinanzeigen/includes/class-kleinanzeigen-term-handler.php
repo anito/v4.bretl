@@ -219,6 +219,10 @@ if (!class_exists('Kleinanzeigen_Term_Handler')) {
     {
       return $this->get_product_terms($post, 'label');
     }
+    public function get_product_labs($post)
+    {
+      return $this->get_product_terms($post, 'lab');
+    }
 
     public function toggle_array_item($ids, $id, $bool = null)
     {

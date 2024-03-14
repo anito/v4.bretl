@@ -407,7 +407,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     }
 
 ?>
-    <tr id="<?php echo $post_ID ?>" <?php if (!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes) ?>" <?php } ?>>
+    <tr id="post-id-<?php echo $post_ID ?>" <?php if (!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes) ?>" <?php } ?>>
       <?php
 
       // Setup Actions
@@ -428,9 +428,10 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           $disabled['activate-deactivate'] = !$sku;
           $disabled['delete'] = !$post_ID;
           $label = array(
-            'disconnect'  => $product->get_sku() ? __('Keep', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
-            'activate-deactivate'  => $product->get_sku() ? ($published ? __('Hide', 'kleinanzeigen') : __('Publish', 'kleinanzeigen')) : __('Disconnected', 'kleinanzeigen'),
-            'delete'      => (!$disabled['delete']) ? __('Delete', 'kleinanzeigen') : __('Deleted', 'kleinanzeigen')
+            'disconnect'  => $product->get_sku() ? __('Disconnect', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+            'publish'     => __('Publish', 'kleinanzeigen'),
+            'deactivate'  => __('Hide', 'kleinanzeigen'),
+            'delete'      => __('Delete', 'kleinanzeigen')
           );
           $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled', 'published'));
           break;

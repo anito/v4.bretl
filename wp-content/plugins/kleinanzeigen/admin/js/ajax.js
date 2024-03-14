@@ -38,7 +38,8 @@ jQuery(document).ready(function ($) {
     disconnect(e.detail.e);
   });
   window.addEventListener('save:item', function (e) {
-    savePost(e.detail.e);
+    const { e: event, action = '' } = e.detail;
+    savePost(event, action);
   });
   window.addEventListener('fixprice:item', function (e) {
     fixPrice(e.detail.e);
@@ -492,14 +493,14 @@ jQuery(document).ready(function ($) {
     });
   }
 
-  function savePost(e) {
+  function savePost(e, action = '') {
     e.preventDefault();
     e.stopPropagation();
     start();
 
     const el = e.target;
     const post_ID = el.dataset.postId;
-    const args = el.dataset.args;
+    const args = action || el.dataset.args;
     const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen || screen;
 
@@ -618,7 +619,7 @@ jQuery(document).ready(function ($) {
         }
 
         if (modal_row) {
-          modalRowEl = $(`.wp-list-kleinanzeigen-tasks tr#${post_ID}`);
+          modalRowEl = $(`.wp-list-kleinanzeigen-tasks tr#post-id-${post_ID}`);
           $(modalRowEl)?.replaceWith(modal_row);
         }
 
@@ -846,7 +847,9 @@ jQuery(document).ready(function ($) {
             1 === count ? '' : 'n'
           } importiert`;
         } else {
-          msg = `${errors} von ${images.length} Foto${1 === count ? '' : 's'} konnten nicht importiert werden!`;
+          msg = `${errors} von ${images.length} Foto${
+            1 === count ? '' : 's'
+          } konnten nicht importiert werden!`;
         }
       }
       alert(msg);

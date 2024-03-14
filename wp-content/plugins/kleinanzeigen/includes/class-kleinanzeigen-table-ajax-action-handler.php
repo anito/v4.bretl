@@ -282,16 +282,12 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
     {
       $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
       $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
-      $args = isset($_REQUEST['args']) ? $_REQUEST['args'] : null;
+      $args = isset($_REQUEST['args']) ? $_REQUEST['args'] : base64_encode(json_encode(array()));
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-      if (!is_null($args)) {
-        $args = (array) json_decode(base64_decode($args));
-      } else {
-        $args = array();
-      }
+      $args = (array) json_decode(base64_decode($args));
 
       if ($post_ID) {
         $postarr = array_merge(array(

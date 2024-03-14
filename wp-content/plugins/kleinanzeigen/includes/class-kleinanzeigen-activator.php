@@ -27,7 +27,6 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
 
     self::install_table();
     self::user_caps();
-    self::register_taxonomies();
   }
 
   private static function user_caps()
@@ -118,53 +117,5 @@ class Kleinanzeigen_Activator extends Kleinanzeigen_Installer
     dbDelta($sql);
 
     add_option('kleinanzeigen_db_version', $kleinanzeigen_db_version);
-  }
-
-  private static function register_taxonomies()
-  {
-
-    register_taxonomy(
-      'product_lapel',
-      'product',
-      array(
-        'hierarchical'          => false,
-        'update_count_callback' => '_wc_term_recount',
-        'label'                 => __('Lapels', 'kleinanzeigen'),
-        'labels'                => array(
-          'name'                  => __('Product labels', 'kleinanzeigen'),
-          'singular_name'         => __('Lapel', 'kleinanzeigen'),
-          'menu_name'             => _x('Lapels', 'Admin menu name', 'kleinanzeigen'),
-          'search_items'          => __('Search labels', 'kleinanzeigen'),
-          'all_items'             => __('All labels', 'kleinanzeigen'),
-          'parent_item'           => __('Parent label', 'kleinanzeigen'),
-          'parent_item_colon'     => __('Parent label:', 'kleinanzeigen'),
-          'edit_item'             => __('Edit label', 'kleinanzeigen'),
-          'update_item'           => __('Update label', 'kleinanzeigen'),
-          'add_new_item'          => __('Add new label', 'kleinanzeigen'),
-          'new_item_name'         => __('New label name', 'kleinanzeigen'),
-          'not_found'             => __('No labels found', 'kleinanzeigen'),
-          'item_link'             => __('Product Lapel Link', 'kleinanzeigen'),
-          'item_link_description' => __('A link to a product label.', 'kleinanzeigen'),
-        ),
-        'show_in_rest'          => true,
-        'show_ui'               => true,
-        "show_in_menu"          => true,
-        "show_in_nav_menus"     => true,
-        "show_admin_column"     => true,
-        'query_var'             => true,
-        'capabilities'          => array(
-          'manage_terms' => 'manage_product_terms',
-          'edit_terms'   => 'edit_product_terms',
-          'delete_terms' => 'delete_product_terms',
-          'assign_terms' => 'assign_product_terms',
-        ),
-        'rewrite'               => array(
-          'slug'         => 'product_lapel',
-          'with_front'   => true,
-          'hierarchical' => false,
-        ),
-      )
-    );
-    register_taxonomy_for_object_type('product_lapel', 'product');
   }
 }

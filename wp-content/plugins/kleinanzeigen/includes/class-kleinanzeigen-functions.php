@@ -214,7 +214,6 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         'has-sku' => array(
           'priority' => 1,
           'items' => array(),
-          'status' => array('publish', 'draft')
         ),
         'no-sku' => array(
           'priority' => 1,
@@ -344,7 +343,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $args = array();
       $product = wc_get_product($post_ID);
 
-      $diff_title = function () use ($product, $record, &$args) {
+      /**
+       * @return boolean
+       */
+      $is_diff_title = function () use ($product, $record, &$args) {
         $diff = ($name = html_entity_decode($product->get_name())) !== $record->title ? $name : false;
         if ($diff) {
           $title = substr($record->title, 0, 15);
@@ -365,7 +367,10 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         }
         return $diff;
       };
-      $diff_date = function () use ($product, $record, &$args) {
+      /**
+       * @return boolean
+       */
+      $is_diff_date = function () use ($product, $record, &$args) {
         $record_date = $this->ka_formatted_date($record->date, 'Y-m-d');
         $date = get_the_date('Y-m-d', $product->get_id());
         
@@ -373,9 +378,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
         if($record_date !== $date) {
           $diff = true;
           $record_datetime = $this->ka_formatted_date($record->date, 'Y-m-d H:i:s');
-        }
 
-        if ($diff) {
           $title = substr($record->title, 0, 15);
           Utils::write_log("##### {$title} #####");
           Utils::write_log("{$date} => {$record_datetime}");
@@ -387,7 +390,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
 
         return $diff;
       };
-      if ($product && ($diff_title() || $diff_date())) {
+      if ($product && ($is_diff_title() || $is_diff_date())) {
         remove_action('save_post_product', array($this, 'save_post_product'), 99);
         wp_update_post(
           array_merge(array(
@@ -1694,7 +1697,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       $r = '';
 
       $actions = array(
-        'keep' => __('Keep', 'kleinanzeigen'),
+        'keep' => __('Keep state', 'kleinanzeigen'),
         'deactivate' => __('Deactivate', 'kleinanzeigen'),
         'delete' => __('Delete', 'kleinanzeigen'),
       );
@@ -1840,9 +1843,8 @@ if (!class_exists('Kleinanzeigen_Functions')) {
       return $content;
     }
 
-    public function ka_formatted_date($date = '', $format = '')
+    public function ka_formatted_date($date = '', $format = 'Y-m-d H:i:s')
     {
-      $_format = ! empty( $format ) ? $format : get_option( 'date_format' );
       if (is_null($date) || empty($date)) {
         $timestamp = time();
       } else {
@@ -1853,7 +1855,7 @@ if (!class_exists('Kleinanzeigen_Functions')) {
             : strtotime($date)
           );
       }
-      return date($_format, $timestamp);
+      return date($format, $timestamp);
     }
 
     public function get_record($id)
