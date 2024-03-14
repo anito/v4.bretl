@@ -51,7 +51,7 @@
     const table = $('#table-task-list');
 
     $('.deactivate', table).on('click', function(e) {
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("save:item", {
           detail: {
             e
@@ -68,7 +68,7 @@
     })
 
     $('.disconnect', table).on('click', function(e) {
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("disconnect:item", {
           detail: {
             e
@@ -85,7 +85,7 @@
     })
 
     $('.deactivate-all').on('click', function() {
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("deactivate:all", {
           detail: {
             data
@@ -95,7 +95,7 @@
     })
 
     $('.disconnect-all').on('click', function() {
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("disconnect:all", {
           detail: {
             data

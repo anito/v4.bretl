@@ -639,7 +639,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           const trEl = $(`#ad-id-${kleinanzeigen_id}`);
           trEl.on('data:parsed', (e) => {
 
-            if ('create' === e.detail?.action) {
+            if ('create' === e.originalEvent.detail?.action) {
               impImagesEl.click();
             }
 

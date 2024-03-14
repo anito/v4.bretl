@@ -9,25 +9,17 @@
 
     // Scan Price Results
     $('.fix-price:not(.disabled)', parent).on('click', function(e) {
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("fixprice:item", {
           detail: {
             e
           },
         })
       );
-      $(e.target).on('data:parsed', handleLabel);
+      $(document).on('data:parsed', handleLabel);
     })
 
 
-    function handleLabel(e) {
-      const el = e.target;
-      const label = $(el).data('success-label');
-      if (label) {
-        $(el).html(label);
-      }
-      $(el).addClass('disabled')
-        .off('data:parsed', handleLabel);
-    }
+    function handleLabel(e) {}
   })(jQuery)
 </script>

@@ -24,35 +24,35 @@ jQuery(document).ready(function ($) {
         });
       }, Promise.resolve())
       .then(() => {
-        window.dispatchEvent(new CustomEvent(eventType));
+        document.dispatchEvent(new CustomEvent(eventType));
       });
   };
 
-  window.addEventListener('toggle-publish:item', function (e) {
+  document.addEventListener('toggle-publish:item', function (e) {
     publishPost(e.detail.e);
   });
-  window.addEventListener('deactivate:item', function (e) {
+  document.addEventListener('deactivate:item', function (e) {
     publishPost(e.detail.e);
   });
-  window.addEventListener('disconnect:item', function (e) {
+  document.addEventListener('disconnect:item', function (e) {
     disconnect(e.detail.e);
   });
-  window.addEventListener('save:item', function (e) {
+  document.addEventListener('save:item', function (e) {
     const { e: event, action = '' } = e.detail;
     savePost(event, action);
   });
-  window.addEventListener('fixprice:item', function (e) {
+  document.addEventListener('fixprice:item', function (e) {
     fixPrice(e.detail.e);
   });
-  window.addEventListener('deactivate:all', async function (e) {
+  document.addEventListener('deactivate:all', async function (e) {
     const { products } = e.detail.data;
     delayed_item_click(products, '.deactivate', 'deactivated:all');
   });
-  window.addEventListener('disconnect:all', async function (e) {
+  document.addEventListener('disconnect:all', async function (e) {
     const { products } = e.detail.data;
     delayed_item_click(products, '.disconnect', 'disconnected:all');
   });
-  window.addEventListener('fixprice:all', async function (e) {
+  document.addEventListener('fixprice:all', async function (e) {
     const { products } = e.detail.data;
     delayed_item_click(products, '.fix-price', 'fixed-price:all');
   });
@@ -613,30 +613,36 @@ jQuery(document).ready(function ($) {
           document.dispatchEvent(new CustomEvent('init:head'));
         }
 
+        let newEl, data;
         if (row) {
           rowEl = $(`.wp-list-kleinanzeigen tr#ad-id-${kleinanzeigen_id}`);
           $(rowEl)?.replaceWith(row);
+          newEl = $(`.wp-list-kleinanzeigen tr#ad-id-${kleinanzeigen_id}`);
+          data = {row: newEl, id: kleinanzeigen_id};
         }
 
         if (modal_row) {
           modalRowEl = $(`.wp-list-kleinanzeigen-tasks tr#post-id-${post_ID}`);
           $(modalRowEl)?.replaceWith(modal_row);
+          newEl = $(`.wp-list-kleinanzeigen-tasks tr#post-id-${post_ID}`);
+          data = {row: newEl, id: post_ID};
         }
 
-        const data = $(el).data();
-        el.dispatchEvent(
-          new CustomEvent('data:parsed', {
-            detail: data,
-          })
-        );
+        if(data) {
+          document.dispatchEvent(
+            new CustomEvent('data:parsed', {
+              detail: data,
+            })
+          );
+        }
 
         if ('create' === el.dataset.action) {
           rowEl = document.querySelector(`tr#ad-id-${kleinanzeigen_id}`);
 
           setTimeout(() => {
-            rowEl.dispatchEvent(
+            $(rowEl).trigger(
               new CustomEvent('data:parsed', {
-                detail: { action: el.dataset.action },
+                detail: {  action: el.dataset.action },
               })
             );
           }, 200);

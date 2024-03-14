@@ -58,7 +58,7 @@
     const table = $('#table-task-list');
 
     $('.fix-price-all', table).on('click', function() {
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("fixprice:all", {
           detail: {
             data

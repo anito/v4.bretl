@@ -429,7 +429,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           $disabled['delete'] = !$post_ID;
           $actions = wbp_fn()->get_invalid_ad_actions();
           $label = array(
-            'disconnect'  => $product->get_sku() ? __('Disconnect', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
+            'disconnect'  => $product->get_sku() ? __('Disconnect', 'kleinanzeigen') : __('Disssconnected', 'kleinanzeigen'),
           );
           $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled', 'published', 'actions'));
           break;
@@ -552,14 +552,14 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
           $('.deactivate-all').on('click', function(e) {
             const el = $(e.target);
-            window.dispatchEvent(
+            document.dispatchEvent(
               new CustomEvent("deactivate:all", {
                 detail: {
                   data
                 },
               })
             );
-            el.on('deactivated:all', handleLabel)
+            $(document).on('deactivated:all', handleLabel)
           })
 
           const featuredEl = $(`#task-feature-post-${post_ID}`);
@@ -571,31 +571,31 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
           $('.disconnect-all').on('click', function(e) {
             const el = $(e.target);
-            window.dispatchEvent(
+            document.dispatchEvent(
               new CustomEvent("disconnect:all", {
                 detail: {
                   data
                 },
               })
             );
-            el.on('deactivated:all', handleLabel)
+            $(document).on('deactivated:all', handleLabel)
           })
 
           // Scan Price Results
           $('.fix-price-all', table).on('click', function(e) {
             const el = $(e.target);
-            window.dispatchEvent(
+            document.dispatchEvent(
               new CustomEvent("fixprice:all", {
                 detail: {
                   data
                 },
               })
             );
-            el.on('fixed-price:all', handleLabel);
+            $(document).on('fixed-price:all', handleLabel);
           })
 
           function handleLabel(e) {
-            const el = e.target;
+            const el = e.originalEvent.target;
             const label = $(el).data('success-label');
             if (label) {
               $(el).html(label);
