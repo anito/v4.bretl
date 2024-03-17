@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-29 21:47+0000\n"
-"PO-Revision-Date: 2024-03-14 13:26+0000\n"
+"PO-Revision-Date: 2024-03-16 10:02+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -84,15 +84,15 @@ msgstr "Anzeigen Import aus Kleinanzeigen.de"
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:35
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:62
 msgid "Add new product brand"
-msgstr ""
+msgstr "Neue Produktmarke hinzufügen"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:66
 msgid "Add or remove product brands"
-msgstr ""
+msgstr "Produktmarken hinzufügen oder entfernen"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:39
 msgid "Add or remove product labels"
-msgstr ""
+msgstr "Produktlabel hinzufügen oder entfernen"
 
 #: admin/class-kleinanzeigen-admin.php:848
 #, php-format
@@ -118,11 +118,11 @@ msgstr "Anzeigen pro Seite"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:59
 msgid "All product brands"
-msgstr ""
+msgstr "Alle Produktmarken"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:32
 msgid "All product labels"
-msgstr ""
+msgstr "Alle Produktlabels"
 
 #: includes/class-kleinanzeigen-functions.php:956
 msgid "Artikelnummer existiert bereits."
@@ -171,11 +171,11 @@ msgstr "Kategorien"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:67
 msgid "Choose from the most used product brands"
-msgstr ""
+msgstr "Wähle aus den meist verwendeten Produktmarken"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:40
 msgid "Choose from the most used product labels"
-msgstr ""
+msgstr "Wähle aus den meist verwendeten Produktlabels"
 
 #: admin/partials/kleinanzeigen-admin-display.php:45
 #: admin/partials/kleinanzeigen-admin-display.php:59
@@ -249,10 +249,10 @@ msgid ""
 "Determine how to proceed with the product when its ad has become invalid due "
 "to reservation, deactivation or deletion"
 msgstr ""
-"Lege hier eine Aktion fest, wie mit Produkten verfahren werden soll, deren "
-"Kleinanzeige nicht mehr auffindbar ist. Grund ist meist eine bestehende "
+"Lege hier eine Aktion für die Produkte fest, deren Kleinanzeige nicht mehr "
+"auffindbar ist. Grund für sog. verwaiste Produkte kann z.B. eine bestehende "
 "Reservierung oder Kaufabschluss bzw. das Deaktivieren oder Löschen der "
-"Anzeige."
+"Anzeige sein."
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:432
 #: includes/class-kleinanzeigen-list-table.php:405
@@ -363,11 +363,11 @@ msgid ""
 "the given actions. After an action has been taken the product will no longer "
 "be listetd here. You can also automate this process in %s."
 msgstr ""
-"Für die nachfolgenden Produkte konnte die zughörige Anzeige nicht mehr "
-"gefunden werden. Diese Produkte können durch Auswahl einer entsprechenden "
-"Aktion manuell von der Anzeige getrennt werden. Nachdem eine Aktion "
-"durchgeführt wurde, wird das Produkt automatisch aus der Liste entfernt. "
-"Dieser Prozess kann in den %s automatisiert werden."
+"Lege hier für jedes verwaiste Produkt individuell fest, ob es weiterhin im "
+"Shop gelistet, deaktiviert oder gelöscht werden soll. Verwaiste Produkte "
+"entstehen immer dann, wenn die zugrundeliegende Anzeige nicht mehr "
+"auffindbar ist. Ursache kann z.B. eine Reservierung, der Verkauf oder das "
+"Löschen der Anzeige sein. Dieser Prozess kann in den %s automatisiert werden."
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:76
 msgid "Hero image"
@@ -500,7 +500,7 @@ msgstr "Niemals"
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:36
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:63
 msgid "New product brand name"
-msgstr ""
+msgstr "Neue Produktmarkenname"
 
 #: includes/class-kleinanzeigen-functions.php:1766
 msgid "New product online"
@@ -520,11 +520,11 @@ msgstr "Keine Daten gefunden"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:68
 msgid "No product brands found"
-msgstr ""
+msgstr "Keine Produktmarken gefunden"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:41
 msgid "No product labels found"
-msgstr ""
+msgstr "Keine Produktlabels gefunden"
 
 #: admin/partials/dashboard/invalid-sku-results.php:22
 #: admin/partials/dashboard/invalid-price-results.php:23
@@ -574,11 +574,11 @@ msgstr "Bitte gebe hier deine Account Daten ein."
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:64
 msgid "Popular product brands"
-msgstr ""
+msgstr "Beliebteste Produktmarken"
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:37
 msgid "Popular product labels"
-msgstr ""
+msgstr "Beliebteste Produktlabels"
 
 #: public/partials/emails/new-product.php:32
 msgid "Preview"

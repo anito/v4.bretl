@@ -236,7 +236,7 @@
     position: fixed;
     top: calc(50vh - 50px);
     left: calc(50vw - 180px + var(--admin-sidebar));
-    z-index: 101;
+    z-index: 0;
     width: 180px;
     height: 80px;
     border-radius: 10px;

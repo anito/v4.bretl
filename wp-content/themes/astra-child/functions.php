@@ -286,14 +286,26 @@ function wbp_custom_default_orderby($sortby)
 
   // categories sorting table
   $orderby = array(
-    'aktionspreise' => 'date',
+    'slug' => array(
+      'aktionspreise' => 'date',
+      'aktionswochen' => 'date',
+      'empfehlungen'  => 'date',
+      'aktionen'      => 'date',
+    ),
+    'taxonomy' => array(
+      'product_cat'   => 'date',
+      'product_brand' => 'date',
+      'pa_merkmale'   => 'date'
+    )
   );
 
-  $cat = $wp_query->get_queried_object();
-  $slug = $cat->slug;
-
-  if (array_key_exists($slug, $orderby)) {
-    $sortby = $orderby[$slug];
+  $obj  = (array) $wp_query->get_queried_object();
+  foreach($orderby as $key => $val) {
+    $prop = $obj[$key];
+    if(array_key_exists($prop, $val)) {
+      $sortby = $val[$prop];
+      break;
+    }
   }
 
   return $sortby;

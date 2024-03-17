@@ -51,14 +51,14 @@ if (!class_exists('Kleinanzeigen_Term_Handler')) {
       $is_on_sale = $product->is_on_sale();
     
       // Product Sale Category
-      $term = get_term_by('name', WC_COMMON_TAXONOMIES['sale'], 'product_cat');
+      $term = wbp_th()->get_product_term('sale', 'cat');
       $term_id = $term->term_id;
       if ($term_id) {
         $this->set_product_term($product, $term_id, 'cat', $is_on_sale);
       }
     
       // Product Sale Tag
-      $term = get_term_by('name', WC_COMMON_TAXONOMIES['sale'], 'product_tag');
+      $term = wbp_th()->get_product_term('sale', 'tag');
       $term_id = $term->term_id;
       if ($term_id) {
         $this->set_product_term($product, $term_id, 'tag', $is_on_sale);
@@ -92,14 +92,14 @@ if (!class_exists('Kleinanzeigen_Term_Handler')) {
       }
       $is_featured = $product->is_featured();
     
-      $term = get_term_by('name', WC_COMMON_TAXONOMIES['featured'], 'product_cat');
+      $term = wbp_th()->get_product_term('featured', 'cat');
       if ($term) {
         $term_id = $term->term_id;
         $this->set_product_term($product, $term_id, 'cat', $is_featured);
       }
     
       // Product Featured tag
-      $term = get_term_by('name', WC_COMMON_TAXONOMIES['featured'], 'product_tag');
+      $term = wbp_th()->get_product_term('featured', 'tag');
       if ($term) {
         $term_id = $term->term_id;
         $this->set_product_term($product, $term_id, 'tag', $is_featured);
@@ -109,6 +109,22 @@ if (!class_exists('Kleinanzeigen_Term_Handler')) {
       if (SYNC_COMMON_TAX_AND_ATTS) {
         // $this->set_pa_term($product, WC_COMMON_TAXONOMIES['featured'], $is_featured);
       }
+    }
+
+    public function get_product_term($slug, $type) {
+      if(!isset(WC_COMMON_TAXONOMIES[$slug])) {
+        return new WP_Error(
+          'term_not_defined',
+				sprintf(__( 'Cannot find product term of slug %s.', 'kleinanzeigen' ), $slug),
+				[ 'status' => 400 ]
+        );
+      }
+      $term_name = WC_COMMON_TAXONOMIES[$slug];
+      $taxonomy = 'product_' . $type;
+      if(!term_exists($slug, $taxonomy)) {
+        wp_insert_term($term_name, $taxonomy, array('slug' => $slug));
+      }
+      return get_term_by('name', $term_name, $taxonomy);
     }
 
     public function set_product_term($product, $term_id, $type, $bool)

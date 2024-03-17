@@ -96,15 +96,12 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         );
         break;
       case 'invalid-cat':
-        $default_cat = get_term_by('id', self::$DEFAULT_CAT_ID, 'product_cat');
-        $subheader = '';
-        $subheader .= __('Please assign the below listed products an appropriate category in order to get located by your visitors.', 'kleinanzeigen');
         $vars = array(
           'header-template' => array(
             'template' => 'modal-table-header',
             'args' => array(
-              'header' => sprintf(__('Products of category "%1$s"', 'kleinanzeigen'), $default_cat->name),
-              'subheader' => $subheader
+              'header' => __('Improve category', 'kleinanzeigen'),
+              'subheader' => __('Please assign the below listed products an appropriate category in order to get located by your visitors.', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
@@ -369,13 +366,18 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     echo '<tr style="display: none;"></tr>';
   }
 
-  function render_terms($terms)
+  function render_terms($terms, $product = false)
   {
-    echo implode(', ', array_map(function ($term) {
-      $classes = array();
-      if ('product_cat' === $term->taxonomy && self::$DEFAULT_CAT_ID === $term->term_id) {
-        $classes[] = 'todo';
-      }
+    $classes = array();
+    if (
+      $product
+      && ($invalid_cat_products = wbp_fn()->get_invalid_cat_products(array('status' => array('publish', 'draft'))))
+      && in_array(
+        $product,
+        $invalid_cat_products
+      )
+    ) $classes[] = 'todo';
+    echo implode(', ', array_map(function ($term) use($classes) {
       return '<a class="' . implode(' ', $classes) . '" href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
     }, $terms !== false ? $terms : []));
   }
@@ -429,7 +431,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           $disabled['delete'] = !$post_ID;
           $actions = wbp_fn()->get_invalid_ad_actions();
           $label = array(
-            'disconnect'  => $product->get_sku() ? __('Disconnect', 'kleinanzeigen') : __('Disssconnected', 'kleinanzeigen'),
+            'disconnect'  => $product->get_sku() ? __('Disconnect', 'kleinanzeigen') : __('Disconnected', 'kleinanzeigen'),
           );
           $actions = wbp_ka()->include_template('/dashboard/invalid-sku-result-row.php', true, compact('post_ID', 'sku', 'label', 'task_type', 'disabled', 'published', 'actions'));
           break;
@@ -511,7 +513,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           case "shop-categories": {
             ?>
               <td class="<?php echo $class ?>">
-                <div class="column-content"><?php $this->render_terms($cat_terms); ?></a></div>
+                <div class="column-content"><?php $this->render_terms($cat_terms, $product); ?></a></div>
               </td>
             <?php
               break;
