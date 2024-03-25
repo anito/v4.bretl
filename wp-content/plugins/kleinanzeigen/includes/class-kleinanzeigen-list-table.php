@@ -188,7 +188,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       'image' => __('Image', 'kleinanzeigen'),
       'title' => __('Title', 'kleinanzeigen'),
       'date' => __('Date of change', 'kleinanzeigen'),
-      'price' => __('KA Price'),
+      'price' => __('KA Price', 'kleinanzeigen'),
       'shop-price' => __('Shop Price', 'kleinanzeigen'),
       'shop-categories' => __('Categories', 'kleinanzeigen'),
       'shop-brands' => __('Vendor', 'kleinanzeigen'),
