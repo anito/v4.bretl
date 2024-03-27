@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/includes/sender-email.php';
-require_once __DIR__ . '/includes/duplicate-content.php';
+if(is_admin()) {
+  require_once __DIR__ . '/includes/duplicate-content.php';
+  require_once __DIR__ . '/includes/custom-avatar.php';
+}
 
 function wbp_init()
 {
@@ -383,71 +386,6 @@ function custom_elementor_placeholder_image()
 add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeholder_image');
 
 /**
- * Add Metabox to product screen
- *
- */
-function kleinanzeigen_meta_box()
-{
-
-  $screens = array('edit-product', 'product');
-
-  foreach ($screens as $screen) {
-    add_meta_box(
-      'kleinanzeigen',
-      __('Ads', 'astra-child'),
-      'kleinanzeigen_metabox_callback',
-      $screen
-    );
-  }
-}
-// add_action('add_meta_boxes', 'kleinanzeigen_meta_box');
-
-function kleinanzeigen_metabox_callback($post)
-{
-
-  wp_nonce_field('kleinanzeigen_nonce', 'kleinanzeigen_nonce');
-
-  $id = get_post_meta($post->ID, 'kleinanzeigen_id', true);
-  wbp_include_kleinanzeigen_template('metaboxes/kleinanzeigen-import.php', false, array('id' => $id));
-}
-
-function save_kleinanzeigen_meta_box_data($post_ID)
-{
-
-  // Check if our nonce is set.
-  if (!isset($_POST['kleinanzeigen_nonce'])) {
-    return;
-  }
-
-  // Verify that the nonce is valid.
-  if (!wp_verify_nonce($_POST['kleinanzeigen_nonce'], 'kleinanzeigen_nonce')) {
-    return;
-  }
-
-  // If this is an autosave, our form has not been submitted, so we don't want to do anything.
-  if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-    return;
-  }
-
-  // Check the user's permissions.
-  if (isset($_POST['post_type']) && 'product' == $_POST['post_type']) {
-
-    if (!current_user_can('edit_post', $post_ID)) {
-      return;
-    }
-  }
-
-  if (!isset($_POST['kleinanzeigen_id'])) {
-    return;
-  }
-
-  $id = sanitize_text_field($_POST['kleinanzeigen_id']);
-
-  update_post_meta($post_ID, 'kleinanzeigen_id', $id);
-}
-// add_action('save_post', 'save_kleinanzeigen_meta_box_data');
-
-/**
  * In order to improve SEO,
  * display the product title again in product description
  *
@@ -558,7 +496,7 @@ add_filter('woocommerce_default_address_fields', 'wbp_filter_default_address_fie
 function wbp_wc_coupons_frontend_enabled($is_enabled)
 {
   if (!is_admin() && function_exists('astra_get_option')) {
-    return astra_get_option('checkout-coupon-display');;
+    return astra_get_option('checkout-coupon-display');
   }
   return true;
 }
