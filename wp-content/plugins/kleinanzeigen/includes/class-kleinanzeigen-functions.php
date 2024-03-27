@@ -1667,7 +1667,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         'Aktionspreis'        => array('aktionspreis', 'match_type' => 'like', 'fn' => 'sale'),
         'Allrad'              => array('allrad', 'match_type' => 'like'),
         'Vorführmaschine'     => array(
-          array('vorführ', 'match_type' => 'like'),
+          array('vorführm', 'match_type' => 'like'),
           array('vfm'),
         ),
         'Guter Zustand'       => array('guter zustand'),
@@ -1979,7 +1979,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $post_status        = get_post_status($post_ID);
       $thumbnail          = get_the_post_thumbnail_url($post_ID);
       $kleinanzeigen_url  = $this->get_kleinanzeigen_url($record->url);
-      $email_heading      = __('New product online', 'kleinanzeigen');
+      $email_heading      = __('New product', 'kleinanzeigen');
       $additional_content = '';
       $headers            = array(
         'content-type: text/html',
