@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-29 21:47+0000\n"
-"PO-Revision-Date: 2024-03-17 16:54+0000\n"
+"PO-Revision-Date: 2024-03-27 21:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: Deutsch\n"
 "Language: de_DE\n"
@@ -15,12 +15,12 @@ msgstr ""
 "X-Loco-Version: 2.6.6; wp-6.4.3\n"
 "X-Domain: kleinanzeigen"
 
-#: includes/class-kleinanzeigen-functions.php:1486
-#: includes/class-kleinanzeigen-functions.php:1490
-#: includes/class-kleinanzeigen-functions.php:1494
-#: includes/class-kleinanzeigen-functions.php:1498
-#: includes/class-kleinanzeigen-functions.php:1502
-#: includes/class-kleinanzeigen-functions.php:1506
+#: includes/class-kleinanzeigen-functions.php:1487
+#: includes/class-kleinanzeigen-functions.php:1491
+#: includes/class-kleinanzeigen-functions.php:1495
+#: includes/class-kleinanzeigen-functions.php:1499
+#: includes/class-kleinanzeigen-functions.php:1503
+#: includes/class-kleinanzeigen-functions.php:1507
 msgid "%d Days"
 msgstr "%d Tage"
 
@@ -29,7 +29,7 @@ msgstr "%d Tage"
 msgid "%s out of %s ads"
 msgstr "%s von %s Anzeigen"
 
-#: includes/class-kleinanzeigen-functions.php:1482
+#: includes/class-kleinanzeigen-functions.php:1483
 msgid "1 Day"
 msgstr "1 Tag"
 
@@ -39,7 +39,7 @@ msgstr "1 Tag"
 msgid "A link to a product brand."
 msgstr "Link zur Produktmarke"
 
-#: includes/class-kleinanzeigen-functions.php:932
+#: includes/class-kleinanzeigen-functions.php:933
 msgid ""
 "A Product with the same Ad ID already exists. Delete this draft or enter a "
 "different Ad ID."
@@ -47,7 +47,7 @@ msgstr ""
 "Es existiert bereits ein Produkt mit dieser Anzeige ID. Lösche bitte diesen "
 "Entwurf oder verwende eine andere Anzeige ID für den Import."
 
-#: includes/class-kleinanzeigen-functions.php:956
+#: includes/class-kleinanzeigen-functions.php:957
 msgid ""
 "A product with the same title already exists. Delete this draft or enter a "
 "different title."
@@ -124,7 +124,7 @@ msgstr "Alle Produktmarken"
 msgid "All product labels"
 msgstr "Alle Produktlabels"
 
-#: includes/class-kleinanzeigen-functions.php:1086
+#: includes/class-kleinanzeigen-functions.php:1087
 msgid "Artikelnummer existiert bereits."
 msgstr ""
 
@@ -142,10 +142,11 @@ msgid "Automatically accept price changes"
 msgstr "Automatisch Preisänderungen übernehmen"
 
 #: admin/class-kleinanzeigen-admin.php:797
-msgid "Automatically create product for new ad"
+#| msgid "Automatically create product for new ad"
+msgid "Automatically create product from new ad"
 msgstr ""
-"Bei Aktivierung dieser Option wird für jede neue Anzeige automatisch ein "
-"neues Produkt erstellt"
+"Bei Aktivierung dieser Option wird für neue Anzeigen automatisch ein neues "
+"Produkt erstellt"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:148
 #: admin/partials/kleinanzeigen-admin-header-display.php:67
@@ -215,7 +216,7 @@ msgstr "Dashboard"
 msgid "Date of change"
 msgstr "Änd. Datum"
 
-#: includes/class-kleinanzeigen-functions.php:2110
+#: includes/class-kleinanzeigen-functions.php:2111
 #: includes/class-kleinanzeigen-list-table-tasks.php:451
 #: includes/class-kleinanzeigen-wc-admin-list-table-products.php:133
 #: admin/partials/dashboard/invalid-sku-results.php:31
@@ -231,7 +232,7 @@ msgstr "Alle deaktivieren"
 msgid "Deactivated"
 msgstr "Deaktiviert"
 
-#: includes/class-kleinanzeigen-functions.php:2114
+#: includes/class-kleinanzeigen-functions.php:2115
 msgid "Delete"
 msgstr "Löschen"
 
@@ -418,6 +419,7 @@ msgid "Just disconnect all"
 msgstr "Alle nur trennen"
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:279
+#: includes/class-kleinanzeigen-list-table.php:191
 msgid "KA Price"
 msgstr "KA Preis"
 
@@ -495,20 +497,20 @@ msgstr ""
 msgid "Never"
 msgstr "Niemals"
 
+#: includes/class-kleinanzeigen-functions.php:1982
+msgid "New product"
+msgstr "Neues Produkt"
+
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:36
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:63
 msgid "New product brand name"
 msgstr "Neue Produktmarkenname"
 
-#: includes/class-kleinanzeigen-functions.php:1981
-msgid "New product online"
-msgstr "Neues Produkt Online"
-
 #: includes/class-utils.php:184
 msgid "No account data found"
 msgstr "Account konnte nicht gefunden werden"
 
-#: includes/class-kleinanzeigen-functions.php:1923
+#: includes/class-kleinanzeigen-functions.php:1924
 msgid "No action"
 msgstr "Keine Aktion"
 
@@ -563,8 +565,8 @@ msgid ""
 "Please assign the below listed products an appropriate category in order to "
 "get located by your visitors."
 msgstr ""
-"Um Besuchern das Auffinden der Produkte zu erleichtern, sollte ihnen eine "
-"geeignetere Kategorie zugewiesen werden."
+"Um Besuchern das Auffinden der Produkte zu erleichtern, sollte ihnen "
+"mindestens eine Hauptkategorie zugewiesen werden."
 
 #: admin/class-kleinanzeigen-admin.php:887
 msgid "Please enter your account data."
@@ -634,7 +636,7 @@ msgstr "Produkte mit Verweis auf eine ungültigen Anzeigen ID"
 msgid "Products with price differences"
 msgstr "Produkte mit Preisabweichungen"
 
-#: includes/class-kleinanzeigen-functions.php:2106
+#: includes/class-kleinanzeigen-functions.php:2107
 msgid "Publish"
 msgstr "Veröffentlichen"
 

@@ -85,6 +85,12 @@ body {
 	background-color: inherit;
 }
 
+#template_header_image h2 {
+	color: <?php echo esc_attr( $base ); ?>;
+	margin-bottom: 10px;
+	font-size: 2em;
+}
+
 #template_header_image img {
 	margin-left: 0;
 	margin-right: 0;

@@ -1686,7 +1686,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         'Top Zustand'         => array('topzust, top zust', 'match_type' => 'like'),
         'Top Ausstattung'     => array('topausst, top ausstat', 'match_type' => 'like'),
         'Von Privat'          => array(
-          array('von privat, rein privat, aus privater hand, privatbesitzer, im kundenauftrag, privatauftrag'),
+          array('von privat, rein privat, aus privater hand, privatbesitzer, im kundenauftrag, privatauftrag, privat vom Besitzer'),
           array('kommission, kommision', 'match_type' => 'like')
         ),
         'Neuwertig'           => array('neuwertig', 'match_type' => 'like'),
