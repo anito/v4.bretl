@@ -794,7 +794,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'get_options_list'  => '',
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => __('Automatically create product for new ad', 'kleinanzeigen'),
+      'label'             => __('Automatically create product from new ad', 'kleinanzeigen'),
     );
     add_settings_field(
       $args['id'],
