@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/sender-email.php';
-if(is_admin()) {
+if (is_admin())
+{
   require_once __DIR__ . '/includes/duplicate-content.php';
   require_once __DIR__ . '/includes/custom-avatar.php';
 }
@@ -43,10 +44,12 @@ add_filter('init', 'wbp_register_ajax');
  * 
  * @return int Screen width when the header should change to the mobile header.
  */
-add_filter('astra_mobile_breakpoint', function () {
+add_filter('astra_mobile_breakpoint', function ()
+{
   return 544;
 });
-add_filter('astra_tablet_breakpoint', function () {
+add_filter('astra_tablet_breakpoint', function ()
+{
   return 921;
 });
 
@@ -144,17 +147,17 @@ function add_scripts()
   wp_localize_script('ajax-front', 'KleinanzeigenAjaxFront', AJAX_FRONT_VARS);
 
   // Iubenda
-  if(!current_user_can('manage_product_terms')) {
-    wp_enqueue_script('iubenda', get_stylesheet_directory_uri() . '/js/iubenda.js', array(), false, false);
-    wp_enqueue_script('iubenda-autoblocking', 'https://cs.iubenda.com/autoblocking/' . IUBENDA_VARS['siteId'] . '.js', array('iubenda'), false, false);
-    wp_enqueue_script('iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array('iubenda'), false, false);
-    wp_localize_script('iubenda', 'Iubenda', IUBENDA_VARS);
+  wp_enqueue_script('iubenda', get_stylesheet_directory_uri() . '/js/iubenda.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+  wp_enqueue_script('iubenda-autoblocking', 'https://cs.iubenda.com/autoblocking/' . IUBENDA_VARS['siteId'] . '.js', array('iubenda'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+  wp_enqueue_script('iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array('iubenda'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+  wp_localize_script('iubenda', 'Iubenda', IUBENDA_VARS);
+
+  if (!IS_DEV_MODE)
+  {
   }
 
-  if (!IS_DEV_MODE) {
-  }
-
-  if (wbp_doing_login_ajax()) {
+  if (wbp_doing_login_ajax())
+  {
     wp_dequeue_script('zxcvbn-async');
     wp_dequeue_script('regenerator-runtime');
     wp_dequeue_script('wp-polyfill-inert');
@@ -186,7 +189,8 @@ add_action('login_enqueue_scripts', 'add_login_style');
 
 function add_login_scripts()
 {
-  if (wbp_doing_login_ajax()) {
+  if (wbp_doing_login_ajax())
+  {
     wp_dequeue_style('login');
     wp_deregister_script('jquery');
 
@@ -203,11 +207,13 @@ function add_login_scripts()
 }
 add_action('login_enqueue_scripts', 'add_login_scripts');
 
-add_filter('logout_redirect', function ($redirect_url) {
+add_filter('logout_redirect', function ($redirect_url)
+{
   return esc_url(home_url());
 });
 
-add_filter('logout_url', function ($logout_url) {
+add_filter('logout_url', function ($logout_url)
+{
   return $logout_url . '&amp;redirect_to=' . get_permalink();
 }, 9999);
 
@@ -281,7 +287,8 @@ add_filter('login_form_bottom', 'wbp_login_form_bottom');
 function wbp_custom_default_orderby($sortby)
 {
 
-  if (is_shop()) {
+  if (is_shop())
+  {
     return 'date';
   }
 
@@ -303,9 +310,11 @@ function wbp_custom_default_orderby($sortby)
   );
 
   $obj  = (array) $wp_query->get_queried_object();
-  foreach($orderby as $key => $val) {
+  foreach ($orderby as $key => $val)
+  {
     $prop = $obj[$key];
-    if(array_key_exists($prop, $val)) {
+    if (array_key_exists($prop, $val))
+    {
       $sortby = $val[$prop];
       break;
     }
@@ -322,12 +331,16 @@ function wbp_detectTrident($current_theme)
 {
   $ua = $_SERVER['HTTP_USER_AGENT'];
   $browser = ['name' => '', 'version' => '', 'platform' => ''];
-  if (preg_match('/Trident\/([0-9.]*)/u', $ua, $match)) {
+  if (preg_match('/Trident\/([0-9.]*)/u', $ua, $match))
+  {
     $match = (int)array_pop($match) + 4;
-  } elseif (preg_match('/MSIE\s{1}([0-9.]*)/u', $ua, $match)) {
+  }
+  elseif (preg_match('/MSIE\s{1}([0-9.]*)/u', $ua, $match))
+  {
     $match = (int)array_pop($match);
   }
-  if (!empty($match) && ($match <= 11)) {
+  if (!empty($match) && ($match <= 11))
+  {
     $browser['name'] = 'ie';
     $browser['version'] = $match;
     add_action('wp_footer', 'unsupported_browsers_template', 100);
@@ -357,7 +370,8 @@ function get_certificate()
     STREAM_CLIENT_CONNECT,
     $g
   ); // returns ressource|false
-  if (false === $r) {
+  if (false === $r)
+  {
     return false;
   }
   $cont = stream_context_get_params($r);
@@ -401,7 +415,8 @@ function wbp_woo_custom_tabs($tabs)
   );
 
   $meta = get_post_meta($product->get_id());
-  if (class_exists('DG_Gallery') && !empty($meta['_datasheet'])) {
+  if (class_exists('DG_Gallery') && !empty($meta['_datasheet']))
+  {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
       'priority'   => 20,
@@ -432,9 +447,12 @@ function wbp_woo_tab_content($tab_name, $tab)
 
 function wbp_woo_tab_quote_request()
 {
-  if (REQUEST_FORM_SHORTCODE_ID) {
+  if (REQUEST_FORM_SHORTCODE_ID)
+  {
     echo  do_shortcode('[elementor-template id="' . REQUEST_FORM_SHORTCODE_ID . '"]');
-  } else {
+  }
+  else
+  {
     echo '<p>Um den Inhalt dieses Tabs anzuzeigen, muss eine Shortcode ID in der wp-config.php hinterlegt werden.</p>';
   }
 }
@@ -468,8 +486,10 @@ function wbp_get_price_visibility($show)
     'class' => (isset($show['to_customer']) && !$show['to_customer']) ? 'price-hidden' : ''
   );
 };
-add_filter('wbp_show_prices', function () {
-  if (!defined('SHOW_CUSTOMER_EMAIL_PRICE')) {
+add_filter('wbp_show_prices', function ()
+{
+  if (!defined('SHOW_CUSTOMER_EMAIL_PRICE'))
+  {
     return false;
   }
   return SHOW_CUSTOMER_EMAIL_PRICE;
@@ -495,7 +515,8 @@ add_filter('woocommerce_default_address_fields', 'wbp_filter_default_address_fie
 
 function wbp_wc_coupons_frontend_enabled($is_enabled)
 {
-  if (!is_admin() && function_exists('astra_get_option')) {
+  if (!is_admin() && function_exists('astra_get_option'))
+  {
     return astra_get_option('checkout-coupon-display');
   }
   return true;
@@ -516,7 +537,8 @@ function wbp_short_description($excerpt)
 {
 
   $max_length = 150;
-  if (strlen($excerpt) > $max_length && function_exists('wbp_ka')) {
+  if (strlen($excerpt) > $max_length && function_exists('wbp_ka'))
+  {
     require_once wbp_ka()->plugin_path('includes/class-utils.php');
     return  Utils::sanitize_excerpt($excerpt, $max_length);
   }
@@ -539,9 +561,11 @@ function wbp_modify_cart_product_subtotal_label($product_subtotal, $product, $qu
 {
   $tax_class = $product->get_tax_class();
   $rates = WC_Tax::get_rates_for_tax_class($tax_class);
-  foreach ($rates as $rate) {
+  foreach ($rates as $rate)
+  {
     $label = $rate->tax_rate_name;
-    if (str_contains(strtolower($tax_class), DIFF_TAX)) {
+    if (str_contains(strtolower($tax_class), DIFF_TAX))
+    {
       $product_subtotal .= ' <small class="tax-label">' . $label . '</small>';
     }
   }
