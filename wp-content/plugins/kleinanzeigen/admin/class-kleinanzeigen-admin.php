@@ -379,6 +379,9 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         continue;
       };
 
+      Utils::write_log("##### New Product #####");
+      Utils::write_log($record->title);
+
       $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_create_products',
         'type'  => 'record',
