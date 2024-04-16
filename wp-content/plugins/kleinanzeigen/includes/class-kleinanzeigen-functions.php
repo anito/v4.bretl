@@ -1842,7 +1842,13 @@ if (!class_exists('Kleinanzeigen_Functions'))
     {
       check_ajax_referer('ajax-nonce-cron', '_ajax_nonce_cron');
 
-      wp_remote_get(home_url('wp-cron.php'));
+      $res = wp_remote_get(home_url('wp-cron.php'), array('sslverify' => false));
+
+      if(is_wp_error($res)) {
+        foreach($res->error_data as $error) {
+          Utils::write_log($error);
+        };
+      }
 
       $get_jobs = function ()
       {
