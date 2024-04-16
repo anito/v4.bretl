@@ -342,7 +342,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $query = new WP_Query($options);
         $posts = $query->get_posts();
         $data = array_map('wc_get_product', $posts);
-        set_transient('missing_cat_products', $data, 60);
+        set_transient('missing_cat_products', $data, 2);
       }
       return $data;
     }
