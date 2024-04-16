@@ -1848,6 +1848,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
         foreach($res->error_data as $error) {
           Utils::write_log($error);
         };
+      } else {
+        sleep(5);
       }
 
       $get_jobs = function ()
