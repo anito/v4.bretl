@@ -75,23 +75,7 @@ $keyed_items = array_combine($ids, $items);
               </fieldset>
             </div>
           </div>
-
-          <div id="drafts" class="flex flex-vertical hidden">
-            <div class="overview-wrap">
-              <fieldset class="fieldset tasks">
-                <legend><?php echo __('Drafts', 'kleinanzeigen') ?></legend>
-                <div class="tasks">
-                  <div class="task">
-                    <div class="task-name">
-                      <a href="#" class="start-task" data-task-type="drafts"><?php echo __('Non published products', 'kleinanzeigen'); ?></a>
-                    </div>
-                    <div class="task-value"><?php echo count($drafts_has_sku); ?></div>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-
+          
           <div id="inconsistencies" class="hidden">
             <fieldset class="fieldset tasks" style="position: relative;">
               <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
@@ -123,6 +107,23 @@ $keyed_items = array_combine($ids, $items);
               </div>
             </fieldset>
           </div>
+
+          <div id="drafts" class="flex flex-vertical hidden">
+            <div class="overview-wrap">
+              <fieldset class="fieldset tasks">
+                <legend><?php echo __('Drafts', 'kleinanzeigen') ?></legend>
+                <div class="tasks">
+                  <div class="task">
+                    <div class="task-name">
+                      <a href="#" class="start-task" data-task-type="drafts"><?php echo __('Non published products', 'kleinanzeigen'); ?></a>
+                    </div>
+                    <div class="task-value"><?php echo count($drafts_has_sku); ?></div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+
         </div>
       </section>
       <section class="wbp-shop">

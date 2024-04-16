@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-27 21:50+0000\n"
+"POT-Creation-Date: 2024-04-15 18:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -34,9 +34,12 @@ msgstr ""
 msgid "1 Day"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:43
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:70
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:72
 msgid "A link to a product brand."
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:44
+msgid "A link to a product label."
 msgstr ""
 
 #: includes/class-kleinanzeigen-functions.php:933
@@ -56,15 +59,15 @@ msgid "Accept KA price"
 msgstr ""
 
 #. ID used to identify this section and with which to register options
-#: admin/class-kleinanzeigen-admin.php:648
+#: admin/class-kleinanzeigen-admin.php:651
 msgid "Account"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:666
+#: admin/class-kleinanzeigen-admin.php:669
 msgid "Account name"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:98
+#: admin/partials/kleinanzeigen-admin-header-display.php:82
 msgid "Action required"
 msgstr ""
 
@@ -77,20 +80,23 @@ msgstr ""
 msgid "Ad import from Kleinanzeigen.de"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:35
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:62
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:64
 msgid "Add new product brand"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:66
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:36
+msgid "Add new product label"
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:68
 msgid "Add or remove product brands"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:39
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:40
 msgid "Add or remove product labels"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:848
+#: admin/class-kleinanzeigen-admin.php:851
 #, php-format
 msgid "Additional Mail %s"
 msgstr ""
@@ -99,17 +105,17 @@ msgstr ""
 msgid "Ads"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:892
+#: admin/class-kleinanzeigen-admin.php:895
 msgid ""
 "Ads on Kleinanzeigen.de may get evaluated on a regular base. Select the "
 "interval and tasks to be performed."
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:711
+#: admin/class-kleinanzeigen-admin.php:714
 msgid "Ads per page"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:59
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:60
 msgid "All product brands"
 msgstr ""
 
@@ -122,19 +128,19 @@ msgid "Artikelnummer existiert bereits."
 msgstr ""
 
 #. ID used to identify this section and with which to register options
-#: admin/class-kleinanzeigen-admin.php:722
+#: admin/class-kleinanzeigen-admin.php:725
 msgid "Auto sync"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:801
+#: admin/class-kleinanzeigen-admin.php:804
 msgid "Autocreate new products"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:774
+#: admin/class-kleinanzeigen-admin.php:777
 msgid "Automatically accept price changes"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:797
+#: admin/class-kleinanzeigen-admin.php:800
 msgid "Automatically create product from new ad"
 msgstr ""
 
@@ -147,15 +153,15 @@ msgstr ""
 msgid "Axel Nitzschner"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:48
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:49
 msgid "Background"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:57
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:58
 msgid "Brands"
 msgstr ""
 
-#: includes/class-kleinanzeigen-term-handler.php:118
+#: includes/class-kleinanzeigen-term-handler.php:134
 #, php-format
 msgid "Cannot find product term of slug %s."
 msgstr ""
@@ -165,11 +171,11 @@ msgstr ""
 msgid "Categories"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:67
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:69
 msgid "Choose from the most used product brands"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:40
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:41
 msgid "Choose from the most used product labels"
 msgstr ""
 
@@ -190,7 +196,7 @@ msgstr ""
 msgid "Could not fetch empty dataset."
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:753
+#: admin/class-kleinanzeigen-admin.php:756
 msgid "Crawl interval"
 msgstr ""
 
@@ -226,7 +232,7 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:867
+#: admin/class-kleinanzeigen-admin.php:870
 msgid ""
 "Determine how to proceed with the product when its ad has become invalid due "
 "to reservation, deactivation or deletion"
@@ -245,12 +251,12 @@ msgid "Disconnected"
 msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:118
-#: admin/partials/kleinanzeigen-admin-header-display.php:82
-#: admin/partials/kleinanzeigen-admin-header-display.php:148
+#: admin/partials/kleinanzeigen-admin-header-display.php:114
+#: admin/partials/kleinanzeigen-admin-header-display.php:149
 msgid "Drafts"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:848
+#: admin/class-kleinanzeigen-admin.php:851
 msgid "During development only"
 msgstr ""
 
@@ -259,20 +265,23 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:33
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:60
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:62
 msgid "Edit product brand"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:48
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:34
+msgid "Edit product label"
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:49
 msgid "Enter a background color."
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:79
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:81
 msgid "Enter a shortcode."
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:80
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:82
 msgid "Enter a source reference."
 msgstr ""
 
@@ -343,7 +352,7 @@ msgid ""
 "be listetd here. You can also automate this process in %s."
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:76
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:78
 msgid "Hero image"
 msgstr ""
 
@@ -352,7 +361,7 @@ msgstr ""
 msgid "Hi %s,"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:205
+#: admin/partials/kleinanzeigen-admin-header-display.php:206
 msgid "Hidden"
 msgstr ""
 
@@ -387,7 +396,7 @@ msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:103
 #: includes/class-kleinanzeigen-list-table.php:28
-#: admin/partials/kleinanzeigen-admin-header-display.php:119
+#: admin/partials/kleinanzeigen-admin-header-display.php:103
 msgid "Improve category"
 msgstr ""
 
@@ -413,11 +422,11 @@ msgid "KA Price accepted"
 msgstr ""
 
 #. Name of the plugin
-#: admin/class-kleinanzeigen-admin.php:546
+#: admin/class-kleinanzeigen-admin.php:549
 msgid "Kleinanzeigen"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:547
+#: admin/class-kleinanzeigen-admin.php:550
 msgid "Kleinanzeigen Settings"
 msgstr ""
 
@@ -463,7 +472,7 @@ msgstr ""
 msgid "Loading data"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:75
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:77
 msgid "Logo"
 msgstr ""
 
@@ -480,9 +489,12 @@ msgstr ""
 msgid "New product"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:36
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:63
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:65
 msgid "New product brand name"
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:37
+msgid "New product label name"
 msgstr ""
 
 #: includes/class-utils.php:184
@@ -497,11 +509,11 @@ msgstr ""
 msgid "No data found"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:68
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:70
 msgid "No product brands found"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:41
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:42
 msgid "No product labels found"
 msgstr ""
 
@@ -510,7 +522,7 @@ msgstr ""
 msgid "No products found"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:86
+#: admin/partials/kleinanzeigen-admin-header-display.php:118
 msgid "Non published products"
 msgstr ""
 
@@ -518,18 +530,18 @@ msgstr ""
 msgid "Not visible"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:173
+#: admin/partials/kleinanzeigen-admin-header-display.php:174
 msgid ""
 "Note, that product status will be changing to <em>Draft</em> after data "
 "import."
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:871
+#: admin/class-kleinanzeigen-admin.php:874
 msgid "Orphaned ad action"
 msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:73
-#: admin/partials/kleinanzeigen-admin-header-display.php:103
+#: admin/partials/kleinanzeigen-admin-header-display.php:87
 msgid "Orphaned products"
 msgstr ""
 
@@ -543,15 +555,15 @@ msgid ""
 "get located by your visitors."
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:887
+#: admin/class-kleinanzeigen-admin.php:890
 msgid "Please enter your account data."
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:64
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:66
 msgid "Popular product brands"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:37
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:38
 msgid "Popular product labels"
 msgstr ""
 
@@ -564,39 +576,42 @@ msgid "Price deviation"
 msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:88
-#: admin/partials/kleinanzeigen-admin-header-display.php:111
+#: admin/partials/kleinanzeigen-admin-header-display.php:95
 msgid "Price deviations"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:778
+#: admin/class-kleinanzeigen-admin.php:781
 msgid "Prices"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:688
+#: admin/class-kleinanzeigen-admin.php:691
 msgid "Pro Account"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:227
+#: admin/partials/kleinanzeigen-admin-header-display.php:228
 msgid "Product"
 msgid_plural "Products"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:56
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:57
 msgid "Product brand"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:42
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:69
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:71
 msgid "Product brand link"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:55
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:56
 msgid "Product brands"
 msgstr ""
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:29
 msgid "Product label"
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:43
+msgid "Product label link"
 msgstr ""
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:28
@@ -615,8 +630,8 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:137
-#: admin/partials/kleinanzeigen-admin-header-display.php:199
+#: admin/partials/kleinanzeigen-admin-header-display.php:138
+#: admin/partials/kleinanzeigen-admin-header-display.php:200
 msgid "Published"
 msgstr ""
 
@@ -624,7 +639,7 @@ msgstr ""
 msgid "Publishings"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:58
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:59
 msgid "Search product brands"
 msgstr ""
 
@@ -632,29 +647,29 @@ msgstr ""
 msgid "Search product labels"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:749
+#: admin/class-kleinanzeigen-admin.php:752
 msgid ""
 "Select the interval at which Kleinanzeigen.de should be crawled for changes"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:824
+#: admin/class-kleinanzeigen-admin.php:827
 msgid "Send email on autocreation"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:820
+#: admin/class-kleinanzeigen-admin.php:823
 #, php-format
 msgid "Send me an email (%s) after a product has been created"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:65
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:67
 msgid "Separate product brands with commas"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:38
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:39
 msgid "Separate product labels with commas"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:547
+#: admin/class-kleinanzeigen-admin.php:550
 #: includes/class-kleinanzeigen-list-table-tasks.php:74
 #: admin/partials/kleinanzeigen-admin-settings-display.php:18
 #: admin/partials/dashboard/settings.php:3
@@ -674,7 +689,7 @@ msgstr ""
 msgid "Shop products"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:80
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:82
 msgid "Source reference"
 msgstr ""
 
@@ -686,11 +701,11 @@ msgstr ""
 msgid "Template not found"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:79
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:81
 msgid "Template shortcode"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:569
+#: admin/class-kleinanzeigen-admin.php:572
 #, php-format
 msgid "The account %1$s could not be found"
 msgstr ""
@@ -701,7 +716,7 @@ msgid ""
 "The product %1$s has been automatically created based on the following ad:"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:580
+#: admin/class-kleinanzeigen-admin.php:583
 msgid ""
 "There was an error adding this setting. Please try again. If this persists, "
 "shoot us an email."
@@ -713,25 +728,28 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:159
-#: admin/partials/kleinanzeigen-admin-header-display.php:211
+#: admin/partials/kleinanzeigen-admin-header-display.php:160
+#: admin/partials/kleinanzeigen-admin-header-display.php:212
 msgid "Unknown"
 msgstr ""
 
-#: admin/partials/kleinanzeigen-admin-header-display.php:217
+#: admin/partials/kleinanzeigen-admin-header-display.php:218
 msgid "Unlinked"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:34
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:61
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:63
 msgid "Update product brand"
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:75
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:35
+msgid "Update product label"
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:77
 msgid "Upload brand logo."
 msgstr ""
 
-#: includes/class-kleinanzeigen-register-wc-taxonomies.php:76
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:78
 msgid "Upload hero image."
 msgstr ""
 
@@ -742,6 +760,14 @@ msgstr ""
 #: admin/partials/kleinanzeigen-page-header.php:16
 #, php-format
 msgid "Version %s"
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:61
+msgid "View product brand"
+msgstr ""
+
+#: includes/class-kleinanzeigen-register-wc-taxonomies.php:33
+msgid "View product label"
 msgstr ""
 
 #: public/partials/emails/new-product.php:36

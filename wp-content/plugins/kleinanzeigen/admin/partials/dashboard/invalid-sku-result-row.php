@@ -7,6 +7,9 @@
       </span>
     <?php endforeach ?>
     <a href="#" type="button" class="button button-primary button-small action-button disconnect <?php echo $disabled['disconnect'] ? 'disabled' : '' ?>" data-task-type="<?php echo $task_type ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-screen="modal" data-success-label="<?php echo __('Disconnected', 'kleinanzeigen'); ?>"><?php echo $label['disconnect'] ?></a>
+    <a href="#" class="reset">
+      <span class="dashicons dashicons-undo" style="font-size: 0.9em;"></span>
+    </a>
   </fieldset>
 </div>
 
@@ -21,7 +24,7 @@
     const check = () => {
       const buttonEl = $('.disconnect', parent());
       // Return if product has already been disconnected
-      if(buttonEl.data('deactivated')) return;
+      if (buttonEl.data('deactivated')) return;
 
       getVal() ?
         enable(buttonEl) :
@@ -41,6 +44,12 @@
         })
       );
       $(document).on('data:parsed', handleLabel);
+    })
+    $('.reset', parent()).on('click', function(e) {
+      $(`input[type=radio]`, parent()).each((i, el) => {
+        el.checked && (el.checked = false);
+      })
+      check();
     })
     check();
 
