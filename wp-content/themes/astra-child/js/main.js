@@ -152,7 +152,6 @@ jQuery.noConflict();
       const clickHandler = () => {
         if(firstRun) {
           firstRun = false;
-          // revapi14.revstart();
           setTimeout(autoclose, 3000);
         }
         root.classList.toggle("sidebar-open") ? opened() : closed();
@@ -161,7 +160,7 @@ jQuery.noConflict();
       const autoclose = () => {
         if (root.classList.contains("sidebar-open")) {
           clickHandler();
-          revapi14.revstart();
+          revapi16.start();
           root.classList.add('rev-started');
         }
       };

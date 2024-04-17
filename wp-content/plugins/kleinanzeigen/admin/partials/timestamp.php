@@ -68,6 +68,9 @@
 
     const init = (jobs, todos, completed) => {
 
+      const sortByTime = (a, b) => a.timestamp - b.timestamp;
+      jobs = jobs.sort(sortByTime);
+
       console.log('jobs', jobs);
       console.log('todos', todos);
       console.log('completed', completed);
@@ -81,25 +84,21 @@
         displayModal?.();
       }
 
-      const sortByTime = (a, b) => a.timestamp < b.timestamp;
-      jobs = jobs.sort(sortByTime);
-
       const renderQueue = [];
-      jobs.forEach((job) => {
+      for(const job of jobs) {
 
         const {
           timestamp
         } = job;
-
-        const remaining = timestamp - new Date().getTime();
+        const remaining = timestamp - Date.now();
 
         remaining > 0 && renderQueue.push({
           job,
           remaining
         });
-      })
+      }
 
-      const next = renderQueue.shift();
+      const next = renderQueue.length && renderQueue.shift();
       if (next) {
 
         const {

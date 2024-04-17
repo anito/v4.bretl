@@ -184,6 +184,14 @@ body {
   text-align: center;
 }
 
+.italic {
+  font-style: italic;
+}
+
+.bold {
+  font-weight: 600;
+}
+
 #body_content .margin-top-10 {
   margin-top: 10px;
 }
@@ -224,6 +232,36 @@ body {
   margin-bottom: 50px;
 }
 
+#body_content .margin-10 {
+  margin: 10px;
+}
+
+#body_content .margin-20 {
+  margin: 20px;
+}
+
+#body_content .margin-30 {
+  margin: 30px;
+}
+
+#body_content .margin-40 {
+  margin: 50px;
+}
+
+#body_content .margin-50 {
+  margin: 50px;
+}
+
+#body_content .warning {
+	color: #F44336;
+}
+
+#body_content .line-b {
+	border-bottom: 1px solid;
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
 .button {
   display: inline-block;
   width: 180px;
@@ -248,6 +286,18 @@ body {
   padding: 2px;
   border: 2px solid <?php echo esc_attr( $link_color ); ?>
   border-radius: 8px;
+}
+
+.status-field {
+	margin: 20px;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
 }
 
 #header_wrapper {

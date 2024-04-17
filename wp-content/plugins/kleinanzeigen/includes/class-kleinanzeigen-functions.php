@@ -300,7 +300,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
     public function get_invalid_cat_products($args = array())
     {
 
-      if (false === ($data = get_transient('missing_cat_products'))) {
+      if (false === ($data = get_transient('missing_cat_products')))
+      {
 
         $default_cat = get_term_by('id', get_option('default_product_cat'), 'product_cat');
         $special_term_slugs = array_merge(array($default_cat->slug), array_keys(WC_COMMON_TAXONOMIES));
@@ -324,21 +325,21 @@ if (!class_exists('Kleinanzeigen_Functions'))
               'relation'    => 'OR',
               'taxonomy'    => 'product_cat',
               'field'       => 'slug',
-              'operator'    => 'NOT IN',  
+              'operator'    => 'NOT IN',
               'terms'       => $default_term_slugs,
             ),
           ),
         );
-  
+
         $options = array();
         $args = array_merge($defaults, $args);
-  
+
         array_walk($args, function ($arg, $k) use (&$options)
         {
           if ('status' === $k) $options['post_status'] = $arg;
           else $options[$k] = $arg;
         });
-  
+
         $query = new WP_Query($options);
         $posts = $query->get_posts();
         $data = array_map('wc_get_product', $posts);
@@ -347,8 +348,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $data;
     }
 
-    public function product_has_missing_cat($product) {
-
+    public function product_has_missing_cat($product)
+    {
     }
 
     public function get_product_from_ad($ad)
@@ -1782,7 +1783,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       die("0");
     }
 
-    public function get_users_by_capabilty($capabilties, $args = array())
+    public function get_users_by_capabilty($capabilties, $args = array(), $includes = array())
     {
       global $wpdb;
       $defaults = array(
@@ -1813,7 +1814,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $query =  new WP_User_Query(array(
         'fields' => $options['fields'],
-        'meta_query' => $meta_query
+        'meta_query' => $meta_query,
+        'include' => $includes
       ));
       return $query->get_results();
     }
@@ -1844,11 +1846,15 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $res = wp_remote_get(home_url('wp-cron.php'), array('sslverify' => false));
 
-      if(is_wp_error($res)) {
-        foreach($res->error_data as $error) {
+      if (is_wp_error($res))
+      {
+        foreach ($res->error_data as $error)
+        {
           Utils::write_log($error);
         };
-      } else {
+      }
+      else
+      {
         sleep(5);
       }
 
@@ -1966,39 +1972,87 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $r;
     }
 
-    public function sendMail($post_ID, $record, $receipients = array())
+    public function sendMailNewProduct($post_ID, $record, $receipients = array())
     {
 
-      add_action('kleinanzeigen_email_header', array($this, 'email_header'));
-      add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
-      add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
-
-      $to_email           = isset($receipients['to_email']) ? $receipients['to_email'] : '';
-      $bcc                = isset($receipients['bcc']) ? $receipients['bcc'] : '';
-      $cc                 = isset($receipients['cc']) ? $receipients['cc'] : '';
-
-      $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
       $edit_link          = admin_url('post.php?action=edit&post=' . $post_ID);
       $permalink          = $permalink = get_permalink($post_ID);
       $previewlink        = get_preview_post_link($post_ID);
-      $plugin_name        = wbp_ka()->get_plugin_name();
-      $plugin_link        = admin_url("admin.php?page={$plugin_name}");
       $product_title      = $record->title;
       $post_status        = get_post_status($post_ID);
       $thumbnail          = get_the_post_thumbnail_url($post_ID);
       $kleinanzeigen_url  = $this->get_kleinanzeigen_url($record->url);
       $email_heading      = __('New product', 'kleinanzeigen');
+
+      $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+      $plugin_name        = wbp_ka()->get_plugin_name();
+      $plugin_link        = admin_url("admin.php?page={$plugin_name}");
+
       $additional_content = '';
+
+      add_action('kleinanzeigen_email_header', array($this, 'email_header'));
+      add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
+      add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
+
+      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'post_status', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
+      $email_content = $this->style_inline($email_content);
+
+      $this->sendMail($email_heading, $email_content, $receipients);
+    }
+
+    public function sendMailStatusReport($receipients = array())
+    {
+
+      $interval =  get_option('kleinanzeigen_report_interval');
+      switch ($interval)
+      {
+        case ('weekly'):
+          $email_heading = __('Weekly status report', 'kleinanzeigen');
+          break;
+        case ('monthly'):
+          $email_heading = __('Monthly status report', 'kleinanzeigen');
+          break;
+        default:
+          $email_heading = __('Status report', 'kleinanzeigen');
+      }
+
+      $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+      $plugin_name        = wbp_ka()->get_plugin_name();
+      $plugin_link        = admin_url("admin.php?page={$plugin_name}");
+
+      $additional_content = '';
+
+      $tasks = array(
+        'has-sku'     => array('name' => __('Linked products', 'kleinanzeigen'), 'count' => count($this->build_tasks('has-sku')['items'])),
+        'no-sku'      => array('name' => __('Autonomous products', 'kleinanzeigen'), 'count' => count($this->build_tasks('no-sku')['items'])),
+        'drafts'      => array('name' => __('Non published products', 'kleinanzeigen'), 'count' => count($this->build_tasks('drafts')['items'])),
+        'invalid_ads' => array('name' => __('Orphaned products', 'kleinanzeigen'), 'count' => count($this->build_tasks('invalid-ad')['items']), 'class' => 'warning'),
+        'invalid-cat' => array('name' => __('Improve category', 'kleinanzeigen'), 'count' => count($this->build_tasks('invalid-cat')['items']), 'class' => 'warning'),
+      );
+
+      add_action('kleinanzeigen_email_header', array($this, 'email_header'));
+      add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
+      add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
+
+      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'tasks', 'additional_content'));
+      $email_content = $this->style_inline($email_content);
+
+      $this->sendMail($email_heading, $email_content, $receipients);
+    }
+
+    public function sendMail($subject, $email_content, $receipients = array())
+    {
+      $to_email           = isset($receipients['to_email']) ? $receipients['to_email'] : '';
+      $bcc                = isset($receipients['bcc']) ? $receipients['bcc'] : '';
+      $cc                 = isset($receipients['cc']) ? $receipients['cc'] : '';
+
       $headers            = array(
         'content-type: text/html',
         "Cc:  {$cc}",
         "Bcc: {$bcc}"
       );
 
-      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'post_status', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
-      $email_content = $this->style_inline($email_content);
-
-      wp_mail($to_email, $email_heading, $email_content, $headers);
+      wp_mail($to_email, $subject, $email_content, $headers);
     }
 
     /**
@@ -2017,6 +2071,37 @@ if (!class_exists('Kleinanzeigen_Functions'))
     public function email_footer()
     {
       wbp_ka()->include_template('emails/email-footer.php');
+    }
+
+    public function get_user_schedules($includes = array())
+    {
+
+      // Get authorized users
+      $users = wbp_fn()->get_users_by_capabilty(array('administrator', 'shop_manager'), array('fields' => array('ID', 'user_email')), $includes);
+
+      $user_intervals = array();
+      foreach ($users as $key => $user)
+      {
+        $interval = get_user_meta($user->ID, 'kleinanzeigen_send_status_mail', true);
+        $user_intervals[$interval][] = $user->user_email;
+      }
+      return array_filter($user_intervals, function ($interval)
+      {
+        return ('never' != $interval) && !empty($interval);
+      }, ARRAY_FILTER_USE_KEY);
+    }
+
+    public function get_users_by_meta($field, $caps = array('administrator', 'shop_manager'))
+    {
+
+      // Get authorized users
+      $users = wbp_fn()->get_users_by_capabilty($caps, array('fields' => array('ID', 'user_email')));
+      
+      // Filter for users that have opt in
+      return array_filter($users, function ($user) use ($field)
+      {
+        return '1' == get_user_meta($user->ID, $field, true);
+      });
     }
 
     public function replace_placeholders($string)

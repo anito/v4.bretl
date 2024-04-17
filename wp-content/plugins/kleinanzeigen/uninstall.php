@@ -37,7 +37,7 @@ function kleinanzeigen_delete_options()
     delete_option('kleinanzeigen_crawl_interval');
     delete_option('kleinanzeigen_schedule_new_ads');
     delete_option('kleinanzeigen_schedule_invalid_ads');
-    delete_option('kleinanzeigen_send_cc_mail_on_new_ad');
+    delete_option('kleinanzeigen_send_cc_mail');
     delete_option('kleinanzeigen_schedule_invalid_prices');
   }
 
