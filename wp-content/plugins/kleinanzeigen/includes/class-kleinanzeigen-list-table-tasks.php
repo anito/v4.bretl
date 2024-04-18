@@ -100,7 +100,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           'header-template' => array(
             'template' => 'modal-table-header',
             'args' => array(
-              'header' => __('Improve category', 'kleinanzeigen'),
+              'header' => __('Unprecise category', 'kleinanzeigen'),
               'subheader' => __('Please assign the below listed products an appropriate category in order to get located by your visitors.', 'kleinanzeigen')
             )
           ),

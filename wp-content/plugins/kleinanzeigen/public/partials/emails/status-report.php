@@ -23,7 +23,7 @@
 
 defined('ABSPATH') || exit;
 
-do_action('kleinanzeigen_email_header', $email_heading); ?>
+do_action('kleinanzeigen_email_header', compact('email_heading')); ?>
 
 <h3><?php echo (esc_html__('Summary of products based on Kleinanzeigen', 'kleinanzeigen')); ?></h3>
 <div class="margin-top-20 line-b">

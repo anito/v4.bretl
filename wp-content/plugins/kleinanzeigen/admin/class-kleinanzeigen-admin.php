@@ -19,6 +19,16 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   public static $events;
 
+  const EVERY_MINUTE    = 'every_minute';
+  const FIVE_MINUTES    = 'five_minutes';
+  const TEN_MINUTES     = 'ten_minutes';
+  const THIRTY_MINUTES  = 'thirty_minutes';
+  const HOURLY          = 'hourly';
+  const DAILY           = 'daily';
+  const WEEKLY          = 'weekly';
+  const MONTHLY         = 'monthly';
+  const NEVER           = 'never';
+
   /**
    * Initialize the class and set its properties.
    *
@@ -179,28 +189,43 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public static function get_schedule()
   {
     return (self::$schedule = array(
-      'never' => array(
+      self::NEVER => array(
         'interval' => 0,
         'display'  => __('Never', 'kleinanzeigen'),
       ),
-      'every_minute' => array(
+      self::EVERY_MINUTE => array(
         'default'  => true,
         'interval' => 60,
         'display'  => __('Every minute', 'kleinanzeigen'),
       ),
-      'hourly' => array(
+      self::FIVE_MINUTES => array(
+        'default'  => true,
+        'interval' => 5 * 60,
+        'display'  => __('Every 5 minutes', 'kleinanzeigen'),
+      ),
+      self::TEN_MINUTES => array(
+        'default'  => true,
+        'interval' => 10 * 60,
+        'display'  => __('Every 10 minutes', 'kleinanzeigen'),
+      ),
+      self::THIRTY_MINUTES => array(
+        'default'  => true,
+        'interval' => 30 * 60,
+        'display'  => __('Every 30 minutes', 'kleinanzeigen'),
+      ),
+      self::HOURLY => array(
         'interval' => 60 * 60,
         'display'  => __('Every hour', 'kleinanzeigen'),
       ),
-      'daily' => array(
+      self::DAILY => array(
         'interval' => 24 * 60 * 60,
         'display'  => __('Every day', 'kleinanzeigen'),
       ),
-      'weekly' => array(
+      self::WEEKLY => array(
         'interval' => 7 * 24 * 60 * 60,
         'display'  => __('Weekly', 'kleinanzeigen'),
       ),
-      'monthly' => array(
+      self::MONTHLY => array(
         'interval' => 365 * 24 * 60 * 60,
         'display'  => __('Monthly', 'kleinanzeigen'),
       )
@@ -271,7 +296,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
 
     $i = 0;
-    $time = function ($offset = 15) use (&$i)
+    $time = function ($offset = 30) use (&$i)
     {
       $time = time() + $i++ * $offset;
       return $time;
@@ -283,7 +308,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     */
     if (!wp_next_scheduled('kleinanzeigen_activate_url'))
     {
-      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_activate_url');
+      wp_schedule_event($time(), self::EVERY_MINUTE, 'kleinanzeigen_activate_url');
     }
 
     /*
@@ -292,7 +317,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     */
     if (!wp_next_scheduled('kleinanzeigen_deactivate_url'))
     {
-      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_deactivate_url');
+      wp_schedule_event($time(), self::EVERY_MINUTE, 'kleinanzeigen_deactivate_url');
     }
 
     /*
@@ -301,7 +326,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     */
     if (!wp_next_scheduled('kleinanzeigen_updated_ads'))
     {
-      wp_schedule_event($time(), 'every_minute', 'kleinanzeigen_updated_ads');
+      wp_schedule_event($time(), self::EVERY_MINUTE, 'kleinanzeigen_updated_ads');
     }
 
     /*
@@ -316,13 +341,13 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       {
         switch ($schedule)
         {
-          case 'every_minute':
+          case self::EVERY_MINUTE:
             $next = time();
             break;
-          case 'weekly':
+          case self::WEEKLY:
             $next = strtotime("next Monday") + (6 * 60 * 60);;
             break;
-          case 'monthly':
+          case self::MONTHLY:
             $next = strtotime("first Monday of next Month") + (6 * 60 * 60);;
             break;
           default:
@@ -336,7 +361,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
 
     $crawl_interval = get_option('kleinanzeigen_crawl_interval');
-    if ('never' !== $crawl_interval)
+    if (self::NEVER !== $crawl_interval)
     {
       /*
        * Sync price
@@ -842,7 +867,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'id'                => 'kleinanzeigen_crawl_interval',
       'name'              => 'kleinanzeigen_crawl_interval',
       'required'          => '',
-      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval', 'every_minute'), $this->schedules()),
+      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval', self::EVERY_MINUTE), $this->schedules(array(self::NEVER, self::EVERY_MINUTE, self::FIVE_MINUTES, self::TEN_MINUTES, self::THIRTY_MINUTES, self::HOURLY))),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
       'label'             => __('Select the interval at which Kleinanzeigen.de should be crawled for changes', 'kleinanzeigen'),
@@ -857,7 +882,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     );
     $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
-    if ('never' !== get_option('kleinanzeigen_crawl_interval'))
+    if (self::NEVER !== get_option('kleinanzeigen_crawl_interval'))
     {
 
       // Schedule invalid prices
@@ -929,7 +954,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       );
       $register($args['id'], array($this, 'sanitize_option'), $get_default($args));
 
-      if (IS_SUBDOMAIN_DEV)
+      if (wp_get_current_user()->has_cap('administrator'))
       {
         // Send CC to-email new ads
         unset($args);
@@ -993,10 +1018,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'id'                => 'kleinanzeigen_send_status_mail',
       'name'              => 'kleinanzeigen_send_status_mail',
       'required'          => '',
-      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_user_meta(get_current_user_id(), 'kleinanzeigen_send_status_mail', true), $this->schedules(array('never', 'weekly', 'monthly'))),
+      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_user_meta(get_current_user_id(), 'kleinanzeigen_send_status_mail', true), $this->schedules(array(self::NEVER, self::WEEKLY, self::MONTHLY))),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
-      'label'             => __('Select the interval at which you want to receive a status report', 'kleinanzeigen'),
+      'label'             => wbp_ka()->display_status_report_link(),
+      'description'       => __('Select the interval at which you want to receive a status report', 'kleinanzeigen'),
     );
     add_settings_field(
       $args['id'],

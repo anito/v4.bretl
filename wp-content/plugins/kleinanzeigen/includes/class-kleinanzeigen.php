@@ -208,7 +208,7 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
   private function define_admin_hooks()
   {
 
-    $admin = new Kleinanzeigen_Admin();
+    $admin = Kleinanzeigen_Admin::get_instance();
     $fns = wbp_fn();
 
     $this->loader->add_action('admin_enqueue_scripts', array($admin, 'enqueue_styles'));
@@ -216,11 +216,12 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
     $this->loader->add_action('admin_init', array($fns, 'table_ajax_handler'), -888);
 
     // Catch ajax referer for cron
-    $this->loader->add_action('check_ajax_referer', array($fns, 'check_ajax_referer'), 10, 2);
+    // $this->loader->add_action('check_ajax_referer', array($fns, 'check_ajax_referer'), 10, 2);
 
     // Ajax actions
     $this->loader->add_action('wp_ajax__ajax_poll', array($fns, '_ajax_poll'));
     $this->loader->add_action('wp_ajax__ajax_cron', array($fns, '_ajax_cron'));
+    $this->loader->add_action('wp_ajax__ajax_status_mail', array($fns, '_ajax_status_mail'));
     
     $this->loader->add_action('wp_ajax_nopriv__ajax_poll', array($fns, '_ajax_poll'));
 

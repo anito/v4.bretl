@@ -1,12 +1,14 @@
 <?php
 
 // If this file is called directly, abort.
-if (!defined('WPINC')) {
+if (!defined('WPINC'))
+{
   die();
 }
 
 // If class `Kleinanzeigen_Templates` doesn't exists yet.
-if (!class_exists('Kleinanzeigen_Templates')) {
+if (!class_exists('Kleinanzeigen_Templates'))
+{
 
 
   class Kleinanzeigen_Templates
@@ -24,13 +26,14 @@ if (!class_exists('Kleinanzeigen_Templates')) {
 
     public function register()
     {
-      add_action('display_timestamp', array($this, 'add_timestamp_template'));
+      add_action('display_timestamp', array($this, 'add_templates'));
     }
-    
+
     public function plugin_path($path = null)
     {
 
-      if (!$this->plugin_path) {
+      if (!$this->plugin_path)
+      {
         $this->plugin_path = trailingslashit(dirname(__FILE__, 2));
       }
 
@@ -39,17 +42,33 @@ if (!class_exists('Kleinanzeigen_Templates')) {
 
     public function include_template($path, $return_instead_of_echo = false, $extract_these = array())
     {
+      $not_found = false;
       if ($return_instead_of_echo) ob_start();
 
       $template_file = $this->get_template($path);
 
-      if (!file_exists($template_file)) {
+      if (!file_exists($template_file))
+      {
+
+        $not_found = true;
+
+        // Switch template path from `admin/` to `public/`
+        $removed = remove_filter('kleinanzeigen/template-path', array(Kleinanzeigen_Admin::get_instance(), 'template_path'));
+        if ($removed)
+        {
+          // Recursive call
+          return $this->include_template($path, $return_instead_of_echo, $extract_these);
+        }
+      }
+
+      if ($not_found)
+      {
         error_log("Template not found: " . $template_file);
         echo __('Error:', 'kleinanzeigen') . ' ' . __('Template not found', 'kleinanzeigen') . " (" . $path . ")";
-      } else {
-        extract($extract_these);
-        include $template_file;
       }
+
+      extract($extract_these);
+      include $template_file;
 
       if ($return_instead_of_echo) return ob_get_clean();
     }
@@ -63,22 +82,31 @@ if (!class_exists('Kleinanzeigen_Templates')) {
 
     private function template_path()
     {
-
-      return apply_filters('kleinanzeigen/template-path', null);
+      $path = apply_filters('kleinanzeigen/template-path', null);
+      return $path ?? trailingslashit('public');
     }
 
-    public function add_timestamp_template() {
+    public function add_templates()
+    {
       $this->include_template('timestamp.php', false);
+      $this->include_template('js.php', false);
     }
 
-    public function display_timestamp() {
+    public function display_status_report_link()
+    {
+      return $this->include_template('status-report-link.php', true);
+    }
+
+    public function display_timestamp()
+    {
       do_action('display_timestamp');
     }
 
     public static function get_instance()
     {
       // If the single instance hasn't been set, set it now.
-      if (null == self::$instance) {
+      if (null == self::$instance)
+      {
         self::$instance = new self;
       }
       return self::$instance;

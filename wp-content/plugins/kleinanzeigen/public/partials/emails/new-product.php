@@ -23,7 +23,7 @@
 
 defined('ABSPATH') || exit;
 
-do_action('kleinanzeigen_email_header', $email_heading); ?>
+do_action('kleinanzeigen_email_header', compact('email_heading', 'thumbnail')); ?>
 
 <p><?php printf(esc_html__('Hi %s,', 'kleinanzeigen'), esc_html($blogname)); ?></p>
 <p><?php printf(esc_html__('The product %1$s has been automatically created based on the following ad:', 'kleinanzeigen'), '<strong>' . esc_html($product_title) . '</strong>'); ?></p>

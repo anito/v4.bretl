@@ -79,6 +79,35 @@ body {
 	font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 }
 
+#template_header  .title {
+	padding: 36px 48px;
+	display: block;
+}
+
+#template_header .thumbnail {
+	margin: 0;
+  padding: 0;
+	width: 117px;
+  height: 117px;
+  border: 0 none;
+  border-radius: 0;
+	overflow: hidden;
+	position: relative;
+	background-image: url(<?php echo $thumbnail ?? ''; ?>);
+	background-size: cover;
+  background-position: center;
+}
+
+#template_header .thumbnail::after {
+    content: '';
+    position: absolute;
+		z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
 #template_header h1,
 #template_header h1 a {
 	color: <?php echo esc_attr( $base_text ); ?>;
@@ -300,11 +329,6 @@ body {
 	float: right;
 }
 
-#header_wrapper {
-	padding: 36px 48px;
-	display: block;
-}
-
 h1 {
 	color: <?php echo esc_attr( $base ); ?>;
 	font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
@@ -367,7 +391,7 @@ img {
  * Gmail clients and can help us achieve better consistency there.
  */
 @media screen and (max-width: 600px) {
-	#header_wrapper {
+	#header_wrapper .title {
 		padding: 27px 36px !important;
 		font-size: 24px;
 	}

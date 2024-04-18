@@ -1,5 +1,6 @@
 <?php
-$cats = array_map(function ($category) {
+$cats = array_map(function ($category)
+{
   return "{$category->title} ({$category->totalAds})";
 }, $categories);
 $ad_cats = implode(', ', $cats);
@@ -8,7 +9,8 @@ $num_pages = ceil($total_ads / get_option('kleinanzeigen_items_per_page', ITEMS_
 $todos = $products['todos'];
 
 define('ORIENTATION_COOKIE_KEY', 'kleinanzeigen-view-o');
-$getOrientationCookie = function ($val) {
+$getOrientationCookie = function ($val)
+{
   $val = isset($_COOKIE[ORIENTATION_COOKIE_KEY]) ? $_COOKIE[ORIENTATION_COOKIE_KEY] : $val;
   setcookie(ORIENTATION_COOKIE_KEY, $val, strtotime('+1 year'));
   return $val;
@@ -18,6 +20,8 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 
 $ids = wp_list_pluck((array) $items, 'id');
 $keyed_items = array_combine($ids, $items);
+
+$invalid_sku_count = count($drafts_has_sku) - ($total_ads - count($published_has_sku));
 
 ?>
 <div class="section-wrapper">
@@ -75,7 +79,7 @@ $keyed_items = array_combine($ids, $items);
               </fieldset>
             </div>
           </div>
-          
+
           <div id="inconsistencies" class="hidden">
             <fieldset class="fieldset tasks" style="position: relative;">
               <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
@@ -100,7 +104,7 @@ $keyed_items = array_combine($ids, $items);
                 <div class="task invalid-cat">
                   <div class="task-name">
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                    <a href="#" class="start-task" data-task-type="invalid-cat"><?php echo __('Improve category', 'kleinanzeigen'); ?></a>
+                    <a href="#" class="start-task" data-task-type="invalid-cat"><?php echo __('Unprecise category', 'kleinanzeigen'); ?></a>
                   </div>
                   <div class="task-value">0</div>
                 </div>
@@ -183,7 +187,8 @@ $keyed_items = array_combine($ids, $items);
       <section class="pagination">
         <?php
         $remote_url = Utils::parse_remote_url();
-        for ($i = 1; $i <= $num_pages; $i++) {
+        for ($i = 1; $i <= $num_pages; $i++)
+        {
         ?>
           <a href="<?php echo $remote_url . '?paged=' . $i ?>" type="button" class="button <?php echo ($i == (int) $paged ? ' button-primary' : '') ?>" name="page_number"><?php echo $i ?></a>
         <?php } ?>
@@ -233,7 +238,8 @@ $keyed_items = array_combine($ids, $items);
             <div class="outer">
               <div class="content">
                 <ul>
-                  <?php foreach ($todos as $id => $todo) {
+                  <?php foreach ($todos as $id => $todo)
+                  {
                     $reasons = implode(', ', $todo['reason']);
                     $title = $keyed_items[$id]->title;
                   ?>

@@ -500,7 +500,7 @@ jQuery(document).ready(function ($) {
 
     const el = e.target;
     const post_ID = el.dataset.postId;
-    const args = action || el.dataset.args;
+    const args = action || el.dataset.args;
     const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen || screen;
 
@@ -618,17 +618,17 @@ jQuery(document).ready(function ($) {
           rowEl = $(`.wp-list-kleinanzeigen tr#ad-id-${kleinanzeigen_id}`);
           $(rowEl)?.replaceWith(row);
           newEl = $(`.wp-list-kleinanzeigen tr#ad-id-${kleinanzeigen_id}`);
-          data = {row: newEl, id: kleinanzeigen_id};
+          data = { row: newEl, id: kleinanzeigen_id };
         }
 
         if (modal_row) {
           modalRowEl = $(`.wp-list-kleinanzeigen-tasks tr#post-id-${post_ID}`);
           $(modalRowEl)?.replaceWith(modal_row);
           newEl = $(`.wp-list-kleinanzeigen-tasks tr#post-id-${post_ID}`);
-          data = {row: newEl, id: post_ID};
+          data = { row: newEl, id: post_ID };
         }
 
-        if(data) {
+        if (data) {
           document.dispatchEvent(
             new CustomEvent('data:parsed', {
               detail: data,
@@ -642,7 +642,7 @@ jQuery(document).ready(function ($) {
           setTimeout(() => {
             $(rowEl).trigger(
               new CustomEvent('data:parsed', {
-                detail: {  action: el.dataset.action },
+                detail: { action: el.dataset.action },
               })
             );
           }, 200);
@@ -652,11 +652,41 @@ jQuery(document).ready(function ($) {
     finish();
   }
 
-  const poll = (args = '') =>
+  const statusReport = async (e, nonce) => {
+    const el = e.target;
+    const text = el.innerHTML;
+
+    $.ajax({
+      url: admin_ajax,
+      data: {
+        action: '_ajax_status_mail',
+        _ajax_nonce: nonce,
+      },
+      beforeSend: () => {
+        $(el).html('Einen Moment...');
+      },
+      success: (response) => {
+        $(el).html(text);
+        console.log(response)
+        return response;
+      },
+      error: (response, status, message) => {
+        return {
+          data: {
+            success: false,
+            message,
+          },
+        };
+      },
+    });
+  }
+
+  const poll = (nonce, args = '') =>
     $.post({
       url: admin_ajax,
       data: {
         action: '_ajax_poll',
+        _ajax_nonce: nonce,
         _poll_action: args,
       },
       success: (response) => response,
@@ -668,7 +698,7 @@ jQuery(document).ready(function ($) {
       url: admin_ajax,
       data: {
         action: '_ajax_cron',
-        _ajax_nonce_cron: nonce,
+        _ajax_nonce: nonce,
       },
       success: (response) => response,
       error: (response, status, message) => {
@@ -718,6 +748,7 @@ jQuery(document).ready(function ($) {
         importImages,
         deleteImages,
         processDataImport,
+        statusReport,
         poll,
         cron,
         getNonce,

@@ -147,6 +147,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
     public function get_transient_data()
     {
+
       require_once wbp_ka()->plugin_path('includes/class-utils.php');
 
       if (false === ($data = get_transient('kleinanzeigen_data')))
@@ -432,7 +433,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         // Date updated
         if ($record_date !== $date)
         {
-          Utils::write_log('Date update');
+          Utils::write_log("##### Date update #####");
           $diff = true;
         }
         else
@@ -442,7 +443,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
           // For multiple datetime updates per day
           if ($record_timestamp > $datetime_timestamp)
           {
-            Utils::write_log('Datetime update');
+            Utils::write_log("### DateTime update ###");
             $diff = true;
           }
         }
@@ -450,8 +451,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
         if ($diff)
         {
           $title = substr($record->title, 0, 15);
-          Utils::write_log("##### {$title} #####");
+          Utils::write_log($title);
           Utils::write_log("{$datetime} => {$record_datetime}");
+          Utils::write_log('#######################');
 
           $args['post_date'] = $record_datetime;
           $args['post_date_gmt'] = get_gmt_from_date($record_datetime);
@@ -1820,19 +1822,15 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $query->get_results();
     }
 
-
-    public function check_ajax_referer($action, $result)
+    public function _ajax_status_mail()
     {
-      if ('ajax-nonce-cron' === $action)
-      {
-        if (!$result)
-        {
-          die(json_encode(array(
-            'success' => false,
-            'data' => array()
-          )));
-        }
-      }
+      check_ajax_referer('ajax-nonce', '_ajax_nonce');
+      $receipients = array(
+        'to_email'  => wp_get_current_user()->user_email,
+      );
+      $this->sendMailStatusReport($receipients);
+
+      die();
     }
 
     public function _ajax_poll()
@@ -1842,7 +1840,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
     public function _ajax_cron()
     {
-      check_ajax_referer('ajax-nonce-cron', '_ajax_nonce_cron');
+      check_ajax_referer('ajax-nonce', '_ajax_nonce');
 
       $res = wp_remote_get(home_url('wp-cron.php'), array('sslverify' => false));
 
@@ -1980,22 +1978,22 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $previewlink        = get_preview_post_link($post_ID);
       $product_title      = $record->title;
       $post_status        = get_post_status($post_ID);
-      $thumbnail          = get_the_post_thumbnail_url($post_ID);
+      // $thumbnail          = get_the_post_thumbnail_url($post_ID);
+      $thumbnail          = $record->image;
       $kleinanzeigen_url  = $this->get_kleinanzeigen_url($record->url);
       $email_heading      = __('New product', 'kleinanzeigen');
-
+      
       $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
       $plugin_name        = wbp_ka()->get_plugin_name();
       $plugin_link        = admin_url("admin.php?page={$plugin_name}");
-
       $additional_content = '';
-
+      
       add_action('kleinanzeigen_email_header', array($this, 'email_header'));
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
 
       $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'post_status', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
-      $email_content = $this->style_inline($email_content);
+      $email_content = $this->style_inline($email_content, compact('thumbnail'));
 
       $this->sendMail($email_heading, $email_content, $receipients);
     }
@@ -2003,7 +2001,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
     public function sendMailStatusReport($receipients = array())
     {
 
-      $interval =  get_option('kleinanzeigen_report_interval');
+      $interval =  get_option('kleinanzeigen_send_status_mail');
       switch ($interval)
       {
         case ('weekly'):
@@ -2019,16 +2017,17 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
       $plugin_name        = wbp_ka()->get_plugin_name();
       $plugin_link        = admin_url("admin.php?page={$plugin_name}");
-
       $additional_content = '';
-
+      
+      
       $tasks = array(
         'has-sku'     => array('name' => __('Linked products', 'kleinanzeigen'), 'count' => count($this->build_tasks('has-sku')['items'])),
         'no-sku'      => array('name' => __('Autonomous products', 'kleinanzeigen'), 'count' => count($this->build_tasks('no-sku')['items'])),
         'drafts'      => array('name' => __('Non published products', 'kleinanzeigen'), 'count' => count($this->build_tasks('drafts')['items'])),
         'invalid_ads' => array('name' => __('Orphaned products', 'kleinanzeigen'), 'count' => count($this->build_tasks('invalid-ad')['items']), 'class' => 'warning'),
-        'invalid-cat' => array('name' => __('Improve category', 'kleinanzeigen'), 'count' => count($this->build_tasks('invalid-cat')['items']), 'class' => 'warning'),
+        'invalid-cat' => array('name' => __('Unprecise category', 'kleinanzeigen'), 'count' => count($this->build_tasks('invalid-cat')['items']), 'class' => 'warning'),
       );
+      
 
       add_action('kleinanzeigen_email_header', array($this, 'email_header'));
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
@@ -2060,9 +2059,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
      *
      * @param mixed $email_heading Heading for the email.
      */
-    public function email_header($email_heading)
+    public function email_header($args)
     {
-      wbp_ka()->include_template('emails/email-header.php', false, compact('email_heading'));
+      wbp_ka()->include_template('emails/email-header.php', false, $args);
     }
 
     /**
@@ -2136,7 +2135,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
      * @param string|null $content Content that will receive inline styles.
      * @return string
      */
-    public function style_inline($content)
+    public function style_inline($content, $args = array())
     {
 
       require_once wbp_ka()->plugin_path('vendor/autoload.php');
@@ -2147,7 +2146,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       {
         try
         {
-          $css = wbp_ka()->include_template('emails/email-styles.php', true);
+          $css = wbp_ka()->include_template('emails/email-styles.php', true, $args);
           $css_inliner = CssInliner::fromHtml($content)->inlineCss($css);
 
           do_action('woocommerce_emogrifier', $css_inliner, $this);

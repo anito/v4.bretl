@@ -1,5 +1,5 @@
 jQuery(document).ready(function ($) {
-  const { screen, poll, cron, display, displayModal } = {
+  const { screen, poll, display, displayModal } = {
     ...KleinanzeigenAjax,
     ...KleinanzeigenUtils,
   };

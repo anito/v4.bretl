@@ -1,0 +1,1 @@
+<a href="." id="send-status-report"><?php echo __('Get the report now', 'kleinanzeigen'); ?></a>

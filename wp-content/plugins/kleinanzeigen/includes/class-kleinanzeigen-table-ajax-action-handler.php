@@ -122,8 +122,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
     }
 
     public function get_nonce($action) {
-      if(!$action) wp_die(-1, 400);
-      $nonce = wp_create_nonce("ajax-nonce-{$action}");
+      $nonce = wp_create_nonce($action);
       die(json_encode($nonce));
     }
 
