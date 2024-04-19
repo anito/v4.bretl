@@ -652,22 +652,21 @@ jQuery(document).ready(function ($) {
     finish();
   }
 
-  const statusReport = async (e, nonce) => {
+  const statusReport = async (e, nonce, temp_text = 'loading...') => {
     const el = e.target;
     const text = el.innerHTML;
 
-    $.ajax({
+    return $.ajax({
       url: admin_ajax,
       data: {
         action: '_ajax_status_mail',
         _ajax_nonce: nonce,
       },
       beforeSend: () => {
-        $(el).html('Einen Moment...');
+        $(el).html(temp_text);
       },
       success: (response) => {
         $(el).html(text);
-        console.log(response)
         return response;
       },
       error: (response, status, message) => {
@@ -679,7 +678,7 @@ jQuery(document).ready(function ($) {
         };
       },
     });
-  }
+  };
 
   const poll = (nonce, args = '') =>
     $.post({

@@ -25,7 +25,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     self::$INVISIBLE = __('Not visible', 'kleinanzeigen');
     self::$PRICE_DIFF = __('Price deviation', 'kleinanzeigen');
-    self::$MISSING_CAT = __('Unprecise category', 'kleinanzeigen');
+    self::$MISSING_CAT = __('Improper category', 'kleinanzeigen');
     self::$DEFAULT_CAT_ID = (int) get_option('default_product_cat');
   }
 
@@ -66,14 +66,9 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       $categories = $data->categoriesSearchData;
     }
 
-    // Total published products
-    $args = array(
-      'status' => 'publish',
-      'limit' => -1,
-    );
-    $published_no_sku     = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
-    $published_has_sku    = wc_get_products(array_merge($args, array('sku_compare' => 'EXISTS')));
-    $drafts_has_sku       = wc_get_products(array_merge($args, array('status' => 'draft'), array('sku_compare' => 'EXISTS')));
+    $no_sku_products     = wbp_fn()->build_tasks('no-sku')['items'];
+    $has_sku_products    = wbp_fn()->build_tasks('has-sku')['items'];
+    $drafts_has_sku       = wbp_fn()->build_tasks('has-sku', array('status' => 'draft'))['items'];
     $featured_products    = wbp_fn()->get_featured_products();
     $missing_cat_products = wbp_fn()->get_invalid_cat_products(array('status' => array('publish', 'draft')));
 
@@ -116,7 +111,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     $items = $this->items;
     $tasks = wbp_fn()->build_tasks();
-    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'published_has_sku', 'published_no_sku', 'drafts_has_sku', 'invalid_sku_count', 'featured_products', 'tasks'));
+    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'has_sku_products', 'no_sku_products', 'drafts_has_sku', 'featured_products', 'tasks'));
   }
 
   /**

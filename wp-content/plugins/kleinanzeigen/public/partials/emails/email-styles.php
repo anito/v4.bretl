@@ -34,11 +34,19 @@ if ( wc_hex_is_light( $body ) ) {
 }
 
 $bg_darker_10    = wc_hex_darker( $bg, 10 );
+$bg_lighter_10   = wc_hex_lighter( $bg, 10 );
 $body_darker_10  = wc_hex_darker( $body, 10 );
 $base_lighter_20 = wc_hex_lighter( $base, 20 );
 $base_lighter_40 = wc_hex_lighter( $base, 40 );
+$text_lighter_10 = wc_hex_lighter( $text, 10 );
 $text_lighter_20 = wc_hex_lighter( $text, 20 );
+$text_lighter_30 = wc_hex_lighter( $text, 30 );
 $text_lighter_40 = wc_hex_lighter( $text, 40 );
+$text_lighter_50 = wc_hex_lighter( $text, 50 );
+$text_lighter_60 = wc_hex_lighter( $text, 60 );
+$text_lighter_70 = wc_hex_lighter( $text, 70 );
+$text_lighter_80 = wc_hex_lighter( $text, 80 );
+$text_lighter_90 = wc_hex_lighter( $text, 90 );
 
 // !important; is a gmail hack to prevent styles being stripped if it doesn't like something.
 // body{padding: 0;} ensures proper scale/positioning of the email in the iOS native email app.
@@ -47,6 +55,45 @@ body {
 	background-color: <?php echo esc_attr( $bg ); ?>;
 	padding: 0;
 	text-align: center;
+}
+
+.text-lighter-10 {
+	color: <?php echo esc_attr( $text_lighter_10 ); ?>;
+}
+
+.text-lighter-20 {
+	color: <?php echo esc_attr( $text_lighter_20 ); ?>;
+}
+
+.text-lighter-30 {
+	color: <?php echo esc_attr( $text_lighter_30 ); ?>;
+}
+
+.text-lighter-40 {
+	color: <?php echo esc_attr( $text_lighter_40 ); ?>;
+}
+
+.text-lighter-50 {
+	color: <?php echo esc_attr( $text_lighter_50 ); ?>;
+}
+
+.text-lighter-60 {
+	color: <?php echo esc_attr( $text_lighter_60 ); ?>;
+}
+
+.text-lighter-70 {
+	color: <?php echo esc_attr( $text_lighter_70 ); ?>;
+}
+
+.text-lighter-80 {
+	color: <?php echo esc_attr( $text_lighter_80 ); ?>;
+}
+
+.boxed {
+  background: <?php echo esc_attr( $bg_lighter_10 ); ?>;
+  padding: 0 5px;
+  border-radius: 3px;
+  border: 1px solid <?php echo esc_attr( $bg_darker_10 ); ?>;
 }
 
 #outer_wrapper {
@@ -213,6 +260,10 @@ body {
   text-align: center;
 }
 
+.normal {
+  font-style: normal;
+}
+
 .italic {
   font-style: italic;
 }
@@ -225,40 +276,80 @@ body {
   margin-top: 10px;
 }
 
+#body_content .margin-right-10 {
+  margin-right: 10px;
+}
+
 #body_content .margin-bottom-10 {
   margin-bottom: 10px;
+}
+
+#body_content .margin-left-10 {
+  margin-left: 10px;
 }
 
 #body_content .margin-top-20 {
   margin-top: 20px;
 }
 
+#body_content .margin-right-20 {
+  margin-right: 20px;
+}
+
 #body_content .margin-bottom-20 {
   margin-bottom: 20px;
+}
+
+#body_content .margin-left-20 {
+  margin-left: 20px;
 }
 
 #body_content .margin-top-30 {
   margin-top: 30px;
 }
 
+#body_content .margin-right-30 {
+  margin-right: 30px;
+}
+
 #body_content .margin-bottom-30 {
   margin-bottom: 30px;
+}
+
+#body_content .margin-left-30 {
+  margin-left: 30px;
 }
 
 #body_content .margin-top-40 {
   margin-top: 40px;
 }
 
+#body_content .margin-right-40 {
+  margin-right: 40px;
+}
+
 #body_content .margin-bottom-40 {
   margin-bottom: 40px;
+}
+
+#body_content .margin-left-40 {
+  margin-left: 40px;
 }
 
 #body_content .margin-top-50 {
   margin-top: 50px;
 }
 
+#body_content .margin-right-50 {
+  margin-right: 50px;
+}
+
 #body_content .margin-bottom-50 {
   margin-bottom: 50px;
+}
+
+#body_content .margin-left-50 {
+  margin-left: 50px;
 }
 
 #body_content .margin-10 {
@@ -287,8 +378,10 @@ body {
 
 #body_content .line-b {
 	border-bottom: 1px solid;
-	margin-top: 30px;
-	margin-bottom: 30px;
+}
+
+#body_content .line-t {
+	border-top: 1px solid;
 }
 
 .button {
@@ -380,6 +473,38 @@ img {
 	vertical-align: middle;
 	margin-<?php echo is_rtl() ? 'left' : 'right'; ?>: 10px;
 	max-width: 100%;
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+.flex {
+	display: flex;
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+.success {
+	color: green;
+}
+
+.warning {
+	color: orange;
+}
+
+.error {
+	color: red;
+}
+
+.large {
+	font-size: 14px;
+}
+
+.medium {
+	font-size: 12px;
 }
 
 .small {

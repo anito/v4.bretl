@@ -21,8 +21,6 @@ $orientation_arr = array('cookie_key' => ORIENTATION_COOKIE_KEY, 'cookie_val' =>
 $ids = wp_list_pluck((array) $items, 'id');
 $keyed_items = array_combine($ids, $items);
 
-$invalid_sku_count = count($drafts_has_sku) - ($total_ads - count($published_has_sku));
-
 ?>
 <div class="section-wrapper">
   <div class="left-sections sections">
@@ -58,18 +56,18 @@ $invalid_sku_count = count($drafts_has_sku) - ($total_ads - count($published_has
                   </div>
                   <div class="task">
                     <div class="task-name"><strong><?php echo __('Shop products', 'kleinanzeigen'); ?></strong></div>
-                    <div class="task-value"><strong><?php echo count($published_has_sku) + count($published_no_sku) ?></strong></div>
+                    <div class="task-value"><strong><?php echo count($has_sku_products) + count($no_sku_products) ?></strong></div>
                   </div>
                   <div class="task">
                     <div class="task-name">
                       <a href="#" class="start-task" data-task-type="has-sku"><?php echo __('Linked products', 'kleinanzeigen'); ?></a>
                       <i class="dashicons dashicons-warning hidden" title="<?php echo __('Contains invalid linked products', 'kleinanzeigen') ?>"></i>
                     </div>
-                    <div class="task-value"><?php echo count($published_has_sku); ?></div>
+                    <div class="task-value"><?php echo count($has_sku_products); ?></div>
                   </div>
                   <div class="task">
                     <div class="task-name"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Autonomous products', 'kleinanzeigen'); ?></a></div>
-                    <div class="task-value"><?php echo count($published_no_sku); ?></div>
+                    <div class="task-value"><?php echo count($no_sku_products); ?></div>
                   </div>
                   <div class="task">
                     <div class="task-name"><a href="#" class="start-task" data-task-type="featured"><?php echo __('Featured products', 'kleinanzeigen'); ?></a></div>
@@ -85,10 +83,10 @@ $invalid_sku_count = count($drafts_has_sku) - ($total_ads - count($published_has
               <?php $title = "Zeige alle Produkte des Shops, die auf Kleinanzeigen.de nicht mehr auffindbar sind." ?>
               <legend><?php echo __('Action required', 'kleinanzeigen') ?></legend>
               <div class="tasks">
-                <div class="task invalid-ad">
+                <div class="task invalid-sku">
                   <div class="task-name">
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                    <a href="#" class="start-task" data-task-type="invalid-ad"><?php echo __('Orphaned products', 'kleinanzeigen'); ?></a>
+                    <a href="#" class="start-task" data-task-type="invalid-sku" data-status="<?php echo Utils::base_64_encode(array('publish', 'draft')) // the default status / used here for bravity ?>"><?php echo __('Orphaned products', 'kleinanzeigen'); ?></a>
                   </div>
                   <div class="task-value">0</div>
                 </div>
@@ -104,7 +102,7 @@ $invalid_sku_count = count($drafts_has_sku) - ($total_ads - count($published_has
                 <div class="task invalid-cat">
                   <div class="task-name">
                     <i class="dashicons dashicons-bell" title="<?php echo $title ?>"></i>
-                    <a href="#" class="start-task" data-task-type="invalid-cat"><?php echo __('Unprecise category', 'kleinanzeigen'); ?></a>
+                    <a href="#" class="start-task" data-task-type="invalid-cat" data-status="<?php echo Utils::base_64_encode(array('publish', 'draft')) // the default status / used here for bravity ?>"><?php echo __('Improper category', 'kleinanzeigen'); ?></a>
                   </div>
                   <div class="task-value">0</div>
                 </div>
@@ -280,7 +278,7 @@ $invalid_sku_count = count($drafts_has_sku) - ($total_ads - count($published_has
       $(this).toggleClass('active');
     })
 
-    if ($('#invalid-ads-count').text() > 0) {
+    if ($('#invalid-sku-count').text() > 0) {
       const el = $('.task [data-task-type="has-sku"]');
       const parent = el.closest('.task');
       $('.dashicons-warning', parent).removeClass('hidden');

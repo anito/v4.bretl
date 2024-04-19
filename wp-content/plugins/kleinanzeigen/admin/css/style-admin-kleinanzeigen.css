@@ -309,7 +309,7 @@ section.pagination a.button {
   position: relative;
 }
 .loadable::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   right: 0;
@@ -374,8 +374,8 @@ section .color-box.invalid {
 .wp-list-table .column-shop-price .woocommerce-price-suffix {
   display: none;
 }
-.wp-list-kleinanzeigen .manage-column[class*="status"],
-.column[class*="column-status"] {
+.wp-list-kleinanzeigen .manage-column[class*='status'],
+.column[class*='column-status'] {
   width: 5px;
   padding: 0;
 }
@@ -423,16 +423,16 @@ section .color-box.invalid {
 .wp-list-kleinanzeigen .column-content {
   position: relative;
 }
-.wp-list-kleinanzeigen [class*="column-shop-"] {
+.wp-list-kleinanzeigen [class*='column-shop-'] {
   background-color: rgb(193 227 250 / 12%);
 }
-.wp-list-kleinanzeigen [id*="-wbp-action"] {
+.wp-list-kleinanzeigen [id*='-wbp-action'] {
   position: relative;
 }
-.wp-list-table tr[class*="diff"] {
+.wp-list-table tr[class*='diff'] {
   background-color: #ff00001e;
 }
-.wp-list-table .diff.price-diff .column[class*="-price"],
+.wp-list-table .diff.price-diff .column[class*='-price'],
 .wp-list-table .column a.todo {
   text-decoration: underline;
   text-decoration-style: wavy;
@@ -534,7 +534,7 @@ section .color-box.invalid {
   padding: 0 7px;
   display: flex;
   justify-content: center;
-  background-color:#d1d1d1;
+  background-color: #d1d1d1;
   color: #fff;
 }
 .summary-status .todo .title {
@@ -571,13 +571,13 @@ fieldset.radio-fieldset span {
   margin-right: 0.6em;
 }
 
-fieldset.radio-fieldset span input[type=radio] {
+fieldset.radio-fieldset span input[type='radio'] {
   margin-left: 0.8em;
   margin-bottom: -0.2em;
   margin-right: 0.5em;
 }
 
-fieldset.radio-fieldset span input[type=radio]:first-child {
+fieldset.radio-fieldset span input[type='radio']:first-child {
   margin-left: 0;
 }
 
@@ -588,14 +588,30 @@ fieldset.radio-fieldset span input[type=radio]:first-child {
   animation: jump-shaking 2.83s infinite;
 }
 @keyframes jump-shaking {
-  0% { transform: translateX(0) }
-  1% { transform: translateY(-3px) }
-  3% { transform: translateY(-3px) rotate(17deg) }
-  6% { transform: translateY(-3px) rotate(-17deg) }
-  7% { transform: translateY(-3px) rotate(17deg) }
-  9% { transform: translateY(-3px) rotate(-17deg) }
-  15% { transform: translateY(0) rotate(0) }
-  100% { transform: translateY(0) rotate(0) }
+  0% {
+    transform: translateX(0);
+  }
+  1% {
+    transform: translateY(-3px);
+  }
+  3% {
+    transform: translateY(-3px) rotate(17deg);
+  }
+  6% {
+    transform: translateY(-3px) rotate(-17deg);
+  }
+  7% {
+    transform: translateY(-3px) rotate(17deg);
+  }
+  9% {
+    transform: translateY(-3px) rotate(-17deg);
+  }
+  15% {
+    transform: translateY(0) rotate(0);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
 }
 
 /**
@@ -699,9 +715,29 @@ fieldset.radio-fieldset span input[type=radio]:first-child {
 /**
  * Action button width depending on task type
 */
-.wp-list-kleinanzeigen-tasks .column-actions a[data-task-type="invalid-ad"] {
+.wp-list-kleinanzeigen-tasks .column-actions a[data-task-type='invalid-sku'] {
   --button-width: 90px;
 }
-.wp-list-kleinanzeigen-tasks .column-actions a[data-task-type="invalid-price"] {
+.wp-list-kleinanzeigen-tasks .column-actions a[data-task-type='invalid-price'] {
   --button-width: auto;
+}
+
+#kleinanzeigen-admin-settings-display .success {
+  color: green;
+}
+
+#kleinanzeigen-admin-settings-display .warning {
+  color: orange;
+}
+
+#kleinanzeigen-admin-settings-display .error {
+  color: red;
+}
+
+#kleinanzeigen-admin-settings-display .boxed {
+  background: #fcfcfc;
+  padding: 2px 10px;
+  border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #dbdbdb;
 }

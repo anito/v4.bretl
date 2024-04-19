@@ -333,10 +333,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * Status report
      * Mandatory, based on user options
     */
-    $schedules = wbp_fn()->get_user_schedules();
+    $schedules = wbp_fn()->get_users_schedules();
     foreach ($schedules as $schedule => $emails)
     {
-      $args = array(json_encode(array('schedule' => $schedule, 'emails' => $emails), JSON_UNESCAPED_SLASHES));
+      $args = array(json_encode(array('emails' => $emails), JSON_UNESCAPED_SLASHES));
       if (!wp_next_scheduled("kleinanzeigen_report_{$schedule}", $args))
       {
         switch ($schedule)
@@ -355,6 +355,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         }
         if ($next)
         {
+
           wp_schedule_event($next, $schedule, "kleinanzeigen_report_{$schedule}", $args);
         }
       }
@@ -545,7 +546,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
   public function job_deactivate_url()
   {
-    $items = wbp_fn()->build_tasks('invalid-ad')['items'];
+    $items = wbp_fn()->build_tasks('invalid-sku')['items'];
     $products = wp_list_pluck($items, 'product');
     $ids = array_map(function ($product)
     {
@@ -577,7 +578,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   public function job_invalid_ad_action()
   {
     $action = get_option('kleinanzeigen_schedule_invalid_ads');
-    $items = wbp_fn()->build_tasks('invalid-ad')['items'];
+    $items = wbp_fn()->build_tasks('invalid-sku')['items'];
 
     foreach ($items as $item)
     {
@@ -942,7 +943,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'get_options_list'  => '',
         'value_type'        => 'normal',
         'wp_data'           => 'option',
-        'label'             => sprintf(__('Send me an email (%s) after a product has been created', 'kleinanzeigen'), '<span style="font-weight: 100; font-family: sans-serif; background: #dedede; color: #828282; padding: 3px 5px; border-radius: 3px;">' . wp_get_current_user()->user_email . '</span>'),
+        'label'             => sprintf(__('Send me an email ( %s ) after a product has been created', 'kleinanzeigen'), '<span class="boxed">' . wp_get_current_user()->user_email . '</span>'),
       );
       add_settings_field(
         $args['id'],

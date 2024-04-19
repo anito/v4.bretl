@@ -108,15 +108,12 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
       // Keep in mind Utils::get_remote_page_data will alter the page_number cookie, so save it and reset it later if required
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
-      $product_ids = isset($_REQUEST['product_ids']) ? $_REQUEST['product_ids'] : array();
-
+      $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : '';
+      
+      $status = Utils::base_64_decode($status);
+      $args = $status ? array('status' => $status) : array();
       $wp_tasks_list_table->set_vars($task_type);
 
-      $args = array(
-        'status' => array('publish'),
-        'include' => $product_ids,
-        'limit' => -1
-      );
       $items = wbp_fn()->build_tasks($task_type, $args)['items'];
 
       setcookie('kleinanzeigen-task-type', $task_type);
@@ -262,8 +259,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                 const data = $(el).data();
                 const restored_text = $(el).html();
                 const {
-                  productIds: product_ids,
-                  taskType: task_type
+                  taskType: task_type,
+                  status
                 } = data;
 
                 $.ajax({
@@ -274,7 +271,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                       _ajax_nonce_custom_list: nonce,
                       action: '_ajax_kleinanzeigen_task',
                       task_type,
-                      product_ids
+                      status,
                     },
                     beforeSend: function(data) {
                       $(el).html('Einen Moment...');
@@ -375,12 +372,10 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                 Object.entries(tasks).forEach((task) => {
                   const name = task[0];
                   const items = task[1]['items'];
-                  const product_ids = items.map(item => item.product_id)
 
                   const count = items.length;
                   if (count) {
                     $(`#kleinanzeigen-head-wrap .task.${name} .task-value`).html(count);
-                    $(`#kleinanzeigen-head-wrap .task.${name} a`).data('product-ids', product_ids);
                   } else {
                     $(`#kleinanzeigen-head-wrap .task.${name}`).addClass('hidden');
                     $(`#kleinanzeigen-head-wrap .task.${name} a`).addClass('disabled');

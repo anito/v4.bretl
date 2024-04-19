@@ -65,7 +65,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
   function set_vars($task_type)
   {
     switch ($task_type) {
-      case 'invalid-ad':
+      case 'invalid-sku':
         $vars = array(
           'header-template' => array(
             'template' => 'modal-table-header',
@@ -75,7 +75,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             )
           ),
           'footer-template' => array(
-            'template' => 'footer-invalid-ad',
+            'template' => 'footer-invalid-sku',
             'args' => array()
           )
         );
@@ -100,7 +100,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           'header-template' => array(
             'template' => 'modal-table-header',
             'args' => array(
-              'header' => __('Unprecise category', 'kleinanzeigen'),
+              'header' => __('Improper category', 'kleinanzeigen'),
               'subheader' => __('Please assign the below listed products an appropriate category in order to get located by your visitors.', 'kleinanzeigen')
             )
           ),
@@ -219,11 +219,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
     $task_type = isset($_GET['task_type']) ? $_GET['task_type'] : '';
 
-    $args = array(
-      'status' => array('publish'),
-      'limit' => -1
-    );
-    $items = wbp_fn()->build_tasks($task_type, $args)['items'];
+    $items = wbp_fn()->build_tasks($task_type)['items'];
     $this->setData($items);
 
     extract($this->_args);
@@ -424,7 +420,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       $cat_terms = get_the_terms($post_ID, 'product_cat');
 
       switch ($task_type) {
-        case 'invalid-ad':
+        case 'invalid-sku':
           $published = 'publish' === $product->get_status();
           $disabled['disconnect'] = !$sku;
           $disabled['activate-deactivate'] = !$sku;

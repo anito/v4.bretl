@@ -208,9 +208,12 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
     function build_tasks($name = '', $args = array())
     {
-      // All inconsistency relevant tasks should be set to priority => 1
+      /**
+       * All inconsistency relevant tasks should be set to priority => 1
+       * Status is `publish` unless stated differently in 
+       */
       $tasks = array(
-        'invalid-ad' => array(
+        'invalid-sku' => array(
           'priority' => 1,
           'items' => array(),
           'status' => array('publish', 'draft')
@@ -268,17 +271,14 @@ if (!class_exists('Kleinanzeigen_Functions'))
         });
       }
 
-      $ads = $this->get_transient_data();
-
-      $args = wp_parse_args($args, array('status' => array('publish')));
-
       $get_query_args = function ($task_name) use ($tasks, $args)
       {
-        return array(
-          'status' => isset($tasks[$task_name]['status']) ? $tasks[$task_name]['status'] : $args['status'],
-          'limit' => -1
-        );
+        $status = isset($tasks[$task_name]['status']) ? $tasks[$task_name]['status'] : array('publish');
+        $args = wp_parse_args($args, array('status' => $status, 'limit' => -1));
+        return $args;
       };
+
+      $ads = $this->get_transient_data();
 
       foreach ($tasks as $task_name => $task)
       {
@@ -298,10 +298,17 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return isset($tasks[$name]) ? $tasks[$name] : $tasks;
     }
 
-    public function get_invalid_cat_products($args = array())
+    public function get_invalid_cat_products($args)
     {
 
-      if (false === ($data = get_transient('missing_cat_products')))
+      $suffix = '';
+      if (isset($args['status']))
+      {
+        $status = $args['status'];
+        $suffix = is_array($status) ? implode('_', $status) : $status;
+        $suffix = '_' . $suffix;
+      }
+      if (false === ($data = get_transient("missing_cat_products{$suffix}")))
       {
 
         $default_cat = get_term_by('id', get_option('default_product_cat'), 'product_cat');
@@ -344,7 +351,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $query = new WP_Query($options);
         $posts = $query->get_posts();
         $data = array_map('wc_get_product', $posts);
-        set_transient('missing_cat_products', $data, 2);
+        set_transient("missing_cat_products{$suffix}", $data, 2);
       }
       return $data;
     }
@@ -602,7 +609,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       if ('featured' === $task_type)
       {
         $record = null;
-        $featured_posts = $this->get_featured_products();
+        $featured_posts = $this->get_featured_products($args);
         foreach ($featured_posts as $post)
         {
           $product = new WC_Product($post->ID);
@@ -668,7 +675,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         {
           switch ($task_type)
           {
-            case 'invalid-ad':
+            case 'invalid-sku':
               $record = null;
               if (!in_array($sku, $ids))
               {
@@ -1459,8 +1466,11 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $terms;
     }
 
-    public function get_featured_products()
+    public function get_featured_products($args = array())
     {
+
+      $args = wp_parse_args($args, array('status' => 'publish'));
+
       $tax_query[] = array(
         'taxonomy' => 'product_visibility',
         'field'    => 'name',
@@ -1470,7 +1480,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $query = new WP_Query(array(
         'post_type'           => 'product',
-        'post_status'         => 'publish',
+        'post_status'         => $args['status'],
         'posts_per_page'      => -1,
         'tax_query'           => $tax_query
       ));
@@ -1828,9 +1838,14 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $receipients = array(
         'to_email'  => wp_get_current_user()->user_email,
       );
-      $this->sendMailStatusReport($receipients);
+      $res = $this->sendMailStatusReport($receipients);
 
-      die();
+      die(json_encode([
+        'data' => array(
+          'success' => $res,
+          'message' => $res ? __('Please check your inbox', 'kleinanzeigen') : __('Mail could not be sent', 'kleinanzeigen')
+        )
+      ]));
     }
 
     public function _ajax_poll()
@@ -1982,12 +1997,12 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $thumbnail          = $record->image;
       $kleinanzeigen_url  = $this->get_kleinanzeigen_url($record->url);
       $email_heading      = __('New product', 'kleinanzeigen');
-      
+
       $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
       $plugin_name        = wbp_ka()->get_plugin_name();
       $plugin_link        = admin_url("admin.php?page={$plugin_name}");
       $additional_content = '';
-      
+
       add_action('kleinanzeigen_email_header', array($this, 'email_header'));
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
@@ -1995,7 +2010,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'post_status', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
       $email_content = $this->style_inline($email_content, compact('thumbnail'));
 
-      $this->sendMail($email_heading, $email_content, $receipients);
+      return $this->sendMail($email_heading, $email_content, $receipients);
     }
 
     public function sendMailStatusReport($receipients = array())
@@ -2018,25 +2033,76 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $plugin_name        = wbp_ka()->get_plugin_name();
       $plugin_link        = admin_url("admin.php?page={$plugin_name}");
       $additional_content = '';
-      
-      
-      $tasks = array(
-        'has-sku'     => array('name' => __('Linked products', 'kleinanzeigen'), 'count' => count($this->build_tasks('has-sku')['items'])),
-        'no-sku'      => array('name' => __('Autonomous products', 'kleinanzeigen'), 'count' => count($this->build_tasks('no-sku')['items'])),
-        'drafts'      => array('name' => __('Non published products', 'kleinanzeigen'), 'count' => count($this->build_tasks('drafts')['items'])),
-        'invalid_ads' => array('name' => __('Orphaned products', 'kleinanzeigen'), 'count' => count($this->build_tasks('invalid-ad')['items']), 'class' => 'warning'),
-        'invalid-cat' => array('name' => __('Unprecise category', 'kleinanzeigen'), 'count' => count($this->build_tasks('invalid-cat')['items']), 'class' => 'warning'),
+      $next_event         = null;
+
+      // Next schedule
+      $timestamp = $this->get_next_scheduled();
+      if ($timestamp)
+      {
+
+        $timezone = new DateTimeZone('Europe/Berlin');
+
+        $date = new DateTime();
+        $date->setTimestamp($timestamp);
+        $date->setTimezone($timezone);
+
+
+        $fmt = new IntlDateFormatter(
+          'de-DE',
+          IntlDateFormatter::FULL,
+          IntlDateFormatter::FULL,
+          'Europe/Berlin',
+          IntlDateFormatter::GREGORIAN
+        );
+        $fmt->setPattern('EEEE, dd.MM.YYYY hh:mm');
+        $next_event = $fmt->format($date);
+      }
+
+      $ads = $this->get_transient_data();
+
+      // Tree
+      $tree = array(
+        array('items' => $ads, 'text' => __('Kleinanzeigen', 'kleinanzeigen')),
+        array('level' => 0, 'items' => wc_get_products(array('status' => array('publish'), 'limit' => -1)), 'text' => __('Total published products', 'kleinanzeigen'), 'childs' => array(
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Autonomous', 'kleinanzeigen')),
+          array('level' => 1, 'items' => $published_sku = wp_list_pluck($this->build_tasks('has-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Linked', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 2, 'items' => $published_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Invalid link', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
+            array('level' => 2, 'items' => array_diff($published_sku, $published_invalid), 'text' => __('Valid link', 'kleinanzeigen'))
+          ))
+        )),
+        array('level' => 0, 'items' => wc_get_products(array('status' => array('draft'), 'limit' => -1)), 'text' => __('Total hidden products', 'kleinanzeigen'), 'childs' => array(
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Autonomous', 'kleinanzeigen')),
+          array('level' => 1, 'items' => $drafts_sku = wp_list_pluck($this->build_tasks('drafts')['items'], 'product'), 'text' => __('Linked', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 2, 'items' => $drafts_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Invalid link', 'kleinanzeigen')),
+            array('level' => 2, 'items' => array_diff($drafts_sku, $drafts_invalid), 'text' => __('Valid link', 'kleinanzeigen'), 'info' => __('Ready for publication', 'kleinanzeigen'))
+          ))
+        )),
+        array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => array('publish', 'draft')))['items'], 'product'), 'text' => __('Total autonomous products', 'kleinanzeigen'), 'childs' => array(
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen')),
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+        )),
+        array('level' => 0, 'items' => array_merge($published_invalid, $drafts_invalid), 'text' => __('Total invalid links', 'kleinanzeigen'), 'childs' => array(
+          array('level' => 1, 'items' => $published_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
+          array('level' => 1, 'items' => $drafts_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+        )),
+        array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('invalid-cat')['items'], 'product'), 'text' => __('Improper category', 'kleinanzeigen'), 'childs' => array(
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('invalid-cat', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('invalid-cat', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+        )),
+        array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => array('publish', 'draft')))['items'], 'product'), 'text' => __('Featured products', 'kleinanzeigen'), 'childs' => array(
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen')),
+          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+        ))
       );
-      
 
       add_action('kleinanzeigen_email_header', array($this, 'email_header'));
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
 
-      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'tasks', 'additional_content'));
+      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event'));
       $email_content = $this->style_inline($email_content);
 
-      $this->sendMail($email_heading, $email_content, $receipients);
+      return $this->sendMail($email_heading, $email_content, $receipients);
     }
 
     public function sendMail($subject, $email_content, $receipients = array())
@@ -2051,7 +2117,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         "Bcc: {$bcc}"
       );
 
-      wp_mail($to_email, $subject, $email_content, $headers);
+      return wp_mail($to_email, $subject, $email_content, $headers);
     }
 
     /**
@@ -2072,7 +2138,30 @@ if (!class_exists('Kleinanzeigen_Functions'))
       wbp_ka()->include_template('emails/email-footer.php');
     }
 
-    public function get_user_schedules($includes = array())
+    public function get_next_scheduled($user_id = null)
+    {
+      if (is_null($user_id))
+      {
+        $user = wp_get_current_user();
+      }
+      else
+      {
+        $user = get_user_by('ID', $user_id);
+      }
+
+      $user_schedule = $this->get_users_schedules($user->ID);
+      $schedule = key($user_schedule);
+      $schedules = $this->get_users_schedules();
+
+      if(!empty($schedules)) {
+        $emails = $schedules[$schedule];
+        $args = array(json_encode(array('emails' => $emails), JSON_UNESCAPED_SLASHES));;
+        return wp_next_scheduled("kleinanzeigen_report_{$schedule}", $args);
+      }
+      return null;
+    }
+
+    public function get_users_schedules($includes = array())
     {
 
       // Get authorized users
@@ -2095,7 +2184,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       // Get authorized users
       $users = wbp_fn()->get_users_by_capabilty($caps, array('fields' => array('ID', 'user_email')));
-      
+
       // Filter for users that have opt in
       return array_filter($users, function ($user) use ($field)
       {

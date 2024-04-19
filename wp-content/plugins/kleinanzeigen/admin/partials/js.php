@@ -2,6 +2,7 @@
   jQuery(document).ready(async ($) => {
 
     let nonce = <?php echo json_encode(wp_create_nonce('ajax-nonce')) ?>;
+    let mail_wait_text = "<?php echo __('Sending mail...', 'kleinanzeigen') ?>";
     let encoded_action = "<?php echo Utils::base_64_encode('Foo', 'Bar') ?>";
 
     const {
@@ -180,13 +181,29 @@
     /**
      * Send status email
      */
-    const send_status_mail = (e) => {
+    const send_status_mail = async (e) => {
       e.preventDefault();
-      statusReport(e, nonce);
-    }
-    const status_link_el = document.getElementById('send-status-report');
-    status_link_el?.addEventListener('click', send_status_mail);
+      const res = await statusReport(e, nonce, mail_wait_text).then((res) => JSON.parse(res).data)
+      const {
+        success,
+        message
+      } = res;
+      const dash_class = success ? ['dashicons-saved', 'success'] : ['dashicons-warning warning'];
 
+      status_fields_wrapper_el.classList.add('active');
+      status_indicator_el.classList.add(...dash_class);
+      status_message_el.innerHTML = message;
+
+      setTimeout(() => status_fields_wrapper_el.classList.remove('active'), 5000);
+    }
+    const status_container = document.getElementById('status-report');
+    const status_link_el = status_container?.querySelector('.send-report');
+    const status_fields_wrapper_el = status_container?.querySelector('.status-fields-wrapper');
+    const status_fields_el = document.getElementById('status-report-fields');
+    const status_indicator_el = status_fields_el?.querySelector('.indicator');
+    const status_message_el = status_fields_el?.querySelector('.message');
+
+    status_link_el?.addEventListener('click', send_status_mail);
   });
 </script>
 
