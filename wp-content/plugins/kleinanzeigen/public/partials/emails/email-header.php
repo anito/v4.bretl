@@ -21,6 +21,23 @@ if (!defined('ABSPATH'))
   exit; // Exit if accessed directly
 }
 
+$timestamp = time();
+$timezone = new DateTimeZone('Europe/Berlin');
+
+$date = new DateTime();
+$date->setTimestamp($timestamp);
+$date->setTimezone($timezone);
+
+
+$fmt = new IntlDateFormatter(
+  'de-DE',
+  IntlDateFormatter::FULL,
+  IntlDateFormatter::FULL,
+  'Europe/Berlin',
+  IntlDateFormatter::GREGORIAN
+);
+$fmt->setPattern('EEEE, dd.MM.YYYY hh:mm');
+$date = $fmt->format($date);
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -66,6 +83,8 @@ if (!defined('ABSPATH'))
                           </td>
                           <?php if (isset($thumbnail)) : ?>
                             <td class="thumbnail"></td>
+                          <?php else : ?>
+                            <td class="date"><small><?php echo $date; ?></small></td>
                           <?php endif ?>
                         </tr>
                       </table>

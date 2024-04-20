@@ -33,17 +33,25 @@ function buildTree($tree, $level = 0)
   <?php foreach ($tree as $key => $leave) :
     $level        = $leave['level'];
     $margin_left  = $level * 20;
-    $font_size    = 'medium';
-    $font_style   = 'normal';
-    $font_weight  = '';
-    switch($leave['level']) {
+    switch ($level)
+    {
       case 0:
-        $font_weight = 'bold';
+        $font_size    = 'large';
+        $font_style   = 'normal';
+        $font_weight  = 'bold';
+        break;
       case 1:
-        $font_style = 'italic';
+        $font_size    = 'medium';
+        $font_style   = 'normal';
+        $font_weight  = '';
+        break;
+      case 2:
+        $font_size    = 'medium';
+        $font_style   = 'normal';
+        $font_weight  = '';
+        break;
+      default:
     }
-    $font_size  = (0 == $leave['level']) ? 'large' : 'medium';
-    $font_style = (2 == $leave['level']) ? 'italic' : 'normal';
   ?>
 
     <div class="inner-section level-<?php echo $leave['level'] ?>">
@@ -57,25 +65,31 @@ function buildTree($tree, $level = 0)
       <?php if (isset($leave['childs'])) buildTree($leave['childs'], ++$level); ?>
     </div>
 
-  <?php endforeach ?>
-<?php } ?>
+<?php endforeach;
+} ?>
 
 <h3 class="center margin-bottom-40"><?php echo (esc_html__('Summary of products based on Kleinanzeigen', 'kleinanzeigen')); ?></h3>
-<div class="margin-top-20 line-b margin-bottom-30">
+<div class="margin-top-20">
   <div class="margin-30">
     <div class="line-b margin-bottom-30 margin-top-20">
       <h4 class="margin-bottom-30">
-        <span class="<?php echo $font_style ?>"><?php echo $first['text'] ?></span>
+        <span class="normal"><?php echo $first['text'] ?></span>
         <span class="right"><?php echo count($first['items']); ?></span>
       </h4>
     </div>
     <?php buildTree($tree); ?>
   </div>
+  <div class="line-t margin-bottom-20 margin-top-30"></div>
+  <div class="medium">
+    <span class="inline-block w-50 bold"><?php echo __('Setting for orphaned ads:', 'kleinanzeigen'); ?></span>
+    <span class="inline-block italic"><?php echo $inactive_ad_text; ?></span>
+  </div>
+  <div class="line-t margin-bottom-30 margin-top-20"></div>
 </div>
 
 <p class="small"><?php printf(esc_html__('Manage your Kleinanzeigen.de products in your online store here: %1$s', 'kleinanzeigen'), esc_html($plugin_link)); ?></p>
-<?php if($next_event) : ?>
-  <p class="small right inline-block line-t margin-top-40 text-lighter-60"><?php echo sprintf( __('Next scheduled report delivery on %s', 'kleinanzeigen'), $next_event); ?></p>
+<?php if ($next_event) : ?>
+  <p class="small inline-block line-t margin-top-40 text-lighter-50" style="font-weight: 200;"><?php echo sprintf(__('Next scheduled report delivery on %s', 'kleinanzeigen'), $next_event); ?></p>
 <?php endif ?>
 
 <?php

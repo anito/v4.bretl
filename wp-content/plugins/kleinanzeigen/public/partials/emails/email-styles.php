@@ -126,9 +126,16 @@ body {
 	font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
 }
 
-#template_header  .title {
+#template_header .title {
 	padding: 36px 48px;
 	display: block;
+}
+
+#template_header .date {
+	font-weight: 100;
+	vertical-align: bottom;
+	text-align: right;
+	padding: 10px;
 }
 
 #template_header .thumbnail {
@@ -473,6 +480,10 @@ img {
 	vertical-align: middle;
 	margin-<?php echo is_rtl() ? 'left' : 'right'; ?>: 10px;
 	max-width: 100%;
+}
+
+.w-50 {
+	width: 50%;
 }
 
 .inline-block {

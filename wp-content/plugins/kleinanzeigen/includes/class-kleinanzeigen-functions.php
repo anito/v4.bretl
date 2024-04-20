@@ -2016,6 +2016,22 @@ if (!class_exists('Kleinanzeigen_Functions'))
     public function sendMailStatusReport($receipients = array())
     {
 
+      $inactive_ad_setting = get_option('kleinanzeigen_schedule_invalid_ads');
+      switch ($inactive_ad_setting)
+      {
+        case ('publish'):
+          $inactive_ad_text = __('Publish ad', 'kleinanzeigen');
+          break;
+        case ('deactivate'):
+          $inactive_ad_text = __('Deactivate ad', 'kleinanzeigen');
+          break;
+        case ('delete'):
+          $inactive_ad_text = __('Delete ad', 'kleinanzeigen');
+          break;
+        default:
+          $inactive_ad_text = __('No action', 'kleinanzeigen');
+      }
+
       $interval =  get_option('kleinanzeigen_send_status_mail');
       switch ($interval)
       {
@@ -2099,7 +2115,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
 
-      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event'));
+      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event', 'inactive_ad_text'));
       $email_content = $this->style_inline($email_content);
 
       return $this->sendMail($email_heading, $email_content, $receipients);

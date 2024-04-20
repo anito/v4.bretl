@@ -612,7 +612,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           'ID' => $post_ID
         ), $args);
 
-        // wp_update_post($postarr);
+        /**
+         * Here the actual job will be done by updating the post
+         */
+        wp_update_post($postarr);
         $product = wc_get_product($post_ID);
 
         if ("trash" === $product->get_status())
