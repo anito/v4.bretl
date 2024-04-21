@@ -46,6 +46,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('admin_init', array($this, 'registerAndBuildFields'));
 
     // Cron jobs
+    add_action('kleinanzeigen_report_daily', array($this, 'job_report'));
     add_action('kleinanzeigen_report_weekly', array($this, 'job_report'));
     add_action('kleinanzeigen_report_monthly', array($this, 'job_report'));
     add_action('kleinanzeigen_report_every_minute', array($this, 'job_report'));
@@ -165,6 +166,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'kleinanzeigen_deactivate_url',
         'kleinanzeigen_updated_ads',
         'kleinanzeigen_report_every_minute',
+        'kleinanzeigen_report_dailyÍ',
         'kleinanzeigen_report_weekly',
         'kleinanzeigen_report_monthly'
       ),
