@@ -344,11 +344,14 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           case self::EVERY_MINUTE:
             $next = time();
             break;
+          case self::DAILY:
+            $next = strtotime("next Day") + (6 * 60 * 60);
+            break;
           case self::WEEKLY:
-            $next = strtotime("next Monday") + (6 * 60 * 60);;
+            $next = strtotime("next Monday") + (6 * 60 * 60);
             break;
           case self::MONTHLY:
-            $next = strtotime("first Monday of next Month") + (6 * 60 * 60);;
+            $next = strtotime("first Monday of next Month") + (6 * 60 * 60);
             break;
           default:
             $next = null;
@@ -1022,7 +1025,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'id'                => 'kleinanzeigen_send_status_mail',
       'name'              => 'kleinanzeigen_send_status_mail',
       'required'          => '',
-      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_user_meta(get_current_user_id(), 'kleinanzeigen_send_status_mail', true), $this->schedules(array(self::NEVER, self::WEEKLY, self::MONTHLY))),
+      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_user_meta(get_current_user_id(), 'kleinanzeigen_send_status_mail', true), $this->schedules(array(self::NEVER, self::DAILY, self::WEEKLY, self::MONTHLY))),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
       'label'             => wbp_ka()->display_status_report_link(),

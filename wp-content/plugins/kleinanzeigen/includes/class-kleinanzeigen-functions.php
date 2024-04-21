@@ -2035,6 +2035,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $interval =  get_option('kleinanzeigen_send_status_mail');
       switch ($interval)
       {
+        case ('daily'):
+          $email_heading = __('Daily status report', 'kleinanzeigen');
+          break;
         case ('weekly'):
           $email_heading = __('Weekly status report', 'kleinanzeigen');
           break;
