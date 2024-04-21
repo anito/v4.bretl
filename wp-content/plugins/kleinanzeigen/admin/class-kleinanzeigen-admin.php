@@ -166,7 +166,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'kleinanzeigen_deactivate_url',
         'kleinanzeigen_updated_ads',
         'kleinanzeigen_report_every_minute',
-        'kleinanzeigen_report_dailyÍ',
+        'kleinanzeigen_report_daily',
         'kleinanzeigen_report_weekly',
         'kleinanzeigen_report_monthly'
       ),
