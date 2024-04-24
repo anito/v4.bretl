@@ -333,9 +333,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $product = wc_get_product($post_ID);
       if ($product) {
         if (isset($ad)) {
-          wbp_fn()->enable_sku($product, $ad);
+          wbp_fn()->enable_sku($product, $ad, true);
         } else {
-          wbp_fn()->disable_sku($product);
+          wbp_fn()->disable_sku($product, true);
         }
         $product->save();
       }
@@ -359,8 +359,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
       $product = wc_get_product($post_ID);
       if ($product) {
-        wbp_fn()->disable_sku($product);
-        $product->save();
+        wbp_fn()->disable_sku($product, true);
       }
 
       switch ($screen) {

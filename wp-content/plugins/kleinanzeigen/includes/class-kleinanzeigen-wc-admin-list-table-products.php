@@ -140,12 +140,10 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
                 </a>
               </span>
             </div>
-            <?php if (wp_get_current_user()->has_cap('administrator')) : ?>
-              <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
-                <span class="spinner"></span>
-                <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_ID ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_ID ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Disconnect', 'kleinanzeigen') ?></a>
-              </div>
-            <?php endif; ?>
+            <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
+              <span class="spinner"></span>
+              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_ID ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_ID ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Disconnect', 'kleinanzeigen') ?></a>
+            </div>
             <div id="publish-post-wbp-action-<?php echo $post_ID ?>" class="publish-column-content">
               <span class="spinner"></span>
               <a id="publish-post-<?php echo $post_ID ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Deactivate', 'kleinanzeigen') : __('Publish') ?></a>

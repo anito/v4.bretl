@@ -1555,7 +1555,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       );
     }
 
-    public function enable_sku(&$product, $ad)
+    public function enable_sku(&$product, $ad, $force = false)
     {
       if (is_int($product))
       {
@@ -1578,8 +1578,13 @@ if (!class_exists('Kleinanzeigen_Functions'))
           )
         ));
       }
-      $id = (int) $product->get_id();
-      $this->set_sku($id, $ad);
+      $post_ID = (int) $product->get_id();
+      $this->set_sku($post_ID, $ad);
+
+      if($force) {
+        delete_post_meta($post_ID, 'kleinanzeigen_force_disconnect');
+      }
+
       return $product;
     }
 
@@ -1597,7 +1602,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       update_post_meta($id, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
     }
 
-    public function disable_sku(WC_Product &$product)
+    public function disable_sku(WC_Product &$product, $force = false)
     {
 
       $product->set_sku('');
@@ -1607,6 +1612,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
       delete_post_meta($post_ID, 'kleinanzeigen_id');
       delete_post_meta($post_ID, 'kleinanzeigen_url');
       delete_post_meta($post_ID, 'kleinanzeigen_search_url');
+
+      if($force) {
+        update_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true);
+      }
 
       return $product;
     }

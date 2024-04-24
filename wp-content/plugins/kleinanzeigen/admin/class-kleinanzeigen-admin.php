@@ -605,6 +605,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $title = $product->get_name();
       $status = $product->get_status();
       
+      // Stop updating if `kleinanzeigen_force_disconnect` flag has been set
+      $forced_disconnected = get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true);
+      if($forced_disconnected) {
+        continue;
+      }
+
       $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_recover_ad',
         'type'  => 'product',
