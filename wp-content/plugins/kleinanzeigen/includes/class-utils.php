@@ -193,9 +193,6 @@ if (!class_exists('Utils')) {
 
     static function extract_kleinanzeigen_price($text)
     {
-      // $regex = '/^([\d.]+)/';
-      // preg_match($regex, $text, $matches);
-      // return !empty($matches) ? str_replace('.', '', $matches[0]) : 0;
       return preg_replace('/[\s.,a-zA-Z€\$]*/', '', $text);
     }
 

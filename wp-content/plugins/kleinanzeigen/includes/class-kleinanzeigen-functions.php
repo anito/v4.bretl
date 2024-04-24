@@ -45,6 +45,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       add_action('current_screen', array($this, 'on_current_screen'));
       add_filter('get_the_terms', array($this, 'get_the_terms'), 10, 3);
       add_filter('get_the_terms', array($this, 'label_filter'), 20, 3);
+      // add_filter('shutdown', array($this, 'log_query'));
 
       add_action('woocommerce_before_product_object_save', array($this, 'product_before_save'), 99, 2);
       add_filter('woocommerce_product_data_store_cpt_get_products_query', array($this, 'handle_cpt_get_products_query'), 10, 2);
@@ -54,9 +55,22 @@ if (!class_exists('Kleinanzeigen_Functions'))
       add_action('save_post_product', array($this, 'quick_edit_product_save'), 10, 1);
       add_filter('update_post_metadata', array($this, 'prevent_metadata_update'), 10, 4);
       add_action('before_delete_post', array('Utils', 'remove_attachments'));
+      add_action('transition_post_status', array($this, 'transition_post_status'), 10, 3);
 
       add_action('wp_insert_post_data', array($this, 'publish_guard'), 99, 3);
       add_filter('wp_insert_post_empty_content', '__return_false');
+    }
+
+    public function log_query()
+    {
+      global $wpdb;
+
+      if (is_null($wpdb->queries)) return;
+
+      foreach ($wpdb->queries as $q)
+      {
+        Utils::write_log($q);
+      }
     }
 
     // Woo internal product save
@@ -256,6 +270,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
         'repair_url' => array(
           'items' => array()
         ),
+        'disconnected' => array(
+          'items' => array(),
+          'status' => array('publish', 'draft')
+        ),
       );
 
       if ($name && isset($tasks[$name]))
@@ -362,32 +380,26 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
     public function get_product_from_ad($ad)
     {
-      global $wpdb;
-
-      $product = false;
       $found_by = '';
-      $posts_table = $wpdb->posts;
-      $postmeta_table = $wpdb->postmeta;
 
-      $prepare = $wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE ($posts_table.post_title='%s' OR $posts_table.post_title='%s') AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $ad->title, htmlentities($ad->title), 'product', '_price', Utils::extract_kleinanzeigen_price($ad->price));
+      // Find by `sku`
+      $product = $this->find_product_by_sku($ad->id);
 
-      // By sku
-      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $postmeta_table WHERE $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", '_sku', $ad->id));
-
-      if ($post_ID)
+      if ($product)
       {
-        $product = $this->update_ad_product($post_ID, $ad);
+
         $found_by = 'sku';
+        $product = $this->maybe_update_ad_product($product->get_id(), $ad);
       }
-
-      // By $title AND $price
-      if (!$product)
+      else
       {
-        // Taking into account both a previously htmlentity encoded title and the decoded title version
-        $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE ($posts_table.post_title='%s' OR $posts_table.post_title='%s') AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $ad->title, htmlentities($ad->title), 'product', '_price', Utils::extract_kleinanzeigen_price($ad->price)));
-        if ($post_ID)
+
+        // Find by `title` AND `price`
+        $product = $this->find_product_by_title_and_price($ad->title, Utils::extract_kleinanzeigen_price($ad->price));
+
+        if ($product)
         {
-          $product = wc_get_product($post_ID);
+
           $found_by = 'title';
         }
       }
@@ -395,7 +407,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return compact('product', 'found_by');
     }
 
-    public function update_ad_product($post_ID, $record)
+    public function maybe_update_ad_product($post_ID, $record)
     {
       $args = array();
       $product = wc_get_product($post_ID);
@@ -488,58 +500,36 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $product;
     }
 
-    public function get_no_sku_product_by_title($title)
+    public function find_product_by_title_and_price($title, $price)
     {
       global $wpdb;
 
       $posts_table = $wpdb->posts;
       $postmeta_table = $wpdb->postmeta;
 
-      $prepare = $wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE $posts_table.post_title='%s' AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $title, 'product', '_sku', '');
-      $products = $wpdb->get_var($prepare);
-
-      // $sql = $wpdb->prepare(
-      //   "
-      // 		SELECT ID
-      // 		FROM $wpdb->posts
-      // 		WHERE post_title = %s
-      // 		AND post_type = %s
-      // 	",
-      //   $title,
-      //   'product'
-      // );
-      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_title='%s' AND post_type='%s' LIMIT 1", $title, 'product'));
+      // Takes into account both a previously htmlentity encoded title and the decoded title version
+      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $posts_table, $postmeta_table WHERE ($posts_table.post_title='%s' OR $posts_table.post_title='%s') AND $posts_table.post_type LIKE '%s' AND $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", $title, htmlentities($title), 'product', '_price', $price));
 
       if (isset($post_ID))
       {
-        return wc_get_product($post_ID);
+        return wc_get_product((int) $post_ID);
       }
+      return false;
     }
 
-    public function get_product_by_sku_($sku)
+    public function find_product_by_sku($sku)
     {
       global $wpdb;
-      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku));
+
+      $postmeta_table = $wpdb->postmeta;
+
+      $post_ID = $wpdb->get_var($wpdb->prepare("SELECT post_ID FROM $postmeta_table WHERE $postmeta_table.meta_key='%s' AND $postmeta_table.meta_value='%s' LIMIT 1", '_sku', $sku));
 
       if (isset($post_ID))
       {
-        return wc_get_product($post_ID);
+        return wc_get_product((int) $post_ID);
       }
-    }
-
-    public function get_product_by_sku($sku)
-    {
-      if ($sku)
-      {
-        $p = wc_get_products(array(
-          'sku' => $sku
-        ));
-
-        if (!empty($p))
-        {
-          return $p[0];
-        }
-      }
+      return false;
     }
 
     public function kleinanzeigen_product_exists($records)
@@ -560,8 +550,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $ids = wp_list_pluck((array) $ads, 'id');
       $keyed_records = array_combine($ids, $ads);
       $items = array();
+
       if ('no-sku' === $task_type)
       {
+
         $products = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
         $record = null;
         foreach ($products as $product)
@@ -626,7 +618,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         {
           $sku = (int) $product->get_sku();
           $record = isset($keyed_records[$sku]) ? $keyed_records[$sku] : null;
-          if (!is_null($record)) $this->update_ad_product($product->get_id(), $record);
+          if (!is_null($record)) $this->maybe_update_ad_product($product->get_id(), $record);
         }
         // Return empty array since all product implicitly should have been repaired
         return $items;
@@ -647,13 +639,44 @@ if (!class_exists('Kleinanzeigen_Functions'))
           $title = $keyed_records[$val]->title;
           $identical_products = $this->product_title_equals($title);
           return 0 === count($identical_products);
-        }, ARRAY_FILTER_USE_BOTH);
+        });
 
         $items = array();
         foreach ($diffs as $key => $sku)
         {
           $record = $keyed_records[$sku];
           $items[] = compact('product', 'task_type', 'record');
+        }
+        return $items;
+      }
+      if ('disconnected' === $task_type)
+      {
+
+        foreach ($ads as $record)
+        {
+
+          $query_args = array(
+            'meta_query'  => array(
+              'relation' => 'AND',
+              array(
+                'key'     => '_sku',
+                'compare' => 'NOT EXISTS',
+              ),
+              array(
+                'key'     => '_price',
+                'value' => Utils::extract_kleinanzeigen_price($record->price),
+              ),
+            ),
+            'title' => $record->title
+          );
+          $query = new WC_Product_Query(array_merge($args, $query_args));
+          $products = $query->get_products();
+
+          if (!empty($products))
+          {
+            $product = $products[0];
+            $items[] = compact('product', 'task_type', 'record');
+          }
         }
         return $items;
       }
@@ -832,7 +855,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       else
       {
         $ad = isset($_POST['kleinanzeigendata']['record']) ? (object) $_POST['kleinanzeigendata']['record'] : null;
-        $ad = is_null($ad) ? (isset($_POST['kleinanzeigen_id']) ? $this->find_kleinanzeige((int) $_POST['kleinanzeigen_id']) : null) : $ad;
+        $ad = $ad ?? (isset($_POST['kleinanzeigen_id']) ? $this->find_kleinanzeige((int) $_POST['kleinanzeigen_id']) : null);
 
         if (is_null($ad))
         {
@@ -843,6 +866,12 @@ if (!class_exists('Kleinanzeigen_Functions'))
           $this->enable_sku($product, $ad);
         }
       }
+    }
+
+    public function transition_post_status($new, $old, $post)
+    {
+      Utils::write_log("{$old} => {$new}");
+      update_post_meta($post->ID, 'kleinanzeigen_previous_state', $old);
     }
 
     public function process_kleinanzeigen($post_ID, $post, $update)
@@ -1077,10 +1106,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
     public function has_price_diff($record, $product)
     {
 
-      $kleinanzeigen_price = Utils::extract_kleinanzeigen_price($record->price);
+      $price = Utils::extract_kleinanzeigen_price($record->price);
       $woo_price = $product->get_price();
 
-      return $kleinanzeigen_price !== $woo_price;
+      return $price !== $woo_price;
     }
 
     public function create_ad_product($record, $content)
@@ -1110,7 +1139,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $this->set_product_data($product, $record, $content);
 
       wp_update_post(array(
-        'ID' => $post_ID,
+        'ID'            => $post_ID,
         'post_title'    => $record->title,
         'post_type'     => 'product',
         'post_status'   => $product->get_status(),
@@ -1347,7 +1376,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       /**
        * Handle Mietmaschinen Variations
        */
-      $product_id = $product->get_ID();
+      $product_id = $product->get_id();
       if ('variable' !== $product->get_type())
       {
         $product = new WC_Product_Variable($product);
@@ -1576,7 +1605,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $post_ID = (int) $product->get_id();
       delete_post_meta($post_ID, 'kleinanzeigen_id');
-      $deleted = delete_post_meta($post_ID, 'kleinanzeigen_url');
+      delete_post_meta($post_ID, 'kleinanzeigen_url');
       delete_post_meta($post_ID, 'kleinanzeigen_search_url');
 
       return $product;
@@ -2045,7 +2074,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
           $email_heading = __('Monthly status report', 'kleinanzeigen');
           break;
         default:
-          $email_heading = __('Status report', 'kleinanzeigen');
+          $email_heading = __('Current status report', 'kleinanzeigen');
       }
 
       $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
@@ -2172,7 +2201,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $schedule = key($user_schedule);
       $schedules = $this->get_users_schedules();
 
-      if(!empty($schedules)) {
+      if (!empty($schedules))
+      {
         $emails = $schedules[$schedule];
         $args = array(json_encode(array('emails' => $emails), JSON_UNESCAPED_SLASHES));;
         return wp_next_scheduled("kleinanzeigen_report_{$schedule}", $args);

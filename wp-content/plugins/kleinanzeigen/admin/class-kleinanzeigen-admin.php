@@ -51,11 +51,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_report_monthly', array($this, 'job_report'));
     add_action('kleinanzeigen_report_every_minute', array($this, 'job_report'));
     add_action('kleinanzeigen_sync_price', array($this, 'job_sync_price'));
-    add_action('kleinanzeigen_updated_ads', array($this, 'job_updated_ads'));
+    add_action('kleinanzeigen_update_ad', array($this, 'job_update_ad'));
     add_action('kleinanzeigen_activate_url', array($this, 'job_activate_url'));
     add_action('kleinanzeigen_deactivate_url', array($this, 'job_deactivate_url'));
     add_action('kleinanzeigen_create_products', array($this, 'job_create_products'));
-    add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad_action'));
+    add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad'));
+    add_action('kleinanzeigen_recover_ad', array($this, 'job_recover_ad'));
 
     // User sepecific options
     add_filter('pre_update_option_kleinanzeigen_send_mail_on_new_ad', array($this, 'update_user_meta_callback'), 10, 3);
@@ -164,7 +165,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'mandatory' => array(
         'kleinanzeigen_activate_url',
         'kleinanzeigen_deactivate_url',
-        'kleinanzeigen_updated_ads',
+        'kleinanzeigen_update_ad',
+        'kleinanzeigen_recover_ad',
         'kleinanzeigen_report_every_minute',
         'kleinanzeigen_report_daily',
         'kleinanzeigen_report_weekly',
@@ -288,9 +290,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     wp_unschedule_hook('kleinanzeigen_sync_price');
     wp_unschedule_hook('kleinanzeigen_activate_url');
     wp_unschedule_hook('kleinanzeigen_deactivate_url');
-    wp_unschedule_hook('kleinanzeigen_updated_ads');
+    wp_unschedule_hook('kleinanzeigen_update_ad');
     wp_unschedule_hook('kleinanzeigen_sync_price');
     wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
+    wp_unschedule_hook('kleinanzeigen_recover_ad');
     wp_unschedule_hook('kleinanzeigen_create_products');
   }
 
@@ -326,9 +329,18 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
      * Repair changed title
      * Mandatory, no option available
     */
-    if (!wp_next_scheduled('kleinanzeigen_updated_ads'))
+    if (!wp_next_scheduled('kleinanzeigen_update_ad'))
     {
-      wp_schedule_event($time(), self::EVERY_MINUTE, 'kleinanzeigen_updated_ads');
+      wp_schedule_event($time(), self::EVERY_MINUTE, 'kleinanzeigen_update_ad');
+    }
+
+    /*
+     * Recover products based on previously deactivated state
+     * Mandatory, no option available
+    */
+    if (!wp_next_scheduled('kleinanzeigen_recover_ad'))
+    {
+      wp_schedule_event($time(), self::EVERY_MINUTE, 'kleinanzeigen_recover_ad');
     }
 
     /*
@@ -344,10 +356,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         switch ($schedule)
         {
           case self::EVERY_MINUTE:
-            $next = time();
+            $next = time() + (5 * 60);
             break;
           case self::DAILY:
-            $next = strtotime("next Day") + (6 * 60 * 60);
+            $next = strtotime("next Day 06:00");
             break;
           case self::WEEKLY:
             $next = strtotime("next Monday") + (6 * 60 * 60);
@@ -425,7 +437,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       ));
 
       $price = Utils::extract_kleinanzeigen_price($item['record']->price);
-      wbp_fn()->fix_price($item['product']->get_ID(), $price);
+      wbp_fn()->fix_price($item['product']->get_id(), $price);
 
       if ($job_id)
       {
@@ -434,7 +446,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
   }
 
-  public function job_updated_ads()
+  public function job_update_ad()
   {
     // This job doesn't require to be registered in the active jobs db table
     // since it only rarily occures
@@ -523,7 +535,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     foreach ($items as $item)
     {
 
-      $post_ID = $item['product']->get_ID();
+      $post_ID = $item['product']->get_id();
       $record = $item['record'];
 
       $urls_valid = get_post_meta($post_ID, 'kleinanzeigen_url', true) &&
@@ -555,7 +567,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     $products = wp_list_pluck($items, 'product');
     $ids = array_map(function ($product)
     {
-      return $product->get_ID();
+      return $product->get_id();
     }, $products);
 
     $ids = array_filter($ids, function ($id)
@@ -580,14 +592,58 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     }
   }
 
-  public function job_invalid_ad_action()
+  public function job_recover_ad()
+  {
+
+    $items = wbp_fn()->build_tasks('disconnected')['items'];
+    
+    foreach ($items as $item)
+    {
+      $record = $item['record'];
+      $product = $item['product'];
+      $post_ID = $product->get_id();
+      $title = $product->get_name();
+      $status = $product->get_status();
+      
+      $job_id = wbp_db()->register_job(array(
+        'slug'  => 'kleinanzeigen_recover_ad',
+        'type'  => 'product',
+        'uid'   => $post_ID
+      ));
+      
+      Utils::write_log("####### Recover #######");
+      Utils::write_log("({$status}) {$post_ID} => {$title}");
+
+      $previous_state = get_post_meta($post_ID, 'kleinanzeigen_previous_state', true) ?? 'publish';
+      wbp_fn()->enable_sku($product, $record);
+      
+      if($previous_state) {
+        remove_action('save_post_product', array($this, 'save_post_product'), 99);
+        wp_update_post(array(
+          'ID'          => $post_ID,
+          'post_status' => $previous_state,
+          'post_type'   => 'product',
+        ));
+        add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
+      }
+
+      Utils::write_log("#######################");
+
+      if ($job_id)
+      {
+        wbp_db()->unregister_job($job_id);
+      }
+    }
+  }
+
+  public function job_invalid_ad()
   {
     $action = get_option('kleinanzeigen_schedule_invalid_ads');
     $items = wbp_fn()->build_tasks('invalid-sku')['items'];
 
     foreach ($items as $item)
     {
-      $post_ID = $item['product']->get_ID();
+      $post_ID = $item['product']->get_id();
 
       $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_invalid_ad_action',

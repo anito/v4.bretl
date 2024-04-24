@@ -13,13 +13,19 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   {
     $this->list_table_type = 'product';
 
-    if (wp_doing_ajax()) {
-      if (isset($_POST['ID'])) {
+    if (wp_doing_ajax())
+    {
+      if (isset($_POST['ID']))
+      {
         $this->is_quickedit = true;
-      } else {
+      }
+      else
+      {
         $this->is_fetch = true;
       }
-    } else {
+    }
+    else
+    {
       $this->is_pageload = true;
     }
 
@@ -28,10 +34,11 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
     add_action('manage_' . $this->list_table_type . '_posts_custom_column', array($this, 'render_custom_columns'), 11, 2);
   }
 
-  function get_primary_column() {
+  function get_primary_column()
+  {
     return 'name';
   }
-  
+
   function render_row($id)
   {
     $wp_list_table = _get_list_table('WP_Posts_List_Table', array('screen' => 'edit-product'));
@@ -81,7 +88,8 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
   {
     $post = get_post($post_ID);
     $product = wc_get_product($post_ID);
-    if ($product) {
+    if ($product)
+    {
 
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_ID);
@@ -89,26 +97,34 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $ka_url = get_post_meta($post_ID, 'kleinanzeigen_url', true);
       $brands = wbp_th()->get_product_terms($post_ID, 'brand');
       $product_labels = wp_list_pluck(wbp_th()->get_product_terms($post_ID, 'label'), 'name');
-    } else return 0;
+    }
+    else return 0;
 
-    switch ($column_name) {
-      case 'product_label': {
+    switch ($column_name)
+    {
+      case 'product_label':
+        {
           echo implode(', ', $product_labels);
           break;
         }
-      case 'ka_sku': {
-          if($ka_url) {
+      case 'ka_sku':
+        {
+          if ($ka_url)
+          {
             echo '<a href="' . esc_html($ka_url) . '" target="_blank">' . $sku . '</a>';
           }
           break;
         }
-      case 'product_brand': {
-          echo implode(', ', array_map(function ($term) {
+      case 'product_brand':
+        {
+          echo implode(', ', array_map(function ($term)
+          {
             return '<a href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
           }, $brands !== false ? $brands : []));
           break;
         }
-      case 'sync': {
+      case 'sync':
+        {
 ?>
           <div class="sync-column-content">
             <div id="import-kleinanzeigen-data-wbp-action-<?php echo $post_ID ?>" style="flex: 1;">
@@ -124,10 +140,12 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
                 </a>
               </span>
             </div>
-            <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
-              <span class="spinner"></span>
-              <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_ID ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_ID ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Disconnect', 'kleinanzeigen') ?></a>
-            </div>
+            <?php if (wp_get_current_user()->has_cap('administrator')) : ?>
+              <div id="disconnect-kleinanzeigen-wbp-action-' ?><?php echo $sku ?>">
+                <span class="spinner"></span>
+                <a id="disconnect-kleinanzeigen-<?php echo $sku ?>" disabled href="<?php echo admin_url(('admin-ajax.php?sku=') . $sku . '&action=disconnect') ?>" data-action="disconnect-<?php echo $post_ID ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" data-post-id="<?php echo $post_ID ?>" class="button button-primary button-small"><i class="dashicons dashicons-editor-unlink"></i><?php echo __('Disconnect', 'kleinanzeigen') ?></a>
+              </div>
+            <?php endif; ?>
             <div id="publish-post-wbp-action-<?php echo $post_ID ?>" class="publish-column-content">
               <span class="spinner"></span>
               <a id="publish-post-<?php echo $post_ID ?>" name="publish-post" data-post-status="<?php echo $post_status ?>" data-post-id="<?php echo $post_ID ?>" data-kleinanzeigen-id="<?php echo $sku ?>" class="publish-post button button-secondary button-small"><i class="dashicons dashicons-<?php echo ($post_status === 'publish') ?  'hidden' : 'visibility' ?>"></i><?php echo ($post_status === 'publish') ?  __('Deactivate', 'kleinanzeigen') : __('Publish') ?></a>

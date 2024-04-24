@@ -433,7 +433,6 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const post_ID = el.dataset.postId;
     const kleinanzeigen_id = el.dataset.kleinanzeigenId;
-    const disconnect = el.dataset.disconnect;
     const task_type = el.dataset.taskType;
     const _screen = el.dataset.screen || screen;
 
@@ -446,7 +445,6 @@ jQuery(document).ready(function ($) {
         action: '_ajax_toggle_publish_post',
         post_ID,
         kleinanzeigen_id,
-        disconnect,
         task_type,
         screen: _screen,
       },

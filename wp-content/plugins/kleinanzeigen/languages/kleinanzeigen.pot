@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kleinanzeigen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 20:43+0000\n"
+"POT-Creation-Date: 2024-04-24 05:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -16,12 +16,12 @@ msgstr ""
 "X-Loco-Version: 2.6.6; wp-6.4.1\n"
 "X-Domain: kleinanzeigen"
 
-#: includes/class-kleinanzeigen-functions.php:1500
-#: includes/class-kleinanzeigen-functions.php:1504
-#: includes/class-kleinanzeigen-functions.php:1508
-#: includes/class-kleinanzeigen-functions.php:1512
-#: includes/class-kleinanzeigen-functions.php:1516
-#: includes/class-kleinanzeigen-functions.php:1520
+#: includes/class-kleinanzeigen-functions.php:1528
+#: includes/class-kleinanzeigen-functions.php:1532
+#: includes/class-kleinanzeigen-functions.php:1536
+#: includes/class-kleinanzeigen-functions.php:1540
+#: includes/class-kleinanzeigen-functions.php:1544
+#: includes/class-kleinanzeigen-functions.php:1548
 msgid "%d Days"
 msgstr ""
 
@@ -30,7 +30,7 @@ msgstr ""
 msgid "%s out of %s ads"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1496
+#: includes/class-kleinanzeigen-functions.php:1524
 msgid "1 Day"
 msgstr ""
 
@@ -42,13 +42,13 @@ msgstr ""
 msgid "A link to a product label."
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:943
+#: includes/class-kleinanzeigen-functions.php:971
 msgid ""
 "A Product with the same Ad ID already exists. Delete this draft or enter a "
 "different Ad ID."
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:967
+#: includes/class-kleinanzeigen-functions.php:995
 msgid ""
 "A product with the same title already exists. Delete this draft or enter a "
 "different title."
@@ -59,16 +59,17 @@ msgid "Accept KA price"
 msgstr ""
 
 #. ID used to identify this section and with which to register options
-#: admin/class-kleinanzeigen-admin.php:785
+#: admin/class-kleinanzeigen-admin.php:849
 msgid "Account"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:803
+#: admin/class-kleinanzeigen-admin.php:867
 msgid "Account name"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2069
-#: includes/class-kleinanzeigen-functions.php:2083
+#: includes/class-kleinanzeigen-functions.php:2119
+#: includes/class-kleinanzeigen-functions.php:2135
+#: includes/class-kleinanzeigen-functions.php:2139
 #: admin/partials/kleinanzeigen-admin-header-display.php:84
 msgid "Action required"
 msgstr ""
@@ -98,12 +99,12 @@ msgstr ""
 msgid "Add or remove product labels"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:975
+#: admin/class-kleinanzeigen-admin.php:1039
 #, php-format
 msgid "Additional Mail %s"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:1051
+#: admin/class-kleinanzeigen-admin.php:1115
 msgid "Additional settings."
 msgstr ""
 
@@ -111,13 +112,13 @@ msgstr ""
 msgid "Ads"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:1056
+#: admin/class-kleinanzeigen-admin.php:1120
 msgid ""
 "Ads on Kleinanzeigen.de may get evaluated on a regular base. Select the "
 "interval and tasks to be performed."
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:848
+#: admin/class-kleinanzeigen-admin.php:912
 msgid "Ads per page"
 msgstr ""
 
@@ -129,29 +130,29 @@ msgstr ""
 msgid "All product labels"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1097
+#: includes/class-kleinanzeigen-functions.php:1125
 msgid "Artikelnummer existiert bereits."
 msgstr ""
 
 #. ID used to identify this section and with which to register options
-#: admin/class-kleinanzeigen-admin.php:859
+#: admin/class-kleinanzeigen-admin.php:923
 msgid "Auto sync"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:927
+#: admin/class-kleinanzeigen-admin.php:991
 msgid "Autocreate new products"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:900
+#: admin/class-kleinanzeigen-admin.php:964
 msgid "Automatically accept price changes"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:923
+#: admin/class-kleinanzeigen-admin.php:987
 msgid "Automatically create product from new ad"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2067
-#: includes/class-kleinanzeigen-functions.php:2074
+#: includes/class-kleinanzeigen-functions.php:2117
+#: includes/class-kleinanzeigen-functions.php:2124
 msgid "Autonomous"
 msgstr ""
 
@@ -207,12 +208,20 @@ msgstr ""
 msgid "Could not fetch empty dataset."
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:878
+#: admin/class-kleinanzeigen-admin.php:942
 msgid "Crawl interval"
 msgstr ""
 
 #: admin/partials/dashboard/kleinanzeigen-create-control.php:3
 msgid "Create"
+msgstr ""
+
+#: includes/class-kleinanzeigen-functions.php:2067
+msgid "Current status report"
+msgstr ""
+
+#: includes/class-kleinanzeigen-functions.php:2070
+msgid "Daily status report"
 msgstr ""
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:30
@@ -223,27 +232,26 @@ msgstr ""
 msgid "Date of change"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2286
+#: includes/class-kleinanzeigen-functions.php:2343
 #: includes/class-kleinanzeigen-list-table-tasks.php:447
 #: includes/class-kleinanzeigen-wc-admin-list-table-products.php:133
-#: admin/partials/dashboard/invalid-sku-results.php:31
 #: admin/partials/dashboard/toggle-publish-link.php:2
 msgid "Deactivate"
 msgstr ""
 
-#: admin/partials/dashboard/invalid-sku-results.php:43
-msgid "Deactivate all"
+#: includes/class-kleinanzeigen-functions.php:2054
+msgid "Deactivate ad"
 msgstr ""
 
-#: admin/partials/dashboard/invalid-sku-results.php:31
-msgid "Deactivated"
-msgstr ""
-
-#: includes/class-kleinanzeigen-functions.php:2290
+#: includes/class-kleinanzeigen-functions.php:2347
 msgid "Delete"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:994
+#: includes/class-kleinanzeigen-functions.php:2057
+msgid "Delete ad"
+msgstr ""
+
+#: admin/class-kleinanzeigen-admin.php:1058
 msgid ""
 "Determine how to proceed with the product when its ad has become invalid due "
 "to reservation, deactivation or deletion"
@@ -257,12 +265,13 @@ msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:430
 #: admin/partials/dashboard/invalid-sku-result-row.php:9
-#: admin/partials/dashboard/invalid-sku-results.php:32
 msgid "Disconnected"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2084
-#: includes/class-kleinanzeigen-functions.php:2088
+#: includes/class-kleinanzeigen-functions.php:2132
+#: includes/class-kleinanzeigen-functions.php:2136
+#: includes/class-kleinanzeigen-functions.php:2140
+#: includes/class-kleinanzeigen-functions.php:2144
 msgid "Draft"
 msgstr ""
 
@@ -272,7 +281,7 @@ msgstr ""
 msgid "Drafts"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:975
+#: admin/class-kleinanzeigen-admin.php:1039
 msgid "During development only"
 msgstr ""
 
@@ -309,51 +318,34 @@ msgstr ""
 msgid "Error:"
 msgstr ""
 
-#: admin/partials/dashboard/invalid-price-results.php:5
-#: admin/partials/dashboard/invalid-sku-results.php:5
-msgid "Evaluation Results"
-msgstr ""
-
-#: admin/class-kleinanzeigen-admin.php:209
+#: admin/class-kleinanzeigen-admin.php:213
 msgid "Every 10 minutes"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:214
+#: admin/class-kleinanzeigen-admin.php:218
 msgid "Every 30 minutes"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:204
+#: admin/class-kleinanzeigen-admin.php:208
 msgid "Every 5 minutes"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:222
+#: admin/class-kleinanzeigen-admin.php:226
 msgid "Every day"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:218
+#: admin/class-kleinanzeigen-admin.php:222
 msgid "Every hour"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:199
+#: admin/class-kleinanzeigen-admin.php:203
 msgid "Every minute"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2086
+#: includes/class-kleinanzeigen-functions.php:2142
 #: includes/class-kleinanzeigen-list-table-tasks.php:163
 #: admin/partials/kleinanzeigen-admin-header-display.php:73
 msgid "Featured products"
-msgstr ""
-
-#: admin/partials/dashboard/invalid-price-results.php:52
-msgid "Fix all prices"
-msgstr ""
-
-#: admin/partials/dashboard/invalid-price-results.php:42
-msgid "Fix price"
-msgstr ""
-
-#: admin/partials/dashboard/invalid-price-results.php:42
-msgid "Fixed"
 msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:74
@@ -411,24 +403,16 @@ msgstr ""
 msgid "Import Images"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2082
+#: includes/class-kleinanzeigen-functions.php:2138
 #: includes/class-kleinanzeigen-list-table-tasks.php:103
 #: includes/class-kleinanzeigen-list-table.php:28
 #: admin/partials/kleinanzeigen-admin-header-display.php:105
 msgid "Improper category"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2069
-#: includes/class-kleinanzeigen-functions.php:2076
+#: includes/class-kleinanzeigen-functions.php:2119
+#: includes/class-kleinanzeigen-functions.php:2126
 msgid "Invalid link"
-msgstr ""
-
-#: admin/partials/dashboard/invalid-sku-results.php:32
-msgid "Just disconnect"
-msgstr ""
-
-#: admin/partials/dashboard/invalid-sku-results.php:44
-msgid "Just disconnect all"
 msgstr ""
 
 #: includes/class-kleinanzeigen-list-table-tasks.php:275
@@ -436,21 +420,17 @@ msgstr ""
 msgid "KA Price"
 msgstr ""
 
-#: admin/partials/dashboard/invalid-price-results.php:33
-msgid "KA price"
-msgstr ""
-
 #: includes/class-kleinanzeigen-list-table-tasks.php:438
 msgid "KA Price accepted"
 msgstr ""
 
 #. Name of the plugin
-#: admin/class-kleinanzeigen-admin.php:651
-#: includes/class-kleinanzeigen-functions.php:2065
+#: admin/class-kleinanzeigen-admin.php:715
+#: includes/class-kleinanzeigen-functions.php:2115
 msgid "Kleinanzeigen"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:652
+#: admin/class-kleinanzeigen-admin.php:716
 msgid "Kleinanzeigen Settings"
 msgstr ""
 
@@ -459,8 +439,8 @@ msgstr ""
 msgid "Labels"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2068
-#: includes/class-kleinanzeigen-functions.php:2075
+#: includes/class-kleinanzeigen-functions.php:2118
+#: includes/class-kleinanzeigen-functions.php:2125
 msgid "Linked"
 msgstr ""
 
@@ -505,34 +485,34 @@ msgstr ""
 msgid "Logo"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1846
+#: includes/class-kleinanzeigen-functions.php:1874
 msgid "Mail could not be sent"
 msgstr ""
 
 #: public/partials/emails/new-product.php:40
-#: public/partials/emails/status-report.php:65
+#: public/partials/emails/status-report.php:90
 #, php-format
 msgid "Manage your Kleinanzeigen.de products in your online store here: %1$s"
 msgstr ""
 
 #. ID used to identify this section and with which to register options
-#: admin/class-kleinanzeigen-admin.php:1010
+#: admin/class-kleinanzeigen-admin.php:1074
 msgid "Misc"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:230
+#: admin/class-kleinanzeigen-admin.php:234
 msgid "Monthly"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2026
+#: includes/class-kleinanzeigen-functions.php:2076
 msgid "Monthly status report"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:194
+#: admin/class-kleinanzeigen-admin.php:198
 msgid "Never"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1999
+#: includes/class-kleinanzeigen-functions.php:2027
 msgid "New product"
 msgstr ""
 
@@ -544,7 +524,7 @@ msgstr ""
 msgid "New product label name"
 msgstr ""
 
-#: public/partials/emails/status-report.php:67
+#: public/partials/emails/status-report.php:92
 #, php-format
 msgid "Next scheduled report delivery on %s"
 msgstr ""
@@ -553,7 +533,8 @@ msgstr ""
 msgid "No account data found"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1951
+#: includes/class-kleinanzeigen-functions.php:1979
+#: includes/class-kleinanzeigen-functions.php:2060
 msgid "No action"
 msgstr ""
 
@@ -567,11 +548,6 @@ msgstr ""
 
 #: includes/class-kleinanzeigen-register-wc-taxonomies.php:42
 msgid "No product labels found"
-msgstr ""
-
-#: admin/partials/dashboard/invalid-price-results.php:23
-#: admin/partials/dashboard/invalid-sku-results.php:22
-msgid "No products found"
 msgstr ""
 
 #: admin/partials/kleinanzeigen-admin-header-display.php:120
@@ -588,7 +564,7 @@ msgid ""
 "import."
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:998
+#: admin/class-kleinanzeigen-admin.php:1062
 msgid "Orphaned ad action"
 msgstr ""
 
@@ -607,11 +583,11 @@ msgid ""
 "get located by your visitors."
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:1846
+#: includes/class-kleinanzeigen-functions.php:1874
 msgid "Please check your inbox"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:1046
+#: admin/class-kleinanzeigen-admin.php:1110
 msgid "Please enter your account data."
 msgstr ""
 
@@ -636,11 +612,11 @@ msgstr ""
 msgid "Price deviations"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:904
+#: admin/class-kleinanzeigen-admin.php:968
 msgid "Prices"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:825
+#: admin/class-kleinanzeigen-admin.php:889
 msgid "Pro Account"
 msgstr ""
 
@@ -674,20 +650,18 @@ msgstr ""
 msgid "Product labels"
 msgstr ""
 
-#: admin/partials/dashboard/invalid-sku-results.php:8
-msgid "Products based on not accessible ads"
-msgstr ""
-
-#: admin/partials/dashboard/invalid-price-results.php:8
-msgid "Products with price differences"
-msgstr ""
-
-#: includes/class-kleinanzeigen-functions.php:2282
+#: includes/class-kleinanzeigen-functions.php:2339
 msgid "Publish"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2083
-#: includes/class-kleinanzeigen-functions.php:2087
+#: includes/class-kleinanzeigen-functions.php:2051
+msgid "Publish ad"
+msgstr ""
+
+#: includes/class-kleinanzeigen-functions.php:2131
+#: includes/class-kleinanzeigen-functions.php:2135
+#: includes/class-kleinanzeigen-functions.php:2139
+#: includes/class-kleinanzeigen-functions.php:2143
 #: admin/partials/kleinanzeigen-admin-header-display.php:140
 #: admin/partials/kleinanzeigen-admin-header-display.php:203
 msgid "Published"
@@ -697,7 +671,7 @@ msgstr ""
 msgid "Publishings"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2077
+#: includes/class-kleinanzeigen-functions.php:2127
 msgid "Ready for publication"
 msgstr ""
 
@@ -709,20 +683,20 @@ msgstr ""
 msgid "Search product labels"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:874
+#: admin/class-kleinanzeigen-admin.php:938
 msgid ""
 "Select the interval at which Kleinanzeigen.de should be crawled for changes"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:1026
+#: admin/class-kleinanzeigen-admin.php:1090
 msgid "Select the interval at which you want to receive a status report"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:950
+#: admin/class-kleinanzeigen-admin.php:1014
 msgid "Send email on autocreation"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:946
+#: admin/class-kleinanzeigen-admin.php:1010
 #, php-format
 msgid "Send me an email ( %s ) after a product has been created"
 msgstr ""
@@ -739,7 +713,11 @@ msgstr ""
 msgid "Separate product labels with commas"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:652
+#: public/partials/emails/status-report.php:84
+msgid "Setting for orphaned ads:"
+msgstr ""
+
+#: admin/class-kleinanzeigen-admin.php:716
 #: includes/class-kleinanzeigen-list-table-tasks.php:74
 #: admin/partials/kleinanzeigen-admin-settings-display.php:18
 #: admin/partials/dashboard/settings.php:3
@@ -751,10 +729,6 @@ msgstr ""
 msgid "Shop Price"
 msgstr ""
 
-#: admin/partials/dashboard/invalid-price-results.php:37
-msgid "Shop price"
-msgstr ""
-
 #: admin/partials/kleinanzeigen-admin-header-display.php:58
 msgid "Shop products"
 msgstr ""
@@ -763,12 +737,12 @@ msgstr ""
 msgid "Source reference"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:1030
-#: includes/class-kleinanzeigen-functions.php:2029
+#: admin/class-kleinanzeigen-admin.php:1094
+#: includes/class-kleinanzeigen-functions.php:2079
 msgid "Status report"
 msgstr ""
 
-#: public/partials/emails/status-report.php:52
+#: public/partials/emails/status-report.php:71
 msgid "Summary of products based on Kleinanzeigen"
 msgstr ""
 
@@ -784,7 +758,7 @@ msgstr ""
 msgid "Template shortcode"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:677
+#: admin/class-kleinanzeigen-admin.php:741
 #, php-format
 msgid "The account %1$s could not be found"
 msgstr ""
@@ -795,7 +769,7 @@ msgid ""
 "The product %1$s has been automatically created based on the following ad:"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:689
+#: admin/class-kleinanzeigen-admin.php:753
 msgid ""
 "There was an error adding this setting. Please try again. If this persists, "
 "shoot us an email."
@@ -807,19 +781,19 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2080
+#: includes/class-kleinanzeigen-functions.php:2130
 msgid "Total autonomous products"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2073
+#: includes/class-kleinanzeigen-functions.php:2123
 msgid "Total hidden products"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2081
+#: includes/class-kleinanzeigen-functions.php:2134
 msgid "Total invalid links"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2066
+#: includes/class-kleinanzeigen-functions.php:2116
 msgid "Total published products"
 msgstr ""
 
@@ -848,8 +822,8 @@ msgstr ""
 msgid "Upload hero image."
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2070
-#: includes/class-kleinanzeigen-functions.php:2077
+#: includes/class-kleinanzeigen-functions.php:2120
+#: includes/class-kleinanzeigen-functions.php:2127
 msgid "Valid link"
 msgstr ""
 
@@ -870,11 +844,11 @@ msgstr ""
 msgid "View product label"
 msgstr ""
 
-#: admin/class-kleinanzeigen-admin.php:226
+#: admin/class-kleinanzeigen-admin.php:230
 msgid "Weekly"
 msgstr ""
 
-#: includes/class-kleinanzeigen-functions.php:2023
+#: includes/class-kleinanzeigen-functions.php:2073
 msgid "Weekly status report"
 msgstr ""
 

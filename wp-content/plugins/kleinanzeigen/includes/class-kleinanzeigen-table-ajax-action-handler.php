@@ -196,7 +196,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-      $post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
+      $new_post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
 
       
       if ($post_ID) {
@@ -204,7 +204,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         $gmt = get_gmt_from_date( $date );
         wp_update_post(array(
           'ID'            => $post_ID,
-          'post_status'   => $post_status,
+          'post_status'   => $new_post_status,
           'post_date'     => $date,
           'post_date_gmt' => $gmt,
         ));
@@ -674,15 +674,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
       ob_start();
       $wp_list_table->render_head();
-      return ob_get_clean();
-    }
-
-    public function build_tasks()
-    {
-      global $wp_list_table;
-
-      ob_start();
-      $wp_list_table->build_tasks();
       return ob_get_clean();
     }
 

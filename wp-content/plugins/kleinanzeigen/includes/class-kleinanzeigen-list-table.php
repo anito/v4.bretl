@@ -433,7 +433,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           }
           $kleinanzeigen_actions =
             '<div>' .
-            wbp_ka()->include_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_ID', 'record', 'post_status', 'classes'), array('connected' => 'sku' === $found_by))) .
+            wp_get_current_user()->has_cap('administrator') ? wbp_ka()->include_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_ID', 'record', 'post_status', 'classes'), array('connected' => 'sku' === $found_by))) : ''.
             wbp_ka()->include_template('dashboard/kleinanzeigen-toggle-link-control.php', true, compact('post_ID', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
             '</div>';
         }
