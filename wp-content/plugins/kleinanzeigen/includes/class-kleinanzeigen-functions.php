@@ -484,6 +484,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       if ($product && ($is_diff_title() || $is_diff_date()))
       {
+
+        // Avoid recursion
         remove_action('save_post_product', array($this, 'save_post_product'), 99);
         wp_update_post(
           array_merge(array(
@@ -870,7 +872,12 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
     public function transition_post_status($new, $old, $post)
     {
-      Utils::write_log("{$old} => {$new}");
+
+      $title = $post->title;
+      $post_ID = $post->ID;
+      Utils::write_log("##### Transition  #####");
+      Utils::write_log("{$post_ID} {$old} => {$new}: {$title}");
+      Utils::write_log("#######################");
       update_post_meta($post->ID, 'kleinanzeigen_previous_state', $old);
     }
 
@@ -1019,6 +1026,11 @@ if (!class_exists('Kleinanzeigen_Functions'))
       }
 
       // Avoid recursion
+      
+      Utils::write_log("#### Update Post ####");
+      Utils::write_log("{$post_ID} {$title}");
+      Utils::write_log("#######################");
+      
       remove_action('save_post_product', array($this, 'save_post_product'), 99);
       wp_update_post([
         'ID'            => $post_ID,
@@ -1135,17 +1147,21 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $product->set_sku($record->id);
       $product->set_status('draft');
       $post_ID = $product->save();
+      $title = $record->title;
 
       $this->set_product_data($product, $record, $content);
 
+      Utils::write_log("##### New Product #####");
+      Utils::write_log("{$post_ID} {$title}");
+      Utils::write_log("#######################");
+
       wp_update_post(array(
         'ID'            => $post_ID,
-        'post_title'    => $record->title,
+        'post_title'    => $title,
         'post_type'     => 'product',
         'post_status'   => $product->get_status(),
         'post_content'  => $content,
         'post_excerpt'  => $record->description, // Utils::sanitize_excerpt($content, 300)
-        'post_foo'      => 'Foo Bar'
       ), true);
 
       $maybe_duplicate_sku = $this->enable_sku($product, $record);
@@ -1581,7 +1597,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $post_ID = (int) $product->get_id();
       $this->set_sku($post_ID, $ad);
 
-      if($force) {
+      if ($force)
+      {
         delete_post_meta($post_ID, 'kleinanzeigen_force_disconnect');
       }
 
@@ -1613,7 +1630,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
       delete_post_meta($post_ID, 'kleinanzeigen_url');
       delete_post_meta($post_ID, 'kleinanzeigen_search_url');
 
-      if($force) {
+      if ($force)
+      {
         update_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true);
       }
 

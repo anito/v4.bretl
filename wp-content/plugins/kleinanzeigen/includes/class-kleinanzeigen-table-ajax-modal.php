@@ -51,7 +51,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table_Modal')) {
       $task_type = isset($_COOKIE['kleinanzeigen-task-type']) ? $_COOKIE['kleinanzeigen-task-type'] : '';
 
       $args = array(
-        'status' => array('publish'),
         'limit' => -1
       );
       $items = wbp_fn()->build_tasks($task_type, $args)['items'];

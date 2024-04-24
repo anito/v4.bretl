@@ -475,10 +475,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         continue;
       };
 
-      Utils::write_log("##### New Product #####");
-      Utils::write_log($record->title);
-      Utils::write_log("#######################");
-
       $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_create_products',
         'type'  => 'record',
@@ -596,7 +592,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
 
     $items = wbp_fn()->build_tasks('disconnected')['items'];
-    
+
     foreach ($items as $item)
     {
       $record = $item['record'];
@@ -604,10 +600,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $post_ID = $product->get_id();
       $title = $product->get_name();
       $status = $product->get_status();
-      
+
       // Stop updating if `kleinanzeigen_force_disconnect` flag has been set
       $forced_disconnected = get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true);
-      if($forced_disconnected) {
+      if ($forced_disconnected)
+      {
         continue;
       }
 
@@ -616,14 +613,19 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'type'  => 'product',
         'uid'   => $post_ID
       ));
-      
+
       Utils::write_log("####### Recover #######");
       Utils::write_log("({$status}) {$post_ID} => {$title}");
 
-      $previous_state = get_post_meta($post_ID, 'kleinanzeigen_previous_state', true) ?? 'publish';
+      $previous_state = get_post_meta($post_ID, 'kleinanzeigen_previous_state', true);
       wbp_fn()->enable_sku($product, $record);
-      
-      if($previous_state) {
+
+      if ($previous_state)
+      {
+
+        Utils::write_log("Updating previous state: {$previous_state}");
+
+        // Avoid recursion
         remove_action('save_post_product', array($this, 'save_post_product'), 99);
         wp_update_post(array(
           'ID'          => $post_ID,
@@ -632,7 +634,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         ));
         add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
       }
+      else
+      {
 
+        Utils::write_log("No previous state");
+      }
       Utils::write_log("#######################");
 
       if ($job_id)
@@ -678,6 +684,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         $postarr = array_merge(array(
           'ID' => $post_ID
         ), $args);
+        $state = $postarr['post_status'];
+
+        Utils::write_log("##### Invalid Ad  #####");
+        Utils::write_log($item['product']->get_title());
+        Utils::write_log("Updating state to: {$state}");
+        Utils::write_log("#######################");
 
         /**
          * Here the actual job will be done by updating the post

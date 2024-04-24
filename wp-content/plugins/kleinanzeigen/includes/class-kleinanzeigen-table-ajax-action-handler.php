@@ -1,12 +1,14 @@
 <?php
 
 // If this file is called directly, abort.
-if (!defined('WPINC')) {
+if (!defined('WPINC'))
+{
   die();
 }
 
 // If class `Kleinanzeigen_Ajax_Action_Handler` doesn't exists yet.
-if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
+if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
+{
 
   class Kleinanzeigen_Ajax_Action_Handler extends Kleinanzeigen
   {
@@ -121,7 +123,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $this->ajax_get_brand_images();
     }
 
-    public function get_nonce($action) {
+    public function get_nonce($action)
+    {
       $nonce = wp_create_nonce($action);
       die(json_encode($nonce));
     }
@@ -163,11 +166,13 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : 1;
 
-      if (isset($post_ID) && isset($price)) {
+      if (isset($post_ID) && isset($price))
+      {
         wbp_fn()->fix_price($post_ID, $price);
       }
 
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $data = $this->prepare_list_table($paged);
@@ -177,7 +182,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       $modal_row = null;
-      if ('modal' === $screen) {
+      if ('modal' === $screen)
+      {
         $record = $this->get_record($kleinanzeigen_id);
         $modal_row = $this->render_task_list_row($post_ID, array('record' => $record));
       }
@@ -197,11 +203,16 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
       $new_post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
+      $title = wc_get_product($post_ID)->get_title();
 
-      
-      if ($post_ID) {
+      Utils::write_log("## Ajax Toggle State ##");
+      Utils::write_log("({$status} => {$new_post_status}) {$post_ID} => {$title}");
+      Utils::write_log("#######################");
+
+      if ($post_ID)
+      {
         $date = get_the_date('Y-m-d H:i:s', $post_ID);
-        $gmt = get_gmt_from_date( $date );
+        $gmt = get_gmt_from_date($date);
         wp_update_post(array(
           'ID'            => $post_ID,
           'post_status'   => $new_post_status,
@@ -211,7 +222,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       ob_start();
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
@@ -223,7 +235,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       $head = null;
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $head = $this->render_head();
@@ -231,7 +244,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       $modal_row = null;
-      if ('modal' === $screen) {
+      if ('modal' === $screen)
+      {
         $record = $this->get_record($kleinanzeigen_id);
         $modal_row = $this->render_task_list_row($post_ID, array('record' => $record));
       }
@@ -249,13 +263,15 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
-      if ($post_ID) {
+      if ($post_ID)
+      {
         $product = wc_get_product($post_ID);
         $product->set_featured(!$product->is_featured());
         $product->save();
       }
 
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $data = $this->prepare_list_table($paged);
@@ -265,7 +281,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       $modal_row = null;
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'modal':
           $record = $this->get_record($kleinanzeigen_id);
           $modal_row = $this->render_task_list_row($post_ID, array('record' => $record));
@@ -288,19 +305,27 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
       $args = (array) json_decode(base64_decode($args));
 
-      if ($post_ID) {
+      if ($post_ID)
+      {
+        $title = wc_get_product($post_ID)->get_title();
         $postarr = array_merge(array(
           'ID' => $post_ID
         ), $args);
 
+        Utils::write_log("## Ajax Save Post ##");
+        Utils::write_log("{$post_ID} {$title}");
+        Utils::write_log("#######################");
+
         wp_update_post($postarr);
         $product = wc_get_product($post_ID);
-        if ("trash" === $product->get_status()) {
+        if ("trash" === $product->get_status())
+        {
           wbp_fn()->delete_product($post_ID, true);
         }
       }
 
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'toplevel_page_kleinanzeigen':
         case 'modal':
           $data = $this->prepare_list_table($paged);
@@ -310,7 +335,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       $modal_row = null;
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'modal':
           $record = $this->get_record($kleinanzeigen_id);
           $modal_row = $this->render_task_list_row($post_ID, array('record' => $record));
@@ -331,10 +357,14 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
       $product = wc_get_product($post_ID);
-      if ($product) {
-        if (isset($ad)) {
+      if ($product)
+      {
+        if (isset($ad))
+        {
           wbp_fn()->enable_sku($product, $ad, true);
-        } else {
+        }
+        else
+        {
           wbp_fn()->disable_sku($product, true);
         }
         $product->save();
@@ -358,11 +388,13 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
       $product = wc_get_product($post_ID);
-      if ($product) {
+      if ($product)
+      {
         wbp_fn()->disable_sku($product, true);
       }
 
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
@@ -375,7 +407,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       $modal_row = null;
-      if ('modal' === $screen) {
+      if ('modal' === $screen)
+      {
         $modal_row = $this->render_task_list_row($post_ID);
       }
 
@@ -389,7 +422,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
       $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : null;
 
-      if ($kleinanzeigen_id) {
+      if ($kleinanzeigen_id)
+      {
         $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id);
       }
 
@@ -401,32 +435,44 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $content = isset($_REQUEST['content']) ? $_REQUEST['content'] : null;
       $record = isset($_REQUEST['record']) ? (object) $_REQUEST['record'] : null;
 
-      if (!$record) {
+      if (!$record)
+      {
         die();
       }
 
-      if (!$post_ID) {
+      if (!$post_ID)
+      {
         $product = new WC_Product();
         $product->set_name($record->title);
         $post_ID = $product->save();
-      } else {
+      }
+      else
+      {
         $product = wc_get_product($post_ID);
       }
 
-      if ($product) {
+      if ($product)
+      {
         wbp_fn()->set_product_data($product, $record, $content);
         $product = wbp_fn()->enable_sku($product, $record);
+        $title = wc_get_product($post_ID)->get_title();
         $date = wbp_fn()->ka_formatted_date($record->date);
         $gmt = get_gmt_from_date($date);
 
-        if (is_wp_error($product)) {
+        if (is_wp_error($product))
+        {
           $error_data = $product->get_error_data();
-          if (isset($error_data['resource_id'])) {
+          if (isset($error_data['resource_id']))
+          {
             wp_delete_post($error_data['resource_id'], true);
           }
           die();
         };
       }
+
+      Utils::write_log("##### Ajax Import #####");
+      Utils::write_log("{$post_ID} {$title}");
+      Utils::write_log("#######################");
 
       wp_update_post(array(
         'ID'            => $post_ID,
@@ -440,7 +486,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
         'post_excerpt'  => $record->description // Utils::sanitize_excerpt($content, 300)
       ), true);
 
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
@@ -451,7 +498,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       }
 
       $head = null;
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'toplevel_page_kleinanzeigen':
           $head = $this->render_head();
           break;
@@ -468,7 +516,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $post_ID =  isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
       $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? $_REQUEST['kleinanzeigen_id'] : null;
 
-      if ($kleinanzeigen_id) {
+      if ($kleinanzeigen_id)
+      {
         $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id);
       }
 
@@ -481,16 +530,21 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $ids = [];
       $count = 0;
       $errors = 0;
-      for ($i = 0; $i < count($kleinanzeigen_images); $i++) {
+      for ($i = 0; $i < count($kleinanzeigen_images); $i++)
+      {
         $url = $kleinanzeigen_images[$i];
         $image_id = Utils::upload_image($url, $post_ID);
-        if(!is_wp_error($image_id)) {
+        if (!is_wp_error($image_id))
+        {
           $ids[] = $image_id;
           $count++;
-          if ($i === 0) {
+          if ($i === 0)
+          {
             set_post_thumbnail((int) $post_ID, $ids[0]);
           }
-        } else {
+        }
+        else
+        {
           $errors++;
         }
       }
@@ -499,7 +553,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       update_post_meta((int) $post_ID, '_product_image_gallery', implode(',', $ids));
       update_post_meta((int) $post_ID, 'kleinanzeigen_id', $kleinanzeigen_id);
 
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
@@ -524,7 +579,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       Utils::remove_attachments($post_ID);
 
       $row = null;
-      switch ($screen) {
+      switch ($screen)
+      {
         case 'edit-product':
           $row = $this->render_wc_admin_list_row($post_ID);
           break;
@@ -543,7 +599,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
 
       $product = wc_get_product($post_ID);
-      if ($product) {
+      if ($product)
+      {
         $product->delete(true);
       }
 
@@ -559,7 +616,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
 
     public function ajax_get_product_categories()
     {
-      foreach (get_terms(['taxonomy' => 'product_cat']) as $key => $term) {
+      foreach (get_terms(['taxonomy' => 'product_cat']) as $key => $term)
+      {
         $cats[] = [
           'id' => $term->term_id,
           'slug' => $term->slug,
@@ -575,9 +633,11 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
     public function ajax_get_brand_images()
     {
       $brands = array();
-      foreach (get_terms(['taxonomy' => 'product_brand']) as $key => $term) {
+      foreach (get_terms(['taxonomy' => 'product_brand']) as $key => $term)
+      {
         $image_ids = get_metadata('term', $term->term_id, 'image');
-        if (!empty($image_ids)) {
+        if (!empty($image_ids))
+        {
           $image_url = wp_get_attachment_image_url($image_ids[0]);
 
           $brands[] = [
@@ -598,20 +658,27 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
     public function upload_image($url, $post_ID)
     {
       $attachmentId = null;
-      if ($url !== "") {
+      if ($url !== "")
+      {
         $file = array();
         $file['name'] = $url;
         $file['tmp_name'] = download_url($url);
 
-        if (!is_wp_error($file['tmp_name'])) {
+        if (!is_wp_error($file['tmp_name']))
+        {
           $attachmentId = media_handle_sideload($file, $post_ID);
 
-          if (is_wp_error($attachmentId)) {
+          if (is_wp_error($attachmentId))
+          {
             @unlink($file['tmp_name']);
-          } else {
+          }
+          else
+          {
             $url = wp_get_attachment_url($attachmentId);
           }
-        } else {
+        }
+        else
+        {
           // @unlink($file['tmp_name']);
         }
       }
@@ -645,7 +712,8 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler')) {
       $ads = $data->ads;
       $ids = array_column($ads, 'id');
       $record_key = array_search($kleinanzeigen_id, $ids);
-      if (isset($record_key)) {
+      if (isset($record_key))
+      {
         $record = $ads[$record_key];
         $wp_list_table->render_row($record);
       }
