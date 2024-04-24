@@ -198,15 +198,15 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
       $post_ID = isset($_REQUEST['post_ID']) ? (int) $_REQUEST['post_ID'] : null;
       $kleinanzeigen_id = isset($_REQUEST['kleinanzeigen_id']) ? (int) $_REQUEST['kleinanzeigen_id'] : '';
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
-      $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : null;
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
-
-      $new_post_status = get_post_status($post_ID) === 'draft' ? 'publish' : 'draft';
-      $title = wc_get_product($post_ID)->get_title();
+      
+      $status = get_post_status($post_ID);
+      $new_post_status = 'draft' === $status ? 'publish' : 'draft';
+      $title = get_the_title($post_ID);
 
       Utils::write_log("## Ajax Toggle State ##");
-      Utils::write_log("({$status} => {$new_post_status}) {$post_ID} => {$title}");
+      Utils::write_log("{$status} => {$new_post_status}: {$post_ID} {$title}");
       Utils::write_log("#######################");
 
       if ($post_ID)

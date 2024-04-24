@@ -101,7 +101,8 @@ class Kleinanzeigen_Deactivator extends Kleinanzeigen_Installer
     wp_unschedule_hook('kleinanzeigen_activate_url');
     wp_unschedule_hook('kleinanzeigen_deactivate_url');
     wp_unschedule_hook('kleinanzeigen_update_ad');
-    wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
+    wp_unschedule_hook('kleinanzeigen_invalid_ad');
+    wp_unschedule_hook('kleinanzeigen_recover_ad');
     wp_unschedule_hook('kleinanzeigen_create_products');
   }
 }

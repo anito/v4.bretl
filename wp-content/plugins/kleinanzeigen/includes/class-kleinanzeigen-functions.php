@@ -873,10 +873,13 @@ if (!class_exists('Kleinanzeigen_Functions'))
     public function transition_post_status($new, $old, $post)
     {
 
-      $title = $post->title;
+      if('product' !== $post->post_type) return;
+      if($new === $old) return;
+
+      $title = $post->post_title;
       $post_ID = $post->ID;
       Utils::write_log("##### Transition  #####");
-      Utils::write_log("{$post_ID} {$old} => {$new}: {$title}");
+      Utils::write_log("{$old} => {$new}: {$post_ID} {$title}");
       Utils::write_log("#######################");
       update_post_meta($post->ID, 'kleinanzeigen_previous_state', $old);
     }
@@ -1571,12 +1574,19 @@ if (!class_exists('Kleinanzeigen_Functions'))
       );
     }
 
-    public function enable_sku(&$product, $ad, $force = false)
+    public function enable_sku(&$product, $ad, $force_connect = false)
     {
       if (is_int($product))
       {
         $product = wc_get_product($product);
       }
+
+      $post_ID = (int) $product->get_id();
+
+      // Stop if `kleinanzeigen_force_disconnect` flag has been set unless `force_connect` is true
+      $forced_disconnected = !!(get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true));
+      if($forced_disconnected && !$force_connect) return;
+
       try
       {
         $product->set_sku($ad->id);
@@ -1594,10 +1604,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
           )
         ));
       }
-      $post_ID = (int) $product->get_id();
+      
       $this->set_sku($post_ID, $ad);
 
-      if ($force)
+      if ($forced_disconnected)
       {
         delete_post_meta($post_ID, 'kleinanzeigen_force_disconnect');
       }

@@ -67,7 +67,10 @@
     const init = (jobs, todos, completed) => {
 
       const sortByTime = (a, b) => a.timestamp - b.timestamp;
-      jobs = jobs.sort(sortByTime);
+      // Remove jobs too far in future
+      jobs = jobs
+        .filter((job) => job.timestamp < Date.now() + 5 * 6e4) // within 5 minutes time
+        .sort(sortByTime);
 
       console.log('jobs', jobs);
       console.log('todos', todos);

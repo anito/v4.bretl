@@ -55,7 +55,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     add_action('kleinanzeigen_activate_url', array($this, 'job_activate_url'));
     add_action('kleinanzeigen_deactivate_url', array($this, 'job_deactivate_url'));
     add_action('kleinanzeigen_create_products', array($this, 'job_create_products'));
-    add_action('kleinanzeigen_invalid_ad_action', array($this, 'job_invalid_ad'));
+    add_action('kleinanzeigen_invalid_ad', array($this, 'job_invalid_ad'));
     add_action('kleinanzeigen_recover_ad', array($this, 'job_recover_ad'));
 
     // User sepecific options
@@ -174,7 +174,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       ),
       'optional' => array(
         'kleinanzeigen_sync_price',
-        'kleinanzeigen_invalid_ad_action',
+        'kleinanzeigen_invalid_ad',
         'kleinanzeigen_create_products',
       ),
     );
@@ -291,8 +291,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     wp_unschedule_hook('kleinanzeigen_activate_url');
     wp_unschedule_hook('kleinanzeigen_deactivate_url');
     wp_unschedule_hook('kleinanzeigen_update_ad');
-    wp_unschedule_hook('kleinanzeigen_sync_price');
-    wp_unschedule_hook('kleinanzeigen_invalid_ad_action');
+    wp_unschedule_hook('kleinanzeigen_invalid_ad');
     wp_unschedule_hook('kleinanzeigen_recover_ad');
     wp_unschedule_hook('kleinanzeigen_create_products');
   }
@@ -399,9 +398,9 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       */
       if ("0" !== get_option('kleinanzeigen_schedule_invalid_ads', '0'))
       {
-        if (!wp_next_scheduled('kleinanzeigen_invalid_ad_action'))
+        if (!wp_next_scheduled('kleinanzeigen_invalid_ad'))
         {
-          wp_schedule_event($time(), $crawl_interval, 'kleinanzeigen_invalid_ad_action');
+          wp_schedule_event($time(), $crawl_interval, 'kleinanzeigen_invalid_ad');
         }
       }
 
@@ -534,11 +533,13 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $post_ID = $item['product']->get_id();
       $record = $item['record'];
 
-      $urls_valid = get_post_meta($post_ID, 'kleinanzeigen_url', true) &&
-        get_post_meta($post_ID, 'kleinanzeigen_search_url', true);
-      $record_exists = !is_null($record);
+      if(is_null($record)) continue;
+      if(get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true)) continue;
 
-      if (!$urls_valid && $record_exists)
+      $urls_need_update = !(get_post_meta($post_ID, 'kleinanzeigen_url', true) &&
+        get_post_meta($post_ID, 'kleinanzeigen_search_url', true));
+
+      if ($urls_need_update)
       {
 
         $job_id = wbp_db()->register_job(array(
@@ -602,7 +603,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $status = $product->get_status();
 
       // Stop updating if `kleinanzeigen_force_disconnect` flag has been set
-      $forced_disconnected = get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true);
+      $forced_disconnected = !!(get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true));
       if ($forced_disconnected)
       {
         continue;
@@ -658,7 +659,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $post_ID = $item['product']->get_id();
 
       $job_id = wbp_db()->register_job(array(
-        'slug'  => 'kleinanzeigen_invalid_ad_action',
+        'slug'  => 'kleinanzeigen_invalid_ad',
         'type'  => 'product',
         'uid' => $post_ID
       ));
