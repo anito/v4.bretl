@@ -221,6 +221,7 @@ class Kleinanzeigen extends Kleinanzeigen_Templates
     // Ajax actions
     $this->loader->add_action('wp_ajax__ajax_poll', array($fns, '_ajax_poll'));
     $this->loader->add_action('wp_ajax__ajax_cron', array($fns, '_ajax_cron'));
+    $this->loader->add_action('wp_ajax__ajax_ping', array($fns, '_ajax_ping'));
     $this->loader->add_action('wp_ajax__ajax_status_mail', array($fns, '_ajax_status_mail'));
     
     $this->loader->add_action('wp_ajax_nopriv__ajax_poll', array($fns, '_ajax_poll'));

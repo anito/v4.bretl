@@ -150,7 +150,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'plugin_name' => self::$plugin_name,
       'home_url'    => home_url(),
       'screen'      => wbp_fn()->screen_id,
-      'edit_link'   => admin_url('post.php?action=edit&post=')
+      'edit_link'   => admin_url('post.php?action=edit&post='),
+      'nonce'       => wp_create_nonce('ajax-nonce')
     ));
     wp_localize_script(self::$plugin_name . '-utils', 'KleinanzeigenUtils', array(
       'admin_ajax'  => admin_url('admin-ajax.php'),
@@ -624,16 +625,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       if ($previous_state)
       {
 
-        Utils::write_log("Updating previous state: {$previous_state}");
-
-        // Avoid recursion
-        remove_action('save_post_product', array($this, 'save_post_product'), 99);
+        Utils::write_log("Updating to previous state: {$previous_state}");
         wp_update_post(array(
           'ID'          => $post_ID,
           'post_status' => $previous_state,
           'post_type'   => 'product',
         ));
-        add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
       }
       else
       {
@@ -685,11 +682,11 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         $postarr = array_merge(array(
           'ID' => $post_ID
         ), $args);
-        $state = $postarr['post_status'];
+        $status = $postarr['post_status'];
 
         Utils::write_log("##### Invalid Ad  #####");
         Utils::write_log($item['product']->get_title());
-        Utils::write_log("Updating state to: {$state}");
+        Utils::write_log("Updating state to: {$status}");
         Utils::write_log("#######################");
 
         /**
@@ -698,9 +695,15 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         wp_update_post($postarr);
         $product = wc_get_product($post_ID);
 
-        if ("trash" === $product->get_status())
-        {
-          wbp_fn()->delete_product($post_ID, true);
+        switch ($status) {
+
+          case "trash":
+            wbp_fn()->delete_product($post_ID, true);
+            break;
+          case "publish":
+          case "draft":
+            wbp_fn()->disable_sku($product);
+            break;
         }
       }
 

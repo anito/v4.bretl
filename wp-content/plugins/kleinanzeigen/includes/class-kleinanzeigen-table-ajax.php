@@ -105,7 +105,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
 
       check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
 
-      // Keep in mind Utils::get_remote_page_data will alter the page_number cookie, so save it and reset it later if required
+      // Keep in mind Utils::get_page_data will alter the page_number cookie, so save it and reset it later if required
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
       $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : '';

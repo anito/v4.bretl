@@ -708,6 +708,23 @@ jQuery(document).ready(function ($) {
       },
     });
 
+  const ping = (post_ID = '', nonce) =>
+    $.ajax({
+      url: admin_ajax,
+      data: {
+        action: '_ajax_ping',
+        _ajax_nonce: nonce,
+        post_ID
+      },
+      success: (response) => response,
+      error: (response, status, message) => {
+        return {
+         success: false,
+         message,
+        };
+      },
+    });
+
   const getNonce = (action) =>
     $.ajax({
       url: admin_ajax,
@@ -748,6 +765,7 @@ jQuery(document).ready(function ($) {
         statusReport,
         poll,
         cron,
+        ping,
         getNonce,
       };
       break;

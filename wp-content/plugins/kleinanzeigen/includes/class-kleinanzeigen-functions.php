@@ -404,6 +404,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
         }
       }
 
+      if (empty($found_by))
+      {
+        Utils::write_log($ad->title);
+      }
       return compact('product', 'found_by');
     }
 
@@ -549,6 +553,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
     protected function get_task_list_items($ads, $task_type, $args = array('status' => 'publish'))
     {
+
       $ids = wp_list_pluck((array) $ads, 'id');
       $keyed_records = array_combine($ids, $ads);
       $items = array();
@@ -666,7 +671,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
               ),
               array(
                 'key'     => '_price',
-                'value' => Utils::extract_kleinanzeigen_price($record->price),
+                'value' => (float) Utils::extract_kleinanzeigen_price($record->price),
               ),
             ),
             'title' => $record->title
@@ -850,14 +855,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
       wbp_th()->process_sale($post_ID, $post);
       wbp_th()->maybe_remove_default_cat($post_ID);
 
-      if (!wp_doing_ajax())
+      if (wp_doing_ajax())
       {
-        $this->process_kleinanzeigen($post_ID, $post, $update);
-      }
-      else
-      {
-        $ad = isset($_POST['kleinanzeigendata']['record']) ? (object) $_POST['kleinanzeigendata']['record'] : null;
-        $ad = $ad ?? (isset($_POST['kleinanzeigen_id']) ? $this->find_kleinanzeige((int) $_POST['kleinanzeigen_id']) : null);
+        $ad = isset($_POST['kleinanzeigen_id']) ? $this->find_kleinanzeige((int) $_POST['kleinanzeigen_id']) : null;
 
         if (is_null($ad))
         {
@@ -868,13 +868,17 @@ if (!class_exists('Kleinanzeigen_Functions'))
           $this->enable_sku($product, $ad);
         }
       }
+      elseif (!wp_doing_cron())
+      {
+        $this->process_kleinanzeigen($post_ID, $post, $update);
+      }
     }
 
     public function transition_post_status($new, $old, $post)
     {
 
-      if('product' !== $post->post_type) return;
-      if($new === $old) return;
+      if ('product' !== $post->post_type) return;
+      if ($new === $old) return;
 
       $title = $post->post_title;
       $post_ID = $post->ID;
@@ -1029,11 +1033,11 @@ if (!class_exists('Kleinanzeigen_Functions'))
       }
 
       // Avoid recursion
-      
+
       Utils::write_log("#### Update Post ####");
       Utils::write_log("{$post_ID} {$title}");
       Utils::write_log("#######################");
-      
+
       remove_action('save_post_product', array($this, 'save_post_product'), 99);
       wp_update_post([
         'ID'            => $post_ID,
@@ -1585,7 +1589,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       // Stop if `kleinanzeigen_force_disconnect` flag has been set unless `force_connect` is true
       $forced_disconnected = !!(get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true));
-      if($forced_disconnected && !$force_connect) return;
+      if ($forced_disconnected && !$force_connect) return;
 
       try
       {
@@ -1604,7 +1608,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
           )
         ));
       }
-      
+
       $this->set_sku($post_ID, $ad);
 
       if ($forced_disconnected)
@@ -1846,21 +1850,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $product;
     }
 
-    public function ajax_poll()
-    {
-      $action = isset($_REQUEST['_poll_action']) ? $_REQUEST['_poll_action'] : false;
-
-      if ($action)
-      {
-        $action = Utils::base_64_decode($action);
-        if (is_callable($action))
-        {
-          call_user_func($action);
-        }
-      }
-      die("0");
-    }
-
     public function get_users_by_capabilty($capabilties, $args = array(), $includes = array())
     {
       global $wpdb;
@@ -1919,7 +1908,52 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $this->ajax_poll();
     }
 
+    public function _ajax_ping()
+    {
+      $this->ajax_ping();
+    }
+
     public function _ajax_cron()
+    {
+      $this->ajax_cron();
+    }
+
+    public function ajax_poll()
+    {
+      $action = isset($_REQUEST['_poll_action']) ? $_REQUEST['_poll_action'] : false;
+
+      if ($action)
+      {
+        $action = Utils::base_64_decode($action);
+        if (is_callable($action))
+        {
+          call_user_func($action);
+        }
+      }
+      die("0");
+    }
+
+    public function ajax_ping()
+    {
+      check_ajax_referer('ajax-nonce', '_ajax_nonce');
+
+      $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
+
+      $success = false;
+      $json = get_post_meta($post_ID, 'kleinanzeigen_record', true);
+      $ad_obj = (object) json_decode($json, true);
+      if (isset($ad_obj->url))
+      {
+        $url = wbp_fn()->get_kleinanzeigen_url($ad_obj->url);
+        $success = Utils::url_exists($url);
+      }
+
+      die(json_encode(array(
+        'success' => $success
+      )));
+    }
+
+    public function ajax_cron()
     {
       check_ajax_referer('ajax-nonce', '_ajax_nonce');
 

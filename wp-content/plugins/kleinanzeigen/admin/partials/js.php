@@ -10,7 +10,6 @@
       displayTime,
       cron,
       poll,
-      getNonce,
       getCookie,
       statusReport,
       display,
@@ -35,10 +34,7 @@
       try {
         response = await cron(nonce);
       } catch (err) {
-        // Auto retrieve nonce
-        nonce = JSON.parse(await getNonce('cron'));
-        cron_error(`${err.status}: ${err.statusText}`);
-        return;
+        return cron_error(`${err.status}: ${err.statusText}`);
       }
 
       const {
@@ -55,8 +51,7 @@
 
         init(jobs, todos, completed);
       } else {
-        nonce = JSON.parse(await getNonce('cron'));
-        cron_error('An error has  occured');
+        return cron_error('An error has  occured');
       }
 
     }

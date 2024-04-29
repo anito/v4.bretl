@@ -1,6 +1,7 @@
 <?php
 
-if (!class_exists('WP_List_Table')) {
+if (!class_exists('WP_List_Table'))
+{
   require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
 }
 
@@ -46,25 +47,32 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
 
   function render_featured_column($product, $task_type)
   {
-    if ($product) {
+    if ($product)
+    {
       $product_id = $product->get_id();
       $sku = $product->get_sku();
       $url = wp_nonce_url(admin_url('admin-ajax.php?action=woocommerce_feature_product&product_id=' . $product_id), 'woocommerce-feature-product');
       echo '<a href="' . esc_url($url) . '" aria-label="' . esc_attr__('Toggle featured', 'woocommerce') . '" id="task-feature-post-' . $product_id . '" data-kleinanzeigen-id="' . $sku . '" data-post-id="' . $product_id . '" data-screen="modal" data-task-type="' . $task_type . '">';
-      if ($product->is_featured()) {
+      if ($product->is_featured())
+      {
         echo '<span class="wc-featured tips" data-tip="' . esc_attr__('Yes', 'woocommerce') . '"><i class="dashicons dashicons-star-filled" style="font-size: 1.3em; vertical-align: middle"></i></span>';
-      } else {
+      }
+      else
+      {
         echo '<span class="wc-featured not-featured tips" data-tip="' . esc_attr__('No', 'woocommerce') . '"><i class="dashicons dashicons-star-empty" style="font-size: 1.3em; vertical-align: middle"></i></span>';
       }
       echo '</a>';
-    } else {
+    }
+    else
+    {
       echo '-';
     }
   }
 
   function set_vars($task_type)
   {
-    switch ($task_type) {
+    switch ($task_type)
+    {
       case 'invalid-sku':
         $vars = array(
           'header-template' => array(
@@ -252,7 +260,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     if (isset($total_items))
       $response['total_items_i18n'] = sprintf(_n('1 item', '%s items', $total_items), number_format_i18n($total_items));
 
-    if (isset($total_pages)) {
+    if (isset($total_pages))
+    {
       $response['total_pages'] = $total_pages;
       $response['total_pages_i18n'] = number_format_i18n($total_pages);
     }
@@ -296,7 +305,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
   function display_rows()
   {
     $records = $this->items;
-    foreach ($records as $record) {
+    foreach ($records as $record)
+    {
       $this->render_row($record);
     }
   }
@@ -373,7 +383,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         $invalid_cat_products
       )
     ) $classes[] = 'todo';
-    echo implode(', ', array_map(function ($term) use($classes) {
+    echo implode(', ', array_map(function ($term) use ($classes)
+    {
       return '<a class="' . implode(' ', $classes) . '" href="' . home_url() . '/' . $term->taxonomy . '/' . $term->slug . '" target="_blank">' . $term->name . '</a>';
     }, $terms !== false ? $terms : []));
   }
@@ -383,7 +394,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     // Extracts $products | $task_type | $record
     extract($item);
 
-    if (!$product) {
+    if (!$product)
+    {
       return $this->render_empty_row();
     }
 
@@ -394,18 +406,16 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
     $product_by_sku = $this->get_product_by_sku($sku);
     $shop_price_html = wp_kses_post($product->get_price_html());
     $ka_price = isset($record) ? $record->price : '-';
-    // $date = isset($record) ? $record->date : '';
-    $diff_classes = array();
-    if (!is_null($record) && wbp_fn()->has_price_diff($record, $product)) {
-      $diff_classes[] = 'diff';
-      $diff_classes[] = 'price-diff';
-    }
-    if (is_null($record)) {
-      $diff_classes[] = 'broken';
+    $classes = array('data-row');
+    if (!is_null($record) && wbp_fn()->has_price_diff($record, $product))
+    {
+      $classes[] = 'diff';
+      $classes[] = 'price-diff';
     }
 
 ?>
-    <tr id="post-id-<?php echo $post_ID ?>" <?php if (!empty($diff_classes)) { ?>class="<?php echo implode(' ', $diff_classes) ?>" <?php } ?>>
+    <tr id="post-id-<?php echo $post_ID ?>" <?php if (!empty($classes))
+                                            { ?>class="<?php echo implode(' ', $classes) ?>" <?php } ?>>
       <?php
 
       // Setup Actions
@@ -414,12 +424,12 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       $editlink  = admin_url('post.php?action=edit&post=' . $post_ID);
       $deletelink  = get_delete_post_link($post_ID);
       $permalink = get_permalink($post_ID);
-      $classes = "";
       $post_status = $product->get_status();
       $image = get_the_post_thumbnail_url($post_ID);
       $cat_terms = get_the_terms($post_ID, 'product_cat');
 
-      switch ($task_type) {
+      switch ($task_type)
+      {
         case 'invalid-sku':
           $published = 'publish' === $product->get_status();
           $disabled['disconnect'] = !$sku;
@@ -451,7 +461,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           break;
         default:
       }
-      switch ($post_status) {
+      switch ($post_status)
+      {
         case 'publish':
           $status = $sku ? 'connected-publish' : 'disconnected-publish';
           break;
@@ -463,18 +474,22 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           break;
       }
 
-      foreach ($columns as $column_name => $column_display_name) {
+      foreach ($columns as $column_name => $column_display_name)
+      {
         $class = $column_name . ' column column-' . $column_name;
         if (in_array($column_name, $hidden)) $class .= ' hidden';
 
-        switch ($column_name) {
-          case "status-start": {
+        switch ($column_name)
+        {
+          case "status-start":
+            {
       ?>
               <td class="status <?php echo $class . ' ' . $status ?>"></td>
             <?php
               break;
             }
-          case "image": {
+          case "image":
+            {
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content"><img src="<?php echo $image ?>" width="90" /></div>
@@ -482,7 +497,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "title": {
+          case "title":
+            {
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content"><a href="<?php echo $permalink ?>" target="_blank"><?php echo $title ?></a></div>
@@ -490,7 +506,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "ka-price": {
+          case "ka-price":
+            {
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content "><?php echo $ka_price ?></div>
@@ -498,7 +515,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "shop-price": {
+          case "shop-price":
+            {
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content "><?php echo $shop_price_html ?></div>
@@ -506,7 +524,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "shop-categories": {
+          case "shop-categories":
+            {
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content"><?php $this->render_terms($cat_terms, $product); ?></a></div>
@@ -514,7 +533,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "featured": {
+          case "featured":
+            {
             ?>
               <td class="<?php echo $class ?>">
                 <div class="column-content "><?php $this->render_featured_column($product, $task_type) ?></div>
@@ -522,7 +542,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "actions": {
+          case "actions":
+            {
             ?>
               <td class="<?php echo $class ?>" style="vertical-align: middle;">
                 <div class="column-content"><?php echo $actions ?></div>
@@ -530,7 +551,8 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             <?php
               break;
             }
-          case "shop-status-end": {
+          case "shop-status-end":
+            {
             ?>
               <td class="status <?php echo $status . ' ' . $class ?>"></td>
       <?php
@@ -540,13 +562,16 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
       }
       ?>
       <script>
-        jQuery(document).ready(($) => {
+        jQuery(document).ready(async ($) => {
           const {
-            featurePost
+            featurePost,
+            ping
           } = KleinanzeigenAjax;
 
+          const nonce = <?php echo json_encode(wp_create_nonce('ajax-nonce')) ?>;
           const table = $('.wp-list-kleinanzeigen-tasks');
-          const post_ID = "<?php echo $product ? $post_ID : '' ?>";
+          const post_ID = "<?php echo $product ? $post_ID : ''; ?>";
+          const is_record = <?php echo is_null($record) ? 0 : 1; ?>;
 
           $('.deactivate-all').on('click', function(e) {
             const el = $(e.target);
@@ -601,6 +626,17 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
             $(el).addClass('disabled')
               .off('data:parsed', handleLabel);
           }
+          
+           !is_record && await ping(post_ID, nonce).then((res) => {
+            const trEl = $(`tr#post-id-${post_ID}`);
+            const {
+              success
+            } = JSON.parse(res);
+            
+            if (!success) {
+              trEl.addClass('broken')
+            }
+          })
         })
       </script>
     </tr>

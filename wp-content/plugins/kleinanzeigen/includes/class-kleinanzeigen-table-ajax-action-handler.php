@@ -367,7 +367,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
         {
           wbp_fn()->disable_sku($product, true);
         }
-        $product->save();
       }
 
       $data = $this->prepare_list_table($paged);

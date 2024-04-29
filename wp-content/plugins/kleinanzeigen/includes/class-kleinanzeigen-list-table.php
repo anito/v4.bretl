@@ -433,7 +433,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           }
           $kleinanzeigen_actions =
             '<div>' .
-            wbp_ka()->include_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_ID', 'record', 'post_status', 'classes'), array('connected' => 'sku' === $found_by))).
+            wbp_ka()->include_template('dashboard/kleinanzeigen-actions.php', true, array_merge(compact('post_ID', 'record', 'post_status', 'classes'), array('connected' => 'sku' === $found_by))) .
             wbp_ka()->include_template('dashboard/kleinanzeigen-toggle-link-control.php', true, compact('post_ID', 'record', 'classes', 'label', 'action', 'icon', 'type')) .
             '</div>';
         }
@@ -600,7 +600,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       }
       ?>
       <script>
-        jQuery(document).ready(($) => {
+        jQuery(document).ready(async ($) => {
           const {
             createPost,
             deletePost,
@@ -610,8 +610,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             disconnect,
             publishPost,
             featurePost,
+            nonce,
+            ping,
             focus_after_edit_post,
-            handle_visibility_change
+            handle_visibility_change,
           } = {
             ...KleinanzeigenAjax,
             ...KleinanzeigenUtils
@@ -620,6 +622,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
           const post_ID = "<?php echo $product ? $post_ID : '' ?>";
           const record = <?php echo json_encode($record) ?>;
           const kleinanzeigen_id = record.id;
+          const use_dummy_data = <?php echo USE_AD_DUMMY_DATA; ?>;
 
           const publishEl = $(`#ad-id-${kleinanzeigen_id} #publish-post-${post_ID}`);
           $(publishEl).on('click', function(e) {
@@ -693,6 +696,15 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             // window.addEventListener('focus', focus_after_edit_post);
           })
           window.addEventListener('visibilitychange', handle_visibility_change);
+
+          use_dummy_data && await ping(post_ID, nonce).then((res) => {
+            const {
+              success
+            } = JSON.parse(res);
+            if (!success) {
+              trEl.addClass('broken')
+            }
+          })
         })
       </script>
     </tr>
