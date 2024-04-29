@@ -53,7 +53,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
       add_filter('wp_insert_post_data', array($this, 'before_insert_post'), 99, 2);
       add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
       add_action('save_post_product', array($this, 'quick_edit_product_save'), 10, 1);
-      add_filter('update_post_metadata', array($this, 'prevent_metadata_update'), 10, 4);
       add_action('before_delete_post', array('Utils', 'remove_attachments'));
 
       add_action('wp_insert_post_data', array($this, 'publish_guard'), 99, 3);
@@ -901,24 +900,14 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $content = $product->get_description();
       $errors = [];
       $ad = null;
+      $recovered = false;
       $kleinanzeigen_id = '';
       $date = '';
 
-      if (isset($_POST['_kleinanzeigen_id']))
-      {
-        $kleinanzeigen_id = sanitize_text_field($_POST['_kleinanzeigen_id']);
-      }
-      elseif ($sku = $product->get_sku())
-      {
-        $kleinanzeigen_id = $sku;
-      }
-
-      if (!empty($kleinanzeigen_id))
-      {
-        $ad = $this->find_kleinanzeige($kleinanzeigen_id);
-      }
-
-      $recover = function ($post_ID) use (&$is_recovered)
+      /**
+       * Helper functions
+       */
+      $recover = function ($post_ID) use (&$recovered)
       {
 
         $json = get_post_meta($post_ID, '_kleinanzeigen_record', true);
@@ -928,7 +917,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
         if (isset($ad_obj->id))
         {
-          $is_recovered = true;
+          $recovered = true;
           return $ad_obj;
         }
       };
@@ -940,47 +929,50 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $name = isset($pos[$pos_key]) ? $pos[$pos_key] : $pos[0];
         return '<!--COMMENT' . strtoupper($name) . '-->' . $content;
       };
+      // Helper functions End
 
-
-      $recover_requested = "true" === get_post_meta($post_ID, '_kleinanzeigen_recover', true);
-      if (!$ad && $recover_requested)
+      if (isset($_POST['_kleinanzeigen_id']))
       {
-        $is_recovered = false;
-        $ad = $recover($post_ID);
-        $_POST['kleinanzeigen_id'] = isset($ad->id) ? $ad->id : '';
+        $kleinanzeigen_id = sanitize_text_field($_POST['_kleinanzeigen_id']);
       }
 
-      // $ad = $recover($post_ID);
+      $req_recover = isset($_POST['_kleinanzeigen_recover']) ? "true" == $_POST['_kleinanzeigen_recover'] : false;
 
-      if ($ad)
+      if (empty($kleinanzeigen_id))
       {
-        $ad_title = $ad->title;
-        $title = $ad_title;
-        $date = $ad->date;
-
-        $sku = (string) $is_recovered ? $ad->id : $product->get_sku();
-        $sku_needs_update = $is_recovered || $sku !== $kleinanzeigen_id;
-
-        if ($sku_needs_update)
+        if ($req_recover)
         {
-
-          // Throws error if sku already exists
-          $success = $this->enable_sku($product, $ad);
-          if (is_wp_error($success))
-          {
-            $error = new WP_Error(400, __('A Product with the same Ad ID already exists. Delete this draft or enter a different Ad ID.', 'kleinanzeigen'));
-            $errors[] = $error;
-          }
+          $ad = $recover($post_ID);
         }
       }
       else
       {
-        $this->disable_sku($product);
+        $ad = $this->find_kleinanzeige($kleinanzeigen_id);
       }
 
-      $date = wbp_fn()->ka_formatted_date($date);
-      $gmt = get_gmt_from_date($date);
+      if ($ad)
+      {
 
+        $ad_title = $ad->title;
+        $title = $ad_title;
+        $date = $ad->date;
+
+        $success = wbp_fn()->enable_sku($product, $ad);
+
+        if (is_wp_error($success))
+        {
+          $errors[] = new WP_Error(400, __('A Product with the same Ad ID already exists. Delete this draft or enter a different Ad ID.', 'kleinanzeigen'));
+        } else {
+          $_POST['_kleinanzeigen_id'] = $ad->id;
+          $_POST['_sku'] = $ad->id;
+        }
+      }
+      else
+      {
+        wbp_fn()->disable_sku($product);
+        $_POST['_kleinanzeigen_id'] = '';
+        $_POST['_sku'] = '';
+      }
 
       if (!ALLOW_DUPLICATE_TITLES)
       {
@@ -1017,12 +1009,15 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $title = Utils::sanitize_dup_title($title, '', array('cleanup' => true));
       }
 
-      // Avoid recursion
-
+      
       Utils::write_log("#### Update Post ####");
       Utils::write_log("{$post_ID} {$title}");
       Utils::write_log("#######################");
+      
+      $date = wbp_fn()->ka_formatted_date($date);
+      $gmt = get_gmt_from_date($date);
 
+      // Avoid recursion
       remove_action('save_post_product', array($this, 'save_post_product'), 99);
       wp_update_post([
         'ID'            => $post_ID,
@@ -1033,7 +1028,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         'edit_date'     => true,
         'post_content'  => $content,
         'post_excerpt'  => $product->get_short_description(),
-        'post_title'    => html_entity_decode($title) // Eventhough this will be encoded during save, however we catch this up again in wp_insert_post_data filter
+        'post_title'    => html_entity_decode($title) // Eventhough this will be encoded during save, we catch this up again in wp_update_post_data filter
       ]);
       add_action('save_post_product', array($this, 'save_post_product'), 99, 3);
     }
@@ -1050,20 +1045,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $prepare = $wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_type = 'product' AND post_status != '%s' AND post_status != '%s' AND post_title != '' AND post_title = %s", 'inherit', 'trash', $title);
       return $wpdb->get_results($prepare);
-    }
-
-    // returning non null value prevents meta from being updated
-    public function prevent_metadata_update($check, $post_ID, $meta_key, $meta_value)
-    {
-      if ('_kleinanzeigen_id' !== $meta_key) return $check;
-
-      $product = wc_get_product($post_ID);
-      if ($product)
-      {
-        $sku = $product->get_sku();
-        if (!$sku) return 1; // stop updating meta
-      }
-      return $check;
     }
 
     /**
@@ -1579,8 +1560,15 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       try
       {
-        $product->set_sku($ad->id);
-        $product->save();
+        if (is_object($ad) && isset($ad->id))
+        {
+          $product->set_sku($ad->id);
+          $product->save();
+        }
+        else
+        {
+          return new WP_Error(402, __('Ad is not a valid object'));
+        }
       }
       catch (WC_Data_Exception $e)
       {

@@ -112,7 +112,7 @@ jQuery(document).ready(function ($) {
 
     const formdata = $(form).serializeJSON();
 
-    if (!formdata.kleinanzeigen_id) {
+    if (_kleinanzeigen_id in formdata) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
@@ -267,7 +267,7 @@ jQuery(document).ready(function ($) {
       formdata = { post_ID, kleinanzeigen_id };
     }
 
-    if (!formdata.kleinanzeigen_id) {
+    if (!_kleinanzeigen_id in formdata) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
@@ -327,6 +327,7 @@ jQuery(document).ready(function ($) {
   function importImages(e) {
     e.preventDefault();
 
+    let formdata;
     if (form) {
       formdata = $(form).serializeJSON();
     } else {
@@ -336,7 +337,7 @@ jQuery(document).ready(function ($) {
       formdata = { post_ID, kleinanzeigen_id };
     }
 
-    if (!formdata.kleinanzeigen_id) {
+    if (!_kleinanzeigen_id in formdata) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
@@ -393,18 +394,19 @@ jQuery(document).ready(function ($) {
     const el = e.target;
     const _screen = el.dataset.screen || screen;
 
-    let post_ID;
+    let formdata;
     if (form) {
       formdata = $(form).serializeJSON();
-      post_ID = formdata.post_ID;
     } else {
       post_ID = el?.dataset.postId;
+      formdata = { post_ID };
     }
 
-    if (!post_ID) {
+    if (!post_ID in formdata) {
       alert(MSG_MISSING_POST_ID);
       return;
     }
+    const { post_ID } = formdata;
 
     const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
     spinner?.classList.add('is-active');
@@ -714,13 +716,13 @@ jQuery(document).ready(function ($) {
       data: {
         action: '_ajax_ping',
         _ajax_nonce: nonce,
-        post_ID
+        post_ID,
       },
       success: (response) => response,
       error: (response, status, message) => {
         return {
-         success: false,
-         message,
+          success: false,
+          message,
         };
       },
     });

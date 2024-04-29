@@ -137,8 +137,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
       if (!isset($formdata['post_ID'])) return;
       $post_ID = $formdata['post_ID'];
 
-      if (!isset($formdata['kleinanzeigen_id'])) return;
-      $kleinanzeigen_id_raw = $formdata['kleinanzeigen_id'];
+      if (!isset($formdata['_kleinanzeigen_id'])) return;
+      
+      $kleinanzeigen_id_raw = $formdata['_kleinanzeigen_id'];
       $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id_raw);
 
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
