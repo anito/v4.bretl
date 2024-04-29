@@ -534,11 +534,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $post_ID = $item['product']->get_id();
       $record = $item['record'];
 
-      if(is_null($record)) continue;
-      if(get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true)) continue;
+      if (is_null($record)) continue;
 
-      $urls_need_update = !(get_post_meta($post_ID, 'kleinanzeigen_url', true) &&
-        get_post_meta($post_ID, 'kleinanzeigen_search_url', true));
+      $urls_need_update = !(get_post_meta($post_ID, '_kleinanzeigen_url', true) &&
+        get_post_meta($post_ID, '_kleinanzeigen_search_url', true));
 
       if ($urls_need_update)
       {
@@ -570,7 +569,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     $ids = array_filter($ids, function ($id)
     {
-      return !empty(get_metadata('post', $id, 'kleinanzeigen_url'));
+      return !empty(get_metadata('post', $id, '_kleinanzeigen_url'));
     });
 
     foreach ($ids as $id)
@@ -582,62 +581,6 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       ));
 
       wbp_fn()->disable_sku_url($id);
-
-      if ($job_id)
-      {
-        wbp_db()->unregister_job($job_id);
-      }
-    }
-  }
-
-  public function job_recover_ad()
-  {
-
-    $items = wbp_fn()->build_tasks('disconnected')['items'];
-
-    foreach ($items as $item)
-    {
-      $record = $item['record'];
-      $product = $item['product'];
-      $post_ID = $product->get_id();
-      $title = $product->get_name();
-      $status = $product->get_status();
-
-      // Stop updating if `kleinanzeigen_force_disconnect` flag has been set
-      $forced_disconnected = !!(get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true));
-      if ($forced_disconnected)
-      {
-        continue;
-      }
-
-      $job_id = wbp_db()->register_job(array(
-        'slug'  => 'kleinanzeigen_recover_ad',
-        'type'  => 'product',
-        'uid'   => $post_ID
-      ));
-
-      Utils::write_log("####### Recover #######");
-      Utils::write_log("({$status}) {$post_ID} => {$title}");
-
-      $previous_state = get_post_meta($post_ID, 'kleinanzeigen_previous_state', true);
-      wbp_fn()->enable_sku($product, $record);
-
-      if ($previous_state)
-      {
-
-        Utils::write_log("Updating to previous state: {$previous_state}");
-        wp_update_post(array(
-          'ID'          => $post_ID,
-          'post_status' => $previous_state,
-          'post_type'   => 'product',
-        ));
-      }
-      else
-      {
-
-        Utils::write_log("No previous state");
-      }
-      Utils::write_log("#######################");
 
       if ($job_id)
       {
@@ -695,7 +638,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         wp_update_post($postarr);
         $product = wc_get_product($post_ID);
 
-        switch ($status) {
+        switch ($status)
+        {
 
           case "trash":
             wbp_fn()->delete_product($post_ID, true);
@@ -706,6 +650,44 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
             break;
         }
       }
+
+      if ($job_id)
+      {
+        wbp_db()->unregister_job($job_id);
+      }
+    }
+  }
+
+  public function job_recover_ad()
+  {
+
+    $items = wbp_fn()->build_tasks('disconnected')['items'];
+
+    foreach ($items as $item)
+    {
+      $record = $item['record'];
+      $product = $item['product'];
+      $post_ID = $product->get_id();
+      $title = $product->get_name();
+      $status = $product->get_status();
+
+      $job_id = wbp_db()->register_job(array(
+        'slug'  => 'kleinanzeigen_recover_ad',
+        'type'  => 'product',
+        'uid'   => $post_ID
+      ));
+
+      Utils::write_log("####### Recover #######");
+      Utils::write_log("({$status}) {$post_ID} => {$title}");
+      Utils::write_log("#######################");
+
+      wbp_fn()->enable_sku($product, $record);
+
+      wp_update_post(array(
+        'ID'          => $post_ID,
+        'post_status' => 'publish',
+        'post_type'   => 'product',
+      ));
 
       if ($job_id)
       {

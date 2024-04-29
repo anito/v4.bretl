@@ -94,7 +94,7 @@ class Extended_WC_Admin_List_Table_Products extends WC_Admin_List_Table_Products
       $post_status = $post->post_status;
       $sku = $product->get_sku($post_ID);
       $sku = is_numeric($sku) ? $sku : false;
-      $ka_url = get_post_meta($post_ID, 'kleinanzeigen_url', true);
+      $ka_url = get_post_meta($post_ID, '_kleinanzeigen_url', true);
       $brands = wbp_th()->get_product_terms($post_ID, 'brand');
       $product_labels = wp_list_pluck(wbp_th()->get_product_terms($post_ID, 'label'), 'name');
     }

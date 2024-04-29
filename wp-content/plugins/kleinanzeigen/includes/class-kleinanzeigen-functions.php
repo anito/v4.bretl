@@ -55,7 +55,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
       add_action('save_post_product', array($this, 'quick_edit_product_save'), 10, 1);
       add_filter('update_post_metadata', array($this, 'prevent_metadata_update'), 10, 4);
       add_action('before_delete_post', array('Utils', 'remove_attachments'));
-      add_action('transition_post_status', array($this, 'transition_post_status'), 10, 3);
 
       add_action('wp_insert_post_data', array($this, 'publish_guard'), 99, 3);
       add_filter('wp_insert_post_empty_content', '__return_false');
@@ -108,7 +107,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       if (!empty($query_vars['kleinanzeigen_id']))
       {
         $query['meta_query'][] = array(
-          'meta_key' => 'kleinanzeigen_id',
+          'meta_key' => '_kleinanzeigen_id',
           'value' => esc_attr($query_vars['kleinanzeigen_id']),
         );
       }
@@ -541,10 +540,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
     public function kleinanzeigen_product_exists($records)
     {
       global $wpdb;
-      $prepare = $wpdb->prepare("SELECT 'post_ID', 'meta_value' FROM $wpdb->postmeta WHERE meta_key='kleinanzeigen_id' LIMIT 1000");
+      $prepare = $wpdb->prepare("SELECT 'post_ID', 'meta_value' FROM $wpdb->postmeta WHERE meta_key='_kleinanzeigen_id' LIMIT 1000");
       $result = $wpdb->get_var($prepare);
       $query = new WP_Query(array(
-        'meta_key' => 'kleinanzeigen_id',
+        'meta_key' => '_kleinanzeigen_id',
         'meta_compare' => 'EXISTS'
       ));
 
@@ -673,6 +672,10 @@ if (!class_exists('Kleinanzeigen_Functions'))
                 'key'     => '_price',
                 'value' => (float) Utils::extract_kleinanzeigen_price($record->price),
               ),
+              array(
+                'key'     => '_cron_sku_disabled',
+                'value' => 1
+              ),
             ),
             'title' => $record->title
           );
@@ -681,7 +684,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
           if (!empty($products))
           {
-            $product = $products[0];
+            $product = array_shift($products);
             $items[] = compact('product', 'task_type', 'record');
           }
         }
@@ -868,50 +871,32 @@ if (!class_exists('Kleinanzeigen_Functions'))
           $this->enable_sku($product, $ad);
         }
       }
-      elseif (!wp_doing_cron())
+      elseif (wp_doing_cron())
       {
-        $this->process_kleinanzeigen($post_ID, $post, $update);
-      }
-    }
-
-    public function transition_post_status($new, $old, $post)
-    {
-
-      if ('product' !== $post->post_type) return;
-      if ($new === $old) return;
-
-      $title = $post->post_title;
-      $post_ID = $post->ID;
-      Utils::write_log("##### Transition  #####");
-      Utils::write_log("{$old} => {$new}: {$post_ID} {$title}");
-      Utils::write_log("#######################");
-      update_post_meta($post->ID, 'kleinanzeigen_previous_state', $old);
-    }
-
-    public function process_kleinanzeigen($post_ID, $post, $update)
-    {
-      // If this is an autosave, our form has not been submitted, so we don't want to do anything.
-      if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
-      {
-        return;
-      }
-
-      if (wp_doing_ajax())
-      {
-        return;
-      }
-
-      // Check the user's permissions.
-      if (isset($_POST['post_type']) && 'product' == $_POST['post_type'])
-      {
-
-        if (!current_user_can('edit_post', $post_ID))
+        switch ($product->get_status())
         {
-          return;
+          case 'draft':
+            if ($product->get_sku())
+            {
+              update_post_meta($post_ID, '_cron_sku_disabled', 1);
+            }
         }
       }
+      else
+      {
+        $this->process_kleinanzeigen($product);
+      }
+    }
 
-      $product = wc_get_product($post_ID);
+    public function process_kleinanzeigen($product)
+    {
+      $post_ID = $product->get_id();
+
+      // If this is an autosave, our form has not been submitted, so we don't want to do anything.
+      if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+      if (wp_doing_ajax()) return;
+      if (!current_user_can('edit_post', $post_ID)) return;
+
       $title = $product->get_name();
       $content = $product->get_description();
       $errors = [];
@@ -919,9 +904,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $kleinanzeigen_id = '';
       $date = '';
 
-      if (isset($_POST['kleinanzeigen_id']))
+      if (isset($_POST['_kleinanzeigen_id']))
       {
-        $kleinanzeigen_id = sanitize_text_field($_POST['kleinanzeigen_id']);
+        $kleinanzeigen_id = sanitize_text_field($_POST['_kleinanzeigen_id']);
       }
       elseif ($sku = $product->get_sku())
       {
@@ -936,8 +921,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $recover = function ($post_ID) use (&$is_recovered)
       {
 
-        $json = get_post_meta($post_ID, 'kleinanzeigen_record', true);
-        $_POST['kleinanzeigen_recover'] = '';
+        $json = get_post_meta($post_ID, '_kleinanzeigen_record', true);
+        $_POST['_kleinanzeigen_recover'] = '';
 
         $ad_obj = (object) json_decode($json, true);
 
@@ -957,7 +942,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       };
 
 
-      $recover_requested = "true" === get_post_meta($post_ID, 'kleinanzeigen_recover', true);
+      $recover_requested = "true" === get_post_meta($post_ID, '_kleinanzeigen_recover', true);
       if (!$ad && $recover_requested)
       {
         $is_recovered = false;
@@ -1067,13 +1052,18 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $wpdb->get_results($prepare);
     }
 
-    public function prevent_metadata_update($data, $id, $meta_key, $meta_value)
+    // returning non null value prevents meta from being updated
+    public function prevent_metadata_update($check, $post_ID, $meta_key, $meta_value)
     {
-      if ('kleinanzeigen_id' !== $meta_key) return $data;
+      if ('_kleinanzeigen_id' !== $meta_key) return $check;
 
-      $product = wc_get_product($id);
-      $sku = $product->get_sku();
-      if (!$sku) return 1;
+      $product = wc_get_product($post_ID);
+      if ($product)
+      {
+        $sku = $product->get_sku();
+        if (!$sku) return 1; // stop updating meta
+      }
+      return $check;
     }
 
     /**
@@ -1578,7 +1568,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       );
     }
 
-    public function enable_sku(&$product, $ad, $force_connect = false)
+    public function enable_sku(&$product, $ad)
     {
       if (is_int($product))
       {
@@ -1586,10 +1576,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
       }
 
       $post_ID = (int) $product->get_id();
-
-      // Stop if `kleinanzeigen_force_disconnect` flag has been set unless `force_connect` is true
-      $forced_disconnected = !!(get_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true));
-      if ($forced_disconnected && !$force_connect) return;
 
       try
       {
@@ -1611,43 +1597,38 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $this->set_sku($post_ID, $ad);
 
-      if ($forced_disconnected)
+      if (wp_doing_cron())
       {
-        delete_post_meta($post_ID, 'kleinanzeigen_force_disconnect');
+        delete_post_meta($post_ID, '_cron_sku_disabled');
       }
 
       return $product;
     }
 
-    public function disable_sku_url($id)
+    public function disable_sku_url($post_ID)
     {
-      delete_post_meta($id, 'kleinanzeigen_url');
-      delete_post_meta($id, 'kleinanzeigen_search_url');
+      delete_post_meta($post_ID, '_kleinanzeigen_url');
+      delete_post_meta($post_ID, '_kleinanzeigen_search_url');
     }
 
-    private function set_sku($id, $ad)
+    private function set_sku($post_ID, $ad)
     {
-      update_post_meta($id, 'kleinanzeigen_id', $ad->id);
-      update_post_meta($id, 'kleinanzeigen_url', $this->get_kleinanzeigen_url($ad->url));
-      update_post_meta($id, 'kleinanzeigen_search_url', $this->get_kleinanzeigen_search_url($ad->id));
-      update_post_meta($id, 'kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
+      update_post_meta($post_ID, '_kleinanzeigen_id', $ad->id);
+      update_post_meta($post_ID, '_kleinanzeigen_url', $this->get_kleinanzeigen_url($ad->url));
+      update_post_meta($post_ID, '_kleinanzeigen_search_url', $this->get_kleinanzeigen_search_url($ad->id));
+      update_post_meta($post_ID, '_kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
     }
 
-    public function disable_sku(WC_Product &$product, $force = false)
+    public function disable_sku(WC_Product &$product)
     {
 
       $product->set_sku('');
       $product->save();
 
       $post_ID = (int) $product->get_id();
-      delete_post_meta($post_ID, 'kleinanzeigen_id');
-      delete_post_meta($post_ID, 'kleinanzeigen_url');
-      delete_post_meta($post_ID, 'kleinanzeigen_search_url');
-
-      if ($force)
-      {
-        update_post_meta($post_ID, 'kleinanzeigen_force_disconnect', true);
-      }
+      delete_post_meta($post_ID, '_kleinanzeigen_id');
+      delete_post_meta($post_ID, '_kleinanzeigen_url');
+      delete_post_meta($post_ID, '_kleinanzeigen_search_url');
 
       return $product;
     }
@@ -1940,7 +1921,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $post_ID = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : null;
 
       $success = false;
-      $json = get_post_meta($post_ID, 'kleinanzeigen_record', true);
+      $json = get_post_meta($post_ID, '_kleinanzeigen_record', true);
       $ad_obj = (object) json_decode($json, true);
       if (isset($ad_obj->url))
       {
@@ -2107,7 +2088,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
 
-      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'post_status', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', 'kleinanzeigen_url', 'additional_content'));
+      $email_content = wbp_ka()->include_template('emails/new-product.php', true, compact('product_title', 'post_status', 'edit_link', 'permalink', 'previewlink', 'plugin_link', 'thumbnail', 'blogname', 'email_heading', '_kleinanzeigen_url', 'additional_content'));
       $email_content = $this->style_inline($email_content, compact('thumbnail'));
 
       return $this->sendMail($email_heading, $email_content, $receipients);

@@ -361,11 +361,11 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
       {
         if (isset($ad))
         {
-          wbp_fn()->enable_sku($product, $ad, true);
+          wbp_fn()->enable_sku($product, $ad);
         }
         else
         {
-          wbp_fn()->disable_sku($product, true);
+          wbp_fn()->disable_sku($product);
         }
       }
 
@@ -389,7 +389,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
       $product = wc_get_product($post_ID);
       if ($product)
       {
-        wbp_fn()->disable_sku($product, true);
+        wbp_fn()->disable_sku($product);
       }
 
       switch ($screen)

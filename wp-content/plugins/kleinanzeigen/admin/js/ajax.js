@@ -2,11 +2,11 @@ jQuery(document).ready(function ($) {
   const { admin_ajax, plugin_name, screen, edit_link } = KleinanzeigenAjax;
 
   // hide controls if sku is not available
-  const sku = document.getElementById('kleinanzeigen_id');
+  const skuInputEl = document.getElementById('_kleinanzeigen_id');
 
-  if (sku?.getAttribute('value')) {
+  if (skuInputEl?.getAttribute('value')) {
     const sku_metabox = document
-      .getElementById('kleinanzeigen_id')
+      .getElementById('_kleinanzeigen_id')
       ?.closest('.postbox');
     sku_metabox?.classList.add('sku');
   }
