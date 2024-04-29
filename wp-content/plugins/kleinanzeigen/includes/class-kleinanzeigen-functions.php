@@ -905,7 +905,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $date = '';
 
       /**
-       * Helper functions
+       * Helper function recover
        */
       $recover = function ($post_ID) use (&$recovered)
       {
@@ -922,6 +922,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
         }
       };
 
+      /**
+       * Helper function commnet
+       */
       $comment = function ($pos_key = 1, $content = '')
       {
 
@@ -929,7 +932,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $name = isset($pos[$pos_key]) ? $pos[$pos_key] : $pos[0];
         return '<!--COMMENT' . strtoupper($name) . '-->' . $content;
       };
-      // Helper functions End
 
       if (isset($_POST['_kleinanzeigen_id']))
       {
