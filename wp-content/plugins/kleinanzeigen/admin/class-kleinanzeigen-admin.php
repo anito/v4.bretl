@@ -677,12 +677,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'uid'   => $post_ID
       ));
 
-      Utils::log("####### Recover #######");
-      Utils::log("({$status}) {$post_ID} => {$title}");
-      Utils::log("#######################");
-
       $saved_state = get_post_meta($post_ID, '_cron_sku_disabled', true);
       wbp_fn()->enable_sku($product, $record);
+
+      Utils::log("####### Recover #######");
+      Utils::log("({$status} => {$saved_state}) {$post_ID} => {$title}");
+      Utils::log("#######################");
 
       wp_update_post(array(
         'ID'          => $post_ID,
