@@ -111,8 +111,9 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
 
     const formdata = $(form).serializeJSON();
+    const {_kleinanzeigen_id: kleinanzeigen_id, post_ID} = formdata;
 
-    if (_kleinanzeigen_id in formdata) {
+    if (!kleinanzeigen_id) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
@@ -133,7 +134,8 @@ jQuery(document).ready(function ($) {
       url: admin_ajax,
       data: {
         action: '_ajax_get_remote',
-        formdata,
+        kleinanzeigen_id,
+        post_ID,
       },
       success: (response) =>
         ajax_ad_callback(response, () => {
@@ -259,15 +261,17 @@ jQuery(document).ready(function ($) {
 
     let formdata;
     if (form) {
-      formdata = $(form).serializeJSON();
+      const { _kleinanzeigen_id: kleinanzeigenId, post_ID: postId } =
+        $(form).serializeJSON();
+      formdata = { kleinanzeigenId, postId };
     } else {
       const target = e.target;
-      const post_ID = target.dataset.postId || '';
-      const kleinanzeigen_id = target.dataset.kleinanzeigenId || '';
-      formdata = { post_ID, kleinanzeigen_id };
+      formdata = target.dataset;
     }
 
-    if (!_kleinanzeigen_id in formdata) {
+    const { kleinanzeigenId: kleinanzeigen_id, postId: post_ID } = formdata;
+
+    if (!kleinanzeigen_id) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
@@ -289,7 +293,8 @@ jQuery(document).ready(function ($) {
       url: admin_ajax,
       data: {
         action: '_ajax_get_remote',
-        formdata,
+        kleinanzeigen_id,
+        post_ID,
         screen,
       },
       beforeSend: () => {
@@ -329,15 +334,17 @@ jQuery(document).ready(function ($) {
 
     let formdata;
     if (form) {
-      formdata = $(form).serializeJSON();
+      const { _kleinanzeigen_id: kleinanzeigenId, post_ID: postId } =
+        $(form).serializeJSON();
+      formdata = { kleinanzeigenId, postId };
     } else {
-      const el = e.target;
-      const post_ID = el.dataset.postId || '';
-      const kleinanzeigen_id = el.dataset.kleinanzeigenId || '';
-      formdata = { post_ID, kleinanzeigen_id };
+      const target = e.target;
+      formdata = target.dataset;
     }
 
-    if (!_kleinanzeigen_id in formdata) {
+    const { kleinanzeigenId: kleinanzeigen_id, postId: post_ID } = formdata;
+
+    if (!kleinanzeigen_id) {
       alert(MSG_MISSING_KLEINANZEIGEN_ID);
       return;
     }
@@ -359,7 +366,8 @@ jQuery(document).ready(function ($) {
       url: admin_ajax,
       data: {
         action: '_ajax_get_remote',
-        formdata,
+        kleinanzeigen_id,
+        post_ID,
         screen,
       },
       beforeSend: () => {
@@ -396,17 +404,20 @@ jQuery(document).ready(function ($) {
 
     let formdata;
     if (form) {
-      formdata = $(form).serializeJSON();
+      const { post_ID: postId } =
+        $(form).serializeJSON();
+      formdata = { postId };
     } else {
-      post_ID = el?.dataset.postId;
-      formdata = { post_ID };
+      const target = e.target;
+      formdata = target.dataset;
     }
+
+    const { postId: post_ID } = formdata;
 
     if (!post_ID in formdata) {
       alert(MSG_MISSING_POST_ID);
       return;
     }
-    const { post_ID } = formdata;
 
     const spinner = el.closest('[id*=-action]')?.querySelector('.spinner');
     spinner?.classList.add('is-active');

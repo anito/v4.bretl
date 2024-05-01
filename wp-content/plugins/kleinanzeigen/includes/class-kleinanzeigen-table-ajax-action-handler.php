@@ -131,15 +131,11 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
 
     public function get_remote()
     {
-      if (!isset($_REQUEST['formdata'])) return;
-      $formdata = $_REQUEST['formdata'];
-
-      if (!isset($formdata['post_ID'])) return;
-      $post_ID = $formdata['post_ID'];
-
-      if (!isset($formdata['_kleinanzeigen_id'])) return;
+      if (!isset($_REQUEST['kleinanzeigen_id'])) return;
+      if (!isset($_REQUEST['post_ID'])) return;
       
-      $kleinanzeigen_id_raw = $formdata['_kleinanzeigen_id'];
+      $post_ID = $_REQUEST['post_ID'];
+      $kleinanzeigen_id_raw = $_REQUEST['kleinanzeigen_id'];
       $kleinanzeigen_id = wbp_fn()->parse_kleinanzeigen_id($kleinanzeigen_id_raw);
 
       $screen = isset($_REQUEST['screen']) ? $_REQUEST['screen'] : null;
@@ -206,9 +202,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
       $new_post_status = 'draft' === $status ? 'publish' : 'draft';
       $title = get_the_title($post_ID);
 
-      Utils::write_log("## Ajax Toggle State ##");
-      Utils::write_log("{$status} => {$new_post_status}: {$post_ID} {$title}");
-      Utils::write_log("#######################");
+      Utils::log("## Ajax Toggle State ##");
+      Utils::log("{$status} => {$new_post_status}: {$post_ID} {$title}");
+      Utils::log("#######################");
 
       if ($post_ID)
       {
@@ -313,9 +309,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
           'ID' => $post_ID
         ), $args);
 
-        Utils::write_log("## Ajax Save Post ##");
-        Utils::write_log("{$post_ID} {$title}");
-        Utils::write_log("#######################");
+        Utils::log("## Ajax Save Post ##");
+        Utils::log("{$post_ID} {$title}");
+        Utils::log("#######################");
 
         wp_update_post($postarr);
         $product = wc_get_product($post_ID);
@@ -470,9 +466,9 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
         };
       }
 
-      Utils::write_log("##### Ajax Import #####");
-      Utils::write_log("{$post_ID} {$title}");
-      Utils::write_log("#######################");
+      Utils::log("##### Ajax Import #####");
+      Utils::log("{$post_ID} {$title}");
+      Utils::log("#######################");
 
       wp_update_post(array(
         'ID'            => $post_ID,

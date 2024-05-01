@@ -253,6 +253,11 @@ if (!class_exists('Kleinanzeigen_Functions'))
           'priority' => 1,
           'items' => array(),
         ),
+        'drafts-no-sku' => array(
+          'priority' => 1,
+          'items' => array(),
+          'status' => array('draft')
+        ),
         'featured' => array(
           'priority' => 1,
           'items' => array(),
@@ -423,8 +428,8 @@ if (!class_exists('Kleinanzeigen_Functions'))
         if ($diff)
         {
           $title = substr($record->title, 0, 15);
-          Utils::write_log("##### {$title} #####");
-          Utils::write_log("{$name} => {$record->title}");
+          Utils::log("##### {$title} #####");
+          Utils::log("{$name} => {$record->title}");
 
           /**
            * Fetch new content
@@ -454,7 +459,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         // Date updated
         if ($record_date !== $date)
         {
-          Utils::write_log("##### Date update #####");
+          Utils::log("##### Date update #####");
           $diff = true;
         }
         else
@@ -464,7 +469,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
           // For multiple datetime updates per day
           if ($record_timestamp > $datetime_timestamp)
           {
-            Utils::write_log("### DateTime update ###");
+            Utils::log("### DateTime update ###");
             $diff = true;
           }
         }
@@ -472,9 +477,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
         if ($diff)
         {
           $title = substr($record->title, 0, 15);
-          Utils::write_log($title);
-          Utils::write_log("{$datetime} => {$record_datetime}");
-          Utils::write_log('#######################');
+          Utils::log($title);
+          Utils::log("{$datetime} => {$record_datetime}");
+          Utils::log('#######################');
 
           $args['post_date'] = $record_datetime;
           $args['post_date_gmt'] = get_gmt_from_date($record_datetime);
@@ -557,6 +562,17 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $items = array();
 
       if ('no-sku' === $task_type)
+      {
+
+        $products = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
+        $record = null;
+        foreach ($products as $product)
+        {
+          $items[] = compact('product', 'task_type', 'record');
+        }
+        return $items;
+      }
+      if ('drafts-no-sku' === $task_type)
       {
 
         $products = wc_get_products(array_merge($args, array('sku_compare' => 'NOT EXISTS')));
@@ -799,8 +815,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
       }
     }
 
-    public function find_kleinanzeige(int $id): stdClass | null
+    public function find_kleinanzeige($id): stdClass | null
     {
+      $id = (int) $id;
       $paged = 1;
       $num_pages = 1;
       while ($paged <= $num_pages)
@@ -874,6 +891,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       {
         switch ($product->get_status())
         {
+          case 'publish':
           case 'draft':
             if ($product->get_sku())
             {
@@ -1012,9 +1030,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
       }
 
       
-      Utils::write_log("#### Update Post ####");
-      Utils::write_log("{$post_ID} {$title}");
-      Utils::write_log("#######################");
+      Utils::log("#### Update Post ####");
+      Utils::log("{$post_ID} {$title}");
+      Utils::log("#######################");
       
       $date = wbp_fn()->ka_formatted_date($date);
       $gmt = get_gmt_from_date($date);
@@ -1131,9 +1149,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $this->set_product_data($product, $record, $content);
 
-      Utils::write_log("##### New Product #####");
-      Utils::write_log("{$post_ID} {$title}");
-      Utils::write_log("#######################");
+      Utils::log("##### New Product #####");
+      Utils::log("{$post_ID} {$title}");
+      Utils::log("#######################");
 
       wp_update_post(array(
         'ID'            => $post_ID,
@@ -1569,7 +1587,13 @@ if (!class_exists('Kleinanzeigen_Functions'))
         }
         else
         {
-          return new WP_Error(402, __('Ad is not a valid object'));
+          $message = __('Ad is not a valid object', 'kleinanzeigen');
+          return new WP_Error(400, $message, array(
+            'data' => array(
+              'product' => $product,
+              'message' => $message
+            )
+          ));
         }
       }
       catch (WC_Data_Exception $e)
@@ -1904,7 +1928,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       die("0");
     }
 
-    public function ajax_ping()
+    public function ajax_ping($is_retry = false)
     {
       check_ajax_referer('ajax-nonce', '_ajax_nonce');
 
@@ -1912,11 +1936,20 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       $success = false;
       $json = get_post_meta($post_ID, '_kleinanzeigen_record', true);
-      $ad_obj = (object) json_decode($json, true);
-      if (isset($ad_obj->url))
+      $ad = (object) json_decode($json, true);
+      if (isset($ad->url))
       {
-        $url = wbp_fn()->get_kleinanzeigen_url($ad_obj->url);
+        $url = wbp_fn()->get_kleinanzeigen_url($ad->url);
         $success = Utils::url_exists($url);
+      } else {
+        // meta seem to be missing, add it
+        $kleinanzeigen_id = get_post_meta($post_ID, '_kleinanzeigen_id', true);
+        $ad = wbp_fn()->find_kleinanzeige($kleinanzeigen_id);
+        update_post_meta($post_ID, '_kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
+
+        if(false === $is_retry) {
+          return $this->ajax_ping(true);
+        }
       }
 
       die(json_encode(array(
@@ -2102,6 +2135,28 @@ if (!class_exists('Kleinanzeigen_Functions'))
         default:
           $inactive_ad_text = __('No action', 'kleinanzeigen');
       }
+      
+      $mail_setting = (int) get_option('kleinanzeigen_send_mail_on_new_ad');
+      switch ($mail_setting)
+      {
+        case (0):
+          $mail_setting_text = __('No', 'kleinanzeigen');
+          break;
+        case (1):
+          $mail_setting_text = __('Yes', 'kleinanzeigen');
+          break;
+      }
+
+      $price_setting = (int) get_option('kleinanzeigen_schedule_invalid_prices');
+      switch ($price_setting)
+      {
+        case (0):
+          $price_setting_text = __('No', 'kleinanzeigen');
+          break;
+        case (1):
+          $price_setting_text = __('Yes', 'kleinanzeigen');
+          break;
+      }
 
       $interval =  get_option('kleinanzeigen_send_status_mail');
       switch ($interval)
@@ -2189,7 +2244,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
       add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
 
-      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event', 'inactive_ad_text'));
+      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event', 'inactive_ad_text', 'mail_setting_text', 'price_setting_text'));
       $email_content = $this->style_inline($email_content);
 
       return $this->sendMail($email_heading, $email_content, $receipients);

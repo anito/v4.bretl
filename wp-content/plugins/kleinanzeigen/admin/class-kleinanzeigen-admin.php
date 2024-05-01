@@ -627,10 +627,10 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         ), $args);
         $status = $postarr['post_status'];
 
-        Utils::write_log("##### Invalid Ad  #####");
-        Utils::write_log($item['product']->get_title());
-        Utils::write_log("Updating state to: {$status}");
-        Utils::write_log("#######################");
+        Utils::log("##### Invalid Ad  #####");
+        Utils::log($item['product']->get_title());
+        Utils::log("Updating state to: {$status}");
+        Utils::log("#######################");
 
         /**
          * Here the actual job will be done by updating the post
@@ -677,9 +677,9 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'uid'   => $post_ID
       ));
 
-      Utils::write_log("####### Recover #######");
-      Utils::write_log("({$status}) {$post_ID} => {$title}");
-      Utils::write_log("#######################");
+      Utils::log("####### Recover #######");
+      Utils::log("({$status}) {$post_ID} => {$title}");
+      Utils::log("#######################");
 
       wbp_fn()->enable_sku($product, $record);
 

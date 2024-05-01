@@ -56,22 +56,22 @@ $keyed_items = array_combine($ids, $items);
                   </div>
                   <div class="task">
                     <div class="task-name"><strong><?php echo __('Shop products', 'kleinanzeigen'); ?></strong></div>
-                    <div class="task-value"><strong><?php echo count($has_sku_products) + count($no_sku_products) ?></strong></div>
+                    <div class="task-value"><strong><?php echo count($has_sku) + count($no_sku) ?></strong></div>
                   </div>
                   <div class="task">
                     <div class="task-name">
                       <a href="#" class="start-task" data-task-type="has-sku"><?php echo __('Linked products', 'kleinanzeigen'); ?></a>
                       <i class="dashicons dashicons-warning hidden" title="<?php echo __('Contains invalid linked products', 'kleinanzeigen') ?>"></i>
                     </div>
-                    <div class="task-value"><?php echo count($has_sku_products); ?></div>
+                    <div class="task-value"><?php echo count($has_sku); ?></div>
                   </div>
                   <div class="task">
                     <div class="task-name"><a href="#" class="start-task" data-task-type="no-sku"><?php echo __('Autonomous products', 'kleinanzeigen'); ?></a></div>
-                    <div class="task-value"><?php echo count($no_sku_products); ?></div>
+                    <div class="task-value"><?php echo count($no_sku); ?></div>
                   </div>
                   <div class="task">
                     <div class="task-name"><a href="#" class="start-task" data-task-type="featured"><?php echo __('Featured products', 'kleinanzeigen'); ?></a></div>
-                    <div class="task-value"><?php echo count($featured_products); ?></div>
+                    <div class="task-value"><?php echo count($featured); ?></div>
                   </div>
                 </div>
               </fieldset>
@@ -117,7 +117,7 @@ $keyed_items = array_combine($ids, $items);
                 <div class="tasks">
                   <div class="task">
                     <div class="task-name">
-                      <a href="#" class="start-task" data-task-type="drafts"><?php echo __('Non published products', 'kleinanzeigen'); ?></a>
+                      <a href="#" class="start-task" data-task-type="drafts"><?php echo __('Linked products', 'kleinanzeigen'); ?></a>
                     </div>
                     <div class="task-value"><?php echo count($drafts_has_sku); ?></div>
                   </div>

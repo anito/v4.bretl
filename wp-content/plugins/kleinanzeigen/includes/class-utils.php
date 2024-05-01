@@ -137,11 +137,33 @@ if (!class_exists('Utils'))
       return !empty($account_name) ? sanitize_url("{$url}{$pro_account}{$account_name}/ads", array('http', 'https')) : null;
     }
 
-    static function write_log($vars)
+    static function log($message)
     {
-      if (is_callable('write_log'))
+      $dir = wbp_ka()->plugin_path('logs');
+      $fn = 'debug-' . date('Y-m-d') . '.log';
+      $file = trailingslashit($dir) . $fn;
+
+      if (!file_exists($dir))
       {
-        write_log($vars);
+        mkdir($dir);
+      };
+
+      if (is_array($message) || is_object($message))
+      {
+        $message = print_r($message, true);
+      }
+
+      $file = fopen($file, "a");
+      echo fwrite($file, "[" . date('d-M-y H:i:s T') . "] " . $message . "\n");
+      fclose($file);
+    }
+
+    static function write_log($log)
+    {
+      if (is_array($log) || is_object($log)) {
+        error_log(print_r($log, true));
+      } else {
+        error_log($log);
       }
     }
 

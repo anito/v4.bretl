@@ -153,8 +153,23 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
           'header-template' => array(
             'template' => 'modal-table-header',
             'args' => array(
-              'header' => __('Autonomous products', 'kleinanzeigen'),
+              'header' => __('Published autonomous products', 'kleinanzeigen'),
               'subheader' => __('List of published products not related to an ad', 'kleinanzeigen')
+            )
+          ),
+          'footer-template' => array(
+            'template' => 'blank',
+            'args' => array()
+          )
+        );
+        break;
+      case 'drafts-no-sku':
+        $vars = array(
+          'header-template' => array(
+            'template' => 'modal-table-header',
+            'args' => array(
+              'header' => __('Deactivated autonomous products', 'kleinanzeigen'),
+              'subheader' => __('List of deactivated products not related to an ad', 'kleinanzeigen')
             )
           ),
           'footer-template' => array(
@@ -452,6 +467,7 @@ class Kleinanzeigen_Tasks_List_Table extends WP_List_Table
         case 'drafts':
         case 'has-sku':
         case 'no-sku':
+        case 'drafts-no-sku':
         case 'featured':
           $label = array(
             'publish' => $post_status === 'publish' ? __('Deactivate', 'kleinanzeigen') : __('Publish'),

@@ -66,11 +66,12 @@ class Kleinanzeigen_List_Table extends WP_List_Table
       $categories = $data->categoriesSearchData;
     }
 
-    $no_sku_products     = wbp_fn()->build_tasks('no-sku')['items'];
-    $has_sku_products    = wbp_fn()->build_tasks('has-sku')['items'];
-    $drafts_has_sku       = wbp_fn()->build_tasks('has-sku', array('status' => 'draft'))['items'];
-    $featured_products    = wbp_fn()->get_featured_products();
-    $missing_cat_products = wbp_fn()->get_invalid_cat_products(array('status' => array('publish', 'draft')));
+    $no_sku         = wbp_fn()->build_tasks('no-sku')['items'];
+    // $drafts_no_sku  = wbp_fn()->build_tasks('drafts-no-sku')['items'];
+    $has_sku        = wbp_fn()->build_tasks('has-sku')['items'];
+    $drafts_has_sku = wbp_fn()->build_tasks('has-sku', array('status' => 'draft'))['items'];
+    $featured       = wbp_fn()->get_featured_products();
+    $missing_cat    = wbp_fn()->get_invalid_cat_products(array('status' => array('publish', 'draft')));
 
     $products = array('publish' => array(), 'draft' => array(), 'unknown' => array(), 'other' => array(), 'no-sku' => array(), 'todos' => array());
     foreach ($this->items as $item)
@@ -97,7 +98,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
             $products['other'][] = $product;
         }
 
-        if (in_array($product, $missing_cat_products))
+        if (in_array($product, $missing_cat))
         {
           $products['todos'][$item->id]['reason'][] = self::$MISSING_CAT;
         }
@@ -111,7 +112,7 @@ class Kleinanzeigen_List_Table extends WP_List_Table
 
     $items = $this->items;
     $tasks = wbp_fn()->build_tasks();
-    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'has_sku_products', 'no_sku_products', 'drafts_has_sku', 'featured_products', 'tasks'));
+    wbp_ka()->include_template('kleinanzeigen-admin-header-display.php', false, compact('products', 'items', 'paged', 'categories', 'has_sku', 'no_sku', 'drafts_has_sku', 'featured', 'tasks'));
   }
 
   /**
@@ -297,10 +298,10 @@ class Kleinanzeigen_List_Table extends WP_List_Table
     $classes = array();
     if (
       $product
-      && ($invalid_cat_products = wbp_fn()->get_invalid_cat_products(array('status' => array('publish', 'draft'))))
+      && ($invalid_cat = wbp_fn()->get_invalid_cat_products(array('status' => array('publish', 'draft'))))
       && in_array(
         $product,
-        $invalid_cat_products
+        $invalid_cat
       )
     ) $classes[] = 'todo';
     echo implode(', ', array_map(function ($term) use ($classes)

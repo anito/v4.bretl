@@ -174,21 +174,19 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
              * method display:
              * get first sets of data
              */
-            display: async function(cb) {
+            display: function(cb) {
 
               if (prevented) return;
               prevented = true;
 
               if (cb && 'function' === typeof cb) cb();
 
-              const _nonce = nonce || await list.createNonce()
-
               $.ajax({
 
                   url: ajaxurl,
                   dataType: 'json',
                   data: {
-                    _ajax_nonce_custom_list: _nonce,
+                    _ajax_nonce_custom_list: nonce,
                     action: '_ajax_fetch_kleinanzeigen_display',
                   },
                   beforeSend: () => list.prepare()

@@ -80,9 +80,20 @@ function buildTree($tree, $level = 0)
     <?php buildTree($tree); ?>
   </div>
   <div class="line-t margin-bottom-20 margin-top-30"></div>
-  <div class="medium">
-    <span class="inline-block w-50 bold"><?php echo __('Setting for orphaned ads:', 'kleinanzeigen'); ?></span>
-    <span class="inline-block italic"><?php echo $inactive_ad_text; ?></span>
+  <div class="settings small">
+    <div class="italic"><?php echo __('Settings', 'kleinanzeigen'); ?>:</div>
+    <div class="settings-item">
+      <span class="inline-block w-50 bold"><?php echo __('Invalid link action', 'kleinanzeigen'); ?>:</span>
+      <span class="inline-block italic"><?php echo $inactive_ad_text; ?></span>
+    </div>
+    <div class="settings-item">
+      <span class="inline-block w-50 bold"><?php echo __('Send mail on new ads', 'kleinanzeigen'); ?>:</span>
+      <span class="inline-block italic"><?php echo $mail_setting_text; ?></span>
+    </div>
+    <div class="settings-item">
+      <span class="inline-block w-50 bold"><?php echo __('Sync prices', 'kleinanzeigen'); ?>:</span>
+      <span class="inline-block italic"><?php echo $price_setting_text; ?></span>
+    </div>
   </div>
   <div class="line-t margin-bottom-30 margin-top-20"></div>
 </div>
