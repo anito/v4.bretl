@@ -681,11 +681,12 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       Utils::log("({$status}) {$post_ID} => {$title}");
       Utils::log("#######################");
 
+      $saved_state = get_post_meta($post_ID, '_cron_sku_disabled', true);
       wbp_fn()->enable_sku($product, $record);
 
       wp_update_post(array(
         'ID'          => $post_ID,
-        'post_status' => 'publish',
+        'post_status' => $saved_state,
         'post_type'   => 'product',
       ));
 

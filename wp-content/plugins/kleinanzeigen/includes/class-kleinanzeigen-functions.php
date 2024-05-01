@@ -689,7 +689,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
               ),
               array(
                 'key'     => '_cron_sku_disabled',
-                'value' => 1
+                'compare' => 'EXISTS'
               ),
             ),
             'title' => $record->title
@@ -889,13 +889,14 @@ if (!class_exists('Kleinanzeigen_Functions'))
       }
       elseif (wp_doing_cron())
       {
-        switch ($product->get_status())
+        $status = $product->get_status();
+        switch ($status)
         {
           case 'publish':
           case 'draft':
             if ($product->get_sku())
             {
-              update_post_meta($post_ID, '_cron_sku_disabled', 1);
+              update_post_meta($post_ID, '_cron_sku_disabled', $status);
             }
         }
       }
