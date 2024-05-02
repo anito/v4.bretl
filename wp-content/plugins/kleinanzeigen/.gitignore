@@ -21,4 +21,4 @@ CVS
 /languages/*backup*
 /vendor/*
 /data/samples
-/logs
+/logs/*

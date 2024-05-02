@@ -202,10 +202,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
       $new_post_status = 'draft' === $status ? 'publish' : 'draft';
       $title = get_the_title($post_ID);
 
-      Utils::log("## Ajax Toggle State ##");
-      Utils::log("{$status} => {$new_post_status}: {$post_ID} {$title}");
-      Utils::log("#######################");
-
       if ($post_ID)
       {
         $date = get_the_date('Y-m-d H:i:s', $post_ID);
@@ -308,10 +304,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
         $postarr = array_merge(array(
           'ID' => $post_ID
         ), $args);
-
-        Utils::log("## Ajax Save Post ##");
-        Utils::log("{$post_ID} {$title}");
-        Utils::log("#######################");
 
         wp_update_post($postarr);
         $product = wc_get_product($post_ID);
@@ -465,10 +457,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Action_Handler'))
           die();
         };
       }
-
-      Utils::log("##### Ajax Import #####");
-      Utils::log("{$post_ID} {$title}");
-      Utils::log("#######################");
 
       wp_update_post(array(
         'ID'            => $post_ID,
