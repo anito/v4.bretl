@@ -350,13 +350,13 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
     $schedules = wbp_fn()->get_users_schedules();
     foreach ($schedules as $schedule => $emails)
     {
-      $args = array(json_encode(array('emails' => $emails), JSON_UNESCAPED_SLASHES));
+      $args = array(json_encode($emails, JSON_UNESCAPED_SLASHES));
       if (!wp_next_scheduled("kleinanzeigen_report_{$schedule}", $args))
       {
         switch ($schedule)
         {
           case self::EVERY_MINUTE:
-            $next = time() + (5 * 60);
+            $next = time() + (1 * 60);
             break;
           case self::DAILY:
             $next = strtotime("next Day 06:00");
@@ -697,17 +697,13 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   }
 
   // Job status report
-  public function job_report($arg)
+  public function job_report($args)
   {
 
-    $args = (object) json_decode($arg);
-    $user_mails = $args->emails;
-    $to_emails = $user_mails;
-    $bcc_email = get_bloginfo('admin_email');
+    $user_mails = (array) json_decode($args);
 
     $receipients = array(
-      'to_email'  => implode(',', $to_emails),
-      'bcc'       => $bcc_email,
+      'to_email'  => implode(',', $user_mails),
     );
 
     wbp_fn()->sendMailStatusReport($receipients);
@@ -781,10 +777,8 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
   {
     if ($new === $old) return;
 
-    $user_id = wp_get_current_user()->ID;
-    update_user_meta($user_id, $option, $new);
-
     // Handle mail report usage
+    $errors = 0;
     if ('kleinanzeigen_send_status_mail' == $option)
     {
       foreach (_get_cron_array() as $timestamp => $jobs)
@@ -795,20 +789,25 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
           {
             foreach ($job as $key => $job_details)
             {
-              if ($job_details['schedule'] === $old)
+              $args = $job_details['args'];
+              if(true != wp_unschedule_event($timestamp, $name, $args))
               {
-                $args = $job_details['args'];
-                wp_unschedule_event($timestamp, "kleinanzeigen_report_{$old}", $args);
-              }
-              if ($job_details['schedule'] === $new)
-              {
-                $args = $job_details['args'];
-                wp_unschedule_event($timestamp, "kleinanzeigen_report_{$new}", $args);
+                ++$errors;
               }
             }
           }
         }
       };
+    }
+
+    if (0 === $errors)
+    {
+      $user_id = wp_get_current_user()->ID;
+      update_user_meta($user_id, $option, $new);
+    }
+    else
+    {
+      add_settings_error('kleinanzeigen_send_status_mail', 403, sprintf(__('Could not apply settings for scheduling status report: %s', 'kleinanzeigen'), '<em class="">"' . $new . '"</em>'), 'error');
     }
   }
 
@@ -936,7 +935,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'id'                => 'kleinanzeigen_crawl_interval',
       'name'              => 'kleinanzeigen_crawl_interval',
       'required'          => '',
-      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_option('kleinanzeigen_crawl_interval', self::EVERY_MINUTE), $this->schedules(array(self::NEVER, self::EVERY_MINUTE, self::FIVE_MINUTES, self::TEN_MINUTES, self::THIRTY_MINUTES, self::HOURLY))),
+      'get_options_list'  => wbp_fn()->dropdown_time_interval(get_option('kleinanzeigen_crawl_interval', self::EVERY_MINUTE), $this->schedules(array(self::NEVER, self::EVERY_MINUTE, self::FIVE_MINUTES, self::TEN_MINUTES, self::THIRTY_MINUTES, self::HOURLY))),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
       'label'             => __('Select the interval at which Kleinanzeigen.de should be crawled for changes', 'kleinanzeigen'),
@@ -1087,7 +1086,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       'id'                => 'kleinanzeigen_send_status_mail',
       'name'              => 'kleinanzeigen_send_status_mail',
       'required'          => '',
-      'get_options_list'  => wbp_fn()->dropdown_crawl_interval(get_user_meta(get_current_user_id(), 'kleinanzeigen_send_status_mail', true), $this->schedules(array(self::NEVER, self::DAILY, self::WEEKLY, self::MONTHLY))),
+      'get_options_list'  => wbp_fn()->dropdown_time_interval(get_user_meta(get_current_user_id(), 'kleinanzeigen_send_status_mail', true), $this->schedules(array_merge(array(self::NEVER, self::DAILY, self::WEEKLY, self::MONTHLY), (IS_DEV_MODE && wp_get_current_user()->has_cap('administrator')) ? array(self::EVERY_MINUTE) : array()))),
       'value_type'        => 'normal',
       'wp_data'           => 'option',
       'label'             => wbp_ka()->display_status_report_link(),

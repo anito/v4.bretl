@@ -17,8 +17,8 @@ xcuserdata
 .svn
 CVS
 
-
 /node_modules/*
 /languages/*backup*
 /vendor/*
 /data/samples
+/logs

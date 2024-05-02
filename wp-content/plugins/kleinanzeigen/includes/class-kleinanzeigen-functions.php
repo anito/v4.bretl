@@ -2066,10 +2066,18 @@ if (!class_exists('Kleinanzeigen_Functions'))
       return $r;
     }
 
-    public function dropdown_crawl_interval($selected, $schedules)
+    public function dropdown_time_interval($selected, $schedules)
     {
+      if (!defined('_sort_by_interval'))
+      {
+        define('_sort_by_interval', function ($a, $b)
+        {
+          return $a['interval'] - $b['interval'];
+        });
+      }
       $r = '';
 
+      uasort($schedules, _sort_by_interval);
       foreach ($schedules as $action => $name)
       {
         // Preselect specified action.
@@ -2135,6 +2143,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $interval =  get_user_meta($user->ID, 'kleinanzeigen_send_status_mail', true);
         switch ($interval)
         {
+          case ('every_minute'):
+            $email_heading = __('Meticulously status report', 'kleinanzeigen');
+            break;
           case ('daily'):
             $email_heading = __('Daily status report', 'kleinanzeigen');
             break;
@@ -2200,7 +2211,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
             'Europe/Berlin',
             IntlDateFormatter::GREGORIAN
           );
-          $fmt->setPattern('EEEE, dd.MM.YYYY hh:mm');
+          $fmt->setPattern('EEEE, dd.MM.YYYY HH:mm');
           $next_event = $fmt->format($date);
         }
 
@@ -2308,7 +2319,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       if (!empty($schedules))
       {
         $emails = $schedules[$schedule];
-        $args = array(json_encode(array('emails' => $emails), JSON_UNESCAPED_SLASHES));;
+        $args = array(json_encode($emails, JSON_UNESCAPED_SLASHES));;
         return wp_next_scheduled("kleinanzeigen_report_{$schedule}", $args);
       }
       return null;

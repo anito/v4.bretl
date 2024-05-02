@@ -1,12 +1,14 @@
 <?php
 
 // If this file is called directly, abort.
-if (!defined('WPINC')) {
+if (!defined('WPINC'))
+{
   die();
 }
 
 // If class `Kleinanzeigen_Ajax_Table` doesn't exists yet.
-if (!class_exists('Kleinanzeigen_Ajax_Table')) {
+if (!class_exists('Kleinanzeigen_Ajax_Table'))
+{
 
   class Kleinanzeigen_Ajax_Table extends Kleinanzeigen
   {
@@ -51,12 +53,21 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
     {
       global $wp_list_table;
 
-      check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
+      add_action('wp_verify_nonce_failed', array($this, 'nonce_failed'), 10, 4);
+      check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list', false);
 
-      if (isset($_REQUEST['paged'])) {
+      if (isset($_REQUEST['paged']))
+      {
         setcookie('ka-paged', $_REQUEST['paged']);
       }
       $wp_list_table->ajax_response();
+    }
+
+    public function nonce_failed($nonce, $action, $user, $token)
+    {
+      die(json_encode(array(
+        "head" => wbp_ka()->include_template('error-message.php', true, array('prefix' => sprintf(__('Access forbidden for: %s', 'kleinanzeigen'), $action), 'message' => __('Please reload the page', 'kleinanzeigen')))
+      )));
     }
 
     /**
@@ -66,22 +77,24 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
     {
       global $wp_list_table;
 
-      check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list');
+      add_action('wp_verify_nonce_failed', array($this, 'nonce_failed'), 10, 4);
+      check_ajax_referer('ajax-nonce-custom-list', '_ajax_nonce_custom_list', false);
 
       $paged = 1;
-      if (!isset($_COOKIE['ka-paged'])) {
+      if (!isset($_COOKIE['ka-paged']))
+      {
         setcookie('ka-paged', $paged);
       }
       $paged = isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : $paged;
       $data = Utils::get_page_data(array('paged' => $paged));
 
-      if (is_wp_error($data)) {
+      if (is_wp_error($data))
+      {
         die(json_encode(array(
-
-          "head" => wbp_ka()->include_template('error-message.php', true, array('message' => $data->get_error_message()))
-
+          "head" => wbp_ka()->include_template('error-message.php', true, array('prefix' => __('No data found', 'kleinanzeigen'), 'message' => $data->get_error_message()))
         )));
       }
+
       // $categories = $data->categoriesSearchData;
       // $totalAds = array_column($categories, 'totalAds');
 
@@ -109,7 +122,7 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
       $paged = isset($_REQUEST['paged']) ? $_REQUEST['paged'] : (isset($_COOKIE['ka-paged']) ? $_COOKIE['ka-paged'] : 1);
       $task_type = isset($_REQUEST['task_type']) ? $_REQUEST['task_type'] : null;
       $status = isset($_REQUEST['status']) ? $_REQUEST['status'] : '';
-      
+
       $status = Utils::base_64_decode($status);
       $args = $status ? array('status' => $status) : array();
       $wp_tasks_list_table->set_vars($task_type);
@@ -154,7 +167,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
         (function($) {
 
           let nonce = <?php echo json_encode(wp_create_nonce('ajax-nonce-custom-list')) ?>;
-          let prevented = false;
 
           const list = {
 
@@ -176,17 +188,16 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
              */
             display: function(cb) {
 
-              if (prevented) return;
-              prevented = true;
-
-              if (cb && 'function' === typeof cb) cb();
+              if (cb && 'function' === typeof cb) {
+                cb()
+              };
 
               $.ajax({
 
                   url: ajaxurl,
                   dataType: 'json',
                   data: {
-                    _ajax_nonce_custom_list: nonce,
+                    _ajax_nonce_custom_list: nonce + '',
                     action: '_ajax_fetch_kleinanzeigen_display',
                   },
                   beforeSend: () => list.prepare()
@@ -215,7 +226,6 @@ if (!class_exists('Kleinanzeigen_Ajax_Table')) {
                 .always(() => {
 
                   $("body").removeClass('loading');
-                  setTimeout(() => prevented = false, 5000)
 
                 });
 

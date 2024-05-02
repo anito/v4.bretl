@@ -36,7 +36,7 @@ $fmt = new IntlDateFormatter(
   'Europe/Berlin',
   IntlDateFormatter::GREGORIAN
 );
-$fmt->setPattern('EEEE, dd.MM.YYYY hh:mm');
+$fmt->setPattern('EEEE, dd.MM.YYYY HH:mm');
 $date = $fmt->format($date);
 ?>
 <!DOCTYPE html>

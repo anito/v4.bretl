@@ -1,8 +1,9 @@
+<?php $prefix = $prefix ?? __('An error occurred', 'kleinanzeigen'); ?>
 <section>
   <h2><?php echo __('Error', 'kleinanzeigen') ?></h2>
   <div class="notice notice-error is-dismissible">
     <p>
-      <?php echo sprintf('<strong>%1$s:</strong> %2$s', __('No data found', 'kleinanzeigen'), $message); ?>
+      <?php echo sprintf('<strong>%1$s:</strong> %2$s', $prefix, $message); ?>
     </p>
   </div>
 
