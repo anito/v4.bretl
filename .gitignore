@@ -50,8 +50,8 @@ CVS
 # plugins
 !/wp-content/plugins
 !/wp-content/plugins/woocommerce-new-product
-/wp-content/plugins/wp-maintenance-mode
-/wp-content/plugins/kleinanzeigen
+!/wp-content/plugins/wp-maintenance-mode
+!/wp-content/plugins/kleinanzeigen
 !/wp-content/plugins/open-maps
 !/wp-content/plugins/spine-app
 wp-content/themes/astra-child/js/hero/
