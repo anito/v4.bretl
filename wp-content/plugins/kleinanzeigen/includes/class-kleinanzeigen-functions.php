@@ -974,7 +974,9 @@ if (!class_exists('Kleinanzeigen_Functions'))
         if (is_wp_error($success))
         {
           $errors[] = new WP_Error(400, __('A Product with the same Ad ID already exists. Delete this draft or enter a different Ad ID.', 'kleinanzeigen'));
-        } else {
+        }
+        else
+        {
           $_POST['_kleinanzeigen_id'] = $ad->id;
           $_POST['_sku'] = $ad->id;
         }
@@ -1021,11 +1023,11 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $title = Utils::sanitize_dup_title($title, '', array('cleanup' => true));
       }
 
-      
+
       Utils::log("#### Update Post ####");
       Utils::log("{$post_ID} {$title}");
       Utils::log("#######################");
-      
+
       $date = wbp_fn()->ka_formatted_date($date);
       $gmt = get_gmt_from_date($date);
 
@@ -1933,13 +1935,16 @@ if (!class_exists('Kleinanzeigen_Functions'))
       {
         $url = wbp_fn()->get_kleinanzeigen_url($ad->url);
         $success = Utils::url_exists($url);
-      } else {
+      }
+      else
+      {
         // meta seem to be missing, add it
         $kleinanzeigen_id = get_post_meta($post_ID, '_kleinanzeigen_id', true);
         $ad = wbp_fn()->find_kleinanzeige($kleinanzeigen_id);
         update_post_meta($post_ID, '_kleinanzeigen_record', html_entity_decode(json_encode($ad, JSON_UNESCAPED_UNICODE)));
 
-        if(false === $is_retry) {
+        if (false === $is_retry)
+        {
           return $this->ajax_ping(true);
         }
       }
@@ -2111,135 +2116,145 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
     public function sendMailStatusReport($receipients = array())
     {
+      $errors = array();
+      foreach ($receipients as $receipient)
+      {
+        $send_mail_users = wbp_fn()->get_users_by_meta('kleinanzeigen_send_mail_on_new_ad');
+        $send_mail_users_mails = wp_list_pluck($send_mail_users, 'user_email');
+        $emails = array_intersect($send_mail_users_mails, $receipient);
 
-      $inactive_ad_setting = get_option('kleinanzeigen_schedule_invalid_ads');
-      switch ($inactive_ad_setting)
-      {
-        case ('publish'):
-          $inactive_ad_text = __('Publish ad', 'kleinanzeigen');
-          break;
-        case ('deactivate'):
-          $inactive_ad_text = __('Deactivate ad', 'kleinanzeigen');
-          break;
-        case ('delete'):
-          $inactive_ad_text = __('Delete ad', 'kleinanzeigen');
-          break;
-        default:
-          $inactive_ad_text = __('No action', 'kleinanzeigen');
-      }
-      
-      $mail_setting = (int) get_option('kleinanzeigen_send_mail_on_new_ad');
-      switch ($mail_setting)
-      {
-        case (0):
+        if (empty($emails))
+        {
           $mail_setting_text = __('No', 'kleinanzeigen');
-          break;
-        case (1):
+        }
+        else
+        {
           $mail_setting_text = __('Yes', 'kleinanzeigen');
-          break;
-      }
+        }
 
-      $price_setting = (int) get_option('kleinanzeigen_schedule_invalid_prices');
-      switch ($price_setting)
-      {
-        case (0):
-          $price_setting_text = __('No', 'kleinanzeigen');
-          break;
-        case (1):
-          $price_setting_text = __('Yes', 'kleinanzeigen');
-          break;
-      }
+        $inactive_ad_setting = get_option('kleinanzeigen_schedule_invalid_ads');
+        switch ($inactive_ad_setting)
+        {
+          case ('publish'):
+            $inactive_ad_text = __('Publish ad', 'kleinanzeigen');
+            break;
+          case ('deactivate'):
+            $inactive_ad_text = __('Deactivate ad', 'kleinanzeigen');
+            break;
+          case ('delete'):
+            $inactive_ad_text = __('Delete ad', 'kleinanzeigen');
+            break;
+          default:
+            $inactive_ad_text = __('No action', 'kleinanzeigen');
+        }
 
-      $interval =  get_option('kleinanzeigen_send_status_mail');
-      switch ($interval)
-      {
-        case ('daily'):
-          $email_heading = __('Daily status report', 'kleinanzeigen');
-          break;
-        case ('weekly'):
-          $email_heading = __('Weekly status report', 'kleinanzeigen');
-          break;
-        case ('monthly'):
-          $email_heading = __('Monthly status report', 'kleinanzeigen');
-          break;
-        default:
-          $email_heading = __('Current status report', 'kleinanzeigen');
-      }
+        $price_setting = (int) get_option('kleinanzeigen_schedule_invalid_prices');
+        switch ($price_setting)
+        {
+          case (0):
+            $price_setting_text = __('No', 'kleinanzeigen');
+            break;
+          case (1):
+            $price_setting_text = __('Yes', 'kleinanzeigen');
+            break;
+        }
 
-      $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
-      $plugin_name        = wbp_ka()->get_plugin_name();
-      $plugin_link        = admin_url("admin.php?page={$plugin_name}");
-      $additional_content = '';
-      $next_event         = null;
+        $interval =  get_option('kleinanzeigen_send_status_mail');
+        switch ($interval)
+        {
+          case ('daily'):
+            $email_heading = __('Daily status report', 'kleinanzeigen');
+            break;
+          case ('weekly'):
+            $email_heading = __('Weekly status report', 'kleinanzeigen');
+            break;
+          case ('monthly'):
+            $email_heading = __('Monthly status report', 'kleinanzeigen');
+            break;
+          default:
+            $email_heading = __('Current status report', 'kleinanzeigen');
+        }
 
-      // Next schedule
-      $timestamp = $this->get_next_scheduled();
-      if ($timestamp)
-      {
+        $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+        $plugin_name        = wbp_ka()->get_plugin_name();
+        $plugin_link        = admin_url("admin.php?page={$plugin_name}");
+        $additional_content = '';
+        $next_event         = null;
 
-        $timezone = new DateTimeZone('Europe/Berlin');
+        // Next schedule
+        $timestamp = $this->get_next_scheduled();
+        if ($timestamp)
+        {
 
-        $date = new DateTime();
-        $date->setTimestamp($timestamp);
-        $date->setTimezone($timezone);
+          $timezone = new DateTimeZone('Europe/Berlin');
+
+          $date = new DateTime();
+          $date->setTimestamp($timestamp);
+          $date->setTimezone($timezone);
 
 
-        $fmt = new IntlDateFormatter(
-          'de-DE',
-          IntlDateFormatter::FULL,
-          IntlDateFormatter::FULL,
-          'Europe/Berlin',
-          IntlDateFormatter::GREGORIAN
+          $fmt = new IntlDateFormatter(
+            'de-DE',
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::FULL,
+            'Europe/Berlin',
+            IntlDateFormatter::GREGORIAN
+          );
+          $fmt->setPattern('EEEE, dd.MM.YYYY hh:mm');
+          $next_event = $fmt->format($date);
+        }
+
+        $ads = $this->get_transient_data();
+
+        // Tree
+        $tree = array(
+          array('items' => $ads, 'text' => __('Kleinanzeigen', 'kleinanzeigen')),
+          array('level' => 0, 'items' => wc_get_products(array('status' => array('publish'), 'limit' => -1)), 'text' => __('Total published products', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Autonomous', 'kleinanzeigen')),
+            array('level' => 1, 'items' => $published_sku = wp_list_pluck($this->build_tasks('has-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Linked', 'kleinanzeigen'), 'childs' => array(
+              array('level' => 2, 'items' => $published_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Invalid link', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
+              array('level' => 2, 'items' => array_diff($published_sku, $published_invalid), 'text' => __('Valid link', 'kleinanzeigen'))
+            ))
+          )),
+          array('level' => 0, 'items' => wc_get_products(array('status' => array('draft'), 'limit' => -1)), 'text' => __('Total hidden products', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Autonomous', 'kleinanzeigen')),
+            array('level' => 1, 'items' => $drafts_sku = wp_list_pluck($this->build_tasks('drafts')['items'], 'product'), 'text' => __('Linked', 'kleinanzeigen'), 'childs' => array(
+              array('level' => 2, 'items' => $drafts_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Invalid link', 'kleinanzeigen')),
+              array('level' => 2, 'items' => array_diff($drafts_sku, $drafts_invalid), 'text' => __('Valid link', 'kleinanzeigen'), 'info' => __('Ready for publication', 'kleinanzeigen'))
+            ))
+          )),
+          array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => array('publish', 'draft')))['items'], 'product'), 'text' => __('Total autonomous products', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen')),
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+          )),
+          array('level' => 0, 'items' => array_merge($published_invalid, $drafts_invalid), 'text' => __('Total invalid links', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 1, 'items' => $published_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
+            array('level' => 1, 'items' => $drafts_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+          )),
+          array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('invalid-cat')['items'], 'product'), 'text' => __('Improper category', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('invalid-cat', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('invalid-cat', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+          )),
+          array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => array('publish', 'draft')))['items'], 'product'), 'text' => __('Featured products', 'kleinanzeigen'), 'childs' => array(
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen')),
+            array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
+          ))
         );
-        $fmt->setPattern('EEEE, dd.MM.YYYY hh:mm');
-        $next_event = $fmt->format($date);
+
+        add_action('kleinanzeigen_email_header', array($this, 'email_header'));
+        add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
+        add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
+
+        $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event', 'inactive_ad_text', 'mail_setting_text', 'price_setting_text'));
+        $email_content = $this->style_inline($email_content);
+
+        $success = $this->sendMail($email_heading, $email_content, array($receipient));
+        if (is_wp_error($success))
+        {
+          $errors[] = $success;
+        }
       }
-
-      $ads = $this->get_transient_data();
-
-      // Tree
-      $tree = array(
-        array('items' => $ads, 'text' => __('Kleinanzeigen', 'kleinanzeigen')),
-        array('level' => 0, 'items' => wc_get_products(array('status' => array('publish'), 'limit' => -1)), 'text' => __('Total published products', 'kleinanzeigen'), 'childs' => array(
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Autonomous', 'kleinanzeigen')),
-          array('level' => 1, 'items' => $published_sku = wp_list_pluck($this->build_tasks('has-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Linked', 'kleinanzeigen'), 'childs' => array(
-            array('level' => 2, 'items' => $published_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Invalid link', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
-            array('level' => 2, 'items' => array_diff($published_sku, $published_invalid), 'text' => __('Valid link', 'kleinanzeigen'))
-          ))
-        )),
-        array('level' => 0, 'items' => wc_get_products(array('status' => array('draft'), 'limit' => -1)), 'text' => __('Total hidden products', 'kleinanzeigen'), 'childs' => array(
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Autonomous', 'kleinanzeigen')),
-          array('level' => 1, 'items' => $drafts_sku = wp_list_pluck($this->build_tasks('drafts')['items'], 'product'), 'text' => __('Linked', 'kleinanzeigen'), 'childs' => array(
-            array('level' => 2, 'items' => $drafts_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Invalid link', 'kleinanzeigen')),
-            array('level' => 2, 'items' => array_diff($drafts_sku, $drafts_invalid), 'text' => __('Valid link', 'kleinanzeigen'), 'info' => __('Ready for publication', 'kleinanzeigen'))
-          ))
-        )),
-        array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => array('publish', 'draft')))['items'], 'product'), 'text' => __('Total autonomous products', 'kleinanzeigen'), 'childs' => array(
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen')),
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('no-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
-        )),
-        array('level' => 0, 'items' => array_merge($published_invalid, $drafts_invalid), 'text' => __('Total invalid links', 'kleinanzeigen'), 'childs' => array(
-          array('level' => 1, 'items' => $published_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
-          array('level' => 1, 'items' => $drafts_invalid = wp_list_pluck($this->build_tasks('invalid-sku', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
-        )),
-        array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('invalid-cat')['items'], 'product'), 'text' => __('Improper category', 'kleinanzeigen'), 'childs' => array(
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('invalid-cat', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen'), 'info' => __('Action required', 'kleinanzeigen')),
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('invalid-cat', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
-        )),
-        array('level' => 0, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => array('publish', 'draft')))['items'], 'product'), 'text' => __('Featured products', 'kleinanzeigen'), 'childs' => array(
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => 'publish'))['items'], 'product'), 'text' => __('Published', 'kleinanzeigen')),
-          array('level' => 1, 'items' => wp_list_pluck($this->build_tasks('featured', array('status' => 'draft'))['items'], 'product'), 'text' => __('Draft', 'kleinanzeigen'))
-        ))
-      );
-
-      add_action('kleinanzeigen_email_header', array($this, 'email_header'));
-      add_action('kleinanzeigen_email_footer', array($this, 'email_footer'));
-      add_filter('woocommerce_email_footer_text', array($this, 'replace_placeholders'));
-
-      $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event', 'inactive_ad_text', 'mail_setting_text', 'price_setting_text'));
-      $email_content = $this->style_inline($email_content);
-
-      return $this->sendMail($email_heading, $email_content, $receipients);
+      return !count($errors);
     }
 
     public function sendMail($subject, $email_content, $receipients = array())
