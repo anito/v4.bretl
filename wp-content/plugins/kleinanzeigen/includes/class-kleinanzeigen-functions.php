@@ -2121,15 +2121,14 @@ if (!class_exists('Kleinanzeigen_Functions'))
       {
         $send_mail_users = wbp_fn()->get_users_by_meta('kleinanzeigen_send_mail_on_new_ad');
         $send_mail_users_mails = wp_list_pluck($send_mail_users, 'user_email');
-        $emails = array_intersect($send_mail_users_mails, $receipient);
 
-        if (empty($emails))
+        if (in_array($receipient, $send_mail_users_mails))
         {
-          $mail_setting_text = __('No', 'kleinanzeigen');
+          mail_setting_text = __('Yes', 'kleinanzeigen');
         }
         else
         {
-          $mail_setting_text = __('Yes', 'kleinanzeigen');
+          $mail_setting_text = __('No', 'kleinanzeigen');
         }
 
         $inactive_ad_setting = get_option('kleinanzeigen_schedule_invalid_ads');
