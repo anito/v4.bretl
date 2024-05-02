@@ -2124,7 +2124,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
         if (in_array($receipient, $send_mail_users_mails))
         {
-          mail_setting_text = __('Yes', 'kleinanzeigen');
+          $mail_setting_text = __('Yes', 'kleinanzeigen');
         }
         else
         {
