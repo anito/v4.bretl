@@ -596,7 +596,9 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
 
     foreach ($items as $item)
     {
-      $post_ID = $item['product']->get_id();
+      $product = $item['product'];
+      $post_ID = $product->get_id();
+      $status  = $product->get_status();
 
       $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_invalid_ad',
@@ -625,20 +627,17 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         $postarr = array_merge(array(
           'ID' => $post_ID
         ), $args);
-        $status = $postarr['post_status'];
+        $new_status = $postarr['post_status'];
 
         Utils::log("##### Invalid Ad  #####");
-        Utils::log($item['product']->get_title());
-        Utils::log("Updating state to: {$status}");
+        Utils::log($product->get_title());
+        Utils::log("Updating state to: {$new_status}");
         Utils::log("#######################");
 
-        /**
-         * Here the actual job will be done by updating the post
-         */
+        update_post_meta($post_ID, '_cron_last_state', $status);
         wp_update_post($postarr);
-        $product = wc_get_product($post_ID);
 
-        switch ($status)
+        switch ($new_status)
         {
 
           case "trash":
@@ -670,6 +669,7 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
       $post_ID = $product->get_id();
       $title = $product->get_name();
       $status = $product->get_status();
+      $last_state = get_post_meta($post_ID, '_cron_last_state', true);
 
       $job_id = wbp_db()->register_job(array(
         'slug'  => 'kleinanzeigen_recover_ad',
@@ -677,16 +677,15 @@ class Kleinanzeigen_Admin extends Kleinanzeigen
         'uid'   => $post_ID
       ));
 
-      $saved_state = get_post_meta($post_ID, '_cron_sku_disabled', true);
       wbp_fn()->enable_sku($product, $record);
 
       Utils::log("####### Recover #######");
-      Utils::log("({$status} => {$saved_state}) {$post_ID} => {$title}");
+      Utils::log("({$status} => {$last_state}) {$post_ID} => {$title}");
       Utils::log("#######################");
 
       wp_update_post(array(
         'ID'          => $post_ID,
-        'post_status' => $saved_state,
+        'post_status' => $last_state,
         'post_type'   => 'product',
       ));
 

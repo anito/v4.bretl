@@ -688,7 +688,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
                 'value' => (float) Utils::extract_kleinanzeigen_price($record->price),
               ),
               array(
-                'key'     => '_cron_sku_disabled',
+                'key'     => '_cron_last_state',
                 'compare' => 'EXISTS'
               ),
             ),
@@ -889,16 +889,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
       }
       elseif (wp_doing_cron())
       {
-        $status = $product->get_status();
-        switch ($status)
-        {
-          case 'publish':
-          case 'draft':
-            if ($product->get_sku())
-            {
-              update_post_meta($post_ID, '_cron_sku_disabled', $status);
-            }
-        }
+        // Nothing here
       }
       else
       {
@@ -1614,7 +1605,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
 
       if (wp_doing_cron())
       {
-        delete_post_meta($post_ID, '_cron_sku_disabled');
+        delete_post_meta($post_ID, '_cron_last_state');
       }
 
       return $product;
