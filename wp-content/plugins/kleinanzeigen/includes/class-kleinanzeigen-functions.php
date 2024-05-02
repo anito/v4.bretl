@@ -2119,10 +2119,11 @@ if (!class_exists('Kleinanzeigen_Functions'))
       $errors = array();
       foreach ($receipients as $receipient)
       {
-        $send_mail_users = wbp_fn()->get_users_by_meta('kleinanzeigen_send_mail_on_new_ad');
-        $send_mail_users_mails = wp_list_pluck($send_mail_users, 'user_email');
+        $user = get_user_by('email', $receipient);
+        $gets_mail = get_user_meta($user->ID, 'kleinanzeigen_send_mail_on_new_ad', true);
 
-        if (in_array($receipient, $send_mail_users_mails))
+        // User settings
+        if ('1' == $gets_mail)
         {
           $mail_setting_text = __('Yes', 'kleinanzeigen');
         }
@@ -2131,6 +2132,23 @@ if (!class_exists('Kleinanzeigen_Functions'))
           $mail_setting_text = __('No', 'kleinanzeigen');
         }
 
+        $interval =  get_user_meta($user->ID, 'kleinanzeigen_send_status_mail', true);
+        switch ($interval)
+        {
+          case ('daily'):
+            $email_heading = __('Daily status report', 'kleinanzeigen');
+            break;
+          case ('weekly'):
+            $email_heading = __('Weekly status report', 'kleinanzeigen');
+            break;
+          case ('monthly'):
+            $email_heading = __('Monthly status report', 'kleinanzeigen');
+            break;
+          default:
+            $email_heading = __('Current status report', 'kleinanzeigen');
+        }
+
+        // Global settings
         $inactive_ad_setting = get_option('kleinanzeigen_schedule_invalid_ads');
         switch ($inactive_ad_setting)
         {
@@ -2158,22 +2176,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
             break;
         }
 
-        $interval =  get_option('kleinanzeigen_send_status_mail');
-        switch ($interval)
-        {
-          case ('daily'):
-            $email_heading = __('Daily status report', 'kleinanzeigen');
-            break;
-          case ('weekly'):
-            $email_heading = __('Weekly status report', 'kleinanzeigen');
-            break;
-          case ('monthly'):
-            $email_heading = __('Monthly status report', 'kleinanzeigen');
-            break;
-          default:
-            $email_heading = __('Current status report', 'kleinanzeigen');
-        }
-
         $blogname           = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
         $plugin_name        = wbp_ka()->get_plugin_name();
         $plugin_link        = admin_url("admin.php?page={$plugin_name}");
@@ -2190,7 +2192,6 @@ if (!class_exists('Kleinanzeigen_Functions'))
           $date = new DateTime();
           $date->setTimestamp($timestamp);
           $date->setTimezone($timezone);
-
 
           $fmt = new IntlDateFormatter(
             'de-DE',
@@ -2247,7 +2248,7 @@ if (!class_exists('Kleinanzeigen_Functions'))
         $email_content = wbp_ka()->include_template('emails/status-report.php', true, compact('plugin_link', 'blogname', 'email_heading', 'additional_content', 'tree', 'next_event', 'inactive_ad_text', 'mail_setting_text', 'price_setting_text'));
         $email_content = $this->style_inline($email_content);
 
-        $success = $this->sendMail($email_heading, $email_content, array($receipient));
+        $success = $this->sendMail($email_heading, $email_content, array('to_email' => $receipient));
         if (is_wp_error($success))
         {
           $errors[] = $success;
