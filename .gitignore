@@ -54,6 +54,7 @@ CVS
 !/wp-content/plugins/kleinanzeigen
 !/wp-content/plugins/open-maps
 !/wp-content/plugins/spine-app
+!/wp-content/plugins/cron
 wp-content/themes/astra-child/js/hero/
 
 /vendor/
