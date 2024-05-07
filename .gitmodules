@@ -1,1 +1,13 @@
 
+[submodule "wp-content/plugins/wp-maintenance-mode"]
+	path = wp-content/plugins/wp-maintenance-mode
+	url = git@github.com:anito/wp-maintenance-mode.git
+[submodule "wp-content/plugins/kleinanzeigen"]
+	path = wp-content/plugins/kleinanzeigen
+	url = git@github.com:anito/kleinanzeigen.git
+[submodule "wp-content/plugins/open-maps"]
+	path = wp-content/plugins/open-maps
+	url = git@github.com:anito/open-maps.git
+[submodule "wp-content/plugins/cron"]
+	path = wp-content/plugins/cron
+	url = git@github.com:anito/cron.git
