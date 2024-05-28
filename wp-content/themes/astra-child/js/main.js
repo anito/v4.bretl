@@ -16,8 +16,8 @@ const wbp_observe = (function () {
 
     // browser support fallback
     else if (window.addEventListener) {
-      obj.addEventListener("DOMNodeInserted", callback, false);
-      obj.addEventListener("DOMNodeRemoved", callback, false);
+      obj.addEventListener('DOMNodeInserted', callback, false);
+      obj.addEventListener('DOMNodeRemoved', callback, false);
     }
   };
 })();
@@ -25,91 +25,88 @@ const wbp_observe = (function () {
 jQuery.noConflict();
 (function ($) {
   $(() => {
-
-    var add_fb_div = function () {
-      $("body").prepend('<div id="fb-root"></div>');
-    };
-  
     //add disclaimer to gallery image
     const disclaimer =
-      "Abbildung kann ähnlich sein. Änderungen und Irrtümer vorbehalten. Mögliches Zubehör auf Bildern ist nicht Teil des Angebots.";
+      'Abbildung kann ähnlich sein. Änderungen und Irrtümer vorbehalten. Mögliches Zubehör auf Bildern ist nicht Teil des Angebots.';
     const add_image_disclaimer = function () {
-      $(".woocommerce-product-gallery").before(
-        '<div class="product-gallery-disclaimer">' + disclaimer + "</div>"
+      $('.woocommerce-product-gallery').before(
+        '<div class="product-gallery-disclaimer">' + disclaimer + '</div>'
       );
     };
-  
+
     // animate scroll
     var add_animate_scroll = function () {
-      const headerEl = document.querySelector("#header"),
+      const headerEl = document.querySelector('#header'),
         headerHeight = headerEl.offsetHeight;
-  
-      $('.animate-scroll a[href^="#"]').on("click", function (e) {
-        var href = $(this).attr("href");
-        $("html, body").animate(
+
+      $('.animate-scroll a[href^="#"]').on('click', function (e) {
+        var href = $(this).attr('href');
+        $('html, body').animate(
           {
             scrollTop: $(href).offset().top - headerHeight,
           },
-          "slow"
+          'slow'
         );
-  
+
         e.preventDefault();
       });
     };
-  
+
     // Copy and observe an elements wishlist count
     var add_jet_engine_wishlist_hook = (targetSelector, storeName) => {
       function copyToTarget(count) {
         const targetEls = document.querySelectorAll(targetSelector);
         targetEls.forEach((el) => {
-          const ankerEl = el.querySelector("a");
-          if (ankerEl) ankerEl.style.paddingLeft = "40px";
-          let targetEl = el.querySelector(".wishlist-widget");
+          const ankerEl = el.querySelector('a');
+          if (ankerEl) ankerEl.style.paddingLeft = '40px';
+          let targetEl = el.querySelector('.wishlist-widget');
           if (!targetEl) {
-            targetEl = document.createElement("span");
-            targetEl.classList.add("wishlist-widget");
+            targetEl = document.createElement('span');
+            targetEl.classList.add('wishlist-widget');
             el.append(targetEl);
           }
-          if (count === "0") {
+          if (count === '0') {
             location = location.href;
           }
           targetEl.innerHTML = storeEl.innerHTML;
         });
       }
-  
+
       function observerCallback(mutationList) {
         let count;
         for (const mutation of mutationList) {
-          if (mutation.type === "childList") {
+          if (mutation.type === 'childList') {
             if (mutation.addedNodes.length) {
               count = mutation.addedNodes[0]?.wholeText;
-              console.log("A node has been added.", mutation.addedNodes[0]);
+              console.log('A node has been added.', mutation.addedNodes[0]);
             }
             if (mutation.removedNodes.length) {
-              console.log("A node has been removed.", mutation.removedNodes[0]);
+              console.log('A node has been removed.', mutation.removedNodes[0]);
             }
-          } else if (mutation.type === "attributes") {
-            console.log(`The ${mutation.attributeName} attribute was modified.`);
+          } else if (mutation.type === 'attributes') {
+            console.log(
+              `The ${mutation.attributeName} attribute was modified.`
+            );
           }
         }
         copyToTarget(count);
       }
-  
-      const el = document.querySelector(".jet-engine-data-store-count");
+
+      const el = document.querySelector('.jet-engine-data-store-count');
       const storeEl = el?.dataset.store === storeName ? el : null;
       if (storeEl) {
         copyToTarget();
         wbp_observe(storeEl, observerCallback);
       }
     };
-  
+
     function add_intersection_observer(data) {
       const observe = function (el, src, threshold = 0) {
         if (undefined !== IntersectionObserver) {
           const onenter = (o) =>
             o.forEach((entry) => {
               if (entry.isIntersecting) entry.target.src = src;
-              else entry.target.src = "";
+              else entry.target.src = '';
             });
           const observer = new IntersectionObserver(onenter, { threshold });
           observer.observe(el, onenter);
@@ -117,98 +114,64 @@ jQuery.noConflict();
           el.src = src;
         }
       };
-  
+
       const { id, src, threshold } = data;
       const el = document.getElementById(id);
-  
+
       if (el) observe(el, src, threshold);
     }
-  
-    function add_toggle_sidebar() {
-      const toggleEl = document.getElementById("sidebar-toggle");
-  
-      if (!toggleEl) return;
-  
-      const svgEl = toggleEl.querySelector("svg");
-      const polygonEl = svgEl.querySelector("polygon");
-      const root = document.querySelector("body");
-  
-      const points = {
-        arrow: "8.39 0 7.61 0 7.61 7.64 0 7.64 0 8.4 8.39 8.4 8.39 0",
-        plus: "8.39 7.64 8.39 0 7.61 0 7.61 7.64 0 7.64 0 8.4 7.61 8.4 7.61 16 8.39 16 8.39 8.4 16 8.4 16 7.64 8.39 7.64",
-      };
-  
-      const opened = () => {
-        polygonEl.setAttribute("points", points.plus);
-        toggleEl.style.display = "unset";
-      };
-  
-      const closed = () => {
-        polygonEl.setAttribute("points", points.arrow);
-        toggleEl.style.display = "unset";
-      };
-  
-      let firstRun = true;
-      const clickHandler = () => {
-        if(firstRun) {
-          firstRun = false;
-          setTimeout(autoclose, 3000);
-        }
-        root.classList.toggle("sidebar-open") ? opened() : closed();
-      };
-  
-      const autoclose = () => {
-        if (root.classList.contains("sidebar-open")) {
-          clickHandler();
-          revapi16.start();
-          root.classList.add('rev-started');
-        }
-      };
-  
-      toggleEl.addEventListener("click", clickHandler);
-      setTimeout(clickHandler, 2000);
-    }
-  
+
     function add_show_quote_request() {
-      $(".description_tab a").on("click", function (e) {
+      $('.description_tab a').on('click', function (e) {
         e.preventDefault();
-        $("#quote-request-form").addClass("hidden");
+        $('#quote-request-form').addClass('hidden');
       });
-  
-      $("#show-quote-request").on("click", function (e) {
+
+      $('#show-quote-request').on('click', function (e) {
         e.preventDefault();
-        $("#quote-request-form").toggleClass("hidden");
+        $('#quote-request-form').toggleClass('hidden');
       });
     }
-  
+
     function add_iubenda_script() {
       (function (w, d) {
         var loader = function () {
-          var s = d.createElement("script"),
-            tag = d.getElementsByTagName("script")[0];
-          s.src = "https://cdn.iubenda.com/iubenda.js";
+          var s = d.createElement('script'),
+            tag = d.getElementsByTagName('script')[0];
+          s.src = 'https://cdn.iubenda.com/iubenda.js';
           tag.parentNode.insertBefore(s, tag);
         };
         if (w.addEventListener) {
-          w.addEventListener("load", loader, false);
+          w.addEventListener('load', loader, false);
         } else if (w.attachEvent) {
-          w.attachEvent("onload", loader);
+          w.attachEvent('onload', loader);
         } else {
           w.onload = loader;
         }
       })(window, document);
     }
-  
-    // add_fb_div();
+
+    function add_resize_listener() {
+      const root = document.querySelector(':root');
+      const siteHeader = document.querySelector('.site-header');
+
+      const resize = function() {
+        const rect = siteHeader.getBoundingClientRect();
+        root.style.setProperty('--site-header-height', rect.height + 'px');
+      }
+      $(window).on('resize', resize)
+      resize();
+    }
+
     // add_image_disclaimer();
+    // add_resize_listener();
     add_iubenda_script();
-    add_jet_engine_wishlist_hook("header .wishlist-target", "wishlist");
-    add_toggle_sidebar();
+    add_jet_engine_wishlist_hook('header .wishlist-target', 'wishlist');
     add_show_quote_request();
     add_intersection_observer({
-      id: "solis-iframe",
-      src: "https://solis-traktor.de/",
+      id: 'solis-iframe',
+      src: 'https://solis-traktor.de/',
       threshold: 0.1,
     });
-  })
+  });
 })(jQuery);
