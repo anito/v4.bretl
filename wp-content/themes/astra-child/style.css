@@ -217,7 +217,7 @@ li a.menu-link.top-level-link {
   position: relative;
 }
 li.quotes a.menu-link.top-level-link::after {
-  content: "★";
+  content: "";
   font-weight: 400;
   position: absolute;
   top: -3px;
