@@ -383,10 +383,7 @@ function get_certificate()
  */
 function wbp_get_wc_placeholder_image($default_placeholder)
 {
-
-  $placeholder = wc_placeholder_img_src('woocommerce_image');
-
-  return $placeholder;
+  return wc_placeholder_img_src('woocommerce_image');
 }
 add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', 'wbp_get_wc_placeholder_image');
 
