@@ -536,8 +536,8 @@ function wbp_short_description($excerpt)
   $max_length = 150;
   if (strlen($excerpt) > $max_length && function_exists('wbp_ka'))
   {
-    require_once wbp_ka()->plugin_path('includes/class-utils.php');
-    return  Utils::sanitize_excerpt($excerpt, $max_length);
+    require_once wbp_ka()->plugin_path('includes/class-kleinanzeigen-utils.php');
+    return  \Kleinanzeigen_Utils::sanitize_excerpt($excerpt, $max_length);
   }
   return $excerpt;
 }
