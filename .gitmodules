@@ -11,3 +11,6 @@
 [submodule "wp-content/plugins/cron"]
 	path = wp-content/plugins/cron
 	url = git@github.com:anito/cron.git
+[submodule "wp-content/plugins/kleinanzeigen-pro"]
+	path = wp-content/plugins/kleinanzeigen-pro
+	url = git@github.com:anito/kleinanzeigen-pro.git
