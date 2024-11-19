@@ -411,8 +411,8 @@ function wbp_woo_custom_tabs($tabs)
     'callback' => 'wbp_woo_tab_content',
   );
 
-  $meta = get_post_meta($product->get_id());
-  if (class_exists('DG_Gallery') && !empty($meta['_datasheet']))
+  $datasheets = get_post_meta($product->get_id(), '_datasheet', true);
+  if (class_exists('DG_Gallery') && !empty($datasheets))
   {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
@@ -468,7 +468,7 @@ function wbp_woo_tab_datasheets()
 
   echo do_shortcode($dg);
 }
-add_filter('woocommerce_product_tabs', 'wbp_woo_custom_tabs', 98);
+add_filter('woocommerce_product_tabs', 'wbp_woo_custom_tabs');
 add_filter('woocommerce_cart_needs_payment', '__return_false');
 // add_filter('woocommerce_cart_hide_zero_taxes', '__return_false');
 // add_filter('woocommerce_order_hide_zero_taxes', '__return_false');
