@@ -1,5 +1,5 @@
 <?php
-function wbp_admin_enqueue_scripts($hook)
+function astra_child_admin_enqueue_scripts($hook)
 {
   if ($hook === 'profile.php' || $hook === 'user-edit.php')
   {
@@ -8,9 +8,9 @@ function wbp_admin_enqueue_scripts($hook)
     wp_enqueue_media();
   }
 }
-add_action("admin_enqueue_scripts", "wbp_admin_enqueue_scripts");
+add_action("admin_enqueue_scripts", "astra_child_admin_enqueue_scripts");
 
-function wbp_admin_media_scripts()
+function astra_child_admin_media_scripts()
 {
   $title = __('Select or Upload an Custom Avatar', 'astra-child');
   $text = __('Select Avatar', 'astra-child');
@@ -43,10 +43,10 @@ function wbp_admin_media_scripts()
   </script>
 <?php
 }
-add_action('admin_print_footer_scripts-profile.php', 'wbp_admin_media_scripts');
-add_action('admin_print_footer_scripts-user-edit.php', 'wbp_admin_media_scripts');
+add_action('admin_print_footer_scripts-profile.php', 'astra_child_admin_media_scripts');
+add_action('admin_print_footer_scripts-user-edit.php', 'astra_child_admin_media_scripts');
 
-function wbp_custom_user_profile_fields($profileuser)
+function astra_child_custom_user_profile_fields($profileuser)
 {
 ?>
   <h3><?php _e('Custom Local Avatar', 'astra-child'); ?></h3>
@@ -79,11 +79,11 @@ function wbp_custom_user_profile_fields($profileuser)
   </table>
 <?php
 }
-add_action('show_user_profile', 'wbp_custom_user_profile_fields', 10, 1);
-add_action('edit_user_profile', 'wbp_custom_user_profile_fields', 10, 1);
+add_action('show_user_profile', 'astra_child_custom_user_profile_fields', 10, 1);
+add_action('edit_user_profile', 'astra_child_custom_user_profile_fields', 10, 1);
 
 
-function wbp_save_local_avatar_fields($user_id)
+function astra_child_save_local_avatar_fields($user_id)
 {
   if (current_user_can('edit_user', $user_id))
   {
@@ -94,10 +94,10 @@ function wbp_save_local_avatar_fields($user_id)
     }
   }
 }
-add_action('personal_options_update', 'wbp_save_local_avatar_fields');
-add_action('edit_user_profile_update', 'wbp_save_local_avatar_fields');
+add_action('personal_options_update', 'astra_child_save_local_avatar_fields');
+add_action('edit_user_profile_update', 'astra_child_save_local_avatar_fields');
 
-function wbp_get_avatar_url($url, $id_or_email, $args)
+function astra_child_get_avatar_url($url, $id_or_email, $args)
 {
   $id = '';
   if (is_numeric($id_or_email))
@@ -127,4 +127,4 @@ function wbp_get_avatar_url($url, $id_or_email, $args)
     return esc_url_raw($custom_url);
   }
 }
-add_filter('get_avatar_url', 'wbp_get_avatar_url', 10, 3);
+add_filter('get_avatar_url', 'astra_child_get_avatar_url', 10, 3);

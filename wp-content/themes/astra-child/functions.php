@@ -6,17 +6,17 @@ if (is_admin())
   require_once __DIR__ . '/includes/custom-avatar.php';
 }
 
-function wbp_init()
+function astra_child_init()
 {
   $theme = wp_get_theme();
   /**
    * Define Constants
    */
-  define('CHILD_THEME_ASTRA_CHILD_VERSION', $theme->__get('version'));
+  define('CHILD_THEME_VERSION', wp_get_theme()->get('Version'));
   define('AJAX_FRONT_VARS', array(
     'admin_ajax'  => admin_url('admin-ajax.php'),
     'is_login'    => is_login(),
-    'user'        => json_encode(wbp_get_current_user()),
+    'user'        => json_encode(astra_child_get_current_user()),
     'home_url'    => home_url(),
     'nonce'       => wp_create_nonce()
   ));
@@ -25,9 +25,9 @@ function wbp_init()
     'cookiePolicyId' => 28713011
   ));
 }
-add_filter('init', 'wbp_init');
+add_filter('init', 'astra_child_init');
 
-function wbp_register_ajax()
+function astra_child_register_ajax()
 {
 
   // Ajax actions
@@ -37,7 +37,7 @@ function wbp_register_ajax()
   add_action('wp_ajax_nopriv__ajax_get_login_form', '_ajax_get_login_form');
   add_action('wp_ajax_nopriv__ajax_submit_form', '_ajax_submit_form');
 }
-add_filter('init', 'wbp_register_ajax');
+add_filter('init', 'astra_child_register_ajax');
 
 /**
  * Change the breakpoint for Astra
@@ -53,7 +53,7 @@ add_filter('astra_tablet_breakpoint', function ()
   return 921;
 });
 
-function wbp_get_current_user()
+function astra_child_get_current_user()
 {
   $cur_user = wp_get_current_user();
   unset($cur_user->user_pass);
@@ -64,17 +64,17 @@ function _ajax_get_login_form()
 {
   require_once __DIR__ . '/includes/ajax-handler.php';
 
-  wbp_get_login_form();
+  astra_child_get_login_form();
 }
 
 function _ajax_submit_form()
 {
   require_once __DIR__ . '/includes/ajax-handler.php';
 
-  wbp_submit_form();
+  astra_child_submit_form();
 }
 
-function wbp_doing_login_ajax()
+function astra_child_doing_login_ajax()
 {
   return isset($_REQUEST['doing_login_ajax']) ? true : false;
 }
@@ -97,7 +97,7 @@ add_filter('allowed_http_origins', 'add_allowed_origins');
  * App asset names (e.g. *.js. *.css files) changing per app distribution
  * This method takes care of it automatically using glob
  */
-function wbp_get_themes_file($file_path)
+function astra_child_get_themes_file($file_path)
 {
   $regex = '/^([\w\-\/.]*)(\/wp-content\/themes[\w\-\.\/]+)/';
   return preg_replace($regex, '\2', glob($file_path)[0]);
@@ -138,25 +138,25 @@ function add_scripts()
   $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
 
   // Theme styles
-  wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'), array(), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
-  wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
+  wp_enqueue_style("parent-style", get_parent_theme_file_uri('/style.css'), array(), ASTRA_THEME_VERSION, 'all');
+  wp_enqueue_style('astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array('astra-theme-css'), CHILD_THEME_VERSION, 'all');
 
-  wp_enqueue_script('ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
-  wp_enqueue_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+  wp_enqueue_script('ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array('jquery'), CHILD_THEME_VERSION, true);
+  wp_enqueue_script('main', get_stylesheet_directory_uri() . '/js/main.js', array('jquery'), CHILD_THEME_VERSION, true);
 
   wp_localize_script('ajax-front', 'KleinanzeigenAjaxFront', AJAX_FRONT_VARS);
 
   // Iubenda
-  wp_enqueue_script('iubenda', get_stylesheet_directory_uri() . '/js/iubenda.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
-  wp_enqueue_script('iubenda-autoblocking', 'https://cs.iubenda.com/autoblocking/' . IUBENDA_VARS['siteId'] . '.js', array('iubenda'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
-  wp_enqueue_script('iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array('iubenda'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+  wp_enqueue_script('iubenda', get_stylesheet_directory_uri() . '/js/iubenda.js', array(), CHILD_THEME_VERSION, true);
+  wp_enqueue_script('iubenda-autoblocking', 'https://cs.iubenda.com/autoblocking/' . IUBENDA_VARS['siteId'] . '.js', array('iubenda'), CHILD_THEME_VERSION, true);
+  wp_enqueue_script('iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array('iubenda'), CHILD_THEME_VERSION, true);
   wp_localize_script('iubenda', 'Iubenda', IUBENDA_VARS);
 
   if (!IS_DEV_MODE)
   {
   }
 
-  if (wbp_doing_login_ajax())
+  if (astra_child_doing_login_ajax())
   {
     wp_dequeue_script('zxcvbn-async');
     wp_dequeue_script('regenerator-runtime');
@@ -189,21 +189,21 @@ add_action('login_enqueue_scripts', 'add_login_style');
 
 function add_login_scripts()
 {
-  if (wbp_doing_login_ajax())
+  if (astra_child_doing_login_ajax())
   {
     wp_dequeue_style('login');
     wp_deregister_script('jquery');
 
-    wp_enqueue_script('login', get_stylesheet_directory_uri() . '/js/login.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+    wp_enqueue_script('login', get_stylesheet_directory_uri() . '/js/login.js', array(), CHILD_THEME_VERSION, true);
     wp_enqueue_style('dashicons', ABSPATH . WPINC . '/css/dashicons.min.css', array());
-    wp_enqueue_style('wbp-login-base', get_stylesheet_directory_uri() . '/css/login.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
+    wp_enqueue_style('wbp-login-base', get_stylesheet_directory_uri() . '/css/login.css', array(), CHILD_THEME_VERSION, 'all');
 
-    wp_enqueue_script('ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
-    wp_enqueue_script('jquery-serializejson', get_stylesheet_directory_uri() . '/js/jquery.serializejson.js', array(), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+    wp_enqueue_script('ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array(), CHILD_THEME_VERSION, true);
+    wp_enqueue_script('jquery-serializejson', get_stylesheet_directory_uri() . '/js/jquery.serializejson.js', array(), CHILD_THEME_VERSION, true);
 
     wp_localize_script('ajax-front', 'KleinanzeigenAjaxFront', AJAX_FRONT_VARS);
   }
-  wp_enqueue_style('wbp-login', get_stylesheet_directory_uri() . '/css/login-style.css', array(), CHILD_THEME_ASTRA_CHILD_VERSION, 'all');
+  wp_enqueue_style('wbp-login', get_stylesheet_directory_uri() . '/css/login-style.css', array(), CHILD_THEME_VERSION, 'all');
 }
 add_action('login_enqueue_scripts', 'add_login_scripts');
 
@@ -219,20 +219,20 @@ add_filter('logout_url', function ($logout_url)
 
 
 // Logo link url
-function wbp_login_logo_url()
+function astra_child_login_logo_url()
 {
   return home_url();
 }
-add_filter('login_headerurl', 'wbp_login_logo_url');
+add_filter('login_headerurl', 'astra_child_login_logo_url');
 
-function wbp_footer()
+function astra_child_footer()
 {
   get_template_part('templates/footer/login');
 }
-add_action('wp_footer', 'wbp_footer', 99);
+add_action('wp_footer', 'astra_child_footer', 99);
 
 
-function wbp_login_form_defaults()
+function astra_child_login_form_defaults()
 {
   return array(
     'echo'           => true,
@@ -253,38 +253,38 @@ function wbp_login_form_defaults()
     'value_remember' => false,
   );
 }
-add_filter('login_form_defaults', 'wbp_login_form_defaults');
+add_filter('login_form_defaults', 'astra_child_login_form_defaults');
 
 
 // Templates for `wp_login_form` function
-function wbp_login_form_top($args)
+function astra_child_login_form_top($args)
 {
   ob_start();
   get_template_part('templates/login/top', 'login', $args);
   return ob_get_clean();
 }
-add_filter('login_form_top', 'wbp_login_form_top');
+add_filter('login_form_top', 'astra_child_login_form_top');
 
-function wbp_login_form_middle($args)
+function astra_child_login_form_middle($args)
 {
   ob_start();
   get_template_part('templates/login/middle', 'login', $args);
   return ob_get_clean();
 }
-add_filter('login_form_middle', 'wbp_login_form_middle');
+add_filter('login_form_middle', 'astra_child_login_form_middle');
 
-function wbp_login_form_bottom($args)
+function astra_child_login_form_bottom($args)
 {
   ob_start();
   get_template_part('templates/login/bottom', 'login', $args);
   return ob_get_clean();
 }
-add_filter('login_form_bottom', 'wbp_login_form_bottom');
+add_filter('login_form_bottom', 'astra_child_login_form_bottom');
 
 /**
  * Default sort for shop and specific categories
  */
-function wbp_custom_default_orderby($sortby)
+function astra_child_custom_default_orderby($sortby)
 {
 
   if (is_shop())
@@ -322,12 +322,12 @@ function wbp_custom_default_orderby($sortby)
 
   return $sortby;
 }
-add_filter('woocommerce_default_catalog_orderby', 'wbp_custom_default_orderby');
+add_filter('woocommerce_default_catalog_orderby', 'astra_child_custom_default_orderby');
 
 /**
  * Unsupprted Browsers IE 11 and lower
  */
-function wbp_detectTrident($current_theme)
+function astra_child_detectTrident($current_theme)
 {
   $ua = $_SERVER['HTTP_USER_AGENT'];
   $browser = ['name' => '', 'version' => '', 'platform' => ''];
@@ -345,7 +345,7 @@ function wbp_detectTrident($current_theme)
     $browser['version'] = $match;
     add_action('wp_footer', 'unsupported_browsers_template', 100);
 
-    wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), CHILD_THEME_ASTRA_CHILD_VERSION, true);
+    wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), CHILD_THEME_VERSION, true);
     wp_localize_script('browser_sniffer', '__browser', array('name' => $browser['name'], 'version' => $browser['version'], 'platform' => $browser['platform']));
     wp_enqueue_script('browser_sniffer');
   }
@@ -357,7 +357,7 @@ function unsupported_browsers_template()
     'email'     => get_bloginfo('admin_email')
   ));
 }
-add_action('wp_enqueue_scripts', 'wbp_detectTrident');
+add_action('wp_enqueue_scripts', 'astra_child_detectTrident');
 
 function get_certificate()
 {
@@ -381,11 +381,11 @@ function get_certificate()
 /**
  * Replace Elementors with Woos Placeholder Image (can be defined in woo product settings)
  */
-function wbp_get_wc_placeholder_image($default_placeholder)
+function astra_child_get_wc_placeholder_image($default_placeholder)
 {
   return wc_placeholder_img_src('woocommerce_image');
 }
-add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', 'wbp_get_wc_placeholder_image');
+add_filter('jet-woo-builder/template-functions/product-thumbnail-placeholder', 'astra_child_get_wc_placeholder_image');
 
 /**
  * Replace default Elementor image placeholdder
@@ -401,14 +401,14 @@ add_filter('elementor/utils/get_placeholder_image_src', 'custom_elementor_placeh
  * display the product title again in product description
  *
  */
-function wbp_woo_custom_tabs($tabs)
+function astra_child_woo_custom_tabs($tabs)
 {
   global $product;
 
   $tabs['description'] = array(
     'title' => __('Description', 'woocommerce'),
     'priority'   => 10,
-    'callback' => 'wbp_woo_tab_content',
+    'callback' => 'astra_child_woo_tab_content',
   );
 
   $datasheets = get_post_meta($product->get_id(), '_datasheet', true);
@@ -417,14 +417,14 @@ function wbp_woo_custom_tabs($tabs)
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
       'priority'   => 20,
-      'callback'   => 'wbp_woo_tab_datasheets'
+      'callback'   => 'astra_child_woo_tab_datasheets'
     );
   }
 
   $tabs['quote_request_form'] = array(
     'title'   => __('Quote Request', 'astra-child'),
     'priority'   => 30,
-    'callback'   => 'wbp_woo_tab_quote_request'
+    'callback'   => 'astra_child_woo_tab_quote_request'
   );
 
   unset($tabs['reviews']);
@@ -433,7 +433,7 @@ function wbp_woo_custom_tabs($tabs)
   return $tabs;
 }
 
-function wbp_woo_tab_content($tab_name, $tab)
+function astra_child_woo_tab_content($tab_name, $tab)
 {
   global $product;
 
@@ -442,7 +442,7 @@ function wbp_woo_tab_content($tab_name, $tab)
   echo '<h6 style="font-weight:600; opacity: 0.5; margin-bottom: 10px;">Highlights</h6><h5 style="margin-bottom: 30px;">' . $title . '</h5>' . do_shortcode($content); // keep possible shortcode
 }
 
-function wbp_woo_tab_quote_request()
+function astra_child_woo_tab_quote_request()
 {
   if (REQUEST_FORM_SHORTCODE_ID)
   {
@@ -454,12 +454,12 @@ function wbp_woo_tab_quote_request()
   }
 }
 
-function wbp_woo_tab_technical()
+function astra_child_woo_tab_technical()
 {
   echo '<p>Der Tab <strong>' . __('Technical Details', 'astra-child') . '</strong> kann auf Wunsch implementiert werden.</p>';
 }
 
-function wbp_woo_tab_datasheets()
+function astra_child_woo_tab_datasheets()
 {
   global $product;
 
@@ -468,7 +468,7 @@ function wbp_woo_tab_datasheets()
 
   echo do_shortcode($dg);
 }
-add_filter('woocommerce_product_tabs', 'wbp_woo_custom_tabs');
+add_filter('woocommerce_product_tabs', 'astra_child_woo_custom_tabs');
 add_filter('woocommerce_cart_needs_payment', '__return_false');
 // add_filter('woocommerce_cart_hide_zero_taxes', '__return_false');
 // add_filter('woocommerce_order_hide_zero_taxes', '__return_false');
@@ -476,14 +476,14 @@ add_filter('woocommerce_cart_needs_payment', '__return_false');
 /**
  * Quote Plugin
  */
-function wbp_get_price_visibility($show)
+function astra_child_get_price_visibility($show)
 {
   return array(
     'show' => (isset($show['to_admin']) ? $show['to_admin'] : false) || (isset($show['to_customer']) ? $show['to_customer'] : false),
     'class' => (isset($show['to_customer']) && !$show['to_customer']) ? 'price-hidden' : ''
   );
 };
-add_filter('wbp_show_prices', function ()
+add_filter('astra_child_show_prices', function ()
 {
   if (!defined('SHOW_CUSTOMER_EMAIL_PRICE'))
   {
@@ -495,7 +495,7 @@ add_filter('wbp_show_prices', function ()
 /**
  * Change required billing & shipping address fields
  */
-function wbp_filter_default_address_fields($address_fields)
+function astra_child_filter_default_address_fields($address_fields)
 {
   // Only on checkout page
   if (!is_checkout()) return $address_fields;
@@ -508,9 +508,9 @@ function wbp_filter_default_address_fields($address_fields)
 
   return $address_fields;
 }
-add_filter('woocommerce_default_address_fields', 'wbp_filter_default_address_fields', 20, 1);
+add_filter('woocommerce_default_address_fields', 'astra_child_filter_default_address_fields', 20, 1);
 
-function wbp_wc_coupons_frontend_enabled($is_enabled)
+function astra_child_wc_coupons_frontend_enabled($is_enabled)
 {
   if (!is_admin() && function_exists('astra_get_option'))
   {
@@ -518,9 +518,9 @@ function wbp_wc_coupons_frontend_enabled($is_enabled)
   }
   return true;
 }
-add_filter('woocommerce_coupons_enabled', 'wbp_wc_coupons_frontend_enabled');
+add_filter('woocommerce_coupons_enabled', 'astra_child_wc_coupons_frontend_enabled');
 
-function wbp_return_theme_author($author)
+function astra_child_return_theme_author($author)
 {
   $author = array(
     'theme_name'       => __('Axel Nitzschner', 'astra-child'),
@@ -528,32 +528,32 @@ function wbp_return_theme_author($author)
   );
   return $author;
 }
-add_filter('astra_theme_author', 'wbp_return_theme_author');
+add_filter('astra_theme_author', 'astra_child_return_theme_author');
 
-function wbp_short_description($excerpt)
+function astra_child_short_description($excerpt)
 {
 
   $max_length = 150;
-  if (strlen($excerpt) > $max_length && function_exists('wbp_ka'))
+  if (strlen($excerpt) > $max_length && function_exists('astra_child_ka'))
   {
     return  \Kleinanzeigen\Utils\Utils::sanitize_excerpt($excerpt, $max_length);
   }
   return $excerpt;
 }
-add_filter('woocommerce_short_description', 'wbp_short_description', 10, 1);
+add_filter('woocommerce_short_description', 'astra_child_short_description', 10, 1);
 
 /**
  * Change Variable Price Range Html
  */
-function wbp_format_variation_price_range($price, $from, $to)
+function astra_child_format_variation_price_range($price, $from, $to)
 {
   // $price = sprintf( _x( '%1$s &ndash; %2$s', 'Price range: from-to', 'woocommerce' ), is_numeric( $from ) ? wc_price( $from ) : $from, is_numeric( $to ) ? wc_price( $to ) : $to );
   $price = sprintf(_x('from %1$s', 'Price range: from', 'astra-child'), is_numeric($from) ? wc_price($from) : $from);
   return $price;
 }
-add_filter('woocommerce_format_price_range', 'wbp_format_variation_price_range', 10, 3);
+add_filter('woocommerce_format_price_range', 'astra_child_format_variation_price_range', 10, 3);
 
-function wbp_modify_cart_product_subtotal_label($product_subtotal, $product, $quantity, $cart)
+function astra_child_modify_cart_product_subtotal_label($product_subtotal, $product, $quantity, $cart)
 {
   $tax_class = $product->get_tax_class();
   $rates = WC_Tax::get_rates_for_tax_class($tax_class);
@@ -567,4 +567,4 @@ function wbp_modify_cart_product_subtotal_label($product_subtotal, $product, $qu
   }
   return $product_subtotal;
 }
-add_filter('woocommerce_cart_product_subtotal', 'wbp_modify_cart_product_subtotal_label', 10, 4);
+add_filter('woocommerce_cart_product_subtotal', 'astra_child_modify_cart_product_subtotal_label', 10, 4);

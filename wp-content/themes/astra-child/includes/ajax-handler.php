@@ -1,6 +1,6 @@
 <?php
 
-function wbp_get_login_form()
+function astra_child_get_login_form()
 {
 
   $user = array();
@@ -27,7 +27,7 @@ function wbp_get_login_form()
   die(json_encode(compact('success', 'user', 'action', 'response')));
 }
 
-function wbp_submit_form()
+function astra_child_submit_form()
 {
 
   $action = !empty($_POST['formaction']) ? $_POST['formaction'] : 'login';

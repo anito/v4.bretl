@@ -2,10 +2,10 @@
 /*
  * Function for post duplication. Dups appear as drafts. User is redirected to the edit screen
  */
-function wbp_duplicate_post_as_draft()
+function astra_child_duplicate_post_as_draft()
 {
   global $wpdb;
-  if (!(isset($_GET['post']) || isset($_POST['post'])  || (isset($_REQUEST['action']) && 'wbp_duplicate_post_as_draft' == $_REQUEST['action']))) {
+  if (!(isset($_GET['post']) || isset($_POST['post'])  || (isset($_REQUEST['action']) && 'astra_child_duplicate_post_as_draft' == $_REQUEST['action']))) {
     wp_die('No post to duplicate has been supplied!');
   }
 
@@ -95,20 +95,20 @@ function wbp_duplicate_post_as_draft()
     wp_die('Post creation failed, could not find original post: ' . $post_ID);
   }
 }
-add_action('admin_action_wbp_duplicate_post_as_draft', 'wbp_duplicate_post_as_draft');
+add_action('admin_action_astra_child_duplicate_post_as_draft', 'astra_child_duplicate_post_as_draft');
 
 /*
  * Add the duplicate link to action list for post_row_actions
  */
-function wbp_duplicate_post_link($actions, $post)
+function astra_child_duplicate_post_link($actions, $post)
 {
   if (current_user_can('edit_posts')) {
-    $actions['duplicate'] = '<a href="' . wp_nonce_url('admin.php?action=wbp_duplicate_post_as_draft&post=' . $post->ID, basename(__FILE__), 'duplicate_nonce') . '" title="' . __('Duplicate', 'atsra-child') . '" rel="permalink">' . __('Duplicate', 'astra-child') . '</a>';
+    $actions['duplicate'] = '<a href="' . wp_nonce_url('admin.php?action=astra_child_duplicate_post_as_draft&post=' . $post->ID, basename(__FILE__), 'duplicate_nonce') . '" title="' . __('Duplicate', 'atsra-child') . '" rel="permalink">' . __('Duplicate', 'astra-child') . '</a>';
   }
   return $actions;
 }
 
 if (is_admin()) {
-  add_filter('post_row_actions', 'wbp_duplicate_post_link', 10, 2);
-  add_filter('page_row_actions', 'wbp_duplicate_post_link', 10, 2);
+  add_filter('post_row_actions', 'astra_child_duplicate_post_link', 10, 2);
+  add_filter('page_row_actions', 'astra_child_duplicate_post_link', 10, 2);
 }
