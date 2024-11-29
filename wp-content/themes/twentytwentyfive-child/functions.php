@@ -56,6 +56,9 @@ add_action('wp_enqueue_scripts', 'twentytwentyfive_child_enqueue_styles');
 if (! function_exists('twentytwentyfive_child_parse_taxonomy_root_request')) :
 	function twentytwentyfive_child_parse_taxonomy_root_request($wp)
 	{
+		if (!isset($wp->query_vars['name']))
+			return;
+
 		$tax_name      = 'product_' . $wp->query_vars['name'];
 
 		// Bail out if no taxonomy QV was present, or if the term QV is.
