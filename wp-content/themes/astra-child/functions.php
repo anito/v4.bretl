@@ -152,10 +152,6 @@ function add_scripts()
   wp_enqueue_script('iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array('iubenda'), CHILD_THEME_VERSION, true);
   wp_localize_script('iubenda', 'Iubenda', IUBENDA_VARS);
 
-  if (!IS_DEV_MODE)
-  {
-  }
-
   if (astra_child_doing_login_ajax())
   {
     wp_dequeue_script('zxcvbn-async');
