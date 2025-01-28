@@ -543,9 +543,7 @@ add_filter('woocommerce_short_description', 'astra_child_short_description', 10,
  */
 function astra_child_format_variation_price_range($price, $from, $to)
 {
-  // $price = sprintf( _x( '%1$s &ndash; %2$s', 'Price range: from-to', 'woocommerce' ), is_numeric( $from ) ? wc_price( $from ) : $from, is_numeric( $to ) ? wc_price( $to ) : $to );
-  $price = sprintf(_x('from %1$s', 'Price range: from', 'astra-child'), is_numeric($from) ? wc_price($from) : $from);
-  return $price;
+  return "<small>" . _x('from ', 'Price range: from', 'astra-child') . "</small>" . wc_price($from);
 }
 add_filter('woocommerce_format_price_range', 'astra_child_format_variation_price_range', 10, 3);
 

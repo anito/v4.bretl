@@ -78,47 +78,6 @@ ol[type="i"] {
 .italic h6 {
   font-style: italic;
 }
-.header-line h1,
-.header-line h2,
-.header-line h3,
-.header-line h4,
-.header-line h5,
-.header-line h6,
-h1.header-line,
-h2.header-line,
-h3.header-line,
-h4.header-line,
-h5.header-line,
-h6.header-line {
-  font-size: 24px;
-  font-weight: 400;
-  font-style: italic;
-  margin: 30px 0 20px !important;
-}
-.after-header-line h1,
-.after-header-line h2,
-.after-header-line h3,
-.after-header-line h4,
-.after-header-line h5,
-.after-header-line h6,
-h1.after-header-line,
-h2.after-header-line,
-h3.after-header-line,
-h4.after-header-line,
-h5.after-header-line,
-h6.after-header-line {
-  font-size: 18px;
-  font-weight: 300;
-  font-style: normal;
-}
-.before-header-line {
-  font-weight: 100;
-  font-size: 15px;
-}
-.text-line {
-  font-size: 18px;
-  font-weight: 100;
-}
 @media (max-width: 1200px) {
   .wp-block-group {
     padding: 0;
