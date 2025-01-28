@@ -1,0 +1,27 @@
+@import url(./font-roboto.css);
+@import url(./font-gibson.css);
+@import url(./font-good-times.css);
+@import url(./font-google-sans.css);
+@import url(./font-google-sans-text.css);
+@import url(./font-good-times-bad-times.css);
+@import url(./font-adobe-handwriting-ernie.css);
+
+.tk-good-times {
+    font-family: "good-times",sans-serif;
+}
+
+.tk-good-times-bad-times {
+    font-family: "good-times-bad-times",sans-serif;
+}
+
+.tk-roboto {
+    font-family: "Roboto",sans-serif;
+}
+
+.tk-gibson {
+    font-family: "Gibson",sans-serif;
+}
+
+.tk-adobe-handwriting-ernie {
+    font-family: "adobe-handwriting-ernie",sans-serif;
+}

@@ -1,0 +1,212 @@
+/**
+Theme Name: Astra Child
+Author: Axel Nitzschner
+Author URI: http://wpastra.com/about/
+Description: Astra is the fastest, fully customizable & beautiful theme suitable for blogs, personal portfolios and business websites. It is very lightweight (less than 50KB on frontend) and offers unparalleled speed. Built with SEO in mind, Astra comes with schema.org code integrated so search engines will love your site. Astra offers plenty of sidebar options and widget areas giving you a full control for customizations. Furthermore, we have included special features and templates so feel free to choose any of your favorite page builder plugin to create pages flexibly. Some of the other features: # WooCommerce Ready # Responsive # Compatible with major plugins # Translation Ready # Extendible with premium addons # Regularly updated # Designed, Developed, Maintained & Supported by Brainstorm Force. Looking for a perfect base theme? Look no further. Astra is fast, fully customizable and beautiful theme!
+Version: 1.9.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: astra-child
+Template: astra
+*/
+
+/**
+ * Import Fonts
+ */
+@import url(./css/fonts/styles.css);
+
+/**
+ * No right/left padding on smaller displays (defined by elementors container class .e-con)
+ */
+@media (max-width: 921px) {
+  :root {
+    --container-default-padding-right: 0;
+    --container-default-padding-left: 0;
+  }
+}
+
+/**
+ * Astra Reset
+ */
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+body {
+  font-family: "Gibson", sans-serif;
+}
+p {
+  overflow: unset;
+}
+ol[type="I"] {
+  list-style: upper-roman;
+}
+ol[type="i"] {
+  list-style: lower-roman;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.flex {
+  display: flex;
+}
+.flex-center {
+  justify-content: center;
+}
+.bold h1,
+.bold h2,
+.bold h3,
+.bold h4,
+.bold h5,
+.bold h6 {
+  font-weight: 600;
+}
+.thin h1,
+.thin h2,
+.thin h3,
+.thin h4,
+.thin h5,
+.thin h6 {
+  font-weight: 100;
+}
+.italic h1,
+.italic h2,
+.italic h3,
+.italic h4,
+.italic h5,
+.italic h6 {
+  font-style: italic;
+}
+@media (max-width: 1200px) {
+  .wp-block-group {
+    padding: 0;
+  }
+  .wp-block-group .wp-block-group {
+    padding: 0;
+  }
+  .wp-block-columns,
+  .wp-block-column {
+    margin: 0;
+  }
+}
+.wp-block-group {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.widget {
+  margin: 0;
+}
+.entry-content h1,
+.entry-content h2,
+.entry-content h3,
+.entry-content h4,
+.entry-content h5,
+.entry-content h6 {
+  margin-bottom: 0;
+}
+.wishlist-widget {
+  padding: 2px 6px;
+  border-radius: 50%;
+  position: absolute;
+  top: 0px;
+  bottom: 0;
+  left: 14px;
+  margin: auto;
+  background: #d32828;
+  line-height: 1.5em;
+  font-family: sans-serif;
+  font-size: 0.7em;
+  color: #fff;
+  font-weight: 600;
+  min-width: 20px;
+  height: 20px;
+  vertical-align: baseline;
+  display: flex;
+}
+#tab-datasheets p {
+  display: none;
+}
+.document-gallery {
+  display: flex;
+  max-width: 700px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.document-gallery::before {
+  content: "";
+  position: absolute;
+  top: -35px;
+  font-size: 1em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.document-gallery .document-icon-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  grid-gap: 5px;
+}
+.document-gallery .document-icon {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 0 none;
+  box-shadow: 0 1px 3px -2px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 10%);
+  transition: all 0.3s ease-in-out;
+  width: unset !important;
+}
+.document-gallery .document-icon:hover {
+  box-shadow: 0 10px 20px rgb(0 0 0 / 10%), 0 4px 8px rgb(0 0 0 / 10%);
+  transition: all 0.3s ease-in-out;
+}
+.document-gallery .document-icon a {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.document-gallery .document-icon img {
+  width: 150px;
+}
+.document-gallery .document-icon img ~ .title {
+  font-size: 1.2em;
+  margin-top: 10px;
+}
+li a.menu-link.top-level-link {
+  position: relative;
+}
+li.quotes a.menu-link.top-level-link::after {
+  content: "";
+  font-weight: 400;
+  position: absolute;
+  top: -3px;
+  font-size: 0.5em;
+  display: inline-block;
+  border: 0 none;
+  border-radius: 99px;
+  padding: 0 5px;
+  line-height: 1.2em;
+}
+.iubenda-embed {
+  width: auto !important;
+}
+#iubenda-pp {
+  z-index: 10000011 !important;
+}
+body.logged-in ul li.hide-if-logged-in {
+  display: none;
+}
+body:not(.logged-in) ul li.hide-if-not-logged-in {
+  display: none;
+}
+
+@media only screen and (max-width: 1600px) {
+  [class*="lg\/"] {
+    display: none;
+  }
+}
+@media only screen and (max-width: 1200px) {
+  [class*="md\/"] {
+    display: none;
+  }
+}
