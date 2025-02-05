@@ -440,7 +440,7 @@ function astra_child_woo_tab_content($tab_name, $tab)
 
 function astra_child_woo_tab_quote_request()
 {
-  if (REQUEST_FORM_SHORTCODE_ID)
+  if (defined('REQUEST_FORM_SHORTCODE_ID'))
   {
     echo  do_shortcode('[elementor-template id="' . REQUEST_FORM_SHORTCODE_ID . '"]');
   }
