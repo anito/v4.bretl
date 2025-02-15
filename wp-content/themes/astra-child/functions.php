@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/sender-email.php';
+
 if (is_admin())
 {
   require_once __DIR__ . '/includes/duplicate-content.php';
