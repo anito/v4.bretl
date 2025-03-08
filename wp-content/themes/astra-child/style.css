@@ -203,7 +203,7 @@ body:not(.logged-in) ul li.hide-if-not-logged-in {
     position: relative;
 }
 .featured.no-image::after {
-    content: 'Image follows';
+    content: 'Images coming soon';
     position: absolute;
     width: 300px;
     text-align: center;
