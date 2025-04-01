@@ -12,12 +12,16 @@
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 9.6.0
+ * @version 9.7.0
  */
+
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
+$email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
 
 ?>
 <!DOCTYPE html>
@@ -51,6 +55,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 										if ( $img ) {
 											echo '<p style="margin-top:0;"><img src="' . esc_url( $img ) . '" alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" /></p>';
+										} elseif ( $email_improvements_enabled ) {
+											echo '<p class="email-logo-text">' . esc_html( get_bloginfo( 'name', 'display' ) ) . '</p>';
 										}
 										?>
 									</div>
