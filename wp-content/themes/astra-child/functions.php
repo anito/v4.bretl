@@ -1,8 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/sender-email.php';
 
-if (is_admin())
-{
+if (is_admin()) {
   require_once __DIR__ . '/includes/duplicate-content.php';
   require_once __DIR__ . '/includes/custom-avatar.php';
 }
@@ -45,12 +44,10 @@ add_filter('init', 'astra_child_register_ajax');
  * 
  * @return int Screen width when the header should change to the mobile header.
  */
-add_filter('astra_mobile_breakpoint', function ()
-{
+add_filter('astra_mobile_breakpoint', function () {
   return 544;
 });
-add_filter('astra_tablet_breakpoint', function ()
-{
+add_filter('astra_tablet_breakpoint', function () {
   return 921;
 });
 
@@ -153,8 +150,7 @@ function add_scripts()
   wp_enqueue_script('iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array('iubenda'), CHILD_THEME_VERSION, true);
   wp_localize_script('iubenda', 'Iubenda', IUBENDA_VARS);
 
-  if (astra_child_doing_login_ajax())
-  {
+  if (astra_child_doing_login_ajax()) {
     wp_dequeue_script('zxcvbn-async');
     wp_dequeue_script('regenerator-runtime');
     wp_dequeue_script('wp-polyfill-inert');
@@ -186,8 +182,7 @@ add_action('login_enqueue_scripts', 'add_login_style');
 
 function add_login_scripts()
 {
-  if (astra_child_doing_login_ajax())
-  {
+  if (astra_child_doing_login_ajax()) {
     wp_dequeue_style('login');
     wp_deregister_script('jquery');
 
@@ -204,13 +199,11 @@ function add_login_scripts()
 }
 add_action('login_enqueue_scripts', 'add_login_scripts');
 
-add_filter('logout_redirect', function ($redirect_url)
-{
+add_filter('logout_redirect', function ($redirect_url) {
   return esc_url(home_url());
 });
 
-add_filter('logout_url', function ($logout_url)
-{
+add_filter('logout_url', function ($logout_url) {
   return $logout_url . '&amp;redirect_to=' . get_permalink();
 }, 9999);
 
@@ -284,8 +277,7 @@ add_filter('login_form_bottom', 'astra_child_login_form_bottom');
 function astra_child_custom_default_orderby($sortby)
 {
 
-  if (is_shop())
-  {
+  if (is_shop()) {
     return 'date';
   }
 
@@ -307,11 +299,9 @@ function astra_child_custom_default_orderby($sortby)
   );
 
   $obj  = (array) $wp_query->get_queried_object();
-  foreach ($orderby as $key => $val)
-  {
+  foreach ($orderby as $key => $val) {
     $prop = $obj[$key];
-    if (array_key_exists($prop, $val))
-    {
+    if (array_key_exists($prop, $val)) {
       $sortby = $val[$prop];
       break;
     }
@@ -326,27 +316,25 @@ add_filter('woocommerce_default_catalog_orderby', 'astra_child_custom_default_or
  */
 function astra_child_detectTrident($current_theme)
 {
-  $ua = $_SERVER['HTTP_USER_AGENT'];
-  $browser = ['name' => '', 'version' => '', 'platform' => ''];
-  if (preg_match('/Trident\/([0-9.]*)/u', $ua, $match))
-  {
-    $match = (int)array_pop($match) + 4;
-  }
-  elseif (preg_match('/MSIE\s{1}([0-9.]*)/u', $ua, $match))
-  {
-    $match = (int)array_pop($match);
-  }
-  if (!empty($match) && ($match <= 11))
-  {
-    $browser['name'] = 'ie';
-    $browser['version'] = $match;
-    add_action('wp_footer', 'unsupported_browsers_template', 100);
+  if (isset($_SERVER['HTTP_USER_AGENT']) && ($ua = $_SERVER['HTTP_USER_AGENT'])) {
+    $browser = ['name' => '', 'version' => '', 'platform' => ''];
+    if (preg_match('/Trident\/([0-9.]*)/u', $ua, $match)) {
+      $match = (int)array_pop($match) + 4;
+    } elseif (preg_match('/MSIE\s{1}([0-9.]*)/u', $ua, $match)) {
+      $match = (int)array_pop($match);
+    }
+    if (!empty($match) && ($match <= 11)) {
+      $browser['name'] = 'ie';
+      $browser['version'] = $match;
+      add_action('wp_footer', 'unsupported_browsers_template', 100);
 
-    wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), CHILD_THEME_VERSION, true);
-    wp_localize_script('browser_sniffer', '__browser', array('name' => $browser['name'], 'version' => $browser['version'], 'platform' => $browser['platform']));
-    wp_enqueue_script('browser_sniffer');
+      wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), CHILD_THEME_VERSION, true);
+      wp_localize_script('browser_sniffer', '__browser', array('name' => $browser['name'], 'version' => $browser['version'], 'platform' => $browser['platform']));
+      wp_enqueue_script('browser_sniffer');
+    }
   }
 }
+
 function unsupported_browsers_template()
 {
   get_template_part('templates/misc/unsupported', 'browser', array(
@@ -367,8 +355,7 @@ function get_certificate()
     STREAM_CLIENT_CONNECT,
     $g
   ); // returns ressource|false
-  if (false === $r)
-  {
+  if (false === $r) {
     return false;
   }
   $cont = stream_context_get_params($r);
@@ -409,8 +396,7 @@ function astra_child_woo_custom_tabs($tabs)
   );
 
   $datasheets = get_post_meta($product->get_id(), '_datasheet', true);
-  if (class_exists('DG_Gallery') && !empty($datasheets))
-  {
+  if (class_exists('DG_Gallery') && !empty($datasheets)) {
     $tabs['datasheets'] = array(
       'title'   => __('Datasheet', 'astra-child'),
       'priority'   => 20,
@@ -441,12 +427,9 @@ function astra_child_woo_tab_content($tab_name, $tab)
 
 function astra_child_woo_tab_quote_request()
 {
-  if (defined('REQUEST_FORM_SHORTCODE_ID'))
-  {
+  if (defined('REQUEST_FORM_SHORTCODE_ID')) {
     echo  do_shortcode('[elementor-template id="' . REQUEST_FORM_SHORTCODE_ID . '"]');
-  }
-  else
-  {
+  } else {
     echo '<p>Um den Inhalt dieses Tabs anzuzeigen, muss eine Shortcode ID in der wp-config.php hinterlegt werden.</p>';
   }
 }
@@ -480,10 +463,8 @@ function astra_child_get_price_visibility($show)
     'class' => (isset($show['to_customer']) && !$show['to_customer']) ? 'price-hidden' : ''
   );
 };
-add_filter('astra_child_show_prices', function ()
-{
-  if (!defined('SHOW_CUSTOMER_EMAIL_PRICE'))
-  {
+add_filter('astra_child_show_prices', function () {
+  if (!defined('SHOW_CUSTOMER_EMAIL_PRICE')) {
     return false;
   }
   return SHOW_CUSTOMER_EMAIL_PRICE;
@@ -509,8 +490,7 @@ add_filter('woocommerce_default_address_fields', 'astra_child_filter_default_add
 
 function astra_child_wc_coupons_frontend_enabled($is_enabled)
 {
-  if (!is_admin() && function_exists('astra_get_option'))
-  {
+  if (!is_admin() && function_exists('astra_get_option')) {
     return astra_get_option('checkout-coupon-display');
   }
   return true;
@@ -531,8 +511,7 @@ function astra_child_short_description($excerpt)
 {
 
   $max_length = 150;
-  if (strlen($excerpt) > $max_length && function_exists('astra_child_ka'))
-  {
+  if (strlen($excerpt) > $max_length && function_exists('astra_child_ka')) {
     return  \Kleinanzeigen\Utils\Utils::sanitize_excerpt($excerpt, $max_length);
   }
   return $excerpt;
@@ -552,11 +531,9 @@ function astra_child_modify_cart_product_subtotal_label($product_subtotal, $prod
 {
   $tax_class = $product->get_tax_class();
   $rates = WC_Tax::get_rates_for_tax_class($tax_class);
-  foreach ($rates as $rate)
-  {
+  foreach ($rates as $rate) {
     $label = $rate->tax_rate_name;
-    if (str_contains(strtolower($tax_class), DIFF_TAX))
-    {
+    if (str_contains(strtolower($tax_class), DIFF_TAX)) {
       $product_subtotal .= ' <small class="tax-label">' . $label . '</small>';
     }
   }
