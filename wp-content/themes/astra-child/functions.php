@@ -1,7 +1,5 @@
 <?php
 
-use Kleinanzeigen\Utils\Kleinanzeigen_Utils;
-
 require_once __DIR__ . '/includes/sender-email.php';
 
 if (is_admin()) {
@@ -512,14 +510,8 @@ add_filter('astra_theme_author', 'astra_child_return_theme_author');
 
 function astra_child_short_description($excerpt)
 {
-
   if (! class_exists('Kleinanzeigen_Utils')) {
-    return;
-  }
-
-  $max_length = 150;
-  if (strlen($excerpt) > $max_length && function_exists('astra_child_ka')) {
-    return  Kleinanzeigen_Utils::sanitize_excerpt($excerpt, $max_length);
+    return \Kleinanzeigen\Utils\Kleinanzeigen_Utils::sanitize_excerpt($excerpt, 150);
   }
   return $excerpt;
 }
