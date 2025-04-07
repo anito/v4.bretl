@@ -508,14 +508,22 @@ function astra_child_return_theme_author($author)
 }
 add_filter('astra_theme_author', 'astra_child_return_theme_author');
 
+/**
+ * Use Kleinanzeigen's short description method `sanitize_excerpt`.
+ * By disabling this filter we just use (the default excerpt) the ad records `description` property.
+ * 
+ * @param string  @excerpt
+ * 
+ * @return string
+ */
 function astra_child_short_description($excerpt)
 {
-  if (! class_exists('Kleinanzeigen_Utils')) {
+  if (class_exists('\Kleinanzeigen\Utils\Kleinanzeigen_Utils')) {
     return \Kleinanzeigen\Utils\Kleinanzeigen_Utils::sanitize_excerpt($excerpt, 150);
   }
   return $excerpt;
 }
-add_filter('woocommerce_short_description', 'astra_child_short_description', 10, 1);
+// add_filter('woocommerce_short_description', 'astra_child_short_description', 10, 1);
 
 /**
  * Change Variable Price Range Html
