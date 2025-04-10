@@ -12,7 +12,7 @@
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 9.7.0
+ * @version 9.8.0
  */
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
@@ -91,7 +91,26 @@ foreach ( $items as $item_id => $item ) :
 							 */
 							do_action( 'woocommerce_order_item_meta_start', $item_id, $item, $order, $plain_text );
 
-							wc_display_item_meta( $item );
+							$item_meta = wc_display_item_meta(
+								$item,
+								array(
+									'before'       => '',
+									'after'        => '',
+									'separator'    => '<br>',
+									'echo'         => false,
+									'label_before' => '<span>',
+									'label_after'  => ':</span> ',
+								)
+							);
+							echo '<div class="email-order-item-meta">';
+							echo wp_kses(
+								$item_meta,
+								array(
+									'br'   => array(),
+									'span' => array(),
+								)
+							);
+							echo '</div>';
 
 							/**
 							 * Allow other plugins to add additional product information.
@@ -109,9 +128,7 @@ foreach ( $items as $item_id => $item ) :
 					</tr>
 				</table>
 				<?php
-			} ?>
-		<td class="td" style="text-align:<?php echo esc_attr( $text_align ); ?>; vertical-align: middle; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif; word-wrap:break-word;">
-		<?php
+			} else {
 
 				// Show title/image etc.
 				if ( $show_image ) {
@@ -124,6 +141,7 @@ foreach ( $items as $item_id => $item ) :
 					 */
 					echo wp_kses_post( apply_filters( 'woocommerce_order_item_thumbnail', $image, $item ) );
 				}
+			}
 
 		// Show title/image etc.
 		if ( $show_image ) {
@@ -147,10 +165,10 @@ foreach ( $items as $item_id => $item ) :
 					echo wp_kses_post( ' (#' . $sku . ')' );
 				}
 
-		// SKU.
-		if ( $show_sku && $sku ) {
-			echo wp_kses_post( ' (#' . $sku . ')' );
-		}
+				// SKU.
+				if ( $show_sku && $sku ) {
+					echo wp_kses_post( ' (#' . $sku . ')' );
+				}
 
 				/**
 				 * Allow other plugins to add additional product information.
@@ -163,10 +181,7 @@ foreach ( $items as $item_id => $item ) :
 				 */
 				do_action( 'woocommerce_order_item_meta_start', $item_id, $item, $order, $plain_text );
 
-		// allow other plugins to add additional product information here.
-		do_action( 'woocommerce_order_item_meta_start', $item_id, $item, $order, $plain_text );
-
-						wc_display_item_meta(
+				wc_display_item_meta(
 					$item,
 					array(
 						'label_before' => '<strong class="wc-item-meta-label" style="float: ' . ( is_rtl() ? 'right' : 'left' ) . '; margin-' . esc_attr( $margin_side ) . ': .25em; clear: both">',
@@ -183,20 +198,11 @@ foreach ( $items as $item_id => $item ) :
 				 * @since 2.3.0
 				 */
 				do_action( 'woocommerce_order_item_meta_end', $item_id, $item, $order, $plain_text );
-		wc_display_item_meta(
-			$item,
-			array(
-				'label_before' => '<strong class="wc-item-meta-label" style="float: ' . esc_attr( $text_align ) . '; margin-' . esc_attr( $margin_side ) . ': .25em; clear: both">',
-			)
-		);
-
-		// allow other plugins to add additional product information here.
-		do_action( 'woocommerce_order_item_meta_end', $item_id, $item, $order, $plain_text );
-
-		?>
+			?>
 		</td>
 		<td class="td" style="text-align:<?php echo esc_attr( $text_align ); ?>; vertical-align:middle; font-family: 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;">
 			<?php
+			echo $email_improvements_enabled ? '&times;' : '';
 			$qty          = $item->get_quantity();
 			$refunded_qty = $order->get_qty_refunded_for_item( $item_id );
 

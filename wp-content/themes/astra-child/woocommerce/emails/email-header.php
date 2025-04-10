@@ -12,7 +12,7 @@
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 9.7.0
+ * @version 9.8.0
  */
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
@@ -53,12 +53,30 @@ $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improveme
 											$img           = false !== $img_transient ? $img_transient : $img;
 										}
 
-										if ( $img ) {
-											echo '<p style="margin-top:0;"><img src="' . esc_url( $img ) . '" alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" /></p>';
-										} elseif ( $email_improvements_enabled ) {
-											echo '<p class="email-logo-text">' . esc_html( get_bloginfo( 'name', 'display' ) ) . '</p>';
-										}
+									if ( $email_improvements_enabled ) :
 										?>
+										<table border="0" cellpadding="0" cellspacing="0" width="100%">
+											<tr>
+												<td id="template_header_image">
+													<?php
+													if ( $img ) {
+														echo '<p style="margin-top:0;"><img src="' . esc_url( $img ) . '" alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" /></p>';
+													} else {
+														echo '<p class="email-logo-text">' . esc_html( get_bloginfo( 'name', 'display' ) ) . '</p>';
+													}
+													?>
+												</td>
+											</tr>
+										</table>
+									<?php else : ?>
+										<div id="template_header_image">
+											<?php
+											if ( $img ) {
+												echo '<p style="margin-top:0;"><img src="' . esc_url( $img ) . '" alt="' . esc_attr( get_bloginfo( 'name', 'display' ) ) . '" /></p>';
+											}
+											?>
+										</div>
+									<?php endif; ?>
 									</div>
 									<table border="0" cellpadding="0" cellspacing="0" width="100%" id="template_container">
 										<tr>
@@ -83,5 +101,5 @@ $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improveme
 															<!-- Content -->
 															<table border="0" cellpadding="20" cellspacing="0" width="100%">
 																<tr>
-																	<td valign="top">
+																	<td valign="top" id="body_content_inner_cell">
 																		<div id="body_content_inner">

@@ -13,22 +13,22 @@
  *
  * @see https://woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates\Emails
- * @version 9.7.0
+ * @version 9.8.0
  */
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
-defined('ABSPATH') || exit;
+defined( 'ABSPATH' ) || exit;
 
 $text_align = is_rtl() ? 'right' : 'left';
 
-$email_improvements_enabled = FeaturesUtil::feature_is_enabled('email_improvements');
+$email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
 $heading_class              = $email_improvements_enabled ? 'email-order-detail-heading' : '';
 $order_table_class          = $email_improvements_enabled ? 'email-order-details' : '';
 $order_total_text_align     = $email_improvements_enabled ? 'right' : 'left';
 
-if ($email_improvements_enabled) {
-	add_filter('woocommerce_order_shipping_to_display_shipped_via', '__return_false');
+if ( $email_improvements_enabled ) {
+	add_filter( 'woocommerce_order_shipping_to_display_shipped_via', '__return_false' );
 }
 
 /**
@@ -40,10 +40,25 @@ if ($email_improvements_enabled) {
  * @param WC_Email $email Email object.
  * @since 2.5.0
  */
-do_action('woocommerce_email_before_order_table', $order, $sent_to_admin, $plain_text, $email); ?>
+do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plain_text, $email ); ?>
 
-<h2 class="<?php echo esc_attr($heading_class); ?>">
-
+<h2 class="<?php echo esc_attr( $heading_class ); ?>">
+	<?php
+	if ( $email_improvements_enabled ) {
+		echo wp_kses_post( __( 'Order summary', 'woocommerce' ) );
+	}
+	if ( $sent_to_admin ) {
+		$before = '<a class="link" href="' . esc_url( $order->get_edit_order_url() ) . '">';
+		$after  = '</a>';
+	} else {
+		$before = '';
+		$after  = '';
+	}
+	if ( $email_improvements_enabled ) {
+		echo '<br><span>';
+	}
+	/* translators: %s: Order ID. */
+	$order_number_string = __( '[Order #%s]', 'woocommerce' );
 	$show_price = apply_filters('wbp_woo_show_prices_customer_email', $sent_to_admin);
 	$price_visibility = astra_child_get_price_visibility($show_price);
 	$price_hidden = !$price_visibility['show'];
@@ -69,14 +84,16 @@ do_action('woocommerce_email_before_order_table', $order, $sent_to_admin, $plain
 		if ($email_improvements_enabled) {
 			echo '<span>';
 		}
+	if ( $email_improvements_enabled ) {
 		/* translators: %s: Order ID. */
-		$order_number_string = $email_improvements_enabled ? __('Order #%s', 'woocommerce') : __('[Order #%s]', 'woocommerce');
-		echo wp_kses_post($before . sprintf($order_number_string . $after . ' (<time datetime="%s">%s</time>)', $order->get_order_number(), $order->get_date_created()->format('c'), wc_format_datetime($order->get_date_created())));
-		if ($email_improvements_enabled) {
-			echo '</span>';
-		}
-		?>
-	</h2>
+		$order_number_string = __( 'Order #%s', 'woocommerce' );
+	}
+	echo wp_kses_post( $before . sprintf( $order_number_string . $after . ' (<time datetime="%s">%s</time>)', $order->get_order_number(), $order->get_date_created()->format( 'c' ), wc_format_datetime( $order->get_date_created() ) ) );
+	if ( $email_improvements_enabled ) {
+		echo '</span>';
+	}
+	?>
+</h2>
 
 	<div style="margin-bottom: <?php echo $email_improvements_enabled ? '24px' : '40px'; ?>;">
 		<table class="td font-family <?php echo esc_attr($order_table_class); ?>" cellspacing="0" cellpadding="6" style="width: 100%;" border="1">
@@ -109,7 +126,7 @@ do_action('woocommerce_email_before_order_table', $order, $sent_to_admin, $plain
 				<tfoot class="<?php echo $price_hidden_class ?>">
 					<?php
 					$item_totals       = $order->get_order_item_totals();
-					$item_totals_count = count($item_totals);
+					$item_totals_count = count( $item_totals );
 
 					if ($item_totals) {
 						$i = 0;
