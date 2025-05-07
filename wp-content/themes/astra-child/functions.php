@@ -30,13 +30,12 @@ add_filter('init', 'astra_child_init');
 
 function astra_child_register_ajax()
 {
-
   // Ajax actions
-  add_action('wp_ajax__ajax_get_login_form', '_ajax_get_login_form');
-  add_action('wp_ajax__ajax_submit_form', '_ajax_submit_form');
+  add_action('wp_ajax__ajax_get_login_form', 'astra_child__ajax_get_login_form');
+  add_action('wp_ajax__ajax_submit_form', 'astra_child__ajax_submit_form');
 
-  add_action('wp_ajax_nopriv__ajax_get_login_form', '_ajax_get_login_form');
-  add_action('wp_ajax_nopriv__ajax_submit_form', '_ajax_submit_form');
+  add_action('wp_ajax_nopriv__ajax_get_login_form', 'astra_child__ajax_get_login_form');
+  add_action('wp_ajax_nopriv__ajax_submit_form', 'astra_child__ajax_submit_form');
 }
 add_filter('init', 'astra_child_register_ajax');
 
@@ -59,14 +58,14 @@ function astra_child_get_current_user()
   return $cur_user;
 }
 
-function _ajax_get_login_form()
+function astra_child__ajax_get_login_form()
 {
   require_once __DIR__ . '/includes/ajax-handler.php';
 
   astra_child_get_login_form();
 }
 
-function _ajax_submit_form()
+function astra_child__ajax_submit_form()
 {
   require_once __DIR__ . '/includes/ajax-handler.php';
 
@@ -81,7 +80,7 @@ function astra_child_doing_login_ajax()
 /**
  * CSRF allowed domains
  */
-function add_allowed_origins($origins)
+function astra_child_add_allowed_origins($origins)
 {
   return array_merge($origins, [
     'http://localhost:5173',
@@ -90,7 +89,7 @@ function add_allowed_origins($origins)
     'https://dev.auto-traktor-bretschneider.mbp',
   ]);
 }
-add_filter('allowed_http_origins', 'add_allowed_origins');
+add_filter('allowed_http_origins', 'astra_child_add_allowed_origins');
 
 /**
  * App asset names (e.g. *.js. *.css files) changing per app distribution
@@ -110,7 +109,7 @@ function astra_child_get_themes_file($file_path)
  * @package Astra Child
  * @since 1.0.0
  */
-function add_scripts()
+function astra_child_add_scripts()
 { ?>
   <style type="text/css">
     #login {
@@ -160,9 +159,9 @@ function add_scripts()
     wp_dequeue_script('user-profile');
   }
 }
-add_action('wp_enqueue_scripts', 'add_scripts');
+add_action('wp_enqueue_scripts', 'astra_child_add_scripts');
 
-function add_login_style()
+function astra_child_add_login_style()
 { ?>
   <style type="text/css">
     #login h1 a,
@@ -179,9 +178,9 @@ function add_login_style()
 
 <?php
 }
-add_action('login_enqueue_scripts', 'add_login_style');
+add_action('login_enqueue_scripts', 'astra_child_add_login_style');
 
-function add_login_scripts()
+function astra_child_add_login_scripts()
 {
   if (astra_child_doing_login_ajax()) {
     wp_dequeue_style('login');
@@ -198,7 +197,7 @@ function add_login_scripts()
   }
   wp_enqueue_style('wbp-login', get_stylesheet_directory_uri() . '/css/login-style.css', array(), CHILD_THEME_VERSION, 'all');
 }
-add_action('login_enqueue_scripts', 'add_login_scripts');
+add_action('login_enqueue_scripts', 'astra_child_add_login_scripts');
 
 add_filter('logout_redirect', function ($redirect_url) {
   return esc_url(home_url());
@@ -327,7 +326,7 @@ function astra_child_detectTrident($current_theme)
     if (!empty($match) && ($match <= 11)) {
       $browser['name'] = 'ie';
       $browser['version'] = $match;
-      add_action('wp_footer', 'unsupported_browsers_template', 100);
+      add_action('wp_footer', 'astra_child_unsupported_browsers_template', 100);
 
       wp_register_script('browser_sniffer', get_stylesheet_directory_uri() . '/js/browser_support.js', array('jquery'), CHILD_THEME_VERSION, true);
       wp_localize_script('browser_sniffer', '__browser', array('name' => $browser['name'], 'version' => $browser['version'], 'platform' => $browser['platform']));
@@ -336,7 +335,7 @@ function astra_child_detectTrident($current_theme)
   }
 }
 
-function unsupported_browsers_template()
+function astra_child_unsupported_browsers_template()
 {
   get_template_part('templates/misc/unsupported', 'browser', array(
     'blogname'  => wp_specialchars_decode(get_option('blogname'), ENT_QUOTES),
