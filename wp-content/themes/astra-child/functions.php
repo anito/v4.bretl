@@ -21,9 +21,10 @@ function astra_child_init()
     'home_url'    => home_url(),
     'nonce'       => wp_create_nonce()
   ));
+  // IUBENDA
   define('IUBENDA_VARS', array(
-    'siteId' => 3304971,
-    'cookiePolicyId' => 28713011
+    'siteId' => defined('IUBENDA_SITE_ID') ? IUBENDA_SITE_ID : '',
+    'cookiePolicyId' => defined('IUBENDA_COOKIE_POLICY_ID') ? IUBENDA_COOKIE_POLICY_ID : ''
   ));
 }
 add_filter('init', 'astra_child_init');
