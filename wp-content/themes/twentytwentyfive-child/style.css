@@ -15,7 +15,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 Template: twentytwentyfive
 */
 
-@import url('tw.css');
+/* @import url('tw.css'); */
 
 .wp-block-site-logo img {
     width: 100%;
