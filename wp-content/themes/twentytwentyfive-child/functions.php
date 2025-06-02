@@ -22,17 +22,18 @@ function twentytwentyfive_child_init()
         'user'       => json_encode( twentytwentyfive_get_current_user() ),
         'home_url'   => home_url(),
         'nonce'      => wp_create_nonce(),
-    ] );
+     ] );
     // IUBENDA
     define( 'IUBENDA_VARS', [
         'siteId'         => defined( 'IUBENDA_SITE_ID' ) ? IUBENDA_SITE_ID : '',
         'cookiePolicyId' => defined( 'IUBENDA_COOKIE_POLICY_ID' ) ? IUBENDA_COOKIE_POLICY_ID : '',
-    ] );
+     ] );
 }
 add_filter( 'init', 'twentytwentyfive_child_init' );
 
 // Enqueues style.css on the front.
-if ( ! function_exists( 'twentytwentyfive_child_enqueue_styles' ) ):
+if ( ! function_exists( 'twentytwentyfive_child_enqueue_styles' ) ) {
+
     /**
      * Enqueues style.css on the front.
      *
@@ -41,24 +42,24 @@ if ( ! function_exists( 'twentytwentyfive_child_enqueue_styles' ) ):
      * @return void
      */
     function twentytwentyfive_child_enqueue_styles()
-{
+    {
         wp_enqueue_style(
             "twentytwentyfive-style",
             get_parent_theme_file_uri( '/style.css' ),
-            [],
+            [  ],
             CHILD_THEME_VERSION
         );
         wp_enqueue_style(
             'twentytwentyfive-child-style',
             get_stylesheet_directory_uri() . '/style.css',
-            [],
+            [  ],
             CHILD_THEME_VERSION
         );
         // Iubenda
         wp_enqueue_script(
             'iubenda',
             get_stylesheet_directory_uri() . '/js/iubenda.js',
-            [],
+            [  ],
             CHILD_THEME_VERSION,
             true
         );
@@ -78,16 +79,16 @@ if ( ! function_exists( 'twentytwentyfive_child_enqueue_styles' ) ):
         );
         wp_localize_script( 'iubenda', 'Iubenda', IUBENDA_VARS );
     }
-endif;
+}
 add_action( 'wp_enqueue_scripts', 'twentytwentyfive_child_enqueue_styles' );
 
-if ( ! function_exists( 'twentytwentyfive_child_parse_taxonomy_root_request' ) ):
+if ( ! function_exists( 'twentytwentyfive_child_parse_taxonomy_root_request' ) ) {
     /**
      * @param $wp
      * @return null
      */
     function twentytwentyfive_child_parse_taxonomy_root_request( $wp )
-{
+    {
         if ( ! isset( $wp->query_vars[ 'name' ] ) ) {
             return;
         }
@@ -124,7 +125,7 @@ if ( ! function_exists( 'twentytwentyfive_child_parse_taxonomy_root_request' ) )
         // Unlike "taxonomy"/"term" QVs, tax-specific QVs can specify an AND/OR list of terms.
         $wp->set_query_var( $tax_query_var, implode( ',', $tax_term_slugs ) );
     }
-endif;
+}
 add_action( 'parse_request', 'twentytwentyfive_child_parse_taxonomy_root_request' );
 
 if ( ! function_exists( 'twentytwentyfive_child_register_tax_root_rewrite' ) ):
