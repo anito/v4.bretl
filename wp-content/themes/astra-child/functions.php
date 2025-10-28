@@ -1,5 +1,7 @@
 <?php
 
+    use Kleinanzeigen\Utils;
+
     require_once __DIR__ . '/includes/sender-email.php';
 
     if ( is_admin() ) {
@@ -288,7 +290,7 @@
     function astra_child_custom_default_orderby( $sortby )
     {
 
-        if ( is_shop() ) {
+        if ( function_exists( 'is_shop' ) && is_shop() ) {
             return 'date';
         }
 
@@ -491,7 +493,7 @@
     function astra_child_filter_default_address_fields( $address_fields )
     {
         // Only on checkout page
-        if ( ! is_checkout() ) {
+        if ( function_exists( 'is_checkout' ) && ! is_checkout() ) {
             return $address_fields;
         }
 
@@ -543,7 +545,7 @@
     function astra_child_short_description( $excerpt )
     {
         if ( class_exists( '\Kleinanzeigen\Utils\Kleinanzeigen_Utils' ) ) {
-            return \Kleinanzeigen\Utils\Kleinanzeigen_Utils::sanitize_excerpt( $excerpt, 150 );
+            return Utils::sanitize_excerpt( $excerpt, 150 );
         }
         return $excerpt;
     }
