@@ -21,12 +21,12 @@
             'user'       => json_encode( astra_child_get_current_user() ),
             'home_url'   => home_url(),
             'nonce'      => wp_create_nonce(),
-         ) );
+        ) );
         // IUBENDA
         define( 'IUBENDA_VARS', array(
             'siteId'         => defined( 'IUBENDA_SITE_ID' ) ? IUBENDA_SITE_ID : '',
             'cookiePolicyId' => defined( 'IUBENDA_COOKIE_POLICY_ID' ) ? IUBENDA_COOKIE_POLICY_ID : '',
-         ) );
+        ) );
     }
 
     add_filter( 'init', 'astra_child_init' );
@@ -89,7 +89,7 @@
             'https://dev.auto-traktor-bretschneider.de',
             'https://dev.auto-traktor-bretschneider.mbp',
             'https://dev.auto-traktor-bretschneider.test',
-         ) );
+        ) );
     }
 
     add_filter( 'allowed_http_origins', 'astra_child_add_allowed_origins' );
@@ -138,7 +138,7 @@
       $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
           // Theme styles
-          wp_enqueue_style( "parent-style", get_parent_theme_file_uri( '/style.css' ), array(  ), ASTRA_THEME_VERSION, 'all' );
+          wp_enqueue_style( "parent-style", get_parent_theme_file_uri( '/style.css' ), array(), ASTRA_THEME_VERSION, 'all' );
           wp_enqueue_style( 'astra-child-theme', get_stylesheet_directory_uri() . '/style.css', array( 'astra-theme-css' ), CHILD_THEME_VERSION, 'all' );
 
           wp_enqueue_script( 'ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array( 'jquery' ), CHILD_THEME_VERSION, true );
@@ -148,7 +148,7 @@
 
       // Iubenda
           if ( defined( 'IUBENDA_VARS' ) && isset( IUBENDA_VARS[ 'siteId' ] ) && IUBENDA_VARS[ 'siteId' ] ) {
-              wp_enqueue_script( 'iubenda', get_stylesheet_directory_uri() . '/js/iubenda.js', array(  ), CHILD_THEME_VERSION, true );
+              wp_enqueue_script( 'iubenda', get_stylesheet_directory_uri() . '/js/iubenda.js', array(), CHILD_THEME_VERSION, true );
               wp_enqueue_script( 'iubenda-autoblocking', 'https://cs.iubenda.com/autoblocking/' . IUBENDA_VARS[ 'siteId' ] . '.js', array( 'iubenda' ), CHILD_THEME_VERSION, true );
               wp_enqueue_script( 'iubenda-cs', '//cdn.iubenda.com/cs/iubenda_cs.js', array( 'iubenda' ), CHILD_THEME_VERSION, true );
               wp_localize_script( 'iubenda', 'Iubenda', IUBENDA_VARS );
@@ -190,17 +190,17 @@
             wp_dequeue_style( 'login' );
             wp_deregister_script( 'jquery' );
 
-            wp_enqueue_script( 'login', get_stylesheet_directory_uri() . '/js/login.js', array(  ), CHILD_THEME_VERSION, true );
-            wp_enqueue_style( 'dashicons', ABSPATH . WPINC . '/css/dashicons.min.css', array(  ) );
-            wp_enqueue_style( 'wbp-login-base', get_stylesheet_directory_uri() . '/css/login.css', array(  ), CHILD_THEME_VERSION, 'all' );
+            wp_enqueue_script( 'login', get_stylesheet_directory_uri() . '/js/login.js', array(), CHILD_THEME_VERSION, true );
+            wp_enqueue_style( 'dashicons', ABSPATH . WPINC . '/css/dashicons.min.css', array() );
+            wp_enqueue_style( 'wbp-login-base', get_stylesheet_directory_uri() . '/css/login.css', array(), CHILD_THEME_VERSION, 'all' );
 
-            wp_enqueue_script( 'ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array(  ), CHILD_THEME_VERSION, true );
-            wp_enqueue_script( 'jquery-serializejson', get_stylesheet_directory_uri() . '/js/jquery.serializejson.js', array(  ), CHILD_THEME_VERSION, true );
+            wp_enqueue_script( 'ajax-front', get_stylesheet_directory_uri() . '/js/ajax-front.js', array(), CHILD_THEME_VERSION, true );
+            wp_enqueue_script( 'jquery-serializejson', get_stylesheet_directory_uri() . '/js/jquery.serializejson.js', array(), CHILD_THEME_VERSION, true );
 
             wp_localize_script( 'ajax-front', 'KleinanzeigenAjaxFront', AJAX_FRONT_VARS );
         }
 
-        wp_enqueue_style( 'wbp-login', get_stylesheet_directory_uri() . '/css/login-style.css', array(  ), CHILD_THEME_VERSION, 'all' );
+        wp_enqueue_style( 'wbp-login', get_stylesheet_directory_uri() . '/css/login-style.css', array(), CHILD_THEME_VERSION, 'all' );
     }
 
     add_action( 'login_enqueue_scripts', 'astra_child_add_login_scripts' );
@@ -244,7 +244,7 @@
             'value_username' => '',
             // Set 'value_remember' to true to default the "Remember me" checkbox to checked.
             'value_remember' => false,
-         );
+        );
     }
 
     add_filter( 'login_form_defaults', 'astra_child_login_form_defaults' );
@@ -301,13 +301,13 @@
                 'aktionswochen' => 'date',
                 'empfehlungen'  => 'date',
                 'aktionen'      => 'date',
-             ),
+            ),
             'taxonomy' => array(
                 'product_cat'   => 'date',
                 'product_brand' => 'date',
                 'pa_merkmale'   => 'date',
-             ),
-         );
+            ),
+        );
 
         $obj = (array) $wp_query->get_queried_object();
 
@@ -355,7 +355,7 @@
         get_template_part( 'templates/misc/unsupported', 'browser', array(
             'blogname' => wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES ),
             'email'    => get_bloginfo( 'admin_email' ),
-         ) );
+        ) );
     }
 
     add_action( 'wp_enqueue_scripts', 'astra_child_detectTrident' );
@@ -370,6 +370,7 @@
             STREAM_CLIENT_CONNECT,
             $g
         );
+
     // returns ressource|false
         if ( false === $r ) {
             return false;
@@ -409,7 +410,7 @@
             'title'    => __( 'Description', 'woocommerce' ),
             'priority' => 10,
             'callback' => 'astra_child_woo_tab_content',
-         );
+        );
 
         $datasheets = get_post_meta( $product->get_id(), '_datasheet', true );
         if ( class_exists( 'DG_Gallery' ) && ! empty( $datasheets ) ) {
@@ -417,14 +418,14 @@
                 'title'    => __( 'Datasheet', 'astra-child' ),
                 'priority' => 20,
                 'callback' => 'astra_child_woo_tab_datasheets',
-             );
+            );
         }
 
         $tabs[ 'quote_request_form' ] = array(
             'title'    => __( 'Quote Request', 'astra-child' ),
             'priority' => 30,
             'callback' => 'astra_child_woo_tab_quote_request',
-         );
+        );
 
         unset( $tabs[ 'reviews' ] );
         unset( $tabs[ 'additional_information' ] );
@@ -480,7 +481,7 @@
         return array(
             'show'  => ( isset( $show[ 'to_admin' ] ) ? $show[ 'to_admin' ] : false ) || ( isset( $show[ 'to_customer' ] ) ? $show[ 'to_customer' ] : false ),
             'class' => ( isset( $show[ 'to_customer' ] ) && ! $show[ 'to_customer' ] ) ? 'price-hidden' : '',
-         );
+        );
     }
 
     add_filter( 'astra_child_show_prices', function () {
@@ -535,7 +536,7 @@
         $author = array(
             'theme_name'       => __( 'Axel Nitzschner', 'astra-child' ),
             'theme_author_url' => 'https://webpremiere.de/',
-         );
+        );
         return $author;
     }
 
