@@ -1,117 +1,117 @@
 <?php
 
-    use Kleinanzeigen\Utils;
+use Kleinanzeigen\Utils\Utils;
 
-    require_once __DIR__ . '/includes/sender-email.php';
+require_once __DIR__ . '/includes/sender-email.php';
 
-    if ( is_admin() ) {
-        require_once __DIR__ . '/includes/duplicate-content.php';
-        require_once __DIR__ . '/includes/custom-avatar.php';
-    }
+if ( is_admin() ) {
+    require_once __DIR__ . '/includes/duplicate-content.php';
+    require_once __DIR__ . '/includes/custom-avatar.php';
+}
 
-    function astra_child_init() {
-        $theme = wp_get_theme();
-        /**
-         * Define Constants
-         */
-        define( 'CHILD_THEME_VERSION', wp_get_theme()->get( 'Version' ) );
-        define( 'AJAX_FRONT_VARS', array(
-            'admin_ajax' => admin_url( 'admin-ajax.php' ),
-            'is_login'   => is_login(),
-            'user'       => json_encode( astra_child_get_current_user() ),
-            'home_url'   => home_url(),
-            'nonce'      => wp_create_nonce(),
-        ) );
-        // IUBENDA
-        define( 'IUBENDA_VARS', array(
-            'siteId'         => defined( 'IUBENDA_SITE_ID' ) ? IUBENDA_SITE_ID : '',
-            'cookiePolicyId' => defined( 'IUBENDA_COOKIE_POLICY_ID' ) ? IUBENDA_COOKIE_POLICY_ID : '',
-        ) );
-    }
-
-    add_filter( 'init', 'astra_child_init' );
-
-    function astra_child_register_ajax() {
-        // Ajax actions
-        add_action( 'wp_ajax__ajax_get_login_form', 'astra_child__ajax_get_login_form' );
-        add_action( 'wp_ajax__ajax_submit_form', 'astra_child__ajax_submit_form' );
-
-        add_action( 'wp_ajax_nopriv__ajax_get_login_form', 'astra_child__ajax_get_login_form' );
-        add_action( 'wp_ajax_nopriv__ajax_submit_form', 'astra_child__ajax_submit_form' );
-    }
-
-    add_filter( 'init', 'astra_child_register_ajax' );
-
+function astra_child_init() {
+    $theme = wp_get_theme();
     /**
-     * Change the breakpoint for Astra
-     *
-     * @return int Screen width when the header should change to the mobile header.
+     * Define Constants
      */
-    add_filter( 'astra_mobile_breakpoint', function () {
-        return 544;
-    } );
-    add_filter( 'astra_tablet_breakpoint', function () {
-        return 921;
-    } );
+    define( 'CHILD_THEME_VERSION', wp_get_theme()->get( 'Version' ) );
+    define( 'AJAX_FRONT_VARS', array(
+        'admin_ajax' => admin_url( 'admin-ajax.php' ),
+        'is_login'   => is_login(),
+        'user'       => json_encode( astra_child_get_current_user() ),
+        'home_url'   => home_url(),
+        'nonce'      => wp_create_nonce(),
+    ) );
+    // IUBENDA
+    define( 'IUBENDA_VARS', array(
+        'siteId'         => defined( 'IUBENDA_SITE_ID' ) ? IUBENDA_SITE_ID : '',
+        'cookiePolicyId' => defined( 'IUBENDA_COOKIE_POLICY_ID' ) ? IUBENDA_COOKIE_POLICY_ID : '',
+    ) );
+}
 
-    /**
-     * @return mixed
-     */
-    function astra_child_get_current_user() {
-        $cur_user = wp_get_current_user();
-        unset( $cur_user->user_pass );
-        return $cur_user;
-    }
+add_filter( 'init', 'astra_child_init' );
 
-    function astra_child__ajax_get_login_form() {
-        require_once __DIR__ . '/includes/ajax-handler.php';
+function astra_child_register_ajax() {
+    // Ajax actions
+    add_action( 'wp_ajax__ajax_get_login_form', 'astra_child__ajax_get_login_form' );
+    add_action( 'wp_ajax__ajax_submit_form', 'astra_child__ajax_submit_form' );
 
-        astra_child_get_login_form();
-    }
+    add_action( 'wp_ajax_nopriv__ajax_get_login_form', 'astra_child__ajax_get_login_form' );
+    add_action( 'wp_ajax_nopriv__ajax_submit_form', 'astra_child__ajax_submit_form' );
+}
 
-    function astra_child__ajax_submit_form() {
-        require_once __DIR__ . '/includes/ajax-handler.php';
+add_filter( 'init', 'astra_child_register_ajax' );
 
-        astra_child_submit_form();
-    }
+/**
+ * Change the breakpoint for Astra
+ *
+ * @return int Screen width when the header should change to the mobile header.
+ */
+add_filter( 'astra_mobile_breakpoint', function () {
+    return 544;
+} );
+add_filter( 'astra_tablet_breakpoint', function () {
+    return 921;
+} );
 
-    function astra_child_doing_login_ajax() {
-        return isset( $_REQUEST[ 'doing_login_ajax' ] ) ? true : false;
-    }
+/**
+ * @return mixed
+ */
+function astra_child_get_current_user() {
+    $cur_user = wp_get_current_user();
+    unset( $cur_user->user_pass );
+    return $cur_user;
+}
 
-    /**
-     * CSRF allowed domains
-     */
-    function astra_child_add_allowed_origins( $origins ) {
-        return array_merge( $origins, array(
-            'http://localhost:5173',
-            'https://dev.bretl.webpremiere.de',
-            'https://dev.auto-traktor-bretschneider.de',
-            'https://dev.auto-traktor-bretschneider.mbp',
-            'https://dev.auto-traktor-bretschneider.test',
-        ) );
-    }
+function astra_child__ajax_get_login_form() {
+    require_once __DIR__ . '/includes/ajax-handler.php';
 
-    add_filter( 'allowed_http_origins', 'astra_child_add_allowed_origins' );
+    astra_child_get_login_form();
+}
 
-    /**
-     * App asset names (e.g. *.js. *.css files) changing per app distribution
-     * This method takes care of it automatically using glob
-     */
-    function astra_child_get_themes_file( $file_path ) {
-        $regex = '/^([\w\-\/.]*)(\/wp-content\/themes[\w\-\.\/]+)/';
-        return preg_replace( $regex, '\2', glob( $file_path )[ 0 ] );
-    }
+function astra_child__ajax_submit_form() {
+    require_once __DIR__ . '/includes/ajax-handler.php';
 
-    /**
-     * Astra Child Theme functions and definitions
-     *
-     * @link https://developer.wordpress.org/themes/basics/theme-functions/
-     *
-     * @package Astra Child
-     * @since 1.0.0
-     */
-    function astra_child_add_scripts() {
+    astra_child_submit_form();
+}
+
+function astra_child_doing_login_ajax() {
+    return isset( $_REQUEST[ 'doing_login_ajax' ] ) ? true : false;
+}
+
+/**
+ * CSRF allowed domains
+ */
+function astra_child_add_allowed_origins( $origins ) {
+    return array_merge( $origins, array(
+        'http://localhost:5173',
+        'https://dev.bretl.webpremiere.de',
+        'https://dev.auto-traktor-bretschneider.de',
+        'https://dev.auto-traktor-bretschneider.mbp',
+        'https://dev.auto-traktor-bretschneider.test',
+    ) );
+}
+
+add_filter( 'allowed_http_origins', 'astra_child_add_allowed_origins' );
+
+/**
+ * App asset names (e.g. *.js. *.css files) changing per app distribution
+ * This method takes care of it automatically using glob
+ */
+function astra_child_get_themes_file( $file_path ) {
+    $regex = '/^([\w\-\/.]*)(\/wp-content\/themes[\w\-\.\/]+)/';
+    return preg_replace( $regex, '\2', glob( $file_path )[ 0 ] );
+}
+
+/**
+ * Astra Child Theme functions and definitions
+ *
+ * @link https://developer.wordpress.org/themes/basics/theme-functions/
+ *
+ * @package Astra Child
+ * @since 1.0.0
+ */
+function astra_child_add_scripts() {
     ?>
   <style type="text/css">
     #login {
@@ -552,7 +552,7 @@
      */
     function astra_child_short_description( $excerpt ) {
 
-        if ( class_exists( '\Kleinanzeigen\Utils\Kleinanzeigen_Utils' ) ) {
+        if ( class_exists( '\Kleinanzeigen\Utils\Utils' ) ) {
             return Utils::sanitize_excerpt( $excerpt, 150 );
         }
 
