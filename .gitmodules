@@ -4,7 +4,7 @@
 	url = git@github.com:anito/wp-maintenance-mode.git
 [submodule "wp-content/plugins/kleinanzeigen"]
 	path = wp-content/plugins/kleinanzeigen
-	url = git@github.com:anito/kleinanzeigen.git
+	url = https://github.com/anito/kleinanzeigen.git
 [submodule "wp-content/plugins/open-maps"]
 	path = wp-content/plugins/open-maps
 	url = git@github.com:anito/open-maps.git
@@ -13,4 +13,4 @@
 	url = git@github.com:anito/cron.git
 [submodule "wp-content/plugins/kleinanzeigen-pro"]
 	path = wp-content/plugins/kleinanzeigen-pro
-	url = git@github.com:anito/kleinanzeigen-pro.git
+	url = https://github.com/anito/kleinanzeigen-pro.git
