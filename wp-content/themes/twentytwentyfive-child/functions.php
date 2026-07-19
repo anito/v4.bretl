@@ -86,7 +86,7 @@ add_action( 'wp_enqueue_scripts', 'twentytwentyfive_child_enqueue_styles' );
 
 if ( ! function_exists( 'twentytwentyfive_child_parse_taxonomy_root_request' ) ) {
     /**
-     * @param $wp
+     * @param WP_Query $wp
      * @return null
      */
     function twentytwentyfive_child_parse_taxonomy_root_request( $wp ) {
@@ -133,9 +133,9 @@ add_action( 'parse_request', 'twentytwentyfive_child_parse_taxonomy_root_request
 
 if ( ! function_exists( 'twentytwentyfive_child_register_tax_root_rewrite' ) ):
     /**
-     * @param $name
-     * @param $types
-     * @param $tax
+     * @param string $name
+     * @param array $types
+     * @param array $tax
      * @return null
      */
     function twentytwentyfive_child_register_tax_root_rewrite( $name, $types, $tax ) {
@@ -153,11 +153,10 @@ add_action( 'registered_taxonomy', 'twentytwentyfive_child_register_tax_root_rew
 
 if ( ! function_exists( 'twentytwentyfive_child_template' ) ):
     /**
-     * @param $template
+     * @param string $template
      * @return mixed
      */
     function twentytwentyfive_child_template( $template ) {
-// if (is_tax('product_brand') && is_post_type_archive('product_brand'))
         if ( is_tax( 'product_brand' ) ) {
             return get_taxonomy_template();
         }
@@ -183,7 +182,7 @@ endif;
 /**
  *   Register mime type SVG
  *
- *   @param $mimes WP types array
+ *   @param array $mimes WP types array
  *
  *   @return array
  */
@@ -196,3 +195,8 @@ if ( ! function_exists( 'twentytwentyfive_allow_mime_type_svg' ) ):
 
 endif;
 add_filter( 'upload_mimes', 'twentytwentyfive_allow_mime_type_svg' );
+
+// Turn auto-updates on.
+add_filter( 'auto_update_plugin', '__return_true' );
+add_filter( 'auto_update_theme', '__return_true' );
+add_filter( 'auto_update_translations', '__return_true' );
