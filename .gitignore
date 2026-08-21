@@ -53,6 +53,8 @@ CVS
 !/wp-content/plugins/wp-maintenance-mode
 !/wp-content/plugins/kleinanzeigen
 !/wp-content/plugins/kleinanzeigen-pro
+!/wp-content/plugins/klassifieds-for-kleinanzeigen
+!/wp-content/plugins/klassifieds-for-kleinanzeigen-pro
 !/wp-content/plugins/open-maps
 !/wp-content/plugins/spine-app
 !/wp-content/plugins/cron
