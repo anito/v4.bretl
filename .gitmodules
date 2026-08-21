@@ -1,10 +1,4 @@
 
-[submodule "wp-content/plugins/klassifieds-for-kleinanzeigen"]
-	path = wp-content/plugins/klassifieds-for-kleinanzeigen
-	url = https://github.comanito/klassifieds-for-kleinanzeigen.git
-[submodule "wp-content/plugins/klassifieds-for-kleinanzeigen-pro"]
-	path = wp-content/plugins/klassifieds-for-kleinanzeigen-pro
-	url = https://github.comanito/klassifieds-for-kleinanzeigen.git
 [submodule "wp-content/plugins/klassifieds-for-woocommerce"]
 	path = wp-content/plugins/klassifieds-for-woocommerce
 	url = https://github.com/anito/klassifieds-for-woocommerce.git
