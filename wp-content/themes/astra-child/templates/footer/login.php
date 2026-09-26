@@ -40,9 +40,21 @@ jQuery(document).ready(function($) {
 	// Prevents flicker
 	loginEl.addClass("block");
 
+	// WordPress adds `logged-in` to <body> for authenticated users.
+	function astra_child_isLoggedIn() {
+		return $("body").hasClass("logged-in");
+	}
+
 	function astra_child_init() {
-		astra_child_initLogin();
 		astra_child_initLogout();
+
+		// Logged-in users keep the links' default behaviour, e.g. the header
+		// account link (.ast-header-account-link) goes to the account page.
+		if (astra_child_isLoggedIn()) {
+			return;
+		}
+
+		astra_child_initLogin();
 		astra_child_initForgot();
 		astra_child_initRegister();
 		astra_child_initBacktoblog();
