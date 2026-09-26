@@ -5,3 +5,6 @@
 [submodule "wp-content/plugins/klassifieds-for-woocommerce-pro"]
 	path = wp-content/plugins/klassifieds-for-woocommerce-pro
 	url = https://github.com/anito/klassifieds-for-woocommerce-pro.git
+[submodule "wp-content/plugins/kleinanzeigen-license-bridge"]
+	path = wp-content/plugins/kleinanzeigen-license-bridge
+	url = git@github.com:anito/kleinanzeigen-license-bridge.git
