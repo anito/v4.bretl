@@ -8,3 +8,6 @@
 [submodule "wp-content/plugins/kleinanzeigen-license-bridge"]
 	path = wp-content/plugins/kleinanzeigen-license-bridge
 	url = git@github.com:anito/kleinanzeigen-license-bridge.git
+[submodule "wp-content/themes/astra-child"]
+	path = wp-content/themes/astra-child
+	url = git@github.com:anito/astra-child.git
