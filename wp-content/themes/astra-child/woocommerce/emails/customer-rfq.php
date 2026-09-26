@@ -31,9 +31,9 @@ do_action('woocommerce_email_header', $email_heading, $email); ?>
 <p><?php printf(esc_html__('Just to let you know &mdash; we\'ve received your order #%s, and it is now being processed:', 'woocommerce'), esc_html($order->get_order_number())); ?></p>
 
 <?php
-add_filter('wbp_woo_show_prices_customer_email', function($args) {
+add_filter('astra_child_woo_show_prices_customer_email', function($args) {
     return array(
-        'to_customer' => apply_filters('wbp_show_prices', 1)
+        'to_customer' => apply_filters('astra_child_show_prices', 1)
     );
 });
 add_filter('woocommerce_email_order_items_args', function ($args) {
