@@ -1,4 +1,4 @@
-const wbp_observe = (function () {
+const astra_child_observe = (function () {
 	const MutationObserver =
 		window.MutationObserver || window.WebKitMutationObserver;
 
@@ -96,7 +96,7 @@ jQuery.noConflict();
 			const storeEl = el?.dataset.store === storeName ? el : null;
 			if (storeEl) {
 				copyToTarget();
-				wbp_observe(storeEl, observerCallback);
+				astra_child_observe(storeEl, observerCallback);
 			}
 		};
 

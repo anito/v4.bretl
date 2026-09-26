@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $email_improvements_enabled = FeaturesUtil::feature_is_enabled( 'email_improvements' );
 
-add_filter('wbp_woo_show_prices_customer_email', function ($args) {
+add_filter('astra_child_woo_show_prices_customer_email', function ($args) {
 	return array(
 		'to_customer' => true
 	);

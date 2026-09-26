@@ -59,7 +59,7 @@ do_action( 'woocommerce_email_before_order_table', $order, $sent_to_admin, $plai
 	}
 	/* translators: %s: Order ID. */
 	$order_number_string = __( '[Order #%s]', 'woocommerce' );
-	$show_price = apply_filters('wbp_woo_show_prices_customer_email', $sent_to_admin);
+	$show_price = apply_filters('astra_child_woo_show_prices_customer_email', $sent_to_admin);
 	$price_visibility = astra_child_get_price_visibility($show_price);
 	$price_hidden = !$price_visibility['show'];
 	$price_hidden_class = $price_visibility['class'];

@@ -28,10 +28,10 @@ do_action('woocommerce_email_header', $email_heading, $email); ?>
     ?></p>
 <?php
 
-add_filter('wbp_woo_show_prices_customer_email', function($args) {
+add_filter('astra_child_woo_show_prices_customer_email', function($args) {
     return array(
         'to_admin' => true,
-        'to_customer' => apply_filters('wbp_show_prices', 1)
+        'to_customer' => apply_filters('astra_child_show_prices', 1)
     );
 });
 /*
