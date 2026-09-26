@@ -211,7 +211,19 @@ function astra_child_add_login_scripts() {
 	}
 
 	wp_dequeue_style( 'login' );
+	// The modal's host page already loads jQuery.
 	wp_deregister_script( 'jquery' );
+
+	// wp-login.php enqueues `user-profile` (which needs jQuery) after this hook,
+	// so drop it right before the footer scripts print. js/login.js provides
+	// the show-password toggle instead.
+	add_action(
+		'login_footer',
+		function () {
+			wp_dequeue_script( 'user-profile' );
+		},
+		19
+	);
 
 	wp_enqueue_script( 'login', get_stylesheet_directory_uri() . '/js/login.js', array(), CHILD_THEME_VERSION, true );
 	wp_enqueue_style( 'dashicons', ABSPATH . WPINC . '/css/dashicons.min.css', array() );
